@@ -1,0 +1,115 @@
+@startuml
+title Activity Diagram (Swimlane) - Cancel Order
+
+partition "UI (OrderDetailPage)" {
+    start
+    :Mở trang chi tiết đơn hàng;
+    :Nhấn "Hủy đơn hàng";
+    :Hiển thị popup xác nhận;
+
+    if (Khách hàng không xác nhận) then (Có)
+        stop
+    endif
+
+    :Gửi request cancelOrder(orderId, reason);
+}
+
+partition "System (Controller + Service)" {
+
+    :Validate orderId và quyền sở hữu;
+
+    if (Đơn không tồn tại\nhoặc không thuộc khách hàng?) then (Có)
+        :Trả lỗi không hợp lệ;
+    else (Không)
+        :Kiểm tra trạng thái đơn hàng;
+    endif
+
+    if (Không đủ điều kiện hủy?) then (Có)
+        :Trả lỗi không thể hủy;
+    else (Không)
+        :Bắt đầu DB Transaction;
+    endif
+}
+
+partition "UI (OrderDetailPage)" {
+
+    if (Đơn không hợp lệ?) then (Có)
+        :Hiển thị lỗi\n(Không tồn tại hoặc không thuộc quyền);
+        stop
+    endif
+
+    if (Không đủ điều kiện hủy?) then (Có)
+        :Hiển thị thông báo không thể hủy;
+        stop
+    endif
+}
+
+partition "DB (OrderRepository + MySQL)" {
+
+    :UPDATE orders SET status='CANCELLED';
+    :INSERT cancel_log (reason, time, user);
+
+    if (Đơn đã thanh toán online?) then (Có)
+        :UPDATE refund_status='PENDING';
+    endif
+}
+
+partition "System (Controller + Service)" {
+
+    if (Lỗi khi cập nhật DB?) then (Có)
+        :ROLLBACK transaction;
+        :Trả lỗi hệ thống;
+    else (Không)
+        :COMMIT transaction;
+    endif
+}
+
+partition "UI (OrderDetailPage)" {
+    if (Lỗi hệ thống?) then (Có)
+        :Hiển thị lỗi hệ thống;
+        stop
+    endif
+}
+
+partition "System (Controller + Service)" {
+
+    if (Đơn đã thanh toán online?) then (Có)
+        :Gửi yêu cầu refund đến Payment Gateway;
+    endif
+}
+
+partition "Payment Gateway (Refund)" {
+
+    if (Refund thành công?) then (Có)
+        :Gửi callback REFUND_SUCCESS;
+    else (Không)
+        :Gửi callback REFUND_FAILED;
+    endif
+}
+
+partition "System (Refund Callback Endpoint)" {
+
+    :Nhận callback refund;
+    :Xác thực chữ ký;
+
+    if (Chữ ký không hợp lệ?) then (Có)
+        stop
+    endif
+
+    if (Refund thành công?) then (Có)
+        :UPDATE refund_status='COMPLETED';
+    else (Không)
+        :UPDATE refund_status='FAILED';
+    endif
+}
+
+partition "DB (OrderRepository + MySQL)" {
+    :UPDATE refund_status;
+}
+
+partition "UI (OrderDetailPage)" {
+    :Hiển thị hủy đơn hàng thành công;
+    stop
+}
+
+@enduml

@@ -1,0 +1,116 @@
+@startuml
+title Activity Diagram (Swimlane) - Place Order
+
+partition "UI (CheckoutPage)" {
+    start
+    :Truy cập giỏ hàng / Mua ngay;
+}
+
+partition "System (Controller + Service)" {
+    :Lấy danh sách sản phẩm;
+}
+
+partition "DB (CartRepository + ProductRepository)" {
+    :SELECT sản phẩm;
+    :Trả về dữ liệu;
+}
+
+partition "System (Controller + Service)" {
+
+    :Kiểm tra tồn tại và tồn kho;
+
+    if (Sản phẩm không hợp lệ?) then (Có)
+        :Trả thông báo lỗi;
+    else (Không)
+        :Chuẩn bị dữ liệu hiển thị;
+    endif
+}
+
+partition "UI (CheckoutPage)" {
+
+    if (Có lỗi sản phẩm?) then (Có)
+        :Hiển thị lỗi;
+        stop
+    else (Không)
+        :Hiển thị giao diện xác nhận đơn hàng;
+    endif
+
+    :Khách hàng kiểm tra & xác nhận\nthông tin giao hàng;
+    :Khách hàng chọn áp dụng mã giảm giá;
+}
+
+partition "System (Controller + Service)" {
+
+    if (Có mã giảm giá?) then (Có)
+        :Thực hiện UC "Sử dụng mã giảm giá";
+    else (Không)
+    endif
+}
+
+partition "UI (CheckoutPage)" {
+
+    :Khách hàng chọn phương thức thanh toán;
+
+    :Nhấn "Đặt hàng";
+    :Gửi request createOrder();
+}
+
+partition "System (Controller + Service)" {
+
+    :Kiểm tra tính hợp lệ đơn hàng:
+    - Thông tin giao hàng
+    - Sản phẩm còn tồn tại
+    - Tồn kho hiện tại
+    - Voucher;
+
+    if (Thông tin giao hàng không hợp lệ?) then (Có)
+        :Trả lỗi thông tin giao hàng;
+    else (Không)
+
+        if (Giỏ hàng trống hoặc sản phẩm hết hàng?) then (Có)
+            :Trả lỗi sản phẩm;
+        else (Không)
+
+            :Tạo đơn hàng;
+
+            if (Thanh toán online?) then (Có)
+                :Set status = PENDING_PAYMENT;
+            else (Không)
+                :Set status = CONFIRMED;
+            endif
+        endif
+    endif
+}
+
+partition "DB (OrderRepository + MySQL)" {
+    :INSERT order;
+    :INSERT order_items;
+    :Trả kết quả;
+}
+
+partition "System (Controller + Service)" {
+
+    if (Lưu thất bại?) then (Có)
+        :Rollback;
+        :Trả lỗi hệ thống;
+    else (Thành công)
+        :Trả kết quả thành công;
+    endif
+}
+
+partition "UI (CheckoutPage)" {
+
+    if (Có lỗi?) then (Có)
+        :Hiển thị thông báo lỗi;
+        stop
+    else (Không)
+        if (Thanh toán online?) then (Có)
+            :Hiển thị "Đơn hàng đã tạo.\nVui lòng thanh toán";
+        else (Không)
+            :Hiển thị "Đặt hàng thành công";
+        endif
+        stop
+    endif
+}
+
+@enduml

@@ -1,0 +1,115 @@
+@startuml
+title Activity Diagram (Swimlane) - Process Return Request
+'https://plantuml.com/activity-diagram-beta
+
+partition "UI (ReturnRequestManagementPage)" {
+
+    start
+    :Mở chức năng Quản lý yêu cầu hoàn trả;
+    :Hiển thị danh sách yêu cầu (Chờ duyệt);
+    :Chọn một yêu cầu;
+
+    :Gửi request getReturnRequestDetail(requestId);
+}
+
+partition "System (Controller + Service)" {
+
+    :Validate requestId;
+
+    if (Yêu cầu không tồn tại?) then (Có)
+        :Trả lỗi không hợp lệ;
+    else (Không)
+        :Kiểm tra trạng thái yêu cầu;
+    endif
+
+    if (Không ở trạng thái "Chờ duyệt"?) then (Có)
+        :Trả lỗi đã xử lý trước đó;
+    else (Không)
+        :Truy vấn chi tiết yêu cầu;
+    endif
+}
+
+partition "UI (ReturnRequestManagementPage)" {
+
+    if (Yêu cầu không hợp lệ?) then (Có)
+        :Hiển thị lỗi;
+        stop
+    endif
+
+    if (Đã xử lý trước đó?) then (Có)
+        :Hiển thị thông báo không thể xử lý lại;
+        stop
+    endif
+
+    :Hiển thị thông tin chi tiết;
+    :Chủ cửa hàng kiểm tra điều kiện\nhoàn trả theo chính sách;
+    :Chủ cửa hàng chọn Chấp nhận hoặc Từ chối;
+}
+
+partition "System (Controller + Service)" {
+
+    :Bắt đầu DB Transaction;
+
+    if (Chủ cửa hàng chọn Chấp nhận?) then (Có)
+
+        :Kiểm tra điều kiện theo chính sách hệ thống;
+
+        if (Không đủ điều kiện?) then (Có)
+            :ROLLBACK transaction;
+            :Trả lỗi không đủ điều kiện;
+            stop
+        else (Không)
+            :Cập nhật trạng thái = APPROVED;
+        endif
+    else (Không)
+        :Cập nhật trạng thái = REJECTED;
+        :Lưu lý do từ chối;
+    endif
+
+    :Ghi nhận người xử lý và thời gian xử lý;
+}
+
+partition "DB (ReturnRequestRepository + MySQL)" {
+
+    :UPDATE return_requests SET status;
+    :INSERT return_request_log (processor, time, reason);
+
+}
+
+partition "System (Controller + Service)" {
+
+    if (Lỗi khi cập nhật DB?) then (Có)
+        :ROLLBACK transaction;
+        :Trả lỗi hệ thống;
+    else (Không)
+        :COMMIT transaction;
+    endif
+}
+
+partition "UI (ReturnRequestManagementPage)" {
+
+    if (Lỗi hệ thống?) then (Có)
+        :Hiển thị lỗi hệ thống;
+        stop
+    endif
+}
+
+partition "System (Controller + Service)" {
+
+    if (Trạng thái = APPROVED?) then (Có)
+        :Chuyển sang quy trình tiếp theo\n(Chờ nhận hàng / Hoàn tiền);
+    endif
+
+    :Gửi thông báo kết quả cho khách hàng;
+}
+
+partition "Notification Service" {
+    :Gửi thông báo (APPROVED/REJECTED);
+}
+
+partition "UI (ReturnRequestManagementPage)" {
+    :Hiển thị xử lý thành công;
+    stop
+}
+
+@enduml

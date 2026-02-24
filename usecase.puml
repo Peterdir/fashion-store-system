@@ -1,0 +1,103 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Khách hàng" as Customer
+actor "Chủ cửa hàng" as Owner
+
+rectangle "Hệ thống bán hàng thời trang" {
+
+  package "Tài khoản" {
+    (Đăng ký)
+    (Đăng nhập)
+    (Đăng xuất)
+    (Quên mật khẩu)
+    (Đổi mật khẩu)
+    (Quản lý thông tin cá nhân)
+    (Đổi số điện thoại)
+    (Xác thực 2 bước)
+    (Xác thực tài khoản)
+    (Lịch sử đơn hàng)
+  }
+
+  package "Mua sắm" {
+    (Xem sản phẩm)
+    (Tìm kiếm sản phẩm)
+    (Xem chi tiết sản phẩm)
+    (Đặt hàng)
+    (Thanh toán)
+    (Thu thập mã giảm giá)
+    (Áp dụng mã giảm giá)
+    (Quản lý giỏ hàng)
+    (Chọn thông tin nhận hàng)
+    (Quản lý mục yêu thích)
+    (Theo dõi trạng thái đơn hàng)
+    (Thêm vào giỏ hàng)
+    (Thêm vào mục yêu thích)
+  }
+
+  package "Hậu mãi" {
+    (Đánh giá sản phẩm)
+    (Gửi yêu cầu hoàn trả)
+    (Hủy đơn hàng)
+  }
+
+  package "Quản lý cửa hàng" {
+    (Quản lý sản phẩm)
+    (Quản lý khách hàng)
+    (Quản lý mã giảm giá)
+    (Quản lý đơn hàng)
+    (Xử lý yêu cầu hoàn trả)
+    (Thống kê doanh thu)
+    (Ghi nhận bán hàng trực tiếp)
+    (Xuất báo cáo doanh thu)
+  }
+
+  "Tài khoản" -[hidden]--> "Mua sắm"
+  "Mua sắm" -[hidden]--> "Hậu mãi"
+  "Hậu mãi" -[hidden]--> "Quản lý cửa hàng"
+}
+
+Customer -- (Đăng ký)
+Customer -- (Đăng nhập)
+Customer -- (Đăng xuất)
+Customer -- (Quản lý thông tin cá nhân)
+Customer -- (Xem sản phẩm)
+Customer -- (Quản lý mục yêu thích)
+Customer -- (Quản lý giỏ hàng)
+Customer -- (Đặt hàng)
+Customer -- (Thu thập mã giảm giá)
+Customer -- (Áp dụng mã giảm giá)
+Customer -- (Đánh giá sản phẩm)
+Customer -- (Gửi yêu cầu hoàn trả)
+Customer -- (Theo dõi trạng thái đơn hàng)
+Customer -- (Hủy đơn hàng)
+Customer -- (Lịch sử đơn hàng)
+
+(Đăng nhập) -- Owner
+(Đăng xuất) -- Owner
+(Quản lý thông tin cá nhân) -- Owner
+(Quản lý sản phẩm) -- Owner
+(Quản lý khách hàng) -- Owner
+(Quản lý mã giảm giá) -- Owner
+(Quản lý đơn hàng) -- Owner
+(Xử lý yêu cầu hoàn trả) -- Owner
+(Thống kê doanh thu) -- Owner
+(Ghi nhận bán hàng trực tiếp) -- Owner
+(Xem sản phẩm) -- Owner
+
+(Đặt hàng) .> (Quản lý giỏ hàng) : <<extend>>
+(Áp dụng mã giảm giá) .> (Đặt hàng) : <<extend>>
+(Chọn thông tin nhận hàng) .> (Đặt hàng) : <<include>>
+(Xác thực 2 bước) .> (Quản lý thông tin cá nhân) : <<extend>>
+(Đổi số điện thoại) .> (Quản lý thông tin cá nhân) : <<extend>>
+(Đổi mật khẩu) .> (Quản lý thông tin cá nhân) : <<extend>>
+(Xác thực tài khoản) .> (Đăng ký) : <<include>>
+(Quên mật khẩu) .> (Đăng nhập) : <<extend>>
+(Xem chi tiết sản phẩm) .> (Xem sản phẩm) : <<extend>>
+(Xuất báo cáo doanh thu) .> (Thống kê doanh thu) : <<extend>>
+(Tìm kiếm sản phẩm) .> (Xem sản phẩm) : <<extend>>
+(Thêm vào giỏ hàng) .> (Xem chi tiết sản phẩm) : <<extend>>
+(Thêm vào mục yêu thích) .> (Xem chi tiết sản phẩm) : <<extend>>
+
+@enduml

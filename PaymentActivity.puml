@@ -1,0 +1,120 @@
+@startuml
+title Activity Diagram (Swimlane) - Payment
+'https://plantuml.com/activity-diagram-beta
+
+partition "UI (PaymentPage)" {
+    start
+    :Mở chức năng thanh toán;
+    :Gửi request getOrder(orderId);
+}
+
+partition "System (Controller + Service)" {
+    :Kiểm tra trạng thái đơn hàng;
+
+    if (Không cho phép thanh toán?) then (Có)
+        :Tạo thông báo không thể thanh toán;
+    else (Không)
+            :Kiểm tra payment_deadline;
+    endif
+
+    if (Đã quá 10 phút?) then (Có)
+        :Cập nhật trạng thái = EXPIRED;
+        :Trả kết quả hết hạn;
+    else (Không)
+        :Trả thông tin đơn hàng;
+    endif
+}
+
+partition "UI (PaymentPage)" {
+    if (Không thể thanh toán?) then (Có)
+        :Hiển thị thông báo;
+        stop
+    endif
+
+    if (Đơn hết hạn?) then (Có)
+        :Hiển thị hết hạn thanh toán;
+        stop
+    endif
+
+    :Hiển thị thông tin đơn hàng;
+}
+
+repeat
+
+partition "UI (PaymentPage)" {
+    :Chọn / thay đổi phương thức thanh toán;
+
+    if (Khách hàng hủy?) then (Có)
+        stop
+    endif
+
+    :Gửi request createPayment(method);
+}
+
+partition "System (Controller + Service)" {
+    :Kiểm tra phương thức;
+
+    if (Không hợp lệ?) then (Có)
+        :Trả lỗi phương thức;
+    else (Không)
+        :Tạo bản ghi transaction (PENDING);
+        :Tạo URL thanh toán;
+        :Trả về URL redirect;
+    endif
+}
+
+partition "UI (PaymentPage)" {
+    if (Phương thức lỗi?) then (Có)
+        :Hiển thị lỗi;
+    else (Không)
+        :Redirect sang Payment Gateway;
+    endif
+}
+
+partition "Payment Gateway" {
+    :Người dùng nhập thông tin thanh toán;
+    :Xử lý giao dịch;
+
+    if (Thanh toán thành công?) then (Có)
+        :Gửi callback SUCCESS;
+    else (Không)
+        :Gửi callback FAILED;
+    endif
+}
+
+partition "System (Callback Endpoint)" {
+    :Nhận callback;
+    :Xác thực chữ ký;
+
+    if (Chữ ký không hợp lệ?) then (Có)
+        :Từ chối xử lý;
+        stop
+    endif
+
+    if (Thanh toán thành công?) then (Có)
+        :Cập nhật order = PAID;
+        :Cập nhật transaction = SUCCESS;
+    else (Không)
+        :Cập nhật order = FAILED;
+        :Cập nhật transaction = FAILED;
+    endif
+}
+
+partition "DB (OrderRepository + MySQL)" {
+    :UPDATE orders;
+    :UPDATE transactions;
+}
+
+partition "UI (PaymentResultPage)" {
+    if (Thanh toán thành công?) then (Có)
+        :Hiển thị thanh toán thành công;
+        stop
+    else (Không)
+        :Hiển thị thanh toán thất bại;
+    endif
+}
+
+repeat while (Chưa hết 10 phút và chưa thanh toán thành công?)
+
+stop
+@enduml

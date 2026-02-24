@@ -1,0 +1,111 @@
+@startuml
+title Activity Diagram (Swimlane) - Register
+
+partition "UI (RegisterPage)" {
+    start
+    :Mở trang đăng ký;
+    :Nhập thông tin (username, email, password,...);
+    :Nhấn "Đăng ký";
+    :Gửi request register(data);
+}
+
+partition "System (Controller + Service)" {
+    :Validate dữ liệu đầu vào;
+
+    if (Thiếu hoặc sai định dạng?) then (Có)
+        :Trả lỗi validate;
+    else (Không)
+        :Kiểm tra trùng username/email/phone;
+    endif
+
+    if (Thông tin đã tồn tại?) then (Có)
+        :Trả lỗi trùng dữ liệu;
+    else (Không)
+        :Bắt đầu DB transaction;
+    endif
+}
+
+partition "UI (RegisterPage)" {
+
+    if (Lỗi validate?) then (Có)
+        :Hiển thị lỗi nhập liệu;
+        stop
+    endif
+
+    if (Lỗi trùng dữ liệu?) then (Có)
+        :Hiển thị thông báo trùng;
+        stop
+    endif
+}
+
+partition "System (Controller + Service)" {
+    :Mã hóa mật khẩu;
+    :Tạo verification token;
+    :Tính expired_time;
+}
+
+partition "DB (UserRepository + MySQL)" {
+    :INSERT user (status='PENDING');
+    :INSERT verification_token (user_id, token, expired_time);
+}
+
+partition "System (Controller + Service)" {
+
+    if (Lỗi khi lưu DB?) then (Có)
+        :ROLLBACK transaction;
+        :Trả lỗi hệ thống;
+    else (Không)
+        :COMMIT transaction;
+    endif
+}
+
+partition "UI (RegisterPage)" {
+    if (Lỗi hệ thống?) then (Có)
+        :Hiển thị lỗi hệ thống;
+        stop
+    endif
+}
+
+partition "System (Email Service)" {
+    :Tạo link verify?token=xxx;
+    :Gửi email chứa verification link;
+
+    if (Gửi email thất bại?) then (Có)
+        :Ghi log lỗi gửi email;
+    endif
+}
+
+partition "UI (RegisterPage)" {
+    :Hiển thị đăng ký thành công;
+    :Hiển thị nút "Gửi lại mã xác thực";
+}
+
+partition "UI (RegisterPage)" {
+    if (Người dùng chọn gửi lại?) then (Có)
+        :Gửi request resendVerification;
+    else (Không)
+        stop
+    endif
+}
+
+partition "System (Controller + Service)" {
+    :Kiểm tra user còn PENDING?;
+    :Tạo token mới;
+}
+
+partition "DB (UserRepository + MySQL)" {
+    :DELETE token cũ;
+    :INSERT verification_token (user_id, token, expired_time);
+}
+
+partition "System (Email Service)" {
+    :Tạo link verify?token=newToken;
+    :Gửi lại email chứa verification link;
+}
+
+partition "UI (RegisterPage)" {
+    :Hiển thị gửi lại thành công;
+    stop
+}
+
+@enduml
