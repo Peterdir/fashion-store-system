@@ -1,0 +1,79 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Customer" as C
+actor "Owner" as O
+
+rectangle "Fashion store system" {
+    usecase "Registration" as UC01
+    usecase "Login" as UC02
+    usecase "Forgot Password" as UC03
+    usecase "Logout" as UC04
+    usecase "Two-factor Authentication" as UC05
+    usecase "Change Password" as UC06
+    usecase "Manage Personal Information" as UC07
+    usecase "Order History" as UC08
+    usecase "View Products" as UC09
+    usecase "View Product Details" as UC10
+    usecase "Place Order" as UC11
+    usecase "Payment" as UC12
+    usecase "Claim Coupon" as UC13
+    usecase "Apply Discount Coupon" as UC14
+    usecase "Manage Shopping Cart" as UC15
+    usecase "Manage Wishlist" as UC16
+    usecase "Add To Favourites" as UC17
+    usecase "Add To Cart" as UC18
+    usecase "Track Order Status" as UC19
+    usecase "Cancel Order" as UC20
+    usecase "Product Preview" as UC21
+    usecase "Submit Return Request" as UC22
+    usecase "Product Management" as UC23
+    usecase "Customer Management" as UC24
+    usecase "Discount Management" as UC25
+    usecase "Order Management" as UC26
+    usecase "Process Return Requests" as UC27
+    usecase "Record In-store Sale" as UC28
+    usecase "Revenue Statistics" as UC29
+    usecase "Export Revenue Report" as UC30
+    usecase "Account Verification" as UC31
+
+    'Mối quan hệ giữa các Use Cases
+    UC03 ..> UC02 : <<extends>>
+    UC05 ..> UC07 : <<extends>>
+    UC06 ..> UC07 : <<extends>>
+    UC10 ..> UC09 : <<extends>>
+    UC11 ..> UC15 : <<extends>>
+    UC14 ..> UC11 : <<extends>>
+    UC17 ..> UC10 : <<extends>>
+    UC18 ..> UC10 : <<extends>>
+    UC30 ..> UC29 : <<extends>>
+    UC31 ..> UC01 : <<include>>
+}
+
+'Kết nối Actor với Use Cases
+C -- UC01
+C -- UC02
+C -- UC04
+C -- UC07
+C -- UC08
+C -- UC09
+C -- UC12
+C -- UC13
+C -- UC14
+C -- UC15
+C -- UC16
+C -- UC19
+C -- UC20
+C -- UC21
+C -- UC22
+
+O -- UC23
+O -- UC24
+O -- UC25
+O -- UC26
+O -- UC27
+O -- UC28
+O -- UC29
+
+@enduml
