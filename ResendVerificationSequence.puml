@@ -1,15 +1,36 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+title Sequence Diagram - Resend Verification
 
-autonumber
+actor "Khách hàng" as User
 
-== Initialization ==
+boundary "RegisterPage" as UI
+control "AuthController" as C
+control "AuthService" as S
+entity "UserRepository" as UR
+entity "VerificationTokenRepository" as TR
+database "MySQL" as DB
+participant "EmailService" as Mail
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+User -> UI : Click "Gửi lại mã"
+UI -> C : resendVerification(userId)
+C -> S : resendVerification(userId)
 
-== Repetition ==
+S -> UR : findById(userId)
+UR -> DB : SELECT user
+DB --> UR 
+UR --> S
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+S -> TR : deleteOldToken(userId)
+TR -> DB : DELETE token
+
+S -> S : generateNewToken()
+
+S -> TR : save(newToken)
+TR -> DB : INSERT token
+
+S -> Mail : sendVerificationEmail(newToken)
+
+C --> UI : showResendSuccess()
+UI --> User : Hiển thị gửi lại thành công
+
 @enduml

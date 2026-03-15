@@ -1,37 +1,37 @@
 @startuml
-'https://plantuml.com/activity-diagram-beta
+title Activity Diagram (Swimlane) - ViewProducts (UC09)
 
+|Client (UI)|
 start
-:ClickServlet.handleRequest();
-:new page;
-if (Page.onSecurityCheck) then (true)
-  :Page.onInit();
-  if (isForward?) then (no)
-    :Process controls;
-    if (continue processing?) then (no)
-      stop
-    endif
-
-    if (isPost?) then (yes)
-      :Page.onPost();
-    else (no)
-      :Page.onGet();
-    endif
-    :Page.onRender();
-  endif
-else (false)
+:Truy cập trang sản phẩm;
+if (Người dùng có nhập từ khóa?) then (Có)
+    |System (Service)|
+    :Gửi yêu cầu tìm kiếm;
+    |Database (MySQL)|
+    :Truy xuất dữ liệu theo từ khóa;
+else (Không)
+    |System (Service)|
+    :Gửi yêu cầu lấy toàn bộ sản phẩm;
+    |Database (MySQL)|
+    :Truy xuất toàn bộ dữ liệu;
 endif
 
-if (do redirect?) then (yes)
-  :redirect process;
-else
-  if (do forward?) then (yes)
-    :Forward request;
-  else (no)
-    :Render page template;
-  endif
+|System (Service)|
+''' Kiểm tra Lỗi tải dữ liệu '''
+if (Lỗi kết nối database?) then (Có)
+    |Client (UI)|
+        :Hiển thị thông báo lỗi;
+        stop
+else (Không)
+    |System (Service)|
+    ''' Kiểm tra không có sản phẩm '''
+    if (Có dữ liệu trả về?) then (Không)
+        |Client (UI)|
+        :Hiển thị thông báo "Không có sản phẩm";
+    else (Có)
+        |Client (UI)|
+        :Hiển thị danh sách sản phẩm;
+    endif
 endif
-
 stop
-
 @enduml

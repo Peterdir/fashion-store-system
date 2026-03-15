@@ -1,37 +1,69 @@
 @startuml
-'https://plantuml.com/activity-diagram-beta
+title Activity Diagram (Swimlane) - Registration (UC01)
 
+|Client (UI)|
 start
-:ClickServlet.handleRequest();
-:new page;
-if (Page.onSecurityCheck) then (true)
-  :Page.onInit();
-  if (isForward?) then (no)
-    :Process controls;
-    if (continue processing?) then (no)
-      stop
-    endif
+:Mở trang đăng ký;
+:Nhập thông tin (username, email, password,...);
+:Nhấn "Đăng ký";
+:Gửi request register(data);
 
-    if (isPost?) then (yes)
-      :Page.onPost();
-    else (no)
-      :Page.onGet();
+|System (Service)|
+:Validate thông tin đăng ký;
+
+if (Thông tin hợp lệ?) then (Không)
+    |Client (UI)|
+    :Hiển thị lỗi validate;
+    stop
+else (Có)
+    |System (Service)|
+    :Kiểm tra trùng username/email;
+
+    if (Thông tin đã tồn tại?) then (Có)
+        |Client (UI)|
+        :Hiển thị thông báo trùng dữ liệu;
+        stop
+    else (Không)
+        |System (Service)|
+        :Bắt đầu DB transaction;
+        :Mã hóa mật khẩu;
+        :Tạo verification token;
+
+        |Database (MySQL)|
+        :Lưu user (status = PENDING);
+        :Lưu verification token;
+
+        |System (Service)|
+        if (Lưu DB thành công?) then (Có)
+            :COMMIT transaction;
+            |Email Service|
+            :Tạo link verify?token=xxx;
+            :Gửi email xác thực;
+            |Client (UI)|
+            :Hiển thị đăng ký thành công;
+            :Yêu cầu kiểm tra email;
+        else (Không)
+            |System (Service)|
+            :ROLLBACK transaction;
+            |Client (UI)|
+            :Hiển thị lỗi hệ thống;
+            stop
+        endif
     endif
-    :Page.onRender();
-  endif
-else (false)
 endif
 
-if (do redirect?) then (yes)
-  :redirect process;
-else
-  if (do forward?) then (yes)
-    :Forward request;
-  else (no)
-    :Render page template;
-  endif
+|Client (UI)|
+if (Người dùng chọn "Gửi lại mã"?) then (Có)
+    :Gửi request resendVerification;
+    |System (Service)|
+    :Tạo token mới;
+    |Database (MySQL)|
+    :Cập nhật token;
+    |Email Service|
+    :Gửi lại email;
+    |Client (UI)|
+    :Thông báo đã gửi lại;
 endif
 
 stop
-
 @enduml

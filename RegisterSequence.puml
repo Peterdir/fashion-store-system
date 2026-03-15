@@ -1,15 +1,71 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+title Sequence Diagram - Register (Website bán hàng thời trang)
 
-autonumber
+actor "Khách hàng" as User
 
-== Initialization ==
+boundary "RegisterPage\n<<boundary>>" as UI
+control "AuthController\n<<control>>" as C
+control "AuthService\n<<control>>" as S
+entity "UserRepository\n<<entity>>" as UR
+entity "VerificationTokenRepository\n<<entity>>" as TR
+database "MySQL" as DB
+participant "EmailService\n<<external>>" as Mail
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+== Submit Register ==
+User -> UI : Nhập thông tin + Click Đăng ký
+UI -> C : register(formData)
+C -> S : register(formData)
 
-== Repetition ==
+== Validate dữ liệu ==
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+S -> S : validate(formData)
+
+alt Validation error
+    S --> C : errors
+    C --> UI : showValidationErrors()
+    UI --> User : Hiển thị lỗi
+else Valid
+    == Check duplicate ==
+    S -> UR : existsByEmail(email)
+    UR -> DB : SELECT ...
+    DB --> UR : result
+    UR --> S : true/false
+
+    alt Email đã tồn tại
+        S --> C : duplicateError
+        C --> UI : showDuplicateError()
+        UI --> User : Hiển thị trùng email
+    else Email chưa tồn tại
+
+        == Tạo user + token ==
+        S -> S : hashPassword()
+        S -> S : generateVerificationToken()
+        S -> S : calculateExpiredTime()
+
+        == Lưu DB ==
+        S -> UR : save(user status=PENDING)
+        UR -> DB : INSERT user
+        DB --> UR : userId
+        UR --> S : userId
+
+        S -> TR : save(token)
+        TR -> DB : INSERT token
+        DB --> TR : OK
+        TR --> S : OK
+
+        alt Lỗi DB
+            S --> C : systemError
+            C --> UI : showSystemError()
+            UI --> User : Hiển thị lỗi hệ thống
+        else Thành công
+            == Gửi email ==
+            S -> Mail : sendVerificationEmail(token)
+            Mail --> S : OK/Fail
+
+            C --> UI : showRegisterSuccess()
+            UI --> User : Hiển thị đăng ký thành công
+        end
+    end
+end
+
 @enduml

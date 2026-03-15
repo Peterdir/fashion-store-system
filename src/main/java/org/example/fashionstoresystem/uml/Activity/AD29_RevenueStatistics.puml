@@ -1,37 +1,39 @@
 @startuml
-'https://plantuml.com/activity-diagram-beta
+title Activity Diagram (Swimlane) - Revenue Statistics (UC29)
 
+|Owner (UI)|
 start
-:ClickServlet.handleRequest();
-:new page;
-if (Page.onSecurityCheck) then (true)
-  :Page.onInit();
-  if (isForward?) then (no)
-    :Process controls;
-    if (continue processing?) then (no)
-      stop
-    endif
+:Chọn chức năng "Thống kê doanh thu";
+:Hiển thị giao diện chọn khoảng thời gian;
+:Chọn ngày/tháng/năm & nhấn "Xem thống kê";
 
-    if (isPost?) then (yes)
-      :Page.onPost();
-    else (no)
-      :Page.onGet();
-    endif
-    :Page.onRender();
-  endif
-else (false)
-endif
+|System (Service)|
+:Nhận yêu cầu & khoảng thời gian;
 
-if (do redirect?) then (yes)
-  :redirect process;
-else
-  if (do forward?) then (yes)
-    :Forward request;
-  else (no)
-    :Render page template;
-  endif
+|Database (MySQL)|
+:Truy vấn doanh thu Online (Orders);
+:Truy vấn doanh thu Offline (Invoices);
+
+|System (Service)|
+if (Có dữ liệu trả về?) then (Không)
+    |Owner (UI)|
+    :Hiển thị: "Không có dữ liệu trong khoảng thời gian này";
+    stop
+else (Có)
+    |System (Service)|
+    :Tổng hợp tổng doanh thu & số lượng đơn;
+    :Xử lý dữ liệu để vẽ biểu đồ;
+
+    if (Lỗi truy xuất?) then (Có)
+        |Owner (UI)|
+        :Hiển thị thông báo lỗi hệ thống;
+        stop
+    else (Thành công)
+        |Owner (UI)|
+        :Hiển thị Tổng doanh thu & Số lượng đơn;
+        :Hiển thị Biểu đồ minh họa trực quan;
+    endif
 endif
 
 stop
-
 @enduml

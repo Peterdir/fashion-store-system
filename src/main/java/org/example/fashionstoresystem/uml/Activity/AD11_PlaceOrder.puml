@@ -1,37 +1,63 @@
 @startuml
-'https://plantuml.com/activity-diagram-beta
+title Activity Diagram (Swimlane) - Place Order (UC11)
 
+|Client (UI)|
 start
-:ClickServlet.handleRequest();
-:new page;
-if (Page.onSecurityCheck) then (true)
-  :Page.onInit();
-  if (isForward?) then (no)
-    :Process controls;
-    if (continue processing?) then (no)
-      stop
+:Chọn "Mua ngay" hoặc chọn "Mua" trong Giỏ hàng;
+
+|System (Service)|
+:Hiển thị giao diện xác nhận đơn hàng;
+
+|Client (UI)|
+repeat
+    :Xác nhận thông tin giao nhận;
+    :Chọn phương thức thanh toán;
+    if (Có mã giảm giá?) then (Có)
+            :Nhập mã giảm giá;
+            |System (Service)|
+            :Thực hiện UC "Sử dụng mã giảm giá";
+    else (Không)
     endif
 
-    if (isPost?) then (yes)
-      :Page.onPost();
-    else (no)
-      :Page.onGet();
-    endif
-    :Page.onRender();
-  endif
-else (false)
-endif
+    |Client (UI)|
+    :Nhấn "Đặt hàng";
 
-if (do redirect?) then (yes)
-  :redirect process;
-else
-  if (do forward?) then (yes)
-    :Forward request;
-  else (no)
-    :Render page template;
-  endif
+    |System (Service)|
+    :Kiểm tra tính hợp lệ (Thông tin, Tồn kho);
+
+    |Database (MySQL)|
+    :Truy vấn kiểm tra kho hàng;
+
+    |System (Service)|
+    if (Dữ liệu hợp lệ?) then (Không)
+        |Client (UI)|
+        :Hiển thị thông báo lỗi;
+    else (Có)
+        break
+    endif
+repeat while (Cần sửa lại thông tin?)
+
+|Database (MySQL)|
+:Lưu thông tin đơn hàng (Bảng Orders);
+:Lưu chi tiết sản phẩm (Bảng OrderItems);
+:Trừ số lượng tồn kho (Bảng Products);
+:Xóa sản phẩm khỏi giỏ hàng (Bảng Cart);
+
+|System (Service)|
+if (Lỗi khi lưu?) then (Có)
+    |Client (UI)|
+    :Thông báo lỗi hệ thống;
+    stop
+else (Thành công)
+    |System (Service)|
+    if (Thanh toán Online?) then (Có)
+        :Set trạng thái "Chờ thanh toán";
+    else (Không - COD)
+        :Set trạng thái "Chờ xác nhận";
+    endif
+    |Client (UI)|
+    :Hiển thị thông báo Đặt hàng thành công;
 endif
 
 stop
-
 @enduml

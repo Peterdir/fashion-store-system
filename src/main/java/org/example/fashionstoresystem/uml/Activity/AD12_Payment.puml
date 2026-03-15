@@ -1,37 +1,60 @@
 @startuml
-'https://plantuml.com/activity-diagram-beta
+title Activity Diagram (Swimlane) - Payment (UC12)
 
+|Client (UI)|
 start
-:ClickServlet.handleRequest();
-:new page;
-if (Page.onSecurityCheck) then (true)
-  :Page.onInit();
-  if (isForward?) then (no)
-    :Process controls;
-    if (continue processing?) then (no)
-      stop
+:Yêu cầu thanh toán đơn hàng;
+
+|System (Service)|
+:Hiển thị thông tin đơn hàng & số tiền;
+
+|Client (UI)|
+repeat
+    if (Thay đổi phương thức?) then (Có)
+        :Chọn phương thức mới;
+        |System (Service)|
+        :Cập nhật phương thức;
+    else (Không)
+    endif
+    |Client (UI)|
+    :Xác nhận và nhấn "Thanh toán";
+    |System (Service)|
+    '''  Kiểm tra thời gian 10 phút '''
+    if (Đã quá 10 phút chờ?) then (Có)
+        |Database (MySQL)|
+        :Cập nhật: Hết hạn thanh toán;
+        |Client (UI)|
+        :Thông báo đơn hàng hết hạn;
+        stop
+    else (Không)
+        |System (Service)|
+        :Gửi yêu cầu tới Cổng thanh toán;
+
+        |Payment Gateway|
+        :Xử lý giao dịch;
+
+        |System (Service)|
+        if (Kết quả giao dịch?) then (Thất bại)
+            |Database (MySQL)|
+            :Cập nhật: Thanh toán thất bại;
+            |Client (UI)|
+            :Hiển thị lỗi thanh toán;
+            stop
+        else (Thành công)
+            break
+        endif
     endif
 
-    if (isPost?) then (yes)
-      :Page.onPost();
-    else (no)
-      :Page.onGet();
+    |Client (UI)|
+    if (Khách hàng hủy?) then (Có)
+        stop
     endif
-    :Page.onRender();
-  endif
-else (false)
-endif
+repeat while (Cần thử lại hoặc đổi cách khác?)
 
-if (do redirect?) then (yes)
-  :redirect process;
-else
-  if (do forward?) then (yes)
-    :Forward request;
-  else (no)
-    :Render page template;
-  endif
-endif
-
+|Database (MySQL)|
+:Cập nhật trạng thái: Đã thanh toán;
+:Lưu vết lịch sử giao dịch;
+|Client (UI)|
+:Hiển thị "Thanh toán thành công";
 stop
-
 @enduml

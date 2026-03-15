@@ -1,22 +1,22 @@
 @startuml
-'https://plantuml.com/use-case-diagram
+left to right direction
+skinparam packageStyle rectangle
+actor "Customer" as C
 
-:Main Admin: as Admin
-(Use the application) as (Use)
+rectangle "Fashion Store System" {
 
-User -> (Start)
-User --> (Use)
+    usecase "Registration" as UC_Regis
+    usecase "Account Verification" as UC_AccVerifi
+    usecase "Check Existing Account" as UC_CheckExistAcc
 
-Admin ---> (Use)
+    ' Quan hệ Bắt buộc (Include) '
+    UC_Regis ..> UC_AccVerifi : <<include>>
+    UC_Regis ..> UC_CheckExistAcc : <<include>>
 
-note right of Admin : This is an example.
+}
 
-note right of (Use)
-A note can also
-be on several lines
-end note
-
-note "This note is connected\nto several objects." as N2
-(Start) .. N2
-N2 .. (Use)
+' Kết nối Actor '
+C -- UC_Regis
+note right of UC_AccVerifi : System sends a verification link to User's Email
+note right of UC_CheckExistAcc : Verifies that Email, Phone, and UserName \ndo not exist in the database.
 @enduml

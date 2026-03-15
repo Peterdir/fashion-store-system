@@ -1,22 +1,26 @@
 @startuml
-'https://plantuml.com/use-case-diagram
+left to right direction
+skinparam packageStyle rectangle
 
-:Main Admin: as Admin
-(Use the application) as (Use)
+actor "Customer" as C
+actor "Payment Gateway" as PG <<System>>
 
-User -> (Start)
-User --> (Use)
+rectangle "Fashion Store System" {
+    usecase "Payment" as UC_Payment
+    usecase "Select Payment Method" as UC_SelPayMeth
+    usecase "Check Payment Timeout" as UC_CheckPayTimeout
+    usecase "Change Payment Method" as UC_ChangePayMeth
 
-Admin ---> (Use)
+    C -- UC_Payment
 
-note right of Admin : This is an example.
+    ''' Quan hệ bắt buộc '''
+    UC_Payment ..> UC_SelPayMeth : <<include>>
+    UC_Payment ..> UC_CheckPayTimeout : <<include>>
 
-note right of (Use)
-A note can also
-be on several lines
-end note
+    ''' Quan hệ mở rộng (AF2) '''
+    UC_ChangePayMeth ..> UC_Payment : <<extend>>
 
-note "This note is connected\nto several objects." as N2
-(Start) .. N2
-N2 .. (Use)
+    ''' Kết nối với cổng thanh toán bên ngoài '''
+    UC_Payment -- PG
+}
 @enduml

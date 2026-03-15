@@ -1,37 +1,51 @@
 @startuml
-'https://plantuml.com/activity-diagram-beta
-
+title Activity Diagram (Swimlane) - Order Management (UC26)
+|Owner (UI)|
 start
-:ClickServlet.handleRequest();
-:new page;
-if (Page.onSecurityCheck) then (true)
-  :Page.onInit();
-  if (isForward?) then (no)
-    :Process controls;
-    if (continue processing?) then (no)
-      stop
+:Truy cập chức năng Quản lý đơn hàng;
+|System (Service)|
+:Truy xuất danh sách các đơn hàng;
+|Owner (UI)|
+:Hiển thị danh sách đơn hàng;
+:Chọn một đơn hàng cần xử lý;
+|System (Service)|
+''' Bước 3 & EL2: Kiểm tra tồn tại '''
+if (Đơn hàng tồn tại?) then (Không)
+    |Owner (UI)|
+    :Thông báo lỗi: Đơn hàng không tồn tại;
+    stop
+else (Có)
+    |System (Service)|
+    :Truy xuất chi tiết đơn hàng;
+    |Owner (UI)|
+    :Hiển thị chi tiết đơn hàng & trạng thái hiện tại;
+
+    if (Cập nhật trạng thái?) then (Không - Chỉ xem)
+        stop
+    else (Có)
+        :Chọn trạng thái mới & nhấn "Lưu";
+
+        |System (Service)|
+        ''' Bước 6 & EL1: Kiểm tra tính hợp lệ trạng thái '''
+        if (Trạng thái mới hợp lệ?) then (Không)
+            |Shop Owner (UI)|
+            :Thông báo lỗi: Trạng thái không hợp lệ;
+            stop
+        else (Có)
+            |Database (MySQL)|
+            :Cập nhật trạng thái mới (Bảng Orders);
+            :Ghi lịch sử thay đổi (Bảng OrderStatusHistory);
+
+            |System (Service)|
+            if (Lỗi khi lưu?) then (Có)
+                |Owner (UI)|
+                :Thông báo lỗi hệ thống;
+            else (Thành công)
+                |Owner (UI)|
+                :Thông báo cập nhật thành công;
+            endif
+        endif
     endif
-
-    if (isPost?) then (yes)
-      :Page.onPost();
-    else (no)
-      :Page.onGet();
-    endif
-    :Page.onRender();
-  endif
-else (false)
 endif
-
-if (do redirect?) then (yes)
-  :redirect process;
-else
-  if (do forward?) then (yes)
-    :Forward request;
-  else (no)
-    :Render page template;
-  endif
-endif
-
 stop
-
 @enduml
