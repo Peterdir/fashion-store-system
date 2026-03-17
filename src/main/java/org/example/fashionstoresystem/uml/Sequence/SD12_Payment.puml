@@ -1,15 +1,70 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+title Sequence Diagram: Payment (UC12)
 
 autonumber
+actor Customer
+participant "Payment View\n(Thymeleaf)" as View
+participant "PaymentController\n(Controller)" as Controller
+participant "PaymentService\n(Service)" as Service
+participant "OrderRepository\n(Repo)" as OrderRepo
+participant "OrderEntity\n(Entity)" as Entity
+participant "Payment Gateway\n(VNPay/Momo)" as Gateway
+database "MySQL\n(Database)" as DB
 
-== Initialization ==
+== Display Payment Information ==
+View -> Controller : GET /payment/{orderId}
+Controller -> Service : getOrderDetails(orderId)
+Service -> OrderRepo : findById(orderId)
+OrderRepo -> DB : SELECT * FROM orders WHERE id = ?
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+DB --> OrderRepo : orderData
+OrderRepo --> Service : orderEntity
+Service --> Controller : orderEntity
 
-== Repetition ==
+Controller --> View : payment.html
+View --> Customer : Display Payment Page and Total Amount
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+== Execute Payment and Process Business Logic ==
+Customer -> View : Select Payment Method and Click "Pay"
+View -> Controller : POST /payment/confirm (orderId, method)
+Controller -> Service : processPayment(orderId, method)
+
+Service -> OrderRepo : findById(orderId)
+OrderRepo --> Service : orderEntity
+
+group Check Expiration (10 minutes)
+    Service -> Entity : isExpired()
+    alt If Expired (Timeout)
+        Entity --> Service : true
+        Service -> Entity : setStatus("EXPIRED")
+        Service -> OrderRepo : save(order)
+        OrderRepo -> DB : UPDATE orders SET status = 'EXPIRED'
+        Service --> Controller : PAYMENT_TIMEOUT
+        Controller -> View : redirect "/payment-error?msg=timeout"
+        View --> Customer : Display "Payment Session Expired"
+    else If Not Expired
+        Entity --> Service : false
+    end
+end
+
+== Gọi Cổng Thanh Toán Ngoại Vi ==
+Service -> Gateway : requestPayment(amount, orderInfo)
+Gateway --> Service : paymentResponse (SUCCESS/FAILED)
+
+alt Payment Successful
+    Service -> Entity : setStatus("PAID")
+    Service -> OrderRepo : save(order)
+    OrderRepo -> DB : UPDATE orders SET status = 'PAID'
+    Service --> Controller : SUCCESS
+    Controller -> View : redirect "/payment-success"
+    View --> Customer : Display "Payment Successful"
+else Payment Failed
+    Service -> Entity : setStatus("FAILED")
+    Service -> OrderRepo : save(order)
+    OrderRepo -> DB : UPDATE orders SET status = 'FAILED'
+    Service --> Controller : FAILED
+    Controller -> View : redirect "/payment-error"
+    View --> Customer : Display "Payment Failed" Message
+end
+
 @enduml

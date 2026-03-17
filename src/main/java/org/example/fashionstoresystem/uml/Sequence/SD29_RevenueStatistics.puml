@@ -1,0 +1,58 @@
+@startuml
+title Sequence Diagram: Revenue Statistics (UC29)
+
+autonumber
+actor "Store Owner" as Owner
+participant "Revenue View\n(Thymeleaf)" as View
+participant "RevenueController\n(Controller)" as Controller
+participant "RevenueService\n(Service)" as Service
+participant "OrderRepository\n(Repo)" as OrderRepo
+database "MySQL\n(Database)" as DB
+
+== 1. Access Statistics Page ==
+
+Owner -> View : Select "Revenue Statistics"
+View -> Controller : GET /admin/revenue
+Controller --> View : admin/revenue_stats.html
+View --> Owner : Display date selection form
+
+== 2. Generate Revenue Report ==
+
+Owner -> View : Select time period and Click "View Statistics"
+View -> Controller : POST /admin/revenue/report (startDate, endDate)
+Controller -> Service : getDetailedRevenueReport(startDate, endDate)
+
+group Data Aggregation (Summary)
+    Service -> OrderRepo : calculateTotalRevenue(startDate, endDate, "ONLINE")
+    OrderRepo -> DB : SELECT SUM(total_amount)...
+    DB --> OrderRepo : onlineRevenue
+    
+    Service -> OrderRepo : calculateTotalRevenue(startDate, endDate, "OFFLINE")
+    OrderRepo -> DB : SELECT SUM(total_amount)...
+    DB --> OrderRepo : offlineRevenue
+    
+    Service -> OrderRepo : countOrders(startDate, endDate)
+    OrderRepo -> DB : SELECT COUNT(*)...
+    DB --> OrderRepo : totalOrders
+end
+
+group Fetch Detailed Order List
+    Service -> OrderRepo : findByOrderDateBetween(startDate, endDate)
+    OrderRepo -> DB : SELECT * FROM orders JOIN order_items...
+    DB --> OrderRepo : List<Order> (including OrderItems & Products)
+    OrderRepo --> Service : List<Order>
+end
+
+Service -> Service : combineToDetailedRevenueReport(online, offline, totalOrders, orderList)
+Service --> Controller : RevenueReport (DTO)
+Controller --> View : admin/revenue_stats.html (Model: report)
+
+alt No Data Found
+    View --> Owner : Display "No data available for this period"
+else Success
+    View --> Owner : Display Summary (Total Revenue, Order Count)
+    View --> Owner : Render Revenue Charts
+    View --> Owner : Display Detailed Table (Order ID, Products, Amount)
+end
+
+@enduml

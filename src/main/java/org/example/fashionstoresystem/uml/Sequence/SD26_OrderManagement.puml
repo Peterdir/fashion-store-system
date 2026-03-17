@@ -1,0 +1,72 @@
+@startuml
+title Sequence Diagram: Order Management (UC26)
+
+autonumber
+actor "Store Owner" as Owner
+participant "Order Admin View\n(Thymeleaf)" as View
+participant "OrderManagementController\n(Controller)" as Controller
+participant "OrderManagementService\n(Service)" as Service
+participant "OrderRepository\n(Repo)" as OrderRepo
+participant "OrderHistoryRepository\n(Repo)" as HistoryRepo
+participant "Order\n(Entity)" as OrderEntity
+database "MySQL\n(Database)" as DB
+
+== 1. Display Order List ==
+
+Owner -> View : Access "Order Management"
+View -> Controller : GET /admin/orders
+Controller -> Service : getAllOrders()
+Service -> OrderRepo : findAll()
+OrderRepo -> DB : SELECT * FROM orders
+DB --> OrderRepo : List<Order>
+OrderRepo --> Service : List<Order>
+Service --> Controller : List<Order>
+Controller --> View : admin/order_list.html
+View --> Owner : Display Order List
+
+== 2. View Order Details ==
+
+Owner -> View : Select an Order
+View -> Controller : GET /admin/orders/{id}
+Controller -> Service : getOrderDetails(id)
+Service -> OrderRepo : findById(id)
+OrderRepo -> DB : SELECT * FROM orders WHERE id = ?
+DB --> OrderRepo : orderData
+OrderRepo --> Service : Order\n(Entity)
+Service --> Controller : Order\n(Entity)
+Controller --> View : admin/order_detail.html
+View --> Owner : Display Order Details and Current Status
+
+== 3. Update Order Status ==
+
+Owner -> View : Select New Status and Click "Update"
+View -> Controller : POST /admin/orders/{id}/status (newStatus)
+Controller -> Service : updateOrderStatus(id, newStatus)
+
+group Validate and Update Status
+    Service -> OrderRepo : findById(id)
+    OrderRepo --> Service : orderEntity
+    
+    Service -> Service : checkStatusTransition(current, new)
+    
+    alt Status Transition Invalid
+        Service --> Controller : throw InvalidStatusException
+        Controller --> View : error message
+        View --> Owner : Display "Invalid Status Update"
+    else Status Valid
+        Service -> OrderEntity : setStatus(newStatus)
+        Service -> OrderRepo : save(orderEntity)
+        OrderRepo -> DB : UPDATE orders SET status = ...
+        
+        == Record History ==
+        Service -> HistoryRepo : save(new OrderHistory)
+        HistoryRepo -> DB : INSERT INTO order_history...
+        DB --> HistoryRepo : success
+        
+        Service --> Controller : success
+        Controller --> View : redirect to /admin/orders/{id}?success
+        View --> Owner : Display "Status Updated Successfully"
+    end
+end
+
+@enduml

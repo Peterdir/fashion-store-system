@@ -1,15 +1,51 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+title Sequence Diagram: View Products (UC09)
 
 autonumber
+actor User
+participant "Product List View\n(Thymeleaf)" as View
+participant "ProductController\n(Controller)" as Controller
+participant "ProductService\n(Service)" as Service
+participant "ProductRepository\n(Repository)" as Repository
+participant "Product\n(Entity)" as Entity
+database "MySQL\n(Database)" as DB
 
-== Initialization ==
+== Load Homepage / Product Page ==
+User -> View : Access Product List page
+View -> Controller : GET /products
+Controller -> Service : getProducts(keyword)
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+group Process product query
+    alt keyword is empty (View all products)
+        Service -> Repository : findAll()
+        Repository -> DB : SELECT * FROM products
+        DB --> Repository : List<Product>
+        Repository --> Service : List<Product>
+    else keyword is NOT empty (Search)
+        Service -> Repository : findByNameContaining(keyword)
+        Repository -> DB : SELECT ... WHERE name LIKE %keyword%
+        DB --> Repository : List<Product>
+        Repository --> Service : List<Product>
+    end
+end
 
-== Repetition ==
+alt Products available
+    Service --> Controller : List<Product>
+    Controller --> View : product_list.html (with products)
+    View --> User : Display product list
+else No products found
+    Service --> Controller : Empty List
+    Controller --> View : product_list.html (with empty message)
+    View --> User : Hiển thị "No products found"
+end
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+== System Error ==
+note right of Repository: Database Connection Failure
+Repository -[#red]> DB : SELECT ...
+DB --[#red]> Repository : Connection Timeout / Error
+Repository --[#red]> Service : throw DataAccessException
+Service --[#red]> Controller : forward exception
+Controller --> View : error.html
+View --> User : Display "Data Loading Error" message
+
 @enduml

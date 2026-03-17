@@ -1,15 +1,56 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+title Sequence Diagram: Place Order (UC11)
 
 autonumber
+actor Customer
+participant "Checkout View\n(Thymeleaf)" as View
+participant "OrderController\n(Controller)" as Controller
+participant "OrderService\n(Service)" as Service
+participant "ProductRepository\n(Repo)" as ProductRepo
+participant "OrderRepository\n(Repo)" as OrderRepo
+participant "OrderItemRepository\n(Repo)" as ItemRepo
+participant "CartRepository\n(Repo)" as CartRepo
+database "MySQL\n(Database)" as DB
 
-== Initialization ==
+Customer -> View : Click "Place Order"
+View -> Controller : POST /place-order (orderData)
+Controller -> Service : placeOrder(orderDto)
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+group Order Management (Transaction)
+    Service -> ProductRepo : findById(productId)
+    ProductRepo -> DB : SELECT stock_quantity...
+    DB --> ProductRepo : Product\n(Entity)
+    ProductRepo --> Service : Product object
 
-== Repetition ==
+    alt Insufficient stock
+        Service --> Controller : throw InsufficientStockException
+        Controller --> View : checkout.html (error)
+        View --> Customer : Display "Product Out of Stock" message
+    else Valid
+        == Save Order ==
+        Service -> Service : calculateTotalAmount()
+        Service -> OrderRepo : save(new Order)
+        OrderRepo -> DB : INSERT INTO orders...
+        DB --> OrderRepo : order_id
+        OrderRepo --> Service : Order object
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+        == Save Order Items & Decrease Stock ==
+        loop For each item in order
+            Service -> ItemRepo : save(new OrderItem)
+            ItemRepo -> DB : INSERT INTO order_items...
+            DB --> ItemRepo : success
+
+            Service -> ProductRepo : updateStock(productId, quantity)
+            ProductRepo -> DB : UPDATE products SET quantity = ...
+        end
+
+        == Clear Cart ==
+        Service -> CartRepo : deleteAllById(selectedCartItemIds)
+        CartRepo -> DB : DELETE FROM cart_items WHERE id IN (...)
+
+        Service --> Controller : OrderSuccessDTO
+        Controller --> View : order_success.html
+        View --> Customer : Display "Order Success" message!
+    end
+end
 @enduml

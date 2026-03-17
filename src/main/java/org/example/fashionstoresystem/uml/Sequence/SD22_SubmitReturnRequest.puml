@@ -1,0 +1,84 @@
+@startuml
+title Sequence Diagram: Submit Return Request (UC22)
+
+autonumber
+actor Customer
+participant "Return View\n(Thymeleaf)" as View
+participant "ReturnRequestController\n(Controller)" as Controller
+participant "ReturnRequestService\n(Service)" as Service
+participant "OrderRepository\n(Repo)" as OrderRepo
+participant "ReturnRequestRepository\n(Repo)" as ReturnRepo
+participant "ReturnRequest\n(Entity)" as Entity
+database "MySQL\n(Database)" as DB
+
+== Display Order Items for Return ==
+
+Customer -> View : Open "My Orders"
+View -> Controller : GET /orders
+Controller -> Service : getOrdersByCustomer(customer_id)
+Service -> OrderRepo : findByCustomerId(customer_id)
+OrderRepo -> DB : SELECT * FROM orders WHERE customer_id = ?
+DB --> OrderRepo : List<Order>
+OrderRepo --> Service : List<Order>
+Service --> Controller : List<Order>
+Controller --> View : order_list
+View --> Customer : Display Order List
+
+Customer -> View : Select Order to Return
+View -> Controller : GET /orders/{id}/return-items
+Controller -> Service : getOrderForReturn(orderId)
+Service -> OrderRepo : findById(orderId)
+OrderRepo -> DB : SELECT * FROM orders...
+DB --> OrderRepo : orderData
+OrderRepo --> Service : orderEntity
+Service --> Controller : orderEntity
+Controller --> View : return_selection.html
+View --> Customer : Display products eligible for return
+
+== Prepare Return Request Form ==
+Customer -> View : Select products and click "Request Return"
+View -> Controller : GET /return/form?orderId=...&itemIds=...
+Controller -> Service : validateReturnEligibility(orderId, itemIds)
+
+group Validate Eligibility
+    Service -> OrderRepo : findById(orderId)
+    OrderRepo --> Service : orderEntity
+    
+    Note right of Service: Check ownership and status (DELIVERED)
+
+    ' Kiểm tra đã có yêu cầu hoàn trả cho các sản phẩm trước đó chưa
+    Service -> ReturnRepo : existsByOrderItemIdIn(itemIds)
+    ReturnRepo --> Service : existsStatus (True/False)
+    
+    alt If ineligible (Policy/Already requested)
+        Service --> Controller : throw IneligibleException
+        Controller --> View : error.html
+        View --> Customer : Display "Ineligible for Return" message
+    else If Valid
+        Service --> Controller : returnEligibleItems
+    end
+end
+
+Controller --> View : return_form.html
+View --> Customer : Display Return Form (Reason, Images...)
+
+== Submit Return Request ==
+Customer -> View : Fill info and click "Submit"
+View -> Controller : POST /return/submit (returnDto)
+Controller -> Service : submitReturnRequest(returnDto, images)
+
+Service -> Service : createReturnRequest(dto)
+Service -> Entity : setStatus("PENDING_APPROVAL")
+
+group Save Return Request (Transaction)
+    Service -> ReturnRepo : save(returnRequest)
+    ReturnRepo -> DB : INSERT INTO return_requests...
+    DB --> ReturnRepo : success
+    ReturnRepo --> Service : savedReturnRequest
+end
+
+Service --> Controller : success
+Controller --> View : return_success.html
+View --> Customer : Display "Return Request Submitted Successfully"
+
+@enduml

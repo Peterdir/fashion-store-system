@@ -1,15 +1,55 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+title Sequence Diagram: Registration (UC01)
 
 autonumber
+actor Customer
+participant "Register View\n(Thymeleaf)" as View
+participant "AuthController\n(Controller)" as Controller
+participant "AuthService\n(Service)" as Service
+participant "UserRepository\n(Repository)" as Repository
+participant "User\n(Entity)" as Entity
+database "MySQL\n(Database)" as DB
+participant "EmailService" as Mail
 
-== Initialization ==
+== Load Page ==
+Customer -> View : Open "Register"
+View -> Controller : GET /register
+Controller --> View : register.html
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+== Process Registration ==
+Customer -> View : Enter data (Full Name, Phone, Email, Password, Confirm Password)
+Customer -> View : Click "Register"
+View -> Controller : POST/register (data)
+Controller -> Service : registerNewAccount(registrationDTO)
 
-== Repetition ==
+group Business Logic
+    Service -> Service : validateInfo(data)
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+    Service -> Repository : existsByEmail(email)
+    Repository -> DB : SELECT ...
+    DB --> Repository : result
+    Repository --> Service: boolean
+
+    alt Invalid / Duplicate Information
+        Service --> Controller : throw RegistrationException
+        Controller --> View : register.html (with error message)
+        View --> Customer : Display errors
+    else Valid
+        Service -> Service : encodePassword(rawPassword)
+        Service -> Entity: new User(data, status=PENDING)
+
+        Service -> Repository : save(User)
+        Repository -> DB : INSERT INTO users ...
+        DB --> Repository : user_id
+        Repository --> Service : User object
+
+        Service -> Service : createVerificationToken(User)
+        Service -> Mail : sendVerificationEmail(email, token)
+        Mail --> Service : success
+
+        Service --> Controller : User object
+        Controller --> View : register.html (with success message)
+        View --> Customer : Registration success, \nPlease check your email
+    end
+end
 @enduml
