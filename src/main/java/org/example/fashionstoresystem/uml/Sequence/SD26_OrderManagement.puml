@@ -14,7 +14,8 @@ database "MySQL\n(Database)" as DB
 == 1. Display Order List ==
 
 Owner -> View : Access "Order Management"
-View -> Controller : GET /admin/orders
+View -> Controller : getAllOrders()
+note right: GET /admin/orders
 Controller -> Service : getAllOrders()
 Service -> OrderRepo : findAll()
 OrderRepo -> DB : SELECT * FROM orders
@@ -27,7 +28,8 @@ View --> Owner : Display Order List
 == 2. View Order Details ==
 
 Owner -> View : Select an Order
-View -> Controller : GET /admin/orders/{id}
+View -> Controller : getOrderDetails(id)
+note right: GET /admin/orders/{id}
 Controller -> Service : getOrderDetails(id)
 Service -> OrderRepo : findById(id)
 OrderRepo -> DB : SELECT * FROM orders WHERE id = ?
@@ -40,7 +42,8 @@ View --> Owner : Display Order Details and Current Status
 == 3. Update Order Status ==
 
 Owner -> View : Select New Status and Click "Update"
-View -> Controller : POST /admin/orders/{id}/status (newStatus)
+View -> Controller : updateOrderStatus(id, newStatus)
+note right: POST /admin/orders/{id}/status
 Controller -> Service : updateOrderStatus(id, newStatus)
 
 group Validate and Update Status

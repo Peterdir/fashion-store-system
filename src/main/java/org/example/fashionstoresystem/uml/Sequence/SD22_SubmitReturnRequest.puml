@@ -14,7 +14,8 @@ database "MySQL\n(Database)" as DB
 == Display Order Items for Return ==
 
 Customer -> View : Open "My Orders"
-View -> Controller : GET /orders
+View -> Controller : showOrderList(customer_id)
+note right: GET /orders
 Controller -> Service : getOrdersByCustomer(customer_id)
 Service -> OrderRepo : findByCustomerId(customer_id)
 OrderRepo -> DB : SELECT * FROM orders WHERE customer_id = ?
@@ -25,7 +26,8 @@ Controller --> View : order_list
 View --> Customer : Display Order List
 
 Customer -> View : Select Order to Return
-View -> Controller : GET /orders/{id}/return-items
+View -> Controller : showReturnSelection(orderId)
+note right: GET /orders/{id}/return-items
 Controller -> Service : getOrderForReturn(orderId)
 Service -> OrderRepo : findById(orderId)
 OrderRepo -> DB : SELECT * FROM orders...
@@ -37,7 +39,8 @@ View --> Customer : Display products eligible for return
 
 == Prepare Return Request Form ==
 Customer -> View : Select products and click "Request Return"
-View -> Controller : GET /return/form?orderId=...&itemIds=...
+View -> Controller : prepareReturnForm(orderId, itemIds)
+note right: GET /return/form?orderId=...&itemIds=...
 Controller -> Service : validateReturnEligibility(orderId, itemIds)
 
 group Validate Eligibility
@@ -64,7 +67,8 @@ View --> Customer : Display Return Form (Reason, Images...)
 
 == Submit Return Request ==
 Customer -> View : Fill info and click "Submit"
-View -> Controller : POST /return/submit (returnDto)
+View -> Controller : submitReturnRequest(returnDto)
+note right: POST /return/submit
 Controller -> Service : submitReturnRequest(returnDto, images)
 
 Service -> Service : createReturnRequest(dto)

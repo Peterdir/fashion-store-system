@@ -1,15 +1,90 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+title Class Diagram: Submit Return Request (UC22)
 
-autonumber
+' Controller
+class ReturnRequestController {
+    - returnRequestService : ReturnRequestService
+    + showOrderList(customerId: Long) : String
+    + showReturnSelection(orderId: Long) : String
+    + prepareReturnForm(orderId: Long, itemIds: List<Long>) : String
+    + submitReturnRequest(returnDto: ReturnRequestDTO) : String
+}
 
-== Initialization ==
+' Service
+interface ReturnRequestService <<interface>> {
+    + getOrdersByCustomer(customerId: Long) : List<Order>
+    + getOrderForReturn(orderId: Long) : Order
+    + validateReturnEligibility(orderId: Long, itemIds: List<Long>) : List<OrderItem>
+    + submitReturnRequest(returnDto: ReturnRequestDTO, images: List<String>) : ReturnRequest
+}
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+class ReturnRequestServiceImpl {
+    - orderRepository : OrderRepository
+    - returnRepository : ReturnRequestRepository
+    + getOrdersByCustomer(customerId: Long) : List<Order>
+    + getOrderForReturn(orderId: Long) : Order
+    + validateReturnEligibility(orderId: Long, itemIds: List<Long>) : List<OrderItem>
+    + submitReturnRequest(returnDto: ReturnRequestDTO, images: List<String>) : ReturnRequest
+    - createReturnRequest(dto: ReturnRequestDTO) : ReturnRequest
+}
 
-== Repetition ==
+' Repository
+interface OrderRepository <<interface>> {
+    + findByCustomerId(customerId: Long) : List<Order>
+    + findById(orderId: Long) : Order
+}
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+interface ReturnRequestRepository <<interface>> {
+    + existsByOrderItemIdIn(itemIds: List<Long>) : Boolean
+    + save(returnRequest: ReturnRequest) : ReturnRequest
+}
+
+' Entity & DTO
+class ReturnRequestDTO {
+    - orderId : Long
+    - itemIds : List<Long>
+    - reason : String
+    - description : String
+}
+
+class ReturnRequest {
+    - id : Long
+    - status : String
+    - reason : String
+    - description : String
+    - requestDate : Date
+    + setStatus(status: String) : void
+}
+
+class Order {
+    - id : Long
+    - status : String
+}
+
+class OrderItem {
+    - id : Long
+}
+
+' Relationships
+
+' Implementation
+ReturnRequestServiceImpl ..|> ReturnRequestService
+
+' Dependency Injection
+ReturnRequestController --> ReturnRequestService : - returnRequestService
+ReturnRequestServiceImpl --> OrderRepository : - orderRepository
+ReturnRequestServiceImpl --> ReturnRequestRepository : - returnRepository
+
+' Object Usage
+ReturnRequestController ..> ReturnRequestDTO : <<uses>>
+ReturnRequestServiceImpl ..> ReturnRequestDTO : <<uses>>
+
+ReturnRequestServiceImpl ..> ReturnRequest : <<creates>>
+ReturnRequestRepository ..> ReturnRequest : <<manages>>
+
+ReturnRequestServiceImpl ..> Order : <<uses>>
+OrderRepository ..> Order : <<manages>>
+
+ReturnRequestServiceImpl ..> OrderItem : <<uses>>
+
 @enduml

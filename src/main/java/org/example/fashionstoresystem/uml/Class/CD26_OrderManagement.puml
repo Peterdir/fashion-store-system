@@ -1,15 +1,74 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+title Class Diagram: Order Management (UC26)
 
-autonumber
+' Controller
+class OrderManagementController {
+    - orderManagementService : OrderManagementService
+    + getAllOrders() : String
+    + getOrderDetails(id: Long) : String
+    + updateOrderStatus(id: Long, newStatus: String) : String
+}
 
-== Initialization ==
+' Service
+interface OrderManagementService <<interface>> {
+    + getAllOrders() : List<Order>
+    + getOrderDetails(id: Long) : Order
+    + updateOrderStatus(id: Long, newStatus: String) : void
+}
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+class OrderManagementServiceImpl {
+    - orderRepository : OrderRepository
+    - historyRepository : OrderHistoryRepository
+    + getAllOrders() : List<Order>
+    + getOrderDetails(id: Long) : Order
+    + updateOrderStatus(id: Long, newStatus: String) : void
+    - checkStatusTransition(currentStatus: String, newStatus: String) : void
+}
 
-== Repetition ==
+' Repository
+interface OrderRepository <<interface>> {
+    + findAll() : List<Order>
+    + findById(id: Long) : Order
+    + save(order: Order) : Order
+}
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+interface OrderHistoryRepository <<interface>> {
+    + save(history: OrderHistory) : OrderHistory
+}
+
+' Entity & DTO
+class Order {
+    - id : Long
+    - totalAmount : Double
+    - status : String
+    - orderDate : Date
+    + setStatus(status: String) : void
+}
+
+class OrderHistory {
+    - id : Long
+    - orderId : Long
+    - previousStatus : String
+    - newStatus : String
+    - changeDate : Date
+}
+
+' Relationships
+
+' Implementation
+OrderManagementServiceImpl ..|> OrderManagementService
+
+' Dependency Injection
+OrderManagementController --> OrderManagementService : - orderManagementService
+OrderManagementServiceImpl --> OrderRepository : - orderRepository
+OrderManagementServiceImpl --> OrderHistoryRepository : - historyRepository
+
+' Object Usage
+OrderManagementController ..> Order : <<uses>>
+OrderManagementServiceImpl ..> Order : <<uses>>
+OrderRepository ..> Order : <<manages>>
+
+OrderManagementServiceImpl ..> OrderHistory : <<creates>>
+OrderHistoryRepository ..> OrderHistory : <<manages>>
+
 @enduml

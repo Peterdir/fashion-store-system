@@ -12,7 +12,8 @@ database "MySQL\n(Database)" as DB
 
 == Load Homepage / Product Page ==
 User -> View : Access Product List page
-View -> Controller : GET /products
+View -> Controller : showProductsPage()
+note right: GET /products
 Controller -> Service : getProducts(keyword)
 
 group Process product query

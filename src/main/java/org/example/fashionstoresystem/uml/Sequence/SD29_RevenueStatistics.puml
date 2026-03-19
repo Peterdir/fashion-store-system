@@ -12,14 +12,16 @@ database "MySQL\n(Database)" as DB
 == 1. Access Statistics Page ==
 
 Owner -> View : Select "Revenue Statistics"
-View -> Controller : GET /admin/revenue
+View -> Controller : showRevenuePage()
+note right: GET /admin/revenue
 Controller --> View : admin/revenue_stats.html
 View --> Owner : Display date selection form
 
 == 2. Generate Revenue Report ==
 
 Owner -> View : Select time period and Click "View Statistics"
-View -> Controller : POST /admin/revenue/report (startDate, endDate)
+View -> Controller : generateRevenueReport(startDate, endDate)
+note right: POST /admin/revenue/report
 Controller -> Service : getDetailedRevenueReport(startDate, endDate)
 
 group Data Aggregation (Summary)
@@ -44,7 +46,7 @@ group Fetch Detailed Order List
 end
 
 Service -> Service : combineToDetailedRevenueReport(online, offline, totalOrders, orderList)
-Service --> Controller : RevenueReport (DTO)
+Service --> Controller : RevenueReportDTO
 Controller --> View : admin/revenue_stats.html (Model: report)
 
 alt No Data Found

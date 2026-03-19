@@ -13,13 +13,15 @@ participant "EmailService" as Mail
 
 == Load Page ==
 Customer -> View : Open "Register"
-View -> Controller : GET /register
+View -> Controller : showRegisterPage()
+note right: GET /register
 Controller --> View : register.html
 
 == Process Registration ==
 Customer -> View : Enter data (Full Name, Phone, Email, Password, Confirm Password)
 Customer -> View : Click "Register"
-View -> Controller : POST/register (data)
+View -> Controller : processRegistration(data)
+note right: POST /register
 Controller -> Service : registerNewAccount(registrationDTO)
 
 group Business Logic

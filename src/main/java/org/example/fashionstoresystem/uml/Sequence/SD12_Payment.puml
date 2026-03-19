@@ -12,7 +12,8 @@ participant "Payment Gateway\n(VNPay/Momo)" as Gateway
 database "MySQL\n(Database)" as DB
 
 == Display Payment Information ==
-View -> Controller : GET /payment/{orderId}
+View -> Controller : showPaymentPage(orderId)
+note right: GET /payment/{orderId}
 Controller -> Service : getOrderDetails(orderId)
 Service -> OrderRepo : findById(orderId)
 OrderRepo -> DB : SELECT * FROM orders WHERE id = ?
@@ -26,7 +27,8 @@ View --> Customer : Display Payment Page and Total Amount
 
 == Execute Payment and Process Business Logic ==
 Customer -> View : Select Payment Method and Click "Pay"
-View -> Controller : POST /payment/confirm (orderId, method)
+View -> Controller : processPayment(orderId, method)
+note right: POST /payment/confirm
 Controller -> Service : processPayment(orderId, method)
 
 Service -> OrderRepo : findById(orderId)

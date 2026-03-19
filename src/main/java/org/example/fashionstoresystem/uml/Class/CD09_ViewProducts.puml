@@ -1,15 +1,54 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+title Class Diagram : View Products (UC09)
 
-autonumber
+' Controller
+class ProductController {
+    - productService: ProductService
+    + showProductsPage() : String
+}
 
-== Initialization ==
+' Service
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+interface ProductService {
+    + getProducts(keyword: String) : List<Product>
+}
 
-== Repetition ==
+class ProductServiceImpl {
+    - productRepository : ProductRepository
+    + getProducts(keyword: String) : List<Product>
+}
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+' Repository
+
+interface ProductRepository {
+    + findAll() : List<Product>
+    + findByNameContaining(keyword: String) : List<Product>
+}
+
+' Entity & DTO
+
+class Product {
+    - id: Long
+    - name: String
+    - price: Double
+    - category: String
+    - size: int
+    - color: String
+
+}
+
+' Relationships
+
+' Class implement Interface
+ProductServiceImpl ..|>ProductService
+
+' Dependency Injection
+ProductController --> ProductService: - productService
+ProductServiceImpl --> ProductRepository: - productRepository
+
+' Object Usage
+ProductController ..> Product : <<uses>>
+ProductServiceImpl ..> Product : <<uses>>
+ProductRepository ..> Product : <<manages>>
+
 @enduml

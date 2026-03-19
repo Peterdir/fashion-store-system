@@ -1,15 +1,79 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+title Class Diagram: Registration (UC01)
 
-autonumber
+' Controller
 
-== Initialization ==
+class AuthController {
+    - authService : AuthService
+    + showRegisterPage() : String
+    + processRegistration(dto: RegistrationDTO) : String
+}
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+'Service
 
-== Repetition ==
+interface AuthService <<interface>> {
+    + registerNewAccount(dto: RegistrationDTO) : User
+}
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+class AuthServiceImpl {
+    - userRepository : UserRepository
+    - emailService : EmailService
+    + registerNewAccount(dto: RegistrationDTO) : User
+    - validateInfo(dto: RegistrationDTO) : Boolean
+    - encodePassword(rawPassword: String) : void
+    - createVerificationToken(user: User) : String
+}
+
+interface EmailService <<interface>> {
+    + sendVerificationEmail(email: String, token: String) : Boolean
+}
+
+class EmailServiceImpl {
+    + sendVerificationEmail(email: String, token: String) : Boolean
+}
+
+' Repository
+
+interface UserRepository <<interface>> {
+    + existsByEmail(email: String) : Boolean
+    + save(user: User) : User
+}
+
+
+' Entity & DTO
+
+class RegistrationDTO {
+    - fullName : String
+    - phone : String
+    - email : String
+    - password : String
+    - confirmPassword : String
+}
+
+class User {
+    - id : Long
+    - fullName : String
+    - phone : String
+    - email : String
+    - password : String
+    - status : String
+    - verificationToken : String
+}
+
+' Relationships
+
+' Class implement Interface
+AuthServiceImpl ..|> AuthService
+EmailServiceImpl ..|> EmailService
+
+' Dependency Injection
+AuthController --> AuthService : - authService
+AuthServiceImpl --> UserRepository : - userRepository
+AuthServiceImpl --> EmailService : - emailService
+
+' Object Usage
+AuthController ..> RegistrationDTO : <<uses>>
+AuthServiceImpl ..> RegistrationDTO : <<uses>>
+AuthServiceImpl ..> User : <<creates>>
+UserRepository ..> User : <<manages>>
 @enduml

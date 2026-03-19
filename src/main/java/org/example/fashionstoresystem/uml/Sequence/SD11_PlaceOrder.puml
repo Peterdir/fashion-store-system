@@ -13,7 +13,8 @@ participant "CartRepository\n(Repo)" as CartRepo
 database "MySQL\n(Database)" as DB
 
 Customer -> View : Click "Place Order"
-View -> Controller : POST /place-order (orderData)
+View -> Controller : processOrder(orderData)
+note right: POST /place-order
 Controller -> Service : placeOrder(orderDto)
 
 group Order Management (Transaction)

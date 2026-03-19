@@ -1,15 +1,60 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+title Class Diagram: Revenue Statistics (UC29)
 
-autonumber
+' Controller
+class RevenueController {
+    - revenueService : RevenueService
+    + showRevenuePage() : String
+    + generateRevenueReport(startDate: Date, endDate: Date) : String
+}
 
-== Initialization ==
+' Service
+interface RevenueService <<interface>> {
+    + getDetailedRevenueReport(startDate: Date, endDate: Date) : RevenueReportDTO
+}
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+class RevenueServiceImpl {
+    - orderRepository : OrderRepository
+    + getDetailedRevenueReport(startDate: Date, endDate: Date) : RevenueReportDTO
+    - combineToDetailedRevenueReport(online: Double, offline: Double, totalOrders: int, orderList: List<Order>) : RevenueReportDTO
+}
 
-== Repetition ==
+' Repository
+interface OrderRepository <<interface>> {
+    + calculateTotalRevenue(startDate: Date, endDate: Date, type: String) : Double
+    + countOrders(startDate: Date, endDate: Date) : int
+    + findByOrderDateBetween(startDate: Date, endDate: Date) : List<Order>
+}
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+' Entity & DTO
+class RevenueReportDTO {
+    - onlineRevenue : Double
+    - offlineRevenue : Double
+    - totalOrders : int
+    - orders : List<Order>
+}
+
+class Order {
+    - id : Long
+    - orderDate : Date
+    - totalAmount : Double
+    - type : String
+}
+
+' Relationships
+
+' Implementation
+RevenueServiceImpl ..|> RevenueService
+
+' Dependency Injection
+RevenueController --> RevenueService : - revenueService
+RevenueServiceImpl --> OrderRepository : - orderRepository
+
+' Object Usage
+RevenueController ..> RevenueReportDTO : <<uses>>
+RevenueServiceImpl ..> RevenueReportDTO : <<creates>>
+
+OrderRepository ..> Order : <<manages>>
+RevenueServiceImpl ..> Order : <<uses>>
+
 @enduml

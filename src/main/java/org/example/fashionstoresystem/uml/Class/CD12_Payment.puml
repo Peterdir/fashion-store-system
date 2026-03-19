@@ -1,15 +1,70 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+title Class Diagram : Payment (UC12)
 
-autonumber
+' Controller
+class PaymentController {
+    - paymentService : PaymentService
+    + showPaymentPage(orderId: Long) : String
+    + processPayment(orderId: Long, method: String) : String
+}
 
-== Initialization ==
+' Service
+interface PaymentService <<interface>> {
+    + getOrderDetails(orderId: Long) : Order
+    + processPayment(orderId: Long, method: String) : String
+}
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+class PaymentServiceImpl {
+    - orderRepository : OrderRepository
+    - paymentGateway : PaymentGateway
+    + getOrderDetails(orderId: Long) : Order
+    + processPayment(orderId: Long, method: String) : String
+}
 
-== Repetition ==
+' External Gateway Service
+interface PaymentGateway <<interface>> {
+    + requestPayment(amount: Double, orderInfo: String) : PaymentResponseDTO
+}
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+' Repository
+interface OrderRepository <<interface>> {
+    + findById(orderId: Long) : Order
+    + save(order: Order) : Order
+}
+
+' Entity & DTO
+class Order {
+    - id : Long
+    - totalAmount : Double
+    - status : String
+    - paymentMethod : String
+    - orderDate : Date
+    + isExpired() : Boolean
+    + setStatus(status: String) : void
+}
+
+class PaymentResponseDTO {
+    - status : String
+    - transactionId : String
+    - message : String
+}
+
+' Relationships
+
+' Class implement Interface
+PaymentServiceImpl ..|> PaymentService
+
+' Dependency Injection
+PaymentController --> PaymentService : - paymentService
+PaymentServiceImpl --> OrderRepository : - orderRepository
+PaymentServiceImpl --> PaymentGateway : - paymentGateway
+
+' Object Usage
+PaymentController ..> Order : <<uses>>
+PaymentServiceImpl ..> Order : <<uses>>
+OrderRepository ..> Order : <<manages>>
+
+PaymentGateway ..> PaymentResponseDTO : <<creates>>
+PaymentServiceImpl ..> PaymentResponseDTO : <<uses>>
+
 @enduml

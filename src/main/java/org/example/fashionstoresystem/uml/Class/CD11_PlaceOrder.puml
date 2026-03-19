@@ -1,15 +1,102 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+title Class Diagram : Place Order (UC11)
 
-autonumber
+' Controller
+class OrderController {
+    - orderService: OrderService
+    + processOrder(orderData: OrderDTO) : String
+}
 
-== Initialization ==
+' Service
+interface OrderService <<interface>>{
+    + placeOrder(orderDto: OrderDTO) : OrderSuccessDTO
+}
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+class OrderServiceImpl {
+    + placeOrder(orderDto: OrderDTO) : OrderSuccessDTO
+    - calculateTotalAmount() : Double
+    - productRepository: ProductRepository
+    - orderRepository: OrderRepository
+    - orderItemRepository: OrderItemRepository
+    - cartRepository: CartRepository
+}
 
-== Repetition ==
+' Repository
+interface ProductRepository <<interface>> {
+    + findById(productId: Long) : Product
+    + updateStock(productId: Long, quantity: int) : void
+}
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+interface OrderRepository <<interface>> {
+    + save(order: Order) : Order
+}
+
+interface OrderItemRepository <<interface>> {
+    + save(orderItem: OrderItem) : OrderItem
+}
+
+interface CartRepository <<interface>> {
+    + deleteAllById(selectedCartItemIds: List<Long>) : void
+}
+
+' Entity & DTO
+class OrderDTO {
+    - cartItemIds: List<Long>
+    - shippingAddress: String
+    - paymentMethod: String
+}
+
+class OrderSuccessDTO {
+    - orderId: Long
+    - totalAmount: Double
+    - message: String
+}
+
+class Order {
+    - id : Long
+    - orderDate : Date
+    - totalAmount : Double
+    - status : String
+    - shippingAddress : String
+}
+
+class OrderItem {
+    - id : Long
+    - quantity : int
+    - price : Double
+}
+
+class Product {
+    - id : Long
+    - stockQuantity : Long
+}
+
+
+
+' Relationships
+
+' Class implement Interface
+OrderServiceImpl ..|> OrderService
+
+' Dependency Injection
+OrderController --> OrderService: - orderService
+OrderServiceImpl --> ProductRepository: - productRepository
+OrderServiceImpl --> OrderRepository: - orderRepository
+OrderServiceImpl --> OrderItemRepository: - orderItemRepository
+OrderServiceImpl --> CartRepository: - cartRepository
+
+' Object Usage
+OrderController ..> OrderDTO : <<uses>>
+OrderController ..> OrderSuccessDTO : <<uses>>
+OrderServiceImpl ..> OrderDTO : <<uses>>
+OrderServiceImpl ..> OrderSuccessDTO : <<creates>>
+
+OrderRepository ..> Order : <<manages>>
+OrderServiceImpl ..> Order : <<creates>>
+
+ProductRepository ..> Product : <<manages>>
+OrderServiceImpl ..> Product : <<uses>>
+
+OrderItemRepository ..> OrderItem : <<manages>>
+OrderServiceImpl ..> OrderItem : <<creates>>
 @enduml
