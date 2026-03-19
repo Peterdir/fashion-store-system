@@ -1,0 +1,37 @@
+@startuml
+title Object Diagram: Registration (UC01)\nScenario: Customer registers a new account successfully
+
+' DTO - Data sent from the registration form
+object "registrationDto : RegistrationDTO" as dto {
+    fullName = "Lam Khanh Duy"
+    phone = "0123456789"
+    email = "lamkhanhduy123kg@gmail.com"
+    password = "Abc@12345"
+    confirmPassword = "Abc@12345"
+}
+
+' Entity - User created after successful registration
+object "newUser : User" as user {
+    id = 1
+    fullName = "Lam Khanh Duy"
+    phone = "0123456789"
+    email = "lamkhanhduy123kg@gmail.com"
+    password = "$2a$10$xJwL5..."
+    status = "PENDING"
+    verificationToken = "a1b2c3d4-e5f6-7890"
+}
+
+' Relationship
+
+note right of dto
+    Customer input data from the registration form
+end note
+
+note right of user
+    User is created with:
+    - Password is hashed using BCrypt
+    - Status = "PENDING"
+    - Email verification token is generated
+end note
+
+@enduml

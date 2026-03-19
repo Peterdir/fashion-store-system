@@ -41,7 +41,17 @@ class Order {
     - type : String
 }
 
+class OrderItem {
+    - id : Long
+    - quantity : int
+    - price : Double
+    - productName : String
+}
+
 ' Relationships
+
+' Composition (Order contains OrderItems)
+Order "1" *-- "many" OrderItem
 
 ' Implementation
 RevenueServiceImpl ..|> RevenueService

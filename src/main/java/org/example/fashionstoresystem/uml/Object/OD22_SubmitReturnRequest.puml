@@ -1,0 +1,51 @@
+@startuml
+title Object Diagram: Submit Return Request (UC22)\nScenario: Customer submits a return request for 2 items
+
+' DTO - Data sent from return form
+object "returnDto : ReturnRequestDTO" as dto {
+    orderId = 1001
+    itemIds = [201, 202]
+    reason = "Defective product"
+    description = "Item has scratches on surface"
+}
+
+' Entity - The original order
+object "order : Order" as order {
+    id = 1001
+    status = "DELIVERED"
+}
+
+' Entity - Items selected for return
+object "item1 : OrderItem" as item1 {
+    id = 201
+}
+
+object "item2 : OrderItem" as item2 {
+    id = 202
+}
+
+' Structural relationships (OrderItems belong to Order)
+order *-- item1
+order *-- item2
+
+' Entity - Return request created
+object "returnRequest : ReturnRequest" as rr {
+    id = 301
+    status = "PENDING_APPROVAL"
+    reason = "Defective product"
+    description = "Item has scratches on surface"
+    requestDate = "2026-03-19"
+}
+
+note right of order
+    Order must have status "DELIVERED"
+    to be eligible for return
+end note
+
+note right of rr
+    Return request is created
+    with status "PENDING_APPROVAL"
+    awaiting admin review
+end note
+
+@enduml

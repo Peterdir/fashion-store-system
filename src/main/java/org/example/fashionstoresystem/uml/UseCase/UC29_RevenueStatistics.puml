@@ -9,6 +9,7 @@ rectangle "Fashion Store System" {
     usecase "Select Time Period" as UC_SelTimePeri
     usecase "View Online Revenue" as UC_VieOnRev
     usecase "View Offline Revenue" as UCVieOffRev
+    usecase "View Order Details" as UC_VieOrdDet
 
     O -- UC_RevSta
 
@@ -16,5 +17,8 @@ rectangle "Fashion Store System" {
     UC_RevSta ..> UC_SelTimePeri : <<include>>
     UC_RevSta ..> UC_VieOnRev : <<include>>
     UC_RevSta ..> UCVieOffRev : <<include>>
+
+    ''' Tùy chọn xem chi tiết sản phẩm trong đơn hàng '''
+    UC_RevSta ..> UC_VieOrdDet : <<extend>>
 }
 @enduml

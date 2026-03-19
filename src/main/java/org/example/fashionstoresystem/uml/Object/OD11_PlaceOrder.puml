@@ -1,0 +1,66 @@
+@startuml
+title Object Diagram: Place Order (UC11)\nScenario: Customer places an order with 2 items successfully
+
+' DTO - Data sent from checkout form
+object "orderDto : OrderDTO" as dto {
+    cartItemIds = [101, 102]
+    shippingAddress = "123 Nguyen Hue, Q1, HCM"
+    paymentMethod = "COD"
+}
+
+' Entity - Order created
+object "order : Order" as order {
+    id = 1001
+    orderDate = "2026-03-19"
+    totalAmount = 3350000.0
+    status = "PENDING"
+    shippingAddress = "123 Nguyen Hue, Q1, HCM"
+}
+
+' Entity - Order Items
+object "item1 : OrderItem" as item1 {
+    id = 201
+    quantity = 2
+    price = 1250000.0
+}
+
+object "item2 : OrderItem" as item2 {
+    id = 202
+    quantity = 1
+    price = 850000.0
+}
+
+' Entity - Products (stock updated)
+object "product1 : Product" as p1 {
+    id = 5
+    stockQuantity = 48
+}
+
+object "product2 : Product" as p2 {
+    id = 12
+    stockQuantity = 29
+}
+
+' Response DTO
+object "response : OrderSuccessDTO" as res {
+    orderId = 1001
+    totalAmount = 3350000.0
+    message = "Order placed successfully!"
+}
+
+' Structural relationships (Order contains OrderItems)
+order *-- item1
+order *-- item2
+
+note bottom of order
+    Order is created with status "PENDING"
+    totalAmount = (1250000 x 2) + (850000 x 1)
+end note
+
+note bottom of p1
+    Stock decreased after order:
+    product1: 50 -> 48 (qty: 2)
+    product2: 30 -> 29 (qty: 1)
+end note
+
+@enduml

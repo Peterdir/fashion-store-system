@@ -1,0 +1,31 @@
+@startuml
+title Object Diagram: Payment (UC12)\nScenario: Customer pays for an order online successfully
+
+' Entity - Order before and after payment
+object "order : Order" as order {
+    id = 1001
+    totalAmount = 3350000.0
+    status = "PAID"
+    paymentMethod = "VNPAY"
+    orderDate = "2026-03-19"
+}
+
+' Response from Payment Gateway
+object "paymentResponse : PaymentResponseDTO" as res {
+    status = "SUCCESS"
+    transactionId = "VNP20260319-0012345"
+    message = "Payment completed successfully"
+}
+
+note right of order
+    Order status changed:
+    "PENDING" -> "PAID"
+    after successful payment
+end note
+
+note right of res
+    Response received from
+    VNPay payment gateway
+end note
+
+@enduml

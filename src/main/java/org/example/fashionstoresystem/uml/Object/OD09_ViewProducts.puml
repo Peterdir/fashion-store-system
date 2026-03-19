@@ -1,0 +1,36 @@
+@startuml
+title Object Diagram: View Products (UC09)\nScenario: Customer searches for products with keyword "Jacket"
+
+object "product1 : Product" as p1 {
+    id = 5
+    name = "Leather Jacket"
+    price = 1250000.0
+    category = "Outerwear"
+    size = 42
+    color = "Black"
+}
+
+object "product2 : Product" as p2 {
+    id = 12
+    name = "Denim Jacket"
+    price = 850000.0
+    category = "Outerwear"
+    size = 40
+    color = "Blue"
+}
+
+object "product3 : Product" as p3 {
+    id = 28
+    name = "Bomber Jacket"
+    price = 980000.0
+    category = "Outerwear"
+    size = 44
+    color = "Green"
+}
+
+note bottom of p1
+    Products returned from database
+    matching keyword "Jacket"
+end note
+
+@enduml

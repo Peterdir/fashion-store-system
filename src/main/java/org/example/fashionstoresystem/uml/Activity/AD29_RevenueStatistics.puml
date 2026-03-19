@@ -32,6 +32,8 @@ else (Có)
         |Owner (UI)|
         :Hiển thị Tổng doanh thu & Số lượng đơn;
         :Hiển thị Biểu đồ minh họa trực quan;
+        :Hiển thị bảng chi tiết đơn hàng
+        (Order ID, Products, Quantity, Price, Amount);
     endif
 endif
 

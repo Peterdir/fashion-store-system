@@ -1,0 +1,31 @@
+@startuml
+title Object Diagram: Order Management (UC26)\nScenario: Admin updates order status from CONFIRMED to SHIPPING
+
+' Entity - Order after status update
+object "order : Order" as order {
+    id = 1001
+    totalAmount = 2100000.0
+    status = "SHIPPING"
+    orderDate = "2026-03-19"
+}
+
+' Entity - History record created
+object "history : OrderHistory" as history {
+    id = 501
+    orderId = 1001
+    previousStatus = "CONFIRMED"
+    newStatus = "SHIPPING"
+    changeDate = "2026-03-19"
+}
+
+note right of order
+    Order status updated:
+    "CONFIRMED" -> "SHIPPING"
+end note
+
+note right of history
+    OrderHistory records every
+    status transition for audit trail
+end note
+
+@enduml
