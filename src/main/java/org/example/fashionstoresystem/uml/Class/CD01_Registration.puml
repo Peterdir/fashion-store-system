@@ -59,6 +59,7 @@ class User {
     - address : String
     - status : String
     - verificationToken : String
+    - verificationTokenExpiryDate : Date
 }
 
 ' Relationships

@@ -23,7 +23,7 @@ Mẫu thiết kế chính đóng vai trò xương sống là **MVC (Model-View-C
 *(Lưu ý: Hệ thống hiện tại đang ở giai đoạn hoàn thiện Entity mapping cốt lõi, phần logic Controller/Service sẽ được rải dần sau).*
 
 *   **`User`**: Chủ thể chính tương tác với ứng dụng.
-    *   *Core fields*: `id`, `fullName`, `phone`, `email`, `password`, `address`, `status`, `role`, `twoFactorEnabled`, `verificationToken`.
+    *   *Core fields*: `id`, `fullName`, `phone`, `email`, `password`, `address`, `status`, `role`, `twoFactorEnabled`, `verificationToken`, `verificationTokenExpiryDate`.
 *   **Authentication & Security** (Bảo mật 4 lớp gắn kết với `User`):
     *   `Token`: Access Token (ngắn hạn 15p). Có cờ `expired`, `revoked`.
     *   `RefreshToken`: Token sống dài hạn dùng reset Access Token cũ.
@@ -48,8 +48,8 @@ Mẫu thiết kế chính đóng vai trò xương sống là **MVC (Model-View-C
 *   **`CartItem`**: Bảng trung gian User ↔ ProductVariant cho tính năng "Giỏ hàng".
     *   *Core fields*: `id`, `quantity`. *Relations*: `user` (ManyToOne), `productVariant` (ManyToOne).
 *   **`Order`**: Đơn hàng.
-    *   *Core fields*: `id`, `orderDate`, `totalAmount`, `status`, `shippingAddress`, `paymentMethod`, `type`, `cancellationReason`, `refundStatus`.
-    *   *Relations*: `user` (ManyToOne), `coupon` (ManyToOne, nullable), `orderItems` (List), `orderHistories` (List), `returnRequests` (List).
+    *   *Core fields*: `id`, `orderDate`, `totalAmount`, `status`, `shippingAddress` (nullable cho offline), `paymentMethod`, `type` (ONLINE/OFFLINE), `cancellationReason`, `refundStatus`.
+    *   *Relations*: `user` (ManyToOne, nullable cho offline), `coupon` (ManyToOne, nullable), `orderItems` (List), `orderHistories` (List), `returnRequests` (List).
 *   **`OrderItem`**: Chi tiết món hàng gắn trên Đơn hàng.
     *   *Core fields*: `id`, `quantity`, `price`, `productName`. *Relations*: `order` (ManyToOne), `productVariant` (ManyToOne), `returnRequest` (ManyToOne).
 *   **`ReturnRequest`**: Yêu cầu hoàn trả sản phẩm.

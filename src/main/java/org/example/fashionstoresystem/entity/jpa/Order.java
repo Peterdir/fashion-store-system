@@ -30,7 +30,7 @@ public class Order {
     @Column(nullable = false)
     private String status;
 
-    @Column(nullable = false)
+    @Column
     private String shippingAddress;
 
     @Column(nullable = false)
@@ -46,7 +46,7 @@ public class Order {
     private String refundStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -49,7 +49,7 @@ class Order {
 
 class OrderHistory {
     - id : Long
-    - orderId : Long
+    - order : Order
     - previousStatus : String
     - newStatus : String
     - changeDate : Date

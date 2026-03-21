@@ -90,6 +90,11 @@ class Coupon {
     - code : String
     - discountValue : Double
     - discountType : String
+    - startDate : Instant
+    - expiryDate : Instant
+    - minOrderAmount : Double
+    - usageLimit : Integer
+    - active : boolean
 }
 
 class User {

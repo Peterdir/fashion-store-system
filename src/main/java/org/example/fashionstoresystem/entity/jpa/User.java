@@ -5,6 +5,7 @@ import lombok.*;
 import org.example.fashionstoresystem.entity.enums.Role;
 import org.example.fashionstoresystem.entity.enums.UserStatus;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +44,9 @@ public class User {
 
     @Column(unique = true)
     private String verificationToken;
+
+    @Column
+    private Instant verificationTokenExpiryDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
