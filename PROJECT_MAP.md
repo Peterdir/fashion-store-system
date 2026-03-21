@@ -30,10 +30,18 @@ Mẫu thiết kế chính đóng vai trò xương sống là **MVC (Model-View-C
     *   `PasswordResetToken`: Quản lý quy trình khôi phục mật khẩu.
     *   `Otp`: Quản lý mã dùng 1 lần cho hệ thống xác thực 2 bước 2FA.
 *   **`Product`**: Danh mục Hàng hóa cốt lõi.
-    *   *Core fields*: `id`, `name`, `price`, `category`, `size`, `color`, `stockQuantity`.
-    *   *Relations*: `images` (List các `ProductImage`).
-*   **`ProductImage`**: Hình ảnh chi tiết của sản phẩm.
+    *   *Core fields*: `id`, `name`, `price`, `category`, `description`, `status`.
+    *   *Relations*: `images` (List `ProductImage`), `variants` (List `ProductVariant`), `reviews` (List `Review`).
+*   **`ProductImage`**: Hình ảnh chi tiết.
     *   *Core fields*: `id`, `url`.
+*   **`ProductVariant`**: Biến thể cấu hình sản phẩm.
+    *   *Core fields*: `id`, `size`, `color`, `stockQuantity`.
+*   **`Review`**: Nhận xét từ người dùng.
+    *   *Core fields*: `id`, `rating`, `comment`.
+*   **`WishlistItem`**: Bảng trung gian User ↔ Product cho tính năng "Mục yêu thích".
+    *   *Core fields*: `id`. *Relations*: `user` (ManyToOne), `product` (ManyToOne).
+*   **`CartItem`**: Bảng trung gian User ↔ ProductVariant cho tính năng "Giỏ hàng".
+    *   *Core fields*: `id`, `quantity`. *Relations*: `user` (ManyToOne), `productVariant` (ManyToOne).
 *   **`Order`**: Đơn hàng.
     *   *Core fields*: `id`, `orderDate`, `totalAmount`, `status`, `shippingAddress`, `paymentMethod`.
 *   **`OrderItem`**: Chi tiết món hàng gắn trên Đơn hàng.
