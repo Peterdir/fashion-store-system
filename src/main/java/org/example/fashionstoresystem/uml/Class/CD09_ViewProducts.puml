@@ -32,12 +32,34 @@ class Product {
     - name: String
     - price: Double
     - category: String
-    - size: int
-    - color: String
+    - description: String
+    - status: String
+}
 
+class ProductVariant {
+    - id: Long
+    - size: String
+    - color: String
+    - stockQuantity: Long
+}
+
+class Review {
+    - id: Long
+    - rating: int
+    - comment: String
+    - createdAt: Date
+}
+
+class ProductImage {
+    - id: Long
+    - url: String
 }
 
 ' Relationships
+
+Product "1" *-- "0..*" ProductImage : has >
+Product "1" *-- "0..*" ProductVariant : has >
+Product "1" *-- "0..*" Review : receives >
 
 ' Class implement Interface
 ProductServiceImpl ..|>ProductService

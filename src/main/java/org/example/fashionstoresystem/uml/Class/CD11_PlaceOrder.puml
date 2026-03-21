@@ -8,6 +8,7 @@ class OrderController {
 }
 
 ' Service
+
 interface OrderService <<interface>>{
     + placeOrder(orderDto: OrderDTO) : OrderSuccessDTO
 }
@@ -15,16 +16,17 @@ interface OrderService <<interface>>{
 class OrderServiceImpl {
     + placeOrder(orderDto: OrderDTO) : OrderSuccessDTO
     - calculateTotalAmount() : Double
-    - productRepository: ProductRepository
+    - productVariantRepository: ProductVariantRepository
     - orderRepository: OrderRepository
     - orderItemRepository: OrderItemRepository
     - cartRepository: CartRepository
+    - couponRepository: CouponRepository
 }
 
 ' Repository
-interface ProductRepository <<interface>> {
-    + findById(productId: Long) : Product
-    + updateStock(productId: Long, quantity: int) : void
+interface ProductVariantRepository <<interface>> {
+    + findById(variantId: Long) : ProductVariant
+    + save(variant: ProductVariant) : ProductVariant
 }
 
 interface OrderRepository <<interface>> {
@@ -39,11 +41,16 @@ interface CartRepository <<interface>> {
     + deleteAllById(selectedCartItemIds: List<Long>) : void
 }
 
+interface CouponRepository <<interface>> {
+    + findByCode(code: String) : Coupon
+}
+
 ' Entity & DTO
 class OrderDTO {
     - cartItemIds: List<Long>
     - shippingAddress: String
     - paymentMethod: String
+    - couponCode: String
 }
 
 class OrderSuccessDTO {
@@ -58,32 +65,60 @@ class Order {
     - totalAmount : Double
     - status : String
     - shippingAddress : String
+    - paymentMethod : String
+    - type : String
+    - cancellationReason : String
+    - refundStatus : String
 }
 
 class OrderItem {
     - id : Long
-    - quantity : int
+    - quantity : Long
     - price : Double
+    - productName : String
 }
 
-class Product {
+class ProductVariant {
     - id : Long
+    - size : String
+    - color : String
     - stockQuantity : Long
 }
 
+class Coupon {
+    - id : Long
+    - code : String
+    - discountValue : Double
+    - discountType : String
+    - startDate : Instant
+    - expiryDate : Instant
+    - minOrderAmount : Double
+    - usageLimit : Integer
+    - active : boolean
+}
 
+class User {
+    - id : Long
+    - address : String
+}
 
 ' Relationships
+
+Order "1" *-- "1..*" OrderItem : contains >
+Order "N" --> "1" User : belongs to >
+Order "N" --> "0..1" Coupon : applies >
+OrderItem "N" --> "1" ProductVariant : references >
 
 ' Class implement Interface
 OrderServiceImpl ..|> OrderService
 
 ' Dependency Injection
 OrderController --> OrderService: - orderService
-OrderServiceImpl --> ProductRepository: - productRepository
+OrderServiceImpl --> ProductVariantRepository: - productVariantRepository
 OrderServiceImpl --> OrderRepository: - orderRepository
 OrderServiceImpl --> OrderItemRepository: - orderItemRepository
 OrderServiceImpl --> CartRepository: - cartRepository
+OrderServiceImpl --> CouponRepository: - couponRepository
 
 ' Object Usage
 OrderController ..> OrderDTO : <<uses>>
@@ -94,8 +129,8 @@ OrderServiceImpl ..> OrderSuccessDTO : <<creates>>
 OrderRepository ..> Order : <<manages>>
 OrderServiceImpl ..> Order : <<creates>>
 
-ProductRepository ..> Product : <<manages>>
-OrderServiceImpl ..> Product : <<uses>>
+ProductVariantRepository ..> ProductVariant : <<manages>>
+OrderServiceImpl ..> ProductVariant : <<uses>>
 
 OrderItemRepository ..> OrderItem : <<manages>>
 OrderServiceImpl ..> OrderItem : <<creates>>

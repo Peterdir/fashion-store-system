@@ -39,6 +39,8 @@ class Order {
     - status : String
     - paymentMethod : String
     - orderDate : Date
+    - cancellationReason : String
+    - refundStatus : String
     + isExpired() : Boolean
     + setStatus(status: String) : void
 }

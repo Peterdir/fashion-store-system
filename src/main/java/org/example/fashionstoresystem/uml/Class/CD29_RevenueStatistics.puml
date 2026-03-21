@@ -39,6 +39,9 @@ class Order {
     - orderDate : Date
     - totalAmount : Double
     - type : String
+    - status : String
+    - cancellationReason : String
+    - refundStatus : String
 }
 
 class OrderItem {

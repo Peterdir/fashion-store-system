@@ -56,8 +56,10 @@ class User {
     - phone : String
     - email : String
     - password : String
+    - address : String
     - status : String
     - verificationToken : String
+    - verificationTokenExpiryDate : Date
 }
 
 ' Relationships

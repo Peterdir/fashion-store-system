@@ -4,7 +4,7 @@ title Object Diagram: Payment (UC12)\nScenario: Customer pays for an order onlin
 ' Entity - Order before and after payment
 object "order : Order" as order {
     id = 1001
-    totalAmount = 3350000.0
+    totalAmount = 2100000.0
     status = "PAID"
     paymentMethod = "VNPAY"
     orderDate = "2026-03-19"
