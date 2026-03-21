@@ -31,9 +31,14 @@ public class Coupon {
     private String discountType;
 
     @Column(nullable = false)
+    private Instant startDate;
+
+    @Column(nullable = false)
     private Instant expiryDate;
 
     private Double minOrderAmount;
+
+    private Integer usageLimit;
 
     @Column(nullable = false)
     private boolean active;

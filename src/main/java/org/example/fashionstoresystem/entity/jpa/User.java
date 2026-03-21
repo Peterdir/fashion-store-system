@@ -34,6 +34,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(columnDefinition = "TEXT")
+    private String address;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserStatus status;

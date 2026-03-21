@@ -42,6 +42,8 @@ class Order {
     - totalAmount : Double
     - status : String
     - orderDate : Date
+    - cancellationReason : String
+    - refundStatus : String
     + setStatus(status: String) : void
 }
 

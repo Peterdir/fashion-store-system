@@ -53,12 +53,17 @@ class ReturnRequest {
     - reason : String
     - description : String
     - requestDate : Date
+    - processedAt : Date
+    - rejectionReason : String
+    - processedBy : String
     + setStatus(status: String) : void
 }
 
 class Order {
     - id : Long
     - status : String
+    - cancellationReason : String
+    - refundStatus : String
 }
 
 class OrderItem {

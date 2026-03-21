@@ -67,6 +67,8 @@ class Order {
     - shippingAddress : String
     - paymentMethod : String
     - type : String
+    - cancellationReason : String
+    - refundStatus : String
 }
 
 class OrderItem {
@@ -92,6 +94,7 @@ class Coupon {
 
 class User {
     - id : Long
+    - address : String
 }
 
 ' Relationships

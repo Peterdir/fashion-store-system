@@ -47,6 +47,7 @@ class Review {
     - id: Long
     - rating: int
     - comment: String
+    - createdAt: Date
 }
 
 class ProductImage {

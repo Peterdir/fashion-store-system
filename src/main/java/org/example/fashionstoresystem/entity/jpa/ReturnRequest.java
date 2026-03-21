@@ -33,6 +33,16 @@ public class ReturnRequest {
     @Column(nullable = false)
     private Date requestDate;
 
+    @Column
+    private Date processedAt;
+
+    @Column(columnDefinition = "TEXT")
+    private String rejectionReason;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "processed_by")
+    private User processedBy;
+
     // Linking to the original order
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
