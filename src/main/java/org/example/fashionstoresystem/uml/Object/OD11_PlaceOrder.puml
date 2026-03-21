@@ -12,7 +12,7 @@ object "orderDto : OrderDTO" as dto {
 object "order : Order" as order {
     id = 1001
     orderDate = "2026-03-19"
-    totalAmount = 3350000.0
+    totalAmount = 2100000.0
     status = "PENDING"
     shippingAddress = "123 Nguyen Hue, Q1, HCM"
 }
@@ -44,7 +44,7 @@ object "product2 : Product" as p2 {
 ' Response DTO
 object "response : OrderSuccessDTO" as res {
     orderId = 1001
-    totalAmount = 3350000.0
+    totalAmount = 2100000.0
     message = "Order placed successfully!"
 }
 

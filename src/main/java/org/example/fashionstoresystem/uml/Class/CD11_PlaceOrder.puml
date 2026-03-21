@@ -62,7 +62,7 @@ class Order {
 
 class OrderItem {
     - id : Long
-    - quantity : int
+    - quantity : Long
     - price : Double
 }
 
