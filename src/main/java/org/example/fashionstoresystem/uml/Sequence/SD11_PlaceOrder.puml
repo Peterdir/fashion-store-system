@@ -6,7 +6,8 @@ actor Customer
 participant "Checkout View\n(Thymeleaf)" as View
 participant "OrderController\n(Controller)" as Controller
 participant "OrderService\n(Service)" as Service
-participant "ProductRepository\n(Repo)" as ProductRepo
+participant "ProductVariantRepository\n(Repo)" as VariantRepo
+participant "CouponRepository\n(Repo)" as CouponRepo
 participant "OrderRepository\n(Repo)" as OrderRepo
 participant "OrderItemRepository\n(Repo)" as ItemRepo
 participant "CartRepository\n(Repo)" as CartRepo
@@ -18,16 +19,28 @@ note right: POST /place-order
 Controller -> Service : placeOrder(orderDto)
 
 group Order Management (Transaction)
-    Service -> ProductRepo : findById(productId)
-    ProductRepo -> DB : SELECT stock_quantity...
-    DB --> ProductRepo : Product\n(Entity)
-    ProductRepo --> Service : Product object
+    == Validate Stock ==
+    loop For each cartItem
+        Service -> VariantRepo : findById(variantId)
+        VariantRepo -> DB : SELECT stock_quantity...
+        DB --> VariantRepo : ProductVariant\n(Entity)
+        VariantRepo --> Service : ProductVariant object
+    end
 
     alt Insufficient stock
         Service --> Controller : throw InsufficientStockException
         Controller --> View : checkout.html (error)
         View --> Customer : Display "Product Out of Stock" message
     else Valid
+        == Apply Coupon (if provided) ==
+        opt couponCode is present
+            Service -> CouponRepo : findByCode(couponCode)
+            CouponRepo -> DB : SELECT * FROM coupons...
+            DB --> CouponRepo : Coupon (Entity)
+            CouponRepo --> Service : Coupon object
+            Service -> Service : applyDiscount(coupon)
+        end
+
         == Save Order ==
         Service -> Service : calculateTotalAmount()
         Service -> OrderRepo : save(new Order)
@@ -41,8 +54,9 @@ group Order Management (Transaction)
             ItemRepo -> DB : INSERT INTO order_items...
             DB --> ItemRepo : success
 
-            Service -> ProductRepo : updateStock(productId, quantity)
-            ProductRepo -> DB : UPDATE products SET quantity = ...
+            Service -> VariantRepo : save(variant)
+            note right: stockQuantity -= ordered quantity
+            VariantRepo -> DB : UPDATE product_variants SET stock_quantity = ...
         end
 
         == Clear Cart ==

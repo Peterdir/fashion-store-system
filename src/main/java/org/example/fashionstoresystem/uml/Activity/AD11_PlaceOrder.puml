@@ -40,8 +40,8 @@ repeat while (Cần sửa lại thông tin?)
 |Database (MySQL)|
 :Lưu thông tin đơn hàng (Bảng Orders);
 :Lưu chi tiết sản phẩm (Bảng OrderItems);
-:Trừ số lượng tồn kho (Bảng Products);
-:Xóa sản phẩm khỏi giỏ hàng (Bảng Cart);
+:Trừ số lượng tồn kho (Bảng ProductVariants);
+:Xóa sản phẩm khỏi giỏ hàng (Bảng CartItems);
 
 |System (Service)|
 if (Lỗi khi lưu?) then (Có)

@@ -1,0 +1,44 @@
+package org.example.fashionstoresystem.entity.jpa;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "coupons")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Coupon {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "coupon_id")
+    private Long id;
+
+    @Column(unique = true, nullable = false)
+    private String code;
+
+    @Column(nullable = false)
+    private Double discountValue;
+
+    @Column(nullable = false)
+    private String discountType;
+
+    @Column(nullable = false)
+    private Instant expiryDate;
+
+    private Double minOrderAmount;
+
+    @Column(nullable = false)
+    private boolean active;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserCoupon> userCoupons = new ArrayList<>();
+}

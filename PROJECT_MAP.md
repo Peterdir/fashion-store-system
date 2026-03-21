@@ -36,15 +36,24 @@ Mẫu thiết kế chính đóng vai trò xương sống là **MVC (Model-View-C
     *   *Core fields*: `id`, `url`.
 *   **`ProductVariant`**: Biến thể cấu hình sản phẩm.
     *   *Core fields*: `id`, `size`, `color`, `stockQuantity`.
+*   **`EmailLog`**: Ghi nhận lịch sử gửi Email.
+*   **`Coupon`**: Mã giảm giá (khuyến mãi) do hệ thống phát hành.
+    *   *Core fields*: `id`, `code`, `discountValue`, `discountType`, `expiryDate`, `minOrderAmount`, `active`.
+*   **`UserCoupon`**: Bảng trung gian User ↔ Coupon, ghi nhận khách hàng đã thu thập mã nào.
+    *   *Core fields*: `id`, `used`. *Relations*: `user` (ManyToOne), `coupon` (ManyToOne).
 *   **`Review`**: Nhận xét từ người dùng.
-    *   *Core fields*: `id`, `rating`, `comment`.
+    *   *Core fields*: `id`, `rating`, `comment`, `createdAt`. *Relations*: `user` (ManyToOne), `product` (ManyToOne).
 *   **`WishlistItem`**: Bảng trung gian User ↔ Product cho tính năng "Mục yêu thích".
     *   *Core fields*: `id`. *Relations*: `user` (ManyToOne), `product` (ManyToOne).
 *   **`CartItem`**: Bảng trung gian User ↔ ProductVariant cho tính năng "Giỏ hàng".
     *   *Core fields*: `id`, `quantity`. *Relations*: `user` (ManyToOne), `productVariant` (ManyToOne).
 *   **`Order`**: Đơn hàng.
-    *   *Core fields*: `id`, `orderDate`, `totalAmount`, `status`, `shippingAddress`, `paymentMethod`.
+    *   *Core fields*: `id`, `orderDate`, `totalAmount`, `status`, `shippingAddress`, `paymentMethod`, `type`, `cancellationReason`, `refundStatus`.
+    *   *Relations*: `user` (ManyToOne), `coupon` (ManyToOne, nullable), `orderItems` (List), `orderHistories` (List), `returnRequests` (List).
 *   **`OrderItem`**: Chi tiết món hàng gắn trên Đơn hàng.
+    *   *Core fields*: `id`, `quantity`, `price`, `productName`. *Relations*: `order` (ManyToOne), `productVariant` (ManyToOne), `returnRequest` (ManyToOne).
+*   **`ReturnRequest`**: Yêu cầu hoàn trả sản phẩm.
+    *   *Core fields*: `id`, `status`, `reason`, `description`, `requestDate`. *Relations*: `order` (ManyToOne), `user` (ManyToOne), `returnItems` (List OrderItem).
 *   **`OrderHistory`**: Lưu vết trạng thái Log của việc vận hành Đơn hàng (Đang xử lý -> Đã gửi -> Hoàn thành).
 
 ## 5. 📦 Thiết kế & Triết lý DTO
