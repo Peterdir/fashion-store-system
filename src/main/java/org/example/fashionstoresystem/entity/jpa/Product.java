@@ -3,6 +3,7 @@ package org.example.fashionstoresystem.entity.jpa;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -37,5 +38,9 @@ public class Product {
 
     @Column(nullable = false)
     private Long stockQuantity;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> images = new ArrayList<>();
 
 }

@@ -34,10 +34,17 @@ class Product {
     - category: String
     - size: int
     - color: String
+    - stockQuantity: Long
+}
 
+class ProductImage {
+    - id: Long
+    - url: String
 }
 
 ' Relationships
+
+Product "1" *-- "0..*" ProductImage : has >
 
 ' Class implement Interface
 ProductServiceImpl ..|>ProductService
