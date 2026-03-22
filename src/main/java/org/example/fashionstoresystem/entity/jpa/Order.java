@@ -3,6 +3,8 @@ package org.example.fashionstoresystem.entity.jpa;
 import jakarta.persistence.*;
 import lombok.*;
 
+import org.example.fashionstoresystem.entity.enums.OrderStatus;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,8 +29,9 @@ public class Order {
     @Column(nullable = false)
     private Double totalAmount;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status;
+    private OrderStatus status;
 
     @Column
     private String shippingAddress;
