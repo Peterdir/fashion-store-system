@@ -1,5 +1,256 @@
 @startuml
 skinparam classAttributeIconSize 0
+title Class Diagram: Fashion Store System (Tổng quan)
+
+' ========== ENUMS ==========
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum TokenType {
+  BEARER
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  OUT_OF_STOCK
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  PROCESSING
+  SHIPPING
+  DELIVERED
+  COMPLETED
+  CANCELLED
+  PAYMENT_FAILED
+  PAYMENT_EXPIRED
+}
+
+enum OrderType {
+  ONLINE
+  OFFLINE
+}
+
+enum PaymentMethod {
+  COD
+  VNPAY
+  MOMO
+  BANK_TRANSFER
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+enum RefundStatus {
+  NONE
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum ReturnStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+' ========== ENTITIES ==========
+
+class User {
+  - id : Long
+  - fullName : String
+  - phone : String
+  - email : String
+  - password : String
+  - address : String
+  - status : UserStatus
+  - verificationToken : String
+  - verificationTokenExpiryDate : Instant
+  - role : Role
+  - twoFactorEnabled : boolean
+}
+
+class Token {
+  - id : Long
+  - token : String
+  - refreshToken : String
+  - tokenType : TokenType
+  - expired : boolean
+  - revoked : boolean
+}
+
+class RefreshToken {
+  - id : Long
+  - token : String
+  - expiryDate : Instant
+  - revoked : boolean
+}
+
+class PasswordResetToken {
+  - id : Long
+  - token : String
+  - expiryDate : Date
+  - used : boolean
+}
+
+class Otp {
+  - id : Long
+  - email : String
+  - otpCode : String
+  - expiryDate : Date
+  - used : boolean
+}
+
+class EmailLog {
+  - id : Long
+  - recipientEmail : String
+  - subject : String
+  - body : String
+  - sentAt : LocalDateTime
+}
+
+class Product {
+  - id : Long
+  - name : String
+  - description : String
+  - price : Double
+  - category : String
+  - status : ProductStatus
+}
+
+class ProductVariant {
+  - id : Long
+  - size : String
+  - color : String
+  - stockQuantity : Integer
+}
+
+class ProductImage {
+  - id : Long
+  - imageUrl : String
+  - isPrimary : boolean
+}
+
+class Review {
+  - id : Long
+  - rating : Integer
+  - comment : String
+  - createdAt : Date
+}
+
+class Coupon {
+  - id : Long
+  - code : String
+  - discountValue : Double
+  - discountType : DiscountType
+  - startDate : Instant
+  - expiryDate : Instant
+  - minOrderAmount : Double
+  - usageLimit : Integer
+  - active : boolean
+}
+
+class UserCoupon {
+  - id : Long
+  - used : boolean
+}
+
+class CartItem {
+  - id : Long
+  - quantity : Integer
+}
+
+class WishlistItem {
+  - id : Long
+  - addedDate : Date
+}
+
+class Order {
+  - id : Long
+  - orderDate : Date
+  - totalAmount : Double
+  - status : OrderStatus
+  - type : OrderType
+  - paymentMethod : PaymentMethod
+  - shippingAddress : String
+  - cancellationReason : String
+  - refundStatus : RefundStatus
+}
+
+class OrderItem {
+  - id : Long
+  - quantity : Integer
+  - price : Double
+  - productName : String
+}
+
+class OrderHistory {
+  - id : Long
+  - previousStatus : OrderStatus
+  - newStatus : OrderStatus
+  - changeDate : Date
+}
+
+class ReturnRequest {
+  - id : Long
+  - status : ReturnStatus
+  - reason : String
+  - description : String
+  - requestDate : Date
+  - processedAt : Date
+  - rejectionReason : String
+}
+
+' ========== RELATIONSHIPS ==========
+
+' User relationships
+User "1" -- "N" Token
+User "1" -- "N" RefreshToken
+User "1" -- "N" PasswordResetToken
+User "1" -- "N" Otp
+User "1" -- "N" Review
+User "1" -- "N" UserCoupon
+User "1" -- "N" CartItem
+User "1" -- "N" WishlistItem
+User "0..1" -- "N" Order
+User "1" -- "N" ReturnRequest : submitted_by
+User "0..1" -- "N" ReturnRequest : processed_by
+
+' Product relationships
+Product "1" -- "N" ProductVariant
+Product "1" -- "N" ProductImage
+Product "1" -- "N" Review
+Product "1" -- "N" WishlistItem
+
+' Coupon relationships
+Coupon "1" -- "N" UserCoupon
+Coupon "0..1" -- "N" Order
+
+' Cart & Variant
+ProductVariant "1" -- "N" CartItem
+
+' Order relationships
+Order "1" -- "N" OrderItem
+Order "1" -- "N" OrderHistory
+Order "1" -- "N" ReturnRequest
+ProductVariant "1" -- "N" OrderItem
+ReturnRequest "0..1" -- "N" OrderItem
+
+=======
 
 class User {
   id: Long

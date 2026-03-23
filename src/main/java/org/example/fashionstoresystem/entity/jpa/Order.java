@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import org.example.fashionstoresystem.entity.enums.OrderStatus;
+import org.example.fashionstoresystem.entity.enums.OrderType;
+import org.example.fashionstoresystem.entity.enums.PaymentMethod;
+import org.example.fashionstoresystem.entity.enums.RefundStatus;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,17 +39,20 @@ public class Order {
     @Column
     private String shippingAddress;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String type;
+    private OrderType type;
 
     @Column
     private String cancellationReason;
 
+    @Enumerated(EnumType.STRING)
     @Column
-    private String refundStatus;
+    private RefundStatus refundStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

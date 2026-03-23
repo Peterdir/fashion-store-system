@@ -7,7 +7,7 @@ class ReturnRequestController {
     + showOrderList(customerId: Long) : String
     + showReturnSelection(orderId: Long) : String
     + prepareReturnForm(orderId: Long, itemIds: List<Long>) : String
-    + submitReturnRequest(returnDto: ReturnRequestDTO) : String
+    + submitReturnRequest(dto: SubmitReturnRequestDTO) : MessageResponseDTO
 }
 
 ' Service
@@ -15,7 +15,7 @@ interface ReturnRequestService <<interface>> {
     + getOrdersByCustomer(customerId: Long) : List<Order>
     + getOrderForReturn(orderId: Long) : Order
     + validateReturnEligibility(orderId: Long, itemIds: List<Long>) : List<OrderItem>
-    + submitReturnRequest(returnDto: ReturnRequestDTO, images: List<String>) : ReturnRequest
+    + submitReturnRequest(dto: SubmitReturnRequestDTO, images: List<String>) : ReturnRequest
 }
 
 class ReturnRequestServiceImpl {
@@ -24,8 +24,8 @@ class ReturnRequestServiceImpl {
     + getOrdersByCustomer(customerId: Long) : List<Order>
     + getOrderForReturn(orderId: Long) : Order
     + validateReturnEligibility(orderId: Long, itemIds: List<Long>) : List<OrderItem>
-    + submitReturnRequest(returnDto: ReturnRequestDTO, images: List<String>) : ReturnRequest
-    - createReturnRequest(dto: ReturnRequestDTO) : ReturnRequest
+    + submitReturnRequest(dto: SubmitReturnRequestDTO, images: List<String>) : ReturnRequest
+    - createReturnRequest(dto: SubmitReturnRequestDTO) : ReturnRequest
 }
 
 ' Repository
@@ -39,31 +39,36 @@ interface ReturnRequestRepository <<interface>> {
     + save(returnRequest: ReturnRequest) : ReturnRequest
 }
 
-' Entity & DTO
-class ReturnRequestDTO {
+' DTO
+
+class SubmitReturnRequestDTO {
     - orderId : Long
     - itemIds : List<Long>
     - reason : String
     - description : String
 }
 
+class MessageResponseDTO {
+    - message : String
+}
+
+' Entity
+
 class ReturnRequest {
     - id : Long
-    - status : String
+    - status : ReturnStatus
     - reason : String
     - description : String
     - requestDate : Date
     - processedAt : Date
     - rejectionReason : String
-    - processedBy : String
-    + setStatus(status: String) : void
 }
 
 class Order {
     - id : Long
-    - status : String
+    - status : OrderStatus
     - cancellationReason : String
-    - refundStatus : String
+    - refundStatus : RefundStatus
 }
 
 class OrderItem {
@@ -81,8 +86,9 @@ ReturnRequestServiceImpl --> OrderRepository : - orderRepository
 ReturnRequestServiceImpl --> ReturnRequestRepository : - returnRepository
 
 ' Object Usage
-ReturnRequestController ..> ReturnRequestDTO : <<uses>>
-ReturnRequestServiceImpl ..> ReturnRequestDTO : <<uses>>
+ReturnRequestController ..> SubmitReturnRequestDTO : <<uses>>
+ReturnRequestController ..> MessageResponseDTO : <<returns>>
+ReturnRequestServiceImpl ..> SubmitReturnRequestDTO : <<uses>>
 
 ReturnRequestServiceImpl ..> ReturnRequest : <<creates>>
 ReturnRequestRepository ..> ReturnRequest : <<manages>>

@@ -6,20 +6,26 @@ title Class Diagram: Registration (UC01)
 class AuthController {
     - authService : AuthService
     + showRegisterPage() : String
-    + processRegistration(dto: RegistrationDTO) : String
+    + processRegistration(dto: RegisterRequestDTO) : RegisterResponseDTO
+    + verifyEmail(dto: VerifyEmailRequestDTO) : MessageResponseDTO
+    + resendVerificationEmail(dto: ResendVerificationEmailRequestDTO) : MessageResponseDTO
 }
 
 'Service
 
 interface AuthService <<interface>> {
-    + registerNewAccount(dto: RegistrationDTO) : User
+    + registerNewAccount(dto: RegisterRequestDTO) : RegisterResponseDTO
+    + verifyEmail(dto: VerifyEmailRequestDTO) : Boolean
+    + resendVerificationEmail(dto: ResendVerificationEmailRequestDTO) : Boolean
 }
 
 class AuthServiceImpl {
     - userRepository : UserRepository
     - emailService : EmailService
-    + registerNewAccount(dto: RegistrationDTO) : User
-    - validateInfo(dto: RegistrationDTO) : Boolean
+    + registerNewAccount(dto: RegisterRequestDTO) : RegisterResponseDTO
+    + verifyEmail(dto: VerifyEmailRequestDTO) : Boolean
+    + resendVerificationEmail(dto: ResendVerificationEmailRequestDTO) : Boolean
+    - validateInfo(dto: RegisterRequestDTO) : Boolean
     - encodePassword(rawPassword: String) : void
     - createVerificationToken(user: User) : String
 }
@@ -40,15 +46,37 @@ interface UserRepository <<interface>> {
 }
 
 
-' Entity & DTO
+' DTO
 
-class RegistrationDTO {
+class RegisterRequestDTO {
     - fullName : String
     - phone : String
     - email : String
     - password : String
     - confirmPassword : String
 }
+
+class RegisterResponseDTO {
+    - userId : Long
+    - fullName : String
+    - email : String
+    - status : UserStatus
+    - message : String
+}
+
+class VerifyEmailRequestDTO {
+    - token : String
+}
+
+class ResendVerificationEmailRequestDTO {
+    - email : String
+}
+
+class MessageResponseDTO {
+    - message : String
+}
+
+' Entity
 
 class User {
     - id : Long
@@ -57,9 +85,11 @@ class User {
     - email : String
     - password : String
     - address : String
-    - status : String
+    - status : UserStatus
     - verificationToken : String
-    - verificationTokenExpiryDate : Date
+    - verificationTokenExpiryDate : Instant
+    - role : Role
+    - twoFactorEnabled : boolean
 }
 
 ' Relationships
@@ -74,8 +104,16 @@ AuthServiceImpl --> UserRepository : - userRepository
 AuthServiceImpl --> EmailService : - emailService
 
 ' Object Usage
-AuthController ..> RegistrationDTO : <<uses>>
-AuthServiceImpl ..> RegistrationDTO : <<uses>>
+AuthController ..> RegisterRequestDTO : <<uses>>
+AuthController ..> RegisterResponseDTO : <<returns>>
+AuthController ..> VerifyEmailRequestDTO : <<uses>>
+AuthController ..> ResendVerificationEmailRequestDTO : <<uses>>
+AuthController ..> MessageResponseDTO : <<returns>>
+
+AuthServiceImpl ..> RegisterRequestDTO : <<uses>>
+AuthServiceImpl ..> RegisterResponseDTO : <<creates>>
+AuthServiceImpl ..> VerifyEmailRequestDTO : <<uses>>
+AuthServiceImpl ..> ResendVerificationEmailRequestDTO : <<uses>>
 AuthServiceImpl ..> User : <<creates>>
 UserRepository ..> User : <<manages>>
 @enduml
