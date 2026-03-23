@@ -2,6 +2,7 @@ package org.example.fashionstoresystem.entity.jpa;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.fashionstoresystem.entity.enums.ReturnStatus;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,8 +22,9 @@ public class ReturnRequest {
     @Column(name = "return_request_id")
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status;
+    private ReturnStatus status;
 
     @Column(nullable = false)
     private String reason;

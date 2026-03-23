@@ -41,10 +41,10 @@ class Order {
     - id : Long
     - orderDate : Date
     - totalAmount : Double
-    - type : String
+    - type : OrderType
     - status : OrderStatus
     - cancellationReason : String
-    - refundStatus : String
+    - refundStatus : RefundStatus
 }
 
 class OrderItem {

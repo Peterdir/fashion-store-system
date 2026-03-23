@@ -56,7 +56,7 @@ class MessageResponseDTO {
 
 class ReturnRequest {
     - id : Long
-    - status : String
+    - status : ReturnStatus
     - reason : String
     - description : String
     - requestDate : Date
@@ -68,7 +68,7 @@ class Order {
     - id : Long
     - status : OrderStatus
     - cancellationReason : String
-    - refundStatus : String
+    - refundStatus : RefundStatus
 }
 
 class OrderItem {

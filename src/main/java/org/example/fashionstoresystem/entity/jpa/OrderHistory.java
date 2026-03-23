@@ -2,6 +2,7 @@ package org.example.fashionstoresystem.entity.jpa;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.fashionstoresystem.entity.enums.OrderStatus;
 
 import java.util.Date;
 
@@ -19,11 +20,13 @@ public class OrderHistory {
     @Column(name = "order_history")
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column
-    private String previousStatus;
+    private OrderStatus previousStatus;
 
+    @Enumerated(EnumType.STRING)
     @Column
-    private String newStatus;
+    private OrderStatus newStatus;
 
     @Column
     private Date changeDate;

@@ -1,3 +1,3 @@
-Xem và trả lời từng câu hỏi một cách chi tiết và đúng kỹ thuật?
-1. WishlistToggleResponseDTO dùng để làm gì ?
-2. CartItemResponseDTO dùng để làm gì ?
+Fix các phần còn đang mơ hồ:
+1. UpdateCustomerStatusRequest tại sao lại có userId, tôi nghĩ nó phải nên nằm ở api của controller {id} vậy sẽ hợp lý hơn.
+2. 

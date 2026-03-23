@@ -2,6 +2,7 @@ package org.example.fashionstoresystem.entity.jpa;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.fashionstoresystem.entity.enums.DiscountType;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -27,8 +28,9 @@ public class Coupon {
     @Column(nullable = false)
     private Double discountValue;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String discountType;
+    private DiscountType discountType;
 
     @Column(nullable = false)
     private Instant startDate;

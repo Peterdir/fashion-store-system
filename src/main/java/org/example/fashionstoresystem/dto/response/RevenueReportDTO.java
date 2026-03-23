@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.fashionstoresystem.entity.enums.OrderType;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class RevenueReportDTO {
     public static class OrderSummaryDTO {
         private Long orderId;
         private Double totalAmount;
-        private String type;
+        private OrderType type;
         private String orderDate;
     }
 }

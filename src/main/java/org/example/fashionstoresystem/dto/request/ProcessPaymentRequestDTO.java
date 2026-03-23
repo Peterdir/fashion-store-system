@@ -6,15 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.fashionstoresystem.entity.enums.PaymentMethod;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PlaceOrderRequestDTO {
-    private List<Long> cartItemIds;
-    private String shippingAddress;
+public class ProcessPaymentRequestDTO {
+    private Long orderId;
     private PaymentMethod paymentMethod;
-    private String couponCode;
 }

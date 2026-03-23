@@ -12,9 +12,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PlaceOrderRequestDTO {
-    private List<Long> cartItemIds;
-    private String shippingAddress;
+public class RecordOfflineSaleRequestDTO {
+    private List<OfflineSaleItemDTO> items;
     private PaymentMethod paymentMethod;
-    private String couponCode;
+    private String customerPhone; 
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class OfflineSaleItemDTO {
+        private Long productVariantId;
+        private int quantity;
+    }
 }

@@ -50,7 +50,7 @@ interface CouponRepository <<interface>> {
 class PlaceOrderRequestDTO {
     - cartItemIds : List<Long>
     - shippingAddress : String
-    - paymentMethod : String
+    - paymentMethod : PaymentMethod
     - couponCode : String
 }
 
@@ -69,10 +69,10 @@ class Order {
     - totalAmount : Double
     - status : OrderStatus
     - shippingAddress : String
-    - paymentMethod : String
-    - type : String
+    - paymentMethod : PaymentMethod
+    - type : OrderType
     - cancellationReason : String
-    - refundStatus : String
+    - refundStatus : RefundStatus
 }
 
 class OrderItem {
@@ -93,7 +93,7 @@ class Coupon {
     - id : Long
     - code : String
     - discountValue : Double
-    - discountType : String
+    - discountType : DiscountType
     - startDate : Instant
     - expiryDate : Instant
     - minOrderAmount : Double

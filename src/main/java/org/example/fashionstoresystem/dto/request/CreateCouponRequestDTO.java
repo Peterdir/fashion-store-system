@@ -1,4 +1,4 @@
-package org.example.fashionstoresystem.dto.response;
+package org.example.fashionstoresystem.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,13 +12,12 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CouponResponseDTO {
-    private Long couponId;
+public class CreateCouponRequestDTO {
     private String code;
     private Double discountValue;
     private DiscountType discountType;
     private Instant startDate;
     private Instant expiryDate;
     private Double minOrderAmount;
-    private boolean collected;
+    private Integer usageLimit;
 }
