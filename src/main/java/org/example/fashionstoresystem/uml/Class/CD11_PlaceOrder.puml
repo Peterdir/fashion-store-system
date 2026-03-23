@@ -4,17 +4,17 @@ title Class Diagram : Place Order (UC11)
 ' Controller
 class OrderController {
     - orderService: OrderService
-    + processOrder(orderData: OrderDTO) : String
+    + processOrder(dto: PlaceOrderRequestDTO) : PlaceOrderResponseDTO
 }
 
 ' Service
 
 interface OrderService <<interface>>{
-    + placeOrder(orderDto: OrderDTO) : OrderSuccessDTO
+    + placeOrder(dto: PlaceOrderRequestDTO) : PlaceOrderResponseDTO
 }
 
 class OrderServiceImpl {
-    + placeOrder(orderDto: OrderDTO) : OrderSuccessDTO
+    + placeOrder(dto: PlaceOrderRequestDTO) : PlaceOrderResponseDTO
     - calculateTotalAmount() : Double
     - productVariantRepository: ProductVariantRepository
     - orderRepository: OrderRepository
@@ -45,25 +45,29 @@ interface CouponRepository <<interface>> {
     + findByCode(code: String) : Coupon
 }
 
-' Entity & DTO
-class OrderDTO {
-    - cartItemIds: List<Long>
-    - shippingAddress: String
-    - paymentMethod: String
-    - couponCode: String
+' DTO
+
+class PlaceOrderRequestDTO {
+    - cartItemIds : List<Long>
+    - shippingAddress : String
+    - paymentMethod : String
+    - couponCode : String
 }
 
-class OrderSuccessDTO {
-    - orderId: Long
-    - totalAmount: Double
-    - message: String
+class PlaceOrderResponseDTO {
+    - orderId : Long
+    - totalAmount : Double
+    - status : OrderStatus
+    - message : String
 }
+
+' Entity
 
 class Order {
     - id : Long
     - orderDate : Date
     - totalAmount : Double
-    - status : String
+    - status : OrderStatus
     - shippingAddress : String
     - paymentMethod : String
     - type : String
@@ -121,10 +125,10 @@ OrderServiceImpl --> CartRepository: - cartRepository
 OrderServiceImpl --> CouponRepository: - couponRepository
 
 ' Object Usage
-OrderController ..> OrderDTO : <<uses>>
-OrderController ..> OrderSuccessDTO : <<uses>>
-OrderServiceImpl ..> OrderDTO : <<uses>>
-OrderServiceImpl ..> OrderSuccessDTO : <<creates>>
+OrderController ..> PlaceOrderRequestDTO : <<uses>>
+OrderController ..> PlaceOrderResponseDTO : <<returns>>
+OrderServiceImpl ..> PlaceOrderRequestDTO : <<uses>>
+OrderServiceImpl ..> PlaceOrderResponseDTO : <<creates>>
 
 OrderRepository ..> Order : <<manages>>
 OrderServiceImpl ..> Order : <<creates>>

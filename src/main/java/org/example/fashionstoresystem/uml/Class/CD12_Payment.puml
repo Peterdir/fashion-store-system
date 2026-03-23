@@ -5,20 +5,20 @@ title Class Diagram : Payment (UC12)
 class PaymentController {
     - paymentService : PaymentService
     + showPaymentPage(orderId: Long) : String
-    + processPayment(orderId: Long, method: String) : String
+    + processPayment(orderId: Long, method: String) : PaymentResponseDTO
 }
 
 ' Service
 interface PaymentService <<interface>> {
     + getOrderDetails(orderId: Long) : Order
-    + processPayment(orderId: Long, method: String) : String
+    + processPayment(orderId: Long, method: String) : PaymentResponseDTO
 }
 
 class PaymentServiceImpl {
     - orderRepository : OrderRepository
     - paymentGateway : PaymentGateway
     + getOrderDetails(orderId: Long) : Order
-    + processPayment(orderId: Long, method: String) : String
+    + processPayment(orderId: Long, method: String) : PaymentResponseDTO
 }
 
 ' External Gateway Service
@@ -32,23 +32,24 @@ interface OrderRepository <<interface>> {
     + save(order: Order) : Order
 }
 
-' Entity & DTO
-class Order {
-    - id : Long
-    - totalAmount : Double
-    - status : String
-    - paymentMethod : String
-    - orderDate : Date
-    - cancellationReason : String
-    - refundStatus : String
-    + isExpired() : Boolean
-    + setStatus(status: String) : void
-}
+' DTO
 
 class PaymentResponseDTO {
     - status : String
     - transactionId : String
     - message : String
+}
+
+' Entity
+
+class Order {
+    - id : Long
+    - totalAmount : Double
+    - status : OrderStatus
+    - paymentMethod : String
+    - orderDate : Date
+    - cancellationReason : String
+    - refundStatus : String
 }
 
 ' Relationships
@@ -63,6 +64,7 @@ PaymentServiceImpl --> PaymentGateway : - paymentGateway
 
 ' Object Usage
 PaymentController ..> Order : <<uses>>
+PaymentController ..> PaymentResponseDTO : <<returns>>
 PaymentServiceImpl ..> Order : <<uses>>
 OrderRepository ..> Order : <<manages>>
 

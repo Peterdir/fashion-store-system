@@ -6,20 +6,20 @@ title Class Diagram: Registration (UC01)
 class AuthController {
     - authService : AuthService
     + showRegisterPage() : String
-    + processRegistration(dto: RegistrationDTO) : String
+    + processRegistration(dto: RegisterRequestDTO) : RegisterResponseDTO
 }
 
 'Service
 
 interface AuthService <<interface>> {
-    + registerNewAccount(dto: RegistrationDTO) : User
+    + registerNewAccount(dto: RegisterRequestDTO) : RegisterResponseDTO
 }
 
 class AuthServiceImpl {
     - userRepository : UserRepository
     - emailService : EmailService
-    + registerNewAccount(dto: RegistrationDTO) : User
-    - validateInfo(dto: RegistrationDTO) : Boolean
+    + registerNewAccount(dto: RegisterRequestDTO) : RegisterResponseDTO
+    - validateInfo(dto: RegisterRequestDTO) : Boolean
     - encodePassword(rawPassword: String) : void
     - createVerificationToken(user: User) : String
 }
@@ -40,15 +40,25 @@ interface UserRepository <<interface>> {
 }
 
 
-' Entity & DTO
+' DTO
 
-class RegistrationDTO {
+class RegisterRequestDTO {
     - fullName : String
     - phone : String
     - email : String
     - password : String
     - confirmPassword : String
 }
+
+class RegisterResponseDTO {
+    - userId : Long
+    - fullName : String
+    - email : String
+    - status : UserStatus
+    - message : String
+}
+
+' Entity
 
 class User {
     - id : Long
@@ -57,9 +67,11 @@ class User {
     - email : String
     - password : String
     - address : String
-    - status : String
+    - status : UserStatus
     - verificationToken : String
-    - verificationTokenExpiryDate : Date
+    - verificationTokenExpiryDate : Instant
+    - role : Role
+    - twoFactorEnabled : boolean
 }
 
 ' Relationships
@@ -74,8 +86,10 @@ AuthServiceImpl --> UserRepository : - userRepository
 AuthServiceImpl --> EmailService : - emailService
 
 ' Object Usage
-AuthController ..> RegistrationDTO : <<uses>>
-AuthServiceImpl ..> RegistrationDTO : <<uses>>
+AuthController ..> RegisterRequestDTO : <<uses>>
+AuthController ..> RegisterResponseDTO : <<returns>>
+AuthServiceImpl ..> RegisterRequestDTO : <<uses>>
+AuthServiceImpl ..> RegisterResponseDTO : <<creates>>
 AuthServiceImpl ..> User : <<creates>>
 UserRepository ..> User : <<manages>>
 @enduml

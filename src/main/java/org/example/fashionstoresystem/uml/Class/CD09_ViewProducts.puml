@@ -4,55 +4,82 @@ title Class Diagram : View Products (UC09)
 ' Controller
 class ProductController {
     - productService: ProductService
-    + showProductsPage() : String
+    + showProductsPage(keyword: String) : List<ProductSummaryResponseDTO>
+    + showProductDetail(productId: Long) : ProductDetailResponseDTO
 }
 
 ' Service
 
-interface ProductService {
-    + getProducts(keyword: String) : List<Product>
+interface ProductService <<interface>> {
+    + getProducts(keyword: String) : List<ProductSummaryResponseDTO>
+    + getProductDetail(productId: Long) : ProductDetailResponseDTO
 }
 
 class ProductServiceImpl {
     - productRepository : ProductRepository
-    + getProducts(keyword: String) : List<Product>
+    + getProducts(keyword: String) : List<ProductSummaryResponseDTO>
+    + getProductDetail(productId: Long) : ProductDetailResponseDTO
 }
 
 ' Repository
 
-interface ProductRepository {
+interface ProductRepository <<interface>> {
     + findAll() : List<Product>
     + findByNameContaining(keyword: String) : List<Product>
+    + findById(productId: Long) : Product
 }
 
-' Entity & DTO
+' DTO
+
+class ProductSummaryResponseDTO {
+    - productId : Long
+    - name : String
+    - price : Double
+    - category : String
+    - status : ProductStatus
+    - primaryImageUrl : String
+}
+
+class ProductDetailResponseDTO {
+    - productId : Long
+    - name : String
+    - price : Double
+    - category : String
+    - description : String
+    - status : ProductStatus
+    - images : List<ProductImageDTO>
+    - variants : List<ProductVariantDTO>
+    - reviews : List<ReviewDTO>
+}
+
+' Entity
 
 class Product {
-    - id: Long
-    - name: String
-    - price: Double
-    - category: String
-    - description: String
-    - status: String
+    - id : Long
+    - name : String
+    - price : Double
+    - category : String
+    - description : String
+    - status : ProductStatus
 }
 
 class ProductVariant {
-    - id: Long
-    - size: String
-    - color: String
-    - stockQuantity: Long
+    - id : Long
+    - size : String
+    - color : String
+    - stockQuantity : Long
 }
 
 class Review {
-    - id: Long
-    - rating: int
-    - comment: String
-    - createdAt: Date
+    - id : Long
+    - rating : int
+    - comment : String
+    - createdAt : Instant
 }
 
 class ProductImage {
-    - id: Long
-    - url: String
+    - id : Long
+    - url : String
 }
 
 ' Relationships
@@ -62,14 +89,17 @@ Product "1" *-- "0..*" ProductVariant : has >
 Product "1" *-- "0..*" Review : receives >
 
 ' Class implement Interface
-ProductServiceImpl ..|>ProductService
+ProductServiceImpl ..|> ProductService
 
 ' Dependency Injection
 ProductController --> ProductService: - productService
 ProductServiceImpl --> ProductRepository: - productRepository
 
 ' Object Usage
-ProductController ..> Product : <<uses>>
+ProductController ..> ProductSummaryResponseDTO : <<returns>>
+ProductController ..> ProductDetailResponseDTO : <<returns>>
+ProductServiceImpl ..> ProductSummaryResponseDTO : <<creates>>
+ProductServiceImpl ..> ProductDetailResponseDTO : <<creates>>
 ProductServiceImpl ..> Product : <<uses>>
 ProductRepository ..> Product : <<manages>>
 
