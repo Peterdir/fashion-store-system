@@ -3,6 +3,8 @@ package org.example.fashionstoresystem.repository;
 import org.example.fashionstoresystem.entity.jpa.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.example.fashionstoresystem.entity.enums.OrderStatus;
 
@@ -35,6 +37,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // hệ thống tự động Hủy
     List<Order> findByStatusAndOrderDateBefore(OrderStatus status, Date timeLimit);
 
-    // Thống kê doanh thu: Lọc đơn hàng TỪ NGÀY ... ĐẾN NGÀY ... thuộc các Trạng thái lấy được tiền (VD: Đã thanh toán, Hoàn tất)
     List<Order> findByOrderDateBetweenAndStatusIn(Date startDate, Date endDate, List<OrderStatus> statuses);
+
+    @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate AND o.type = :type")
+    Double calculateTotalRevenue(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("type") org.example.fashionstoresystem.entity.enums.OrderType type);
+
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate")
+    int countOrders(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+    List<Order> findByOrderDateBetween(Date startDate, Date endDate);
 }
