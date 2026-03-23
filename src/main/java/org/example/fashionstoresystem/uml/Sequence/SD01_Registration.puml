@@ -31,6 +31,11 @@ group Business Logic
     Repository -> DB : SELECT ...
     DB --> Repository : result
     Repository --> Service: boolean
+    
+    Service -> Repository : existsByPhone(phone)
+    Repository -> DB : SELECT ...
+    DB --> Repository : result
+    Repository --> Service: boolean
 
     alt Invalid / Duplicate Information
         Service --> Controller : throw RegistrationException
@@ -46,8 +51,14 @@ group Business Logic
         Repository --> Service : User object
 
         Service -> Service : createVerificationToken(User)
-        Service -> Mail : sendVerificationEmail(email, token)
-        Mail --> Service : success
+        
+        alt Send Email Success
+            Service -> Mail : sendVerificationEmail(email, token)
+            Mail --> Service : success
+        else Email Fails
+            Mail --> Service : Exception
+            note right of Service: Catch error, prevent rollback
+        end
 
         Service --> Controller : User object
         Controller --> View : register.html (with success message)

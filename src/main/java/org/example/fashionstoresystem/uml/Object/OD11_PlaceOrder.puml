@@ -53,6 +53,7 @@ object "variant1 : ProductVariant" as v1 {
     id = 5
     size = "M"
     color = "White"
+    price = 1250000.0
     stockQuantity = 48
 }
 
@@ -60,6 +61,7 @@ object "variant2 : ProductVariant" as v2 {
     id = 12
     size = "L"
     color = "Blue"
+    price = 850000.0
     stockQuantity = 29
 }
 

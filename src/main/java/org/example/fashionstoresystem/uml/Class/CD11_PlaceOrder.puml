@@ -87,6 +87,7 @@ class ProductVariant {
     - size : String
     - color : String
     - stockQuantity : Long
+    - price : Double
 }
 
 class Coupon {

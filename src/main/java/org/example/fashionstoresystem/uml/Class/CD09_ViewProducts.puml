@@ -57,7 +57,6 @@ class ProductDetailResponseDTO {
 class Product {
     - id : Long
     - name : String
-    - price : Double
     - category : String
     - description : String
     - status : ProductStatus
@@ -68,6 +67,7 @@ class ProductVariant {
     - size : String
     - color : String
     - stockQuantity : Long
+    - price : Double
 }
 
 class Review {

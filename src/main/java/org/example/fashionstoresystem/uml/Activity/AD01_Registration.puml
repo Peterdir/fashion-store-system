@@ -17,7 +17,7 @@ if (Thông tin hợp lệ?) then (Không)
     stop
 else (Có)
     |System (Service)|
-    :Kiểm tra trùng username/email;
+    :Kiểm tra trùng email/số điện thoại;
 
     if (Thông tin đã tồn tại?) then (Có)
         |Client (UI)|

@@ -1,227 +1,210 @@
-[26]	Xử lý yêu cầu hoàn trả
-Actor	Chủ cửa hàng
-Trigger	Chủ cửa hàng chọn chức năng Quản lý yêu cầu hoàn trả trong hệ thống quản trị.
-Description	Use case này cho phép chủ cửa hàng tiếp nhận và xử lý các yêu cầu hoàn trả sản phẩm do khách hàng gửi.
-Chủ cửa hàng có thể xem thông tin yêu cầu, kiểm tra điều kiện theo chính sách hoàn trả và quyết định chấp nhận hoặc từ chối yêu cầu.
-Nếu yêu cầu được chấp nhận, hệ thống tiếp tục thực hiện quy trình xử lý hoàn trả.
-Hệ thống cập nhật trạng thái xử lý và thông báo kết quả đến khách hàng.
-Pre-Conditions	•	Chủ cửa hàng đã đăng nhập vào hệ thống.
-•	Tồn tại yêu cầu hoàn trả ở trạng thái Chờ duyệt.
-Post-Conditions	Thành công
-•	Yêu cầu hoàn trả được cập nhật trạng thái:
-o	Đã chấp nhận 
-o	Từ chối
-•	Thông tin xử lý (người xử lý, thời gian xử lý, lý do từ chối nếu có) được lưu trong hệ thống.
-•	Hệ thống gửi thông báo kết quả đến khách hàng.
-Nếu yêu cầu được chấp nhận:
-•	Hệ thống chuyển sang bước xử lý tiếp theo theo quy trình hoàn trả (ví dụ: Chờ nhận hàng hoàn hoặc Thực hiện hoàn tiền).
-Thất bại
-•	Trạng thái yêu cầu không được cập nhật.
-•	Hệ thống hiển thị thông báo lỗi phù hợp.
-Main Flow	1.	Chủ cửa hàng truy cập chức năng Quản lý yêu cầu hoàn trả sản phẩm.
-2.	Hệ thống hiển thị danh sách các yêu cầu ở trạng thái Chờ duyệt.
-3.	Chủ cửa hàng chọn một yêu cầu để xem chi tiết.
-4.	Hệ thống hiển thị thông tin gồm:
-•	Thông tin khách hàng
-•	Thông tin đơn hàng liên quan
-•	Danh sách sản phẩm trong yêu cầu hoàn trả
-•	Lý do hoàn trả cho từng sản phẩm (nếu có)
-•	Hình ảnh chứng minh
-•	Thời gian gửi yêu cầu
-5.	Chủ cửa hàng kiểm tra điều kiện hoàn trả theo chính sách hiện hành.
-6.	Chủ cửa hàng chọn Chấp nhận yêu cầu.
-7.	Hệ thống cập nhật trạng thái yêu cầu thành Đã chấp nhận.
-8.	Hệ thống ghi nhận thời gian xử lý yêu cầu.
-9.	Hệ thống chuyển yêu cầu sang quy trình xử lý tiếp theo theo chính sách.
-10.	Hệ thống gửi thông báo kết quả cho khách hàng.
-11.	Use case kết thúc.
-Alternate Flow	AF1: Từ chối yêu cầu hoàn trả
-•	Tại bước 6, chủ cửa hàng chọn Từ chối yêu cầu.
-•	Chủ cửa hàng nhập lý do từ chối (nếu cần).
-•	Hệ thống cập nhật trạng thái thành Từ chối.
-•	Hệ thống lưu lý do từ chối.
-•	Hệ thống gửi thông báo kết quả cho khách hàng.
-•	Use case kết thúc.
-Exception Flow	EL1: Yêu cầu đã được xử lý trước đó
-•	Tại bước 3, nếu yêu cầu không còn ở trạng thái Chờ duyệt:
-o	Hệ thống hiển thị thông báo không thể xử lý lại.
-o	Use case kết thúc.
-EL2: Lỗi hệ thống khi cập nhật trạng thái
-•	Nếu xảy ra lỗi khi lưu thay đổi:
-o	Hệ thống hiển thị thông báo lỗi.
-o	Use case kết thúc.
 
-4.1.27. Ghi nhận bán hàng trực tiếp
-[27]	Ghi nhận bán hàng trực tiếp
-Actor	Chủ cửa hàng
-Trigger	Chủ cửa hàng chọn chức năng Ghi nhận bán hàng trực tiếp tại trang quản trị hệ thống.
-Description	Use case này cho phép chủ cửa hàng nhập thông tin giao dịch bán hàng trực tiếp tại cửa hàng (offline).
-Thông tin giao dịch bao gồm sản phẩm, số lượng, giá bán và phương thức thanh toán.
-Doanh thu từ bán hàng trực tiếp được hệ thống ghi nhận và tổng hợp chung vào báo cáo doanh thu tổng của cửa hàng.
-Pre-Conditions	•	Chủ cửa hàng đã đăng nhập vào hệ thống.
-•	Sản phẩm tồn tại trong hệ thống.
-Post-Conditions	Thành công
-•	Giao dịch bán hàng trực tiếp được lưu vào hệ thống.
-•	Số lượng tồn kho được cập nhật (nếu có quản lý tồn kho).
-•	Doanh thu được cộng vào báo cáo tổng doanh thu.
-Thất bại
-•	Giao dịch không được lưu.
-•	Hệ thống hiển thị thông báo lỗi phù hợp.
-Main Flow	1.	Chủ cửa hàng chọn chức năng Ghi nhận bán hàng trực tiếp.
-2.	Hệ thống hiển thị form nhập thông tin giao dịch.
-3.	Chủ cửa hàng chọn sản phẩm.
-4.	Hệ thống hiển thị thông tin sản phẩm (giá, tồn kho).
-5.	Chủ cửa hàng nhập số lượng và phương thức thanh toán.
-6.	Chủ cửa hàng xác nhận lưu giao dịch.
-7.	Hệ thống kiểm tra tính hợp lệ của dữ liệu.
-8.	Hệ thống lưu giao dịch vào cơ sở dữ liệu.
-9.	Hệ thống cập nhật tồn kho.
-10.	Hệ thống cập nhật báo cáo doanh thu.
-11.	Hệ thống hiển thị thông báo thành công.
-12.	Use case kết thúc.
-Alternate Flow	AF1: Bán nhiều sản phẩm trong một giao dịch
-•	Tại bước 3, chủ cửa hàng có thể thêm nhiều sản phẩm.
-•	Hệ thống tính tổng tiền tự động.
-•	Quay lại bước 6.
-Exception Flow	EL1: Số lượng vượt quá tồn kho
-•	Tại bước 7, nếu số lượng > tồn kho:
-o	Hệ thống hiển thị thông báo “Số lượng không đủ trong kho”.
-o	Quay lại bước 5.
-EL2: Thiếu thông tin bắt buộc
-•	Tại bước 7, nếu thiếu dữ liệu:
-o	Hệ thống hiển thị thông báo yêu cầu nhập đầy đủ thông tin.
-o	Quay lại bước 2.
-
-4.1.28. Thống kê doanh thu
-[28]	Thống kê doanh thu
-Actor	Chủ cửa hàng
-Trigger	Chủ cửa hàng chọn chức năng Thống kê doanh thu tại trang quản trị hệ thống.
-Description	Use case này cho phép chủ cửa hàng tổng hợp và theo dõi doanh thu của cửa hàng theo các khoảng thời gian khác nhau (ngày, tháng, năm hoặc tùy chọn).
-Hệ thống hiển thị doanh thu từ bán hàng trực tuyến và bán hàng trực tiếp một cách rõ ràng và trực quan nhằm hỗ trợ đánh giá hiệu quả kinh doanh.
-Pre-Conditions	•	Chủ cửa hàng đã đăng nhập vào hệ thống.
-•	Tồn tại dữ liệu giao dịch bán hàng trong hệ thống.
-Post-Conditions	Thành công
-•	Hệ thống hiển thị dữ liệu doanh thu theo điều kiện đã chọn.
-•	Dữ liệu bao gồm doanh thu online và offline.
-Thất bại
-•	Hệ thống không thể truy xuất dữ liệu.
-•	Thông báo lỗi được hiển thị.
-Main Flow	1.	Chủ cửa hàng chọn chức năng Thống kê doanh thu.
-2.	Hệ thống hiển thị giao diện chọn khoảng thời gian.
-3.	Chủ cửa hàng chọn khoảng thời gian cần thống kê.
-4.	Chủ cửa hàng xác nhận xem thống kê.
-5.	Hệ thống tổng hợp dữ liệu doanh thu từ:
-Bán hàng trực tuyến
-Bán hàng trực tiếp
-6.	Hệ thống hiển thị kết quả thống kê dưới dạng:
-•	Tổng doanh thu trong khoảng thời gian được chọn
-•	Tổng Số lượng đơn hàng
-•	Danh sách các đơn hàng, bao gồm:
-o	Mã đơn hàng
-o	Danh sách sản phẩm trong đơn hàng
-o	Tổng tiền của từng đơn hàng
-•	Biểu đồ minh họa doanh thu
+4.1.2. Đăng nhập
+[2]	Đăng nhập
+Actor	Khách hàng, chủ cửa hàng
+Trigger	Actor chọn chức năng đăng nhập ở giao diện hệ thống.
+Description	Use Case này cho phép người dùng đăng nhập vào hệ thống bằng tài khoản đã đăng ký để sử dụng các chức năng tương ứng với vai trò của mình.
+Pre-Conditions	•	Người dùng đã có tài khoản trong hệ thống.
+•	Trang đăng nhập đã được hiển thị.
+Post-Conditions	•	Người dùng đăng nhập thành công vào hệ thống.
+•	Hệ thống xác định vai trò của người dùng và chuyển đến giao diện tương ứng.
+Main Flow	1.	Người dùng chọn chức năng Đăng nhập.
+2.	Hệ thống hiển thị giao diện đăng nhập.
+3.	Người dùng nhập thông tin đăng nhập (tên đăng nhập và mật khẩu).
+4.	Người dùng nhấn nút Đăng nhập.
+5.	Hệ thống kiểm tra thông tin đăng nhập.
+6.	Hệ thống xác thực thành công và chuyển người dùng đến giao diện phù hợp với vai trò.
 7.	Use case kết thúc.
-Alternate Flow	AF1: Không có dữ liệu trong khoảng thời gian đã chọn
-•	Tại bước 5, nếu không có dữ liệu:
-o	Hệ thống hiển thị thông báo “Không có dữ liệu trong khoảng thời gian này”.
-o	Use case kết thúc.
-Exception Flow	EL1: Lỗi truy xuất dữ liệu
-•	Hệ thống gặp lỗi khi tổng hợp dữ liệu:
-o	Hệ thống hiển thị thông báo lỗi.
-o	Use case kết thúc.
+      Alternate Flow	Không có.
+      Exception Flow	EF1: Thiếu thông tin đăng nhập
+      •	Tại bước 5, nếu người dùng không nhập tên đăng nhập hoặc mật khẩu:
+      o	Hệ thống hiển thị thông báo “Vui lòng nhập đầy đủ thông tin”.
+      o	Use case kết thúc.
+      EF2: Tên đăng nhập không tồn tại
+      •	Tại bước 5, nếu tên đăng nhập/email không tồn tại trong hệ thống:
+      o	Hệ thống hiển thị thông báo “Tên đăng nhập không tồn tại”.
+      o	Use case kết thúc.
+      EF3: Mật khẩu không chính xác
+      •	Tại bước 5, nếu mật khẩu không đúng:
+      o	Hệ thống hiển thị thông báo “Mật khẩu không chính xác”.
+      o	Use case kết thúc.
 
-4.1.29. Xuất báo cáo doanh thu
-[29]	Xuất báo cáo doanh thu
-Actor	Chủ cửa hàng
-Trigger	Chủ cửa hàng chọn chức năng Xuất báo cáo tại giao diện thống kê doanh thu.
-Description	Use case này cho phép chủ cửa hàng xuất báo cáo doanh thu theo khoảng thời gian đã chọn ra file (PDF, Excel hoặc định dạng khác).
-Báo cáo phục vụ cho việc lưu trữ, tổng hợp và quản lý kinh doanh.
-Pre-Conditions	•	Chủ cửa hàng đã đăng nhập vào hệ thống.
-•	Đã thực hiện thống kê doanh thu.
-Post-Conditions	Thành công
-•	Báo cáo được tạo thành công.
-•	File báo cáo được tải xuống hoặc lưu trữ trong hệ thống.
-Thất bại
-•	Báo cáo không được tạo.
-•	Thông báo lỗi được hiển thị.
-Main Flow	1.	Chủ cửa hàng đang xem kết quả thống kê doanh thu.
-2.	Chủ cửa hàng chọn chức năng Xuất báo cáo.
-3.	Hệ thống yêu cầu chọn định dạng file (PDF, Excel…).
-4.	Chủ cửa hàng chọn định dạng mong muốn.
-5.	Hệ thống tạo báo cáo dựa trên dữ liệu đã thống kê.
-6.	Hệ thống cung cấp file để tải xuống.
-7.	Use case kết thúc.
-Alternate Flow	Không có.
-Exception Flow	EL1: Lỗi tạo file báo cáo
-•	Tại bước 5, nếu hệ thống gặp lỗi:
-o	Hệ thống hiển thị thông báo lỗi.
-o	Use case kết thúc.
+4.1.3. Quên mật khẩu
+[3]	Quên mật khẩu
+Actor	Khách hàng, chủ cửa hàng
+Trigger	Actor chọn chức năng “Quên mật khẩu” trên giao diện đăng nhập.
+Description	Usecase này cho phép người dùng khôi phục mật khẩu để đăng nhập vào hệ thống trong trường hợp đã quên mật khẩu.
+Pre-Conditions	•	Người dùng đã có tài khoản trong hệ thống.
+•	Trang đăng nhập đã được hiển thị.
+Post-Conditions	•	Mật khẩu của tài khoản được cập nhật thành công.
+•	Người dùng có thể đăng nhập vào hệ thống bằng mật khẩu mới.
+Main Flow	1.	Người dùng chọn chức năng Quên mật khẩu trên giao diện đăng nhập.
+2.	Hệ thống hiển thị giao diện quên mật khẩu.
+3.	Người dùng nhập địa chỉ Email đã đăng ký tài khoản.
+4.	Người dùng nhấn nút xác nhận.
+5.	Hệ thống kiểm tra sự tồn tại của email trong hệ thống.
+6.	Hệ thống gửi liên kết khôi phục mật khẩu đến email của khách hàng.
+7.	Khách hàng truy cập email và nhấn vào liên kết khôi phục mật khẩu.
+8.	Hệ thống hiển thị giao diện đặt lại mật khẩu.
+9.	Khách hàng nhập mật khẩu mới và xác nhận mật khẩu.
+10.	Khách hàng nhấn nút Hoàn tất.
+11.	Hệ thống kiểm tra dữ liệu (Trùng khớp, đủ mạnh)
+12.	Hệ thống cập nhật mật khẩu mới và hiển thị thông báo đổi mật khẩu thành công.
+13.	Use case kết thúc.
+       Alternate Flow	AF1: Gửi lại email khôi phục mật khẩu
+       •	Tại bước 6, nếu khách hàng yêu cầu gửi lại email khôi phục mật khẩu:
+       o	Hệ thống gửi lại liên kết khôi phục mật khẩu đến email đã đăng ký.
+       o	Use case tiếp tục tại bước 7.
+       Exception Flow	EF1: Email không tồn tại trong hệ thống
+       •	Tại bước 5, nếu email không tồn tại trong hệ thống:
+       o	Hệ thống hiển thị thông báo “Email không tồn tại”.
+       o	Use case kết thúc.
+       EF2: Liên kết khôi phục không hợp lệ hoặc đã hết hạn
+       •	Tại bước 7, nếu liên kết khôi phục không hợp lệ hoặc đã hết hạn:
+       o	Hệ thống hiển thị thông báo lỗi.
+       o	Use case kết thúc.
+       EF3: Mật khẩu mới không hợp lệ
+       •	Tại bước 9, nếu mật khẩu mới không đáp ứng yêu cầu bảo mật hoặc mật khẩu xác nhận không trùng khớp:
+       o	Hệ thống hiển thị thông báo lỗi tương ứng.
+       o	Use case kết thúc.
 
-4.1.30. Lịch sử đơn hàng
-[30]	Lịch sử đơn hàng
+4.1.4. Đăng xuất
+[4]	Đăng xuất
+Actor	Khách hàng, chủ cửa hàng
+Trigger	Người dùng chọn chức năng “Đăng xuất” trên giao diện hệ thống.
+Description	Use case này cho phép người dùng đăng xuất khỏi hệ thống, kết thúc phiên làm việc hiện tại và quay về giao diện trang chủ.
+Pre-Conditions	•	Người dùng đã đăng nhập vào hệ thống.
+Post-Conditions	•	Phiên làm việc của actor được kết thúc và không còn hiệu lực.
+•	Người dùng được điều hướng về giao diện trang chủ của hệ thống.
+Main Flow	1.	Người dùng chọn chức năng Đăng xuất trên giao diện hệ thống.
+2.	Hệ thống hiển thị thông báo yêu cầu xác nhận đăng xuất.
+3.	Người dùng xác nhận đăng xuất.
+4.	Hệ thống kết thúc phiên làm việc của người dùng.
+5.	Hệ thống điều hướng người dùng về giao diện trang chủ.
+6.	Use case kết thúc.
+      Alternate Flow	AF1: Người dùng đăng xuất
+      •	Tại bước 3, nếu người dùng chọn Hủy:
+      o	Hệ thống giữ nguyên phiên đăng nhập của người dùng.
+      o	Hệ thống quay lại giao diện trước đó.
+      o	Use case kết thúc.
+      Exception Flow	Không có.
+
+4.1.5. Quản lý thông tin cá nhân
+[5]	Quản lý thông tin cá nhân
+Actor	Khách hàng, chủ cửa hàng
+Trigger	Người dùng chọn mục Profile trên giao diện chính.
+Description	Use case này cho phép người dùng xem và cập nhật thông tin cá nhân của mình trong hệ thống.
+Pre-Conditions	Người dùng đã đăng nhập vào hệ thống.
+Post-Conditions	Thông tin cá nhân được cập nhật (nếu có).
+Dữ liệu mới được lưu vào hệ thống.
+Main Flow	1.	Người dùng chọn mục Profile trên giao diện chính.
+2.	Hệ thống hiển thị trang thông tin cá nhân của người dùng.
+3.	Người dùng chỉnh sửa thông tin cá nhân.
+4.	Người dùng chọn Lưu thay đổi.
+5.	Hệ thống kiểm tra dữ liệu hợp lệ.
+6.	Hệ thống cập nhật thông tin và hiển thị thông báo thành công.
+      Alternate Flow	AF1: Người dùng chỉ xem thông tin
+      •	Tại bước 3, actor không thực hiện chỉnh sửa.
+      •	Hệ thống giữ nguyên thông tin cá nhân.
+      •	Use case kết thúc.
+      AF2: Người dùng hủy thao tác cập nhật
+      •	Tại bước 4, actor chọn Hủy.
+      •	Hệ thống không lưu thay đổi.
+      •	Hệ thống quay lại trang thông tin cá nhân.
+      •	Use case kết thúc.
+      Exception Flow	EL1: Dữ liệu không hợp lệ
+      •	Người dùng nhập thông tin cá nhân không hợp lệ (email sai định dạng, số điện thoại không đúng).
+      •	Hệ thống hiển thị thông báo lỗi.
+      •	Use case kết thúc, thông tin không được cập nhật.
+      EL2: Phiên đăng nhập hết hạn
+      •	Phiên đăng nhập của actor đã hết hạn.
+      •	Hệ thống yêu cầu actor đăng nhập lại.
+      •	Use case kết thúc.
+
+4.1.6. Xác thực hai bước
+[6]	Xác thực hai bước
 Actor	Khách hàng
-Trigger	Khách hàng chọn chức năng “Lịch sử đơn hàng” trên giao diện tài khoản cá nhân.
-Description	Use case này cho phép khách hàng xem danh sách các đơn hàng đã mua trong quá khứ.
-Mỗi đơn hàng hiển thị các thông tin cơ bản bao gồm: mã đơn hàng, ngày đặt hàng, trạng thái đơn hàng và tổng giá trị đơn hàng.
+Trigger	Khách hàng chọn chức năng Xác thực 2 bước trong mục Quản lý thông tin cá nhân.
+Description	Use case này cho phép khách hàng bật hoặc tắt xác thực hai bước để tăng cường bảo mật cho tài khoản.
 Pre-Conditions	•	Khách hàng đã đăng nhập vào hệ thống.
-•	Khách hàng đã từng đặt thành công ít nhất một đơn hàng.
-Post-Conditions	Thành công
-•	Danh sách đơn hàng được hiển thị.
-•	Thông tin mỗi đơn hàng được hiển thị đầy đủ và chính xác.
-Thất bại
-•	Hệ thống không thể truy xuất dữ liệu.
-•	Thông báo lỗi được hiển thị.
-Main Flow	1.	Khách hàng chọn chức năng Lịch sử đơn hàng.
-2.	Hệ thống truy xuất danh sách đơn hàng của khách hàng.
-3.	Hệ thống hiển thị danh sách đơn hàng, bao gồm:
-•	Mã đơn hàng
-•	Ngày đặt hàng
-•	Trạng thái đơn hàng
-•	Tổng giá trị đơn hàng
-4.	Use case kết thúc.
-Alternate Flow	AF1: Không có đơn hàng
-•	Tại bước 2, nếu khách hàng chưa có đơn hàng nào:
-o	Hệ thống hiển thị thông báo “Bạn chưa có đơn hàng nào”.
-o	Use case kết thúc.
-Exception Flow	EL1: Lỗi truy xuất dữ liệu
-•	Hệ thống gặp lỗi khi truy xuất danh sách đơn hàng:
-o	Hệ thống hiển thị thông báo lỗi.
-o	Use case kết thúc.
+•	Khách hàng đang ở trang Quản lý thông tin cá nhân.
+Post-Conditions	•	Trạng thái xác thực 2 bước được cập nhật (bật hoặc tắt).
+•	Thông tin xác thực được lưu vào hệ thống.
+Main Flow	1.	Khách hàng chọn chức năng Xác thực 2 bước.
+2.	Hệ thống hiển thị thông tin và trạng thái xác thực 2 bước hiện tại.
+3.	Khách hàng chọn Bật xác thực 2 bước.
+4.	Hệ thống gửi mã xác thực (OTP) đến phương thức đã đăng ký (email).
+5.	Khách hàng nhập mã xác thực.
+6.	Hệ thống kiểm tra mã xác thực.
+7.	Hệ thống kích hoạt xác thực 2 bước và hiển thị thông báo thành công.
+      Alternate Flow	AF1: Khách hàng tắt xác thực 2 bước
+      •	Tại bước 3, Khách hàng chọn Tắt xác thực 2 bước.
+      •	Hệ thống yêu cầu xác nhận.
+      •	Khách hàng xác nhận.
+      •	Hệ thống cập nhật trạng thái xác thực 2 bước.
+      •	Use case kết thúc.
+      AF2: Khách hàng hủy thao tác
+      •	Tại bước 5, khách hàng hủy.
+      •	Hệ thống không thay đổi trạng thái xác thực.
+      •	Use case kết thúc.
+      Exception Flow	EL1: Mã xác thực không hợp lệ
+      •	Khách hàng nhập sai hoặc mã xác thực đã hết hạn.
+      •	Hệ thống hiển thị thông báo lỗi.
+      •	Use case kết thúc.
+      EL2: Không gửi được mã xác thực
+      •	Hệ thống không thể gửi mã xác thực.
+      •	Hệ thống hiển thị thông báo lỗi.
+      •	Use case kết thúc.
 
-4.1.31. Xác thực tài khoản
-[31]	Xác thực tài khoản
+4.1.7. Đổi mật khẩu
+[7]	Đổi mật khẩu
+Actor	Khách hàng, chủ cửa hàng
+Trigger	Người dùng chọn chức năng “Đổi mật khẩu” trong mục Quản lý thông tin cá nhân.
+Description	Use case này cho phép người dùng thay đổi mật khẩu đăng nhập của tài khoản nhằm tăng cường bảo mật.
+Pre-Conditions	•	Người dùng đã đăng nhập vào hệ thống.
+•	Người dùng đang ở trang Quản lý thông tin cá nhân.
+Post-Conditions	•	Mật khẩu mới được cập nhật và lưu vào hệ thống.
+•	Mật khẩu cũ không còn hiệu lực.
+Main Flow	1.	Người dùng chọn chức năng Đổi mật khẩu.
+2.	Hệ thống hiển thị form đổi mật khẩu.
+3.	Người dùng nhập mật khẩu hiện tại, mật khẩu mới và xác nhận mật khẩu mới.
+4.	Người dùng chọn Xác nhận.
+5.	Hệ thống kiểm tra tính hợp lệ của mật khẩu.
+6.	Hệ thống cập nhật mật khẩu mới.
+7.	Hệ thống hiển thị thông báo đổi mật khẩu thành công.
+      Alternate Flow	AF1: Người dùng hủy thao tác
+      •	Tại bước 4, khách hàng chọn Hủy.
+      •	Hệ thống không thay đổi mật khẩu.
+      •	Hệ thống quay lại trang Quản lý thông tin cá nhân.
+      •	Use case kết thúc.
+      Exception Flow	EL1: Mật khẩu hiện tại không đúng
+      •	Người dùng nhập sai mật khẩu hiện tại.
+      •	Hệ thống hiển thị thông báo lỗi.
+      •	Use case kết thúc.
+      EL2: Mật khẩu mới không hợp lệ
+      •	Mật khẩu mới không đáp ứng yêu cầu bảo mật (quá ngắn, thiếu ký tự đặc biệt…).
+      •	Hệ thống hiển thị thông báo lỗi.
+      •	Use case kết thúc.
+
+4.1.10. Quản lý mục yêu thích
+[10]	Quản lý mục yêu thích
 Actor	Khách hàng
-Trigger	Khách hàng nhấn vào liên kết xác thực được gửi đến email sau khi đăng ký tài khoản.
-Description	Use case này cho phép khách hàng xác thực địa chỉ email của mình để kích hoạt tài khoản.
-Hệ thống gửi một email chứa liên kết đến địa chỉ email đã đăng ký.
-Khách hàng thực hiện xác thực để hoàn tất quá trình đăng ký và sử dụng hệ thống.
-Pre-Conditions	•	Khách hàng đã đăng ký tài khoản với email hợp lệ.
-•	Hệ thống đã gửi email xác thực đến địa chỉ email của khách hàng.
-Post-Conditions	Thành công
-•	Email của khách hàng được xác thực.
-•	Tài khoản của khách hàng được kích hoạt.
-•	Khách hàng có thể đăng nhập và sử dụng các chức năng của hệ thống.
-Thất bại
-•	Email không được xác thực.
-•	Tài khoản vẫn ở trạng thái chưa kích hoạt.
-•	Hệ thống hiển thị thông báo lỗi hoặc yêu cầu xác thực lại.
-Main Flow	1.	Hệ thống gửi email đến địa chỉ email của khách hàng sau khi đăng ký.
-2.	Khách hàng mở email xác thực.
-3.	Khách hàng nhấn vào liên kết xác thực.
-4.	Hệ thống kiểm tra tính hợp lệ của liên kết xác thực.
-5.	Nếu hợp lệ, hệ thống xác nhận email đã được xác thực.
-6.	Hệ thống kích hoạt tài khoản khách hàng.
-7.	Use case kết thúc
-Alternate Flow	AF1: Gửi lại email xác thực
-•	Tại bước 2, nếu khách hàng không nhận được email xác thực:
-o	Khách hàng chọn chức năng “Gửi lại email xác thực”.
-o	Hệ thống gửi lại email xác thực mới.
-o	Khách hàng tiếp tục thực hiện bước 2.
-Exception Flow	EL1: Mã xác thực không hợp lệ hoặc đã hết hạn
-•	Tại bước 4, nếu mã xác thực không hợp lệ hoặc đã hết hạn:
-o	Hệ thống hiển thị thông báo lỗi.
-o	Hệ thống cung cấp tùy chọn “Gửi lại email xác thực”.
-o	Khách hàng chọn chức năng “Gửi lại email xác thực”.
-o	Hệ thống gửi email xác thực mới.
-o	Use case kết thúc.
+Trigger	Khách hàng truy cập vào chức năng Mục yêu thích.
+Description	Use case này cho phép khách hàng xem và quản lý danh sách các sản phẩm yêu thích, bao gồm xem danh sách và loại bỏ sản phẩm khỏi mục yêu thích.
+Pre-Conditions	Khách hàng đã đăng nhập vào hệ thống.
+Post-Conditions	•	Danh sách sản phẩm yêu thích của khách hàng được hiển thị hoặc cập nhật.
+•	Không có dữ liệu sản phẩm trong hệ thống bị thay đổi.
+Main Flow	1.	Khách hàng truy cập vào chức năng Quản lý mục yêu thích.
+2.	Hệ thống truy xuất danh sách các sản phẩm yêu thích của khách hàng.
+3.	Hệ thống hiển thị danh sách sản phẩm yêu thích.
+4.	Khách hàng chọn một sản phẩm trong danh sách yêu thích để xóa.
+5.	Hệ thống cập nhật lại danh sách sản phẩm yêu thích.
+6.	Use case kết thúc.
+      Alternate Flow	AF1: Danh sách mục yêu thích trống
+      •	Tại bước 2, nếu khách hàng chưa có sản phẩm nào trong mục yêu thích:
+-	Hệ thống hiển thị thông báo danh sách mục yêu thích trống.
+-	Use case kết thúc.
+     Exception Flow	EL1: Lỗi tải dữ liệu mục yêu thích
+     •	Hệ thống gặp lỗi khi truy xuất danh sách sản phẩm yêu thích.
+     •	Hệ thống hiển thị thông báo lỗi.
+     •	Use case kết thúc.
