@@ -250,4 +250,165 @@ Order "1" -- "N" ReturnRequest
 ProductVariant "1" -- "N" OrderItem
 ReturnRequest "0..1" -- "N" OrderItem
 
+=======
+
+class User {
+  id: Long
+  fullName: String
+  phone: String
+  email: String
+  password: String
+  address: String
+  status: UserStatus
+  verificationToken: String
+  verificationTokenExpiryDate: Instant
+  role: Role
+  twoFactorEnabled: boolean
+}
+
+class Token {
+  id: Long
+  token: String
+  refreshToken: String
+  tokenType: TokenType
+  expired: boolean
+  revoked: boolean
+}
+
+class PasswordResetToken {
+  id: Long
+  token: String
+  expiryDate: Date
+  used: boolean
+}
+
+class Otp {
+  id: Long
+  email: String
+  otpCode: String
+  expiryDate: Date
+  used: boolean
+}
+
+class EmailLog {
+  id: Long
+  recipientEmail: String
+  subject: String
+  body: String
+  sentAt: LocalDateTime
+}
+
+class Product {
+  id: Long
+  name: String
+  description: String
+  price: Double
+  category: String
+  status: ProductStatus
+}
+
+class ProductVariant {
+  id: Long
+  size: String
+  color: String
+  stockQuantity: Integer
+}
+
+class ProductImage {
+  id: Long
+  imageUrl: String
+  isPrimary: boolean
+}
+
+class Review {
+  id: Long
+  rating: Integer
+  comment: String
+  createdAt: Date
+}
+
+class Coupon {
+  id: Long
+  code: String
+  discountValue: Double
+  discountType: DiscountType
+  startDate: Instant
+  expiryDate: Instant
+  minOrderAmount: Double
+  usageLimit: Integer
+  active: boolean
+}
+
+class UserCoupon {
+  id: Long
+  used: boolean
+}
+
+class CartItem {
+  id: Long
+  quantity: Integer
+}
+
+class WishlistItem {
+  id: Long
+  addedDate: Date
+}
+
+class Order {
+  id: Long
+  orderDate: Date
+  totalAmount: Double
+  status: OrderStatus
+  type: OrderType
+  paymentMethod: String
+  shippingAddress: String
+  cancellationReason: String
+  refundStatus: String
+}
+
+class OrderItem {
+  id: Long
+  quantity: Integer
+  price: Double
+  productName: String
+}
+
+class OrderHistory {
+  id: Long
+  previousStatus: String
+  newStatus: String
+  changeDate: Date
+}
+
+class ReturnRequest {
+  id: Long
+  status: ReturnStatus
+  reason: String
+  description: String
+  requestDate: Date
+  rejectionReason: String
+  processedAt: Date
+}
+
+User "1" -- "N" Token
+User "1" -- "N" PasswordResetToken
+Product "1" -- "N" ProductVariant
+Product "1" -- "N" ProductImage
+User "1" -- "N" Review
+Product "1" -- "N" Review
+User "1" -- "N" UserCoupon
+Coupon "1" -- "N" UserCoupon
+User "1" -- "N" CartItem
+ProductVariant "1" -- "N" CartItem
+User "1" -- "N" WishlistItem
+Product "1" -- "N" WishlistItem
+User "0..1" -- "N" Order
+Coupon "0..1" -- "N" Order
+Order "1" -- "N" OrderItem
+ProductVariant "1" -- "N" OrderItem
+Order "1" -- "N" OrderHistory
+Order "1" -- "N" ReturnRequest
+User "1" -- "N" ReturnRequest : submitted_by
+User "0..1" -- "N" ReturnRequest : processed_by
+ReturnRequest "0..1" -- "N" OrderItem
 @enduml
