@@ -6,14 +6,14 @@ class OrderManagementController {
     - orderManagementService : OrderManagementService
     + getAllOrders() : String
     + getOrderDetails(id: Long) : String
-    + updateOrderStatus(id: Long, newStatus: String) : String
+    + updateOrderStatus(id: Long, newStatus: OrderStatus) : MessageResponseDTO
 }
 
 ' Service
 interface OrderManagementService <<interface>> {
     + getAllOrders() : List<Order>
     + getOrderDetails(id: Long) : Order
-    + updateOrderStatus(id: Long, newStatus: String) : void
+    + updateOrderStatus(id: Long, newStatus: OrderStatus) : void
 }
 
 class OrderManagementServiceImpl {
@@ -21,8 +21,8 @@ class OrderManagementServiceImpl {
     - historyRepository : OrderHistoryRepository
     + getAllOrders() : List<Order>
     + getOrderDetails(id: Long) : Order
-    + updateOrderStatus(id: Long, newStatus: String) : void
-    - checkStatusTransition(currentStatus: String, newStatus: String) : void
+    + updateOrderStatus(id: Long, newStatus: OrderStatus) : void
+    - checkStatusTransition(currentStatus: OrderStatus, newStatus: OrderStatus) : void
 }
 
 ' Repository
@@ -36,22 +36,28 @@ interface OrderHistoryRepository <<interface>> {
     + save(history: OrderHistory) : OrderHistory
 }
 
-' Entity & DTO
+' DTO
+
+class MessageResponseDTO {
+    - message : String
+}
+
+' Entity
+
 class Order {
     - id : Long
     - totalAmount : Double
-    - status : String
+    - status : OrderStatus
     - orderDate : Date
     - cancellationReason : String
-    - refundStatus : String
-    + setStatus(status: String) : void
+    - refundStatus : RefundStatus
 }
 
 class OrderHistory {
     - id : Long
     - order : Order
-    - previousStatus : String
-    - newStatus : String
+    - previousStatus : OrderStatus
+    - newStatus : OrderStatus
     - changeDate : Date
 }
 
@@ -67,6 +73,7 @@ OrderManagementServiceImpl --> OrderHistoryRepository : - historyRepository
 
 ' Object Usage
 OrderManagementController ..> Order : <<uses>>
+OrderManagementController ..> MessageResponseDTO : <<returns>>
 OrderManagementServiceImpl ..> Order : <<uses>>
 OrderRepository ..> Order : <<manages>>
 
