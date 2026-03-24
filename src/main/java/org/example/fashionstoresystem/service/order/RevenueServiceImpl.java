@@ -41,6 +41,13 @@ public class RevenueServiceImpl implements RevenueService {
                                 .totalAmount(order.getTotalAmount())
                                 .type(order.getType())
                                 .orderDate(order.getOrderDate() != null ? order.getOrderDate().toString() : "")
+                                .items(order.getOrderItems().stream()
+                                        .map(item -> RevenueReportDTO.OrderItemDTO.builder()
+                                                .productName(item.getProductName())
+                                                .quantity(item.getQuantity())
+                                                .price(item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0)
+                                                .build())
+                                        .toList())
                                 .build())
                         .toList())
                 .build();
