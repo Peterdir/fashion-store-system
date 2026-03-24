@@ -182,19 +182,18 @@ class Order {
   - id : Long
   - orderDate : Date
   - totalAmount : Double
-  - status : OrderStatus
   - type : OrderType
   - paymentMethod : PaymentMethod
   - shippingAddress : String
-  - cancellationReason : String
-  - refundStatus : RefundStatus
 }
 
 class OrderItem {
   - id : Long
   - quantity : Integer
-  - price : Double
   - productName : String
+  - status : OrderStatus
+  - refundStatus : RefundStatus
+  - cancellationReason : String
 }
 
 class OrderHistory {
@@ -234,7 +233,7 @@ User "0..1" -- "N" Order
 Coupon "0..1" -- "N" Order
 Order "1" -- "N" OrderItem
 ProductVariant "1" -- "N" OrderItem
-Order "1" -- "N" OrderHistory
+OrderItem "1" -- "N" OrderHistory
 Order "1" -- "N" ReturnRequest
 User "1" -- "N" ReturnRequest : submitted_by
 User "0..1" -- "N" ReturnRequest : processed_by

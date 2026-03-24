@@ -19,13 +19,9 @@ public class OrderDetailResponseDTO {
     private Long orderId;
     private Date orderDate;
     private Double totalAmount;
-    private OrderStatus status;
     private PaymentMethod paymentMethod;
     private String shippingAddress;
-    private String cancellationReason;
-    private RefundStatus refundStatus;
     private List<OrderItemDTO> items;
-    private List<OrderHistoryDTO> histories;
 
     @Data
     @NoArgsConstructor
@@ -38,6 +34,10 @@ public class OrderDetailResponseDTO {
         private String color;
         private Long quantity;
         private Double price;
+        private OrderStatus status;
+        private RefundStatus refundStatus;
+        private String cancellationReason;
+        private List<OrderHistoryDTO> histories;
     }
 
     @Data

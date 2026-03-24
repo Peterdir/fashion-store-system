@@ -50,7 +50,6 @@ class Order {
 class OrderItem {
     - id : Long
     - quantity : int
-    - price : Double
     - productName : String
 }
 

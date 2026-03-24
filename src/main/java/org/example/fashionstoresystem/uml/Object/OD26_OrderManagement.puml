@@ -1,24 +1,23 @@
 @startuml
 title Object Diagram: Order Management (UC26)\nScenario: Admin updates order status from CONFIRMED to SHIPPING
 
-' Entity - Order after status update
-object "order : Order" as order {
-    id = 1001
-    totalAmount = 2100000.0
+' Entity - OrderItem after status update
+object "item : OrderItem" as item {
+    id = 2001
+    productName = "Áo Thun Trơn"
     status = "SHIPPING"
-    orderDate = "2026-03-19"
 }
 
 ' Entity - History record created
 object "history : OrderHistory" as history {
     id = 501
-    orderId = 1001
+    orderItemId = 2001
     previousStatus = "CONFIRMED"
     newStatus = "SHIPPING"
     changeDate = "2026-03-19"
 }
 
-note right of order
+note right of item
     Order status updated:
     "CONFIRMED" -> "SHIPPING"
 end note
