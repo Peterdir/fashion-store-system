@@ -27,8 +27,9 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
     private final ReturnRequestRepository returnRepository;
 
     @Override
-    public List<Order> getOrdersByCustomer(Long customerId) {
-        return orderRepository.findByUserIdOrderByOrderDateDesc(customerId);
+    public List<ReturnRequestResponseDTO> getReturnRequestsByCustomer(Long customerId) {
+        return returnRepository.findByUserIdOrderByRequestDateDesc(customerId)
+                .stream().map(this::mapToDTO).toList();
     }
 
     @Override

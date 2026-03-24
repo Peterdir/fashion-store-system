@@ -19,4 +19,7 @@ public interface ReturnRequestRepository extends JpaRepository<ReturnRequest, Lo
     @Query("SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END FROM OrderItem i " +
             "WHERE i.id IN :itemIds AND i.returnRequest IS NOT NULL")
     boolean existsByOrderItemIdIn(@Param("itemIds") List<Long> itemIds);
+
+    // Lấy tất cả yêu cầu hoàn trả của 1 khách hàng
+    List<ReturnRequest> findByUserIdOrderByRequestDateDesc(Long userId);
 }

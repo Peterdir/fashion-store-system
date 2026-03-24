@@ -11,7 +11,8 @@ import org.example.fashionstoresystem.entity.jpa.ReturnRequest;
 import java.util.List;
 
 public interface ReturnRequestService {
-    List<Order> getOrdersByCustomer(Long customerId);
+    // Lấy danh sách đơn hàng đang có yêu cầu hoàn trả của khách hàng
+    List<ReturnRequestResponseDTO> getReturnRequestsByCustomer(Long customerId);
     Order getOrderForReturn(Long orderId);
     List<OrderItem> validateReturnEligibility(Long orderId, List<Long> itemIds);
     ReturnRequest submitReturnRequest(SubmitReturnRequestDTO dto, List<String> images);
