@@ -20,6 +20,8 @@ public interface UserService {
 
     // Admin
     List<CustomerSummaryResponseDTO> getAllCustomers(String keyword);
+
     CustomerDetailResponseDTO getCustomerDetail(Long customerId);
+
     MessageResponseDTO updateCustomerStatus(Long customerId, UpdateCustomerStatusRequestDTO dto);
 }
