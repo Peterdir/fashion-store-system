@@ -10,11 +10,6 @@ public interface UserService {
     ProfileResponseDTO getProfile(Long userId);
     ProfileResponseDTO updateProfile(Long userId, UpdateProfileRequestDTO dto);
 
-    // Xác thực hai bước
-    TwoFactorStatusResponseDTO getTwoFactorStatus(Long userId);
-    MessageResponseDTO requestTwoFactorSetup(Long userId, TwoFactorSetupRequestDTO dto);
-    TwoFactorStatusResponseDTO verifyTwoFactorOtp(Long userId, VerifyOtpRequestDTO dto);
-
     // Đổi mật khẩu
     MessageResponseDTO changePassword(Long userId, ChangePasswordRequestDTO dto);
 
