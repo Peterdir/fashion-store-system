@@ -18,4 +18,6 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
     // Áp dụng mã: Mã đang hiệu lực VÀ chưa qua ngày hết hạn
     Optional<Coupon> findByCodeAndActiveTrueAndExpiryDateAfter(String code, Instant currentDate);
+
+    boolean existsByCode(String code);
 }

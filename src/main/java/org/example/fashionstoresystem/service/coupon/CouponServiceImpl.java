@@ -3,6 +3,8 @@ package org.example.fashionstoresystem.service.coupon;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.ApplyCouponRequestDTO;
 import org.example.fashionstoresystem.dto.request.CollectCouponRequestDTO;
+import org.example.fashionstoresystem.dto.request.CreateCouponRequestDTO;
+import org.example.fashionstoresystem.dto.request.UpdateCouponRequestDTO;
 import org.example.fashionstoresystem.dto.response.ApplyCouponResponseDTO;
 import org.example.fashionstoresystem.dto.response.CouponResponseDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
@@ -119,6 +121,90 @@ public class CouponServiceImpl implements CouponService {
                 .discountType(coupon.getDiscountType())
                 .newTotalAmount(newTotal)
                 .message("Áp dụng mã giảm giá thành công! Giảm " + discountAmount + "đ")
+                .build();
+    }
+
+    // ADMIN API
+    @Override
+    public List<CouponResponseDTO> getAllCoupons() {
+        return couponRepository.findAll().stream().map(this::mapToDTO).toList();
+    }
+
+    @Override
+    public CouponResponseDTO getCouponDetail(Long couponId) {
+        Coupon coupon = couponRepository.findById(couponId)
+                .orElseThrow(() -> new RuntimeException("Mã giảm giá không tồn tại!"));
+        return mapToDTO(coupon);
+    }
+
+    @Override
+    @Transactional
+    public CouponResponseDTO createCoupon(CreateCouponRequestDTO dto) {
+        if (couponRepository.existsByCode(dto.getCode())) {
+            throw new RuntimeException("Mã CODE đã tồn tại!");
+        }
+
+        Coupon coupon = Coupon.builder()
+                .code(dto.getCode())
+                .discountValue(dto.getDiscountValue())
+                .discountType(dto.getDiscountType())
+                .startDate(dto.getStartDate())
+                .expiryDate(dto.getExpiryDate())
+                .minOrderAmount(dto.getMinOrderAmount())
+                .usageLimit(dto.getUsageLimit())
+                .active(true)
+                .build();
+        
+        return mapToDTO(couponRepository.save(coupon));
+    }
+
+    @Override
+    @Transactional
+    public CouponResponseDTO updateCoupon(Long couponId, UpdateCouponRequestDTO dto) {
+        Coupon coupon = couponRepository.findById(couponId)
+                .orElseThrow(() -> new RuntimeException("Mã giảm giá không tồn tại!"));
+
+        if (dto.getCode() != null && !dto.getCode().equals(coupon.getCode())
+                && couponRepository.existsByCode(dto.getCode())) {
+            throw new RuntimeException("Mã CODE cập nhật đã tồn tại!");
+        }
+
+        if (dto.getCode() != null) coupon.setCode(dto.getCode());
+        if (dto.getDiscountValue() != null) coupon.setDiscountValue(dto.getDiscountValue());
+        if (dto.getDiscountType() != null) coupon.setDiscountType(dto.getDiscountType());
+        if (dto.getStartDate() != null) coupon.setStartDate(dto.getStartDate());
+        if (dto.getExpiryDate() != null) coupon.setExpiryDate(dto.getExpiryDate());
+        if (dto.getMinOrderAmount() != null) coupon.setMinOrderAmount(dto.getMinOrderAmount());
+        if (dto.getUsageLimit() != null) coupon.setUsageLimit(dto.getUsageLimit());
+        coupon.setActive(dto.isActive());
+
+        return mapToDTO(couponRepository.save(coupon));
+    }
+
+    @Override
+    @Transactional
+    public MessageResponseDTO toggleCouponStatus(Long couponId) {
+        Coupon coupon = couponRepository.findById(couponId)
+                .orElseThrow(() -> new RuntimeException("Mã giảm giá không tồn tại!"));
+
+        coupon.setActive(!coupon.isActive());
+        couponRepository.save(coupon);
+
+        return MessageResponseDTO.builder()
+                .message("Đã " + (coupon.isActive() ? "kích hoạt" : "ngừng sử dụng") + " mã giảm giá!")
+                .build();
+    }
+
+    private CouponResponseDTO mapToDTO(Coupon coupon) {
+        return CouponResponseDTO.builder()
+                .couponId(coupon.getId())
+                .code(coupon.getCode())
+                .discountValue(coupon.getDiscountValue())
+                .discountType(coupon.getDiscountType())
+                .startDate(coupon.getStartDate())
+                .expiryDate(coupon.getExpiryDate())
+                .minOrderAmount(coupon.getMinOrderAmount())
+                .collected(false) // Assuming collected isn't relevant for Admin view or handle appropriately
                 .build();
     }
 }
