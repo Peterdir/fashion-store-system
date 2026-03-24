@@ -1,12 +1,9 @@
 package org.example.fashionstoresystem.service.user;
 
-import org.example.fashionstoresystem.dto.request.ChangePasswordRequestDTO;
-import org.example.fashionstoresystem.dto.request.TwoFactorSetupRequestDTO;
-import org.example.fashionstoresystem.dto.request.UpdateProfileRequestDTO;
-import org.example.fashionstoresystem.dto.request.VerifyOtpRequestDTO;
-import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
-import org.example.fashionstoresystem.dto.response.ProfileResponseDTO;
-import org.example.fashionstoresystem.dto.response.TwoFactorStatusResponseDTO;
+import org.example.fashionstoresystem.dto.request.*;
+import org.example.fashionstoresystem.dto.response.*;
+
+import java.util.List;
 
 public interface UserService {
     // Quản lý thông tin cá nhân
@@ -20,4 +17,9 @@ public interface UserService {
 
     // Đổi mật khẩu
     MessageResponseDTO changePassword(Long userId, ChangePasswordRequestDTO dto);
+
+    // Admin
+    List<CustomerSummaryResponseDTO> getAllCustomers(String keyword);
+    CustomerDetailResponseDTO getCustomerDetail(Long customerId);
+    MessageResponseDTO updateCustomerStatus(Long customerId, UpdateCustomerStatusRequestDTO dto);
 }

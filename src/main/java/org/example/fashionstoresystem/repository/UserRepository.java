@@ -1,9 +1,11 @@
 package org.example.fashionstoresystem.repository;
 
+import org.example.fashionstoresystem.entity.enums.Role;
 import org.example.fashionstoresystem.entity.jpa.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -21,4 +23,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Chặn trùng lặp data của user khác khi cập nhật thông tin cá nhân
     Boolean existsByEmailAndIdNot(String email, Long id);
     Boolean existsByPhoneAndIdNot(String phone, Long id);
+
+    // Admin
+    List<User> findByRole(Role role);
 }
