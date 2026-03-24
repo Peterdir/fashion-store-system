@@ -27,7 +27,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductSummaryResponseDTO> getProducts(String keyword) {
         List<Product> products;
         
-        // Theo SD09: Nếu keyword trống thì lấy tất cả, ngược lại thì tìm kiếm
+        // Nếu keyword trống thì lấy tất cả, ngược lại thì tìm kiếm
         if (keyword == null || keyword.trim().isEmpty()) {
             products = productRepository.findAll();
         } else {
