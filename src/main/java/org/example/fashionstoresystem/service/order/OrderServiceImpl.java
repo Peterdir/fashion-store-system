@@ -29,8 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -89,17 +92,16 @@ public class OrderServiceImpl implements OrderService {
             if (totalAmount < 0) totalAmount = 0.0;
         }
 
-        // 4. Khởi tạo & Lưu Object Order chính
+        // 4. Khởi tạo & Lưu Object Order chính (không còn status ở Order)
         Order order = new Order();
         order.setOrderDate(new Date());
         order.setTotalAmount(totalAmount);
-        order.setStatus(OrderStatus.PENDING_PAYMENT);
         order.setShippingAddress(dto.getShippingAddress());
         order.setPaymentMethod(dto.getPaymentMethod());
         order.setType(OrderType.ONLINE);
         order = orderRepository.save(order);
 
-        // 5. Khởi tạo OrderItem và Trừ Kho
+        // 5. Khởi tạo OrderItem (mỗi item có status riêng) và Trừ Kho
         for (CartItem item : cartItems) {
             ProductVariant variant = item.getProductVariant();
 
@@ -107,8 +109,8 @@ public class OrderServiceImpl implements OrderService {
                     .order(order)
                     .productVariant(variant)
                     .quantity((long) item.getQuantity())
-                    .price(variant.getPrice())
                     .productName(variant.getProduct().getName())
+                    .status(OrderStatus.PENDING_PAYMENT) // Trạng thái ban đầu ở item
                     .build();
             orderItemRepository.save(orderItem);
 
@@ -123,7 +125,7 @@ public class OrderServiceImpl implements OrderService {
         return PlaceOrderResponseDTO.builder()
                 .orderId(order.getId())
                 .totalAmount(order.getTotalAmount())
-                .status(order.getStatus())
+                .status(OrderStatus.PENDING_PAYMENT) // Tất cả item cùng status lúc đặt
                 .message("Đặt hàng thành công! Đang chuyển hướng sang trang thanh toán...")
                 .build();
     }
@@ -134,16 +136,25 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderSummaryResponseDTO> getMyOrders(Long userId) {
         List<Order> orders = orderRepository.findByUserIdOrderByOrderDateDesc(userId);
 
-        // Không có đơn hàng → trả về list rỗng
         return orders.stream()
-                .map(order -> OrderSummaryResponseDTO.builder()
-                        .orderId(order.getId())
-                        .orderDate(order.getOrderDate())
-                        .totalAmount(order.getTotalAmount())
-                        .status(order.getStatus())
-                        .paymentMethod(order.getPaymentMethod())
-                        .itemCount(order.getOrderItems().size())
-                        .build())
+                .map(order -> {
+                    // Tổng hợp trạng thái từ các OrderItem
+                    Map<String, Integer> statusSummary = order.getOrderItems().stream()
+                            .collect(Collectors.groupingBy(
+                                    item -> item.getStatus().name(),
+                                    LinkedHashMap::new,
+                                    Collectors.summingInt(i -> 1)
+                            ));
+
+                    return OrderSummaryResponseDTO.builder()
+                            .orderId(order.getId())
+                            .orderDate(order.getOrderDate())
+                            .totalAmount(order.getTotalAmount())
+                            .paymentMethod(order.getPaymentMethod())
+                            .itemCount(order.getOrderItems().size())
+                            .statusSummary(statusSummary)
+                            .build();
+                })
                 .toList();
     }
 
@@ -151,40 +162,41 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDetailResponseDTO getMyOrderDetail(Long userId, Long orderId) {
-        // Đơn hàng không tồn tại hoặc không thuộc về khách hàng
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
                 .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại hoặc không thuộc quyền sở hữu của bạn!"));
 
         List<OrderDetailResponseDTO.OrderItemDTO> itemDTOs = order.getOrderItems().stream()
-                .map(item -> OrderDetailResponseDTO.OrderItemDTO.builder()
-                        .orderItemId(item.getId())
-                        .productName(item.getProductName())
-                        .size(item.getProductVariant() != null ? item.getProductVariant().getSize() : null)
-                        .color(item.getProductVariant() != null ? item.getProductVariant().getColor() : null)
-                        .quantity(item.getQuantity())
-                        .price(item.getPrice())
-                        .build())
-                .toList();
+                .map(item -> {
+                    List<OrderDetailResponseDTO.OrderHistoryDTO> historyDTOs = item.getOrderHistories().stream()
+                            .map(h -> OrderDetailResponseDTO.OrderHistoryDTO.builder()
+                                    .previousStatus(h.getPreviousStatus())
+                                    .newStatus(h.getNewStatus())
+                                    .changeDate(h.getChangeDate())
+                                    .build())
+                            .toList();
 
-        List<OrderDetailResponseDTO.OrderHistoryDTO> historyDTOs = order.getOrderHistories().stream()
-                .map(h -> OrderDetailResponseDTO.OrderHistoryDTO.builder()
-                        .previousStatus(h.getPreviousStatus())
-                        .newStatus(h.getNewStatus())
-                        .changeDate(h.getChangeDate())
-                        .build())
+                    return OrderDetailResponseDTO.OrderItemDTO.builder()
+                            .orderItemId(item.getId())
+                            .productName(item.getProductName())
+                            .size(item.getProductVariant() != null ? item.getProductVariant().getSize() : null)
+                            .color(item.getProductVariant() != null ? item.getProductVariant().getColor() : null)
+                            .quantity(item.getQuantity())
+                            .price(item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0)
+                            .status(item.getStatus())
+                            .refundStatus(item.getRefundStatus())
+                            .cancellationReason(item.getCancellationReason())
+                            .histories(historyDTOs)
+                            .build();
+                })
                 .toList();
 
         return OrderDetailResponseDTO.builder()
                 .orderId(order.getId())
                 .orderDate(order.getOrderDate())
                 .totalAmount(order.getTotalAmount())
-                .status(order.getStatus())
                 .paymentMethod(order.getPaymentMethod())
                 .shippingAddress(order.getShippingAddress())
-                .cancellationReason(order.getCancellationReason())
-                .refundStatus(order.getRefundStatus())
                 .items(itemDTOs)
-                .histories(historyDTOs)
                 .build();
     }
 
@@ -193,52 +205,51 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public MessageResponseDTO cancelOrder(Long userId, CancelOrderRequestDTO dto) {
-        // Đơn hàng không tồn tại hoặc không thuộc quyền sở hữu
         Order order = orderRepository.findByIdAndUserId(dto.getOrderId(), userId)
                 .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại hoặc không thuộc quyền sở hữu của bạn!"));
 
-        // Đơn hàng không đủ điều kiện hủy
         Set<OrderStatus> cancellableStatuses = Set.of(
                 OrderStatus.PENDING_PAYMENT,
                 OrderStatus.PAID,
                 OrderStatus.PROCESSING
         );
 
-        if (!cancellableStatuses.contains(order.getStatus())) {
-            throw new RuntimeException("Không thể hủy đơn hàng ở trạng thái " + order.getStatus() +
-                    ". Chỉ có thể hủy đơn hàng Chờ thanh toán, Đã thanh toán hoặc Đang xử lý.");
-        }
+        boolean hasRefund = false;
+        boolean refundFailed = false;
 
-        OrderStatus previousStatus = order.getStatus();
-
-        // Cập nhật trạng thái đơn hàng sang Đã hủy
-        order.setStatus(OrderStatus.CANCELLED);
-        order.setCancellationReason(dto.getCancellationReason());
-
-        // Nếu đơn hàng đã thanh toán online → khởi tạo hoàn tiền
-        if (previousStatus == OrderStatus.PAID && order.getPaymentMethod() != PaymentMethod.COD) {
-            try {
-                // Khởi tạo yêu cầu hoàn tiền đến cổng thanh toán
-                order.setRefundStatus(RefundStatus.PENDING);
-            } catch (Exception e) {
-                // Lỗi khi hoàn tiền
-                order.setRefundStatus(RefundStatus.FAILED);
-            }
-        }
-
-        orderRepository.save(order);
-
-        // Lưu lịch sử chuyển trạng thái
-        OrderHistory history = OrderHistory.builder()
-                .order(order)
-                .previousStatus(previousStatus)
-                .newStatus(OrderStatus.CANCELLED)
-                .changeDate(new Date())
-                .build();
-        orderHistoryRepository.save(history);
-
-        // Hoàn lại tồn kho
         for (OrderItem item : order.getOrderItems()) {
+            if (!cancellableStatuses.contains(item.getStatus())) {
+                throw new RuntimeException("Sản phẩm '" + item.getProductName() + "' ở trạng thái "
+                        + item.getStatus() + " không thể hủy!");
+            }
+
+            OrderStatus previousStatus = item.getStatus();
+
+            // Nếu item đã thanh toán online → hoàn tiền
+            if (previousStatus == OrderStatus.PAID && order.getPaymentMethod() != PaymentMethod.COD) {
+                try {
+                    item.setRefundStatus(RefundStatus.PENDING);
+                    hasRefund = true;
+                } catch (Exception e) {
+                    item.setRefundStatus(RefundStatus.FAILED);
+                    refundFailed = true;
+                }
+            }
+
+            item.setStatus(OrderStatus.CANCELLED);
+            item.setCancellationReason(dto.getCancellationReason());
+            orderItemRepository.save(item);
+
+            // Lưu lịch sử chuyển trạng thái
+            OrderHistory history = OrderHistory.builder()
+                    .orderItem(item)
+                    .previousStatus(previousStatus)
+                    .newStatus(OrderStatus.CANCELLED)
+                    .changeDate(new Date())
+                    .build();
+            orderHistoryRepository.save(history);
+
+            // Hoàn lại tồn kho
             if (item.getProductVariant() != null) {
                 ProductVariant variant = item.getProductVariant();
                 variant.setStockQuantity(variant.getStockQuantity() + item.getQuantity().intValue());
@@ -247,10 +258,10 @@ public class OrderServiceImpl implements OrderService {
         }
 
         String message = "Hủy đơn hàng thành công!";
-        if (order.getRefundStatus() == RefundStatus.PENDING) {
+        if (hasRefund && !refundFailed) {
             message += " Yêu cầu hoàn tiền đang được xử lý.";
-        } else if (order.getRefundStatus() == RefundStatus.FAILED) {
-            message += " Lỗi khi hoàn tiền, vui lòng liên hệ hỗ trợ.";
+        } else if (refundFailed) {
+            message += " Lỗi khi hoàn tiền một số sản phẩm, vui lòng liên hệ hỗ trợ.";
         }
 
         return MessageResponseDTO.builder()
