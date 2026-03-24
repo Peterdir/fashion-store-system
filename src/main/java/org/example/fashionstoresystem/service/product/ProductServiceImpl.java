@@ -159,7 +159,9 @@ public class ProductServiceImpl implements ProductService {
                             .size(vDto.getSize())
                             .color(vDto.getColor())
                             .stockQuantity(vDto.getStockQuantity())
-                            .price(dto.getPrice() != null ? dto.getPrice() : (product.getVariants().isEmpty() ? 0.0 : product.getVariants().get(0).getPrice()))
+                            .price(dto.getPrice() != null
+                                    ? dto.getPrice() : (product.getVariants().isEmpty()
+                                    ? 0.0 : product.getVariants().get(0).getPrice()))
                             .product(product)
                             .build();
                     product.getVariants().add(variant);

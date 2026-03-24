@@ -1,6 +1,11 @@
 package org.example.fashionstoresystem.service.order;
 
 import lombok.RequiredArgsConstructor;
+import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
+import org.example.fashionstoresystem.dto.response.OrderDetailResponseDTO;
+import org.example.fashionstoresystem.dto.response.OrderSummaryResponseDTO;
+import org.example.fashionstoresystem.entity.jpa.Order;
+import org.example.fashionstoresystem.repository.OrderRepository;
 import org.example.fashionstoresystem.entity.enums.OrderStatus;
 import org.example.fashionstoresystem.entity.jpa.OrderHistory;
 import org.example.fashionstoresystem.entity.jpa.OrderItem;
@@ -10,6 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +26,7 @@ public class OrderManagementServiceImpl implements OrderManagementService {
 
     private final OrderItemRepository orderItemRepository;
     private final OrderHistoryRepository historyRepository;
+    private final OrderRepository orderRepository;
 
     @Override
     @Transactional
@@ -43,5 +53,85 @@ public class OrderManagementServiceImpl implements OrderManagementService {
         if (currentStatus == OrderStatus.CANCELLED || currentStatus == OrderStatus.COMPLETED) {
             throw new RuntimeException("Không thể chuyển trạng thái từ " + currentStatus + " sang " + newStatus);
         }
+    }
+
+    @Override
+    public List<OrderSummaryResponseDTO> getAllOrders() {
+        return orderRepository.findAll().stream().map(o -> {
+            Map<String, Integer> statusSummary = new HashMap<>();
+            for (OrderItem item : o.getOrderItems()) {
+                String ss = item.getStatus().name();
+                statusSummary.put(ss, statusSummary.getOrDefault(ss, 0) + 1);
+            }
+            return OrderSummaryResponseDTO.builder()
+                    .orderId(o.getId())
+                    .orderDate(o.getOrderDate())
+                    .totalAmount(o.getTotalAmount())
+                    .paymentMethod(o.getPaymentMethod())
+                    .itemCount(o.getOrderItems().size())
+                    .statusSummary(statusSummary)
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public OrderDetailResponseDTO getOrderDetail(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại!"));
+        
+        List<OrderDetailResponseDTO.OrderItemDTO> itemDTOs = order.getOrderItems().stream().map(item -> {
+            List<OrderDetailResponseDTO.OrderHistoryDTO> histories = item.getOrderHistories().stream().map(h -> 
+                OrderDetailResponseDTO.OrderHistoryDTO.builder()
+                        .previousStatus(h.getPreviousStatus())
+                        .newStatus(h.getNewStatus())
+                        .changeDate(h.getChangeDate())
+                        .build()
+            ).collect(Collectors.toList());
+
+            return OrderDetailResponseDTO.OrderItemDTO.builder()
+                    .orderItemId(item.getId())
+                    .productName(item.getProductName())
+                    .size(item.getProductVariant().getSize())
+                    .color(item.getProductVariant().getColor())
+                    .quantity(item.getQuantity())
+                    .price(item.getProductVariant().getPrice())
+                    .status(item.getStatus())
+                    .refundStatus(item.getRefundStatus())
+                    .cancellationReason(item.getCancellationReason())
+                    .histories(histories)
+                    .build();
+        }).collect(Collectors.toList());
+
+        return OrderDetailResponseDTO.builder()
+                .orderId(order.getId())
+                .orderDate(order.getOrderDate())
+                .totalAmount(order.getTotalAmount())
+                .paymentMethod(order.getPaymentMethod())
+                .shippingAddress(order.getShippingAddress())
+                .items(itemDTOs)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public MessageResponseDTO updateOrderStatus(Long orderId, OrderStatus status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại!"));
+        
+        boolean updated = false;
+        for (OrderItem item : order.getOrderItems()) {
+            if (item.getStatus() != OrderStatus.CANCELLED && item.getStatus() != OrderStatus.COMPLETED && item.getStatus() != status) {
+                updateOrderItemStatus(item.getId(), status);
+                updated = true;
+            }
+        }
+        
+        if (!updated) {
+            throw new RuntimeException("Không có sản phẩm nào trong đơn hàng có thể cập nhật trạng thái mới này!");
+        }
+
+        return MessageResponseDTO.builder()
+                .message("Cập nhật trạng thái đơn hàng thành công!")
+                .build();
     }
 }
