@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
     private final OtpRepository otpRepository;
     private final EmailService emailService;
 
-    // ======================== UC05: QUẢN LÝ THÔNG TIN CÁ NHÂN ========================
+    // QUẢN LÝ THÔNG TIN CÁ NHÂN
 
     @Override
     public ProfileResponseDTO getProfile(Long userId) {
@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
     public ProfileResponseDTO updateProfile(Long userId, UpdateProfileRequestDTO dto) {
         User user = findUserById(userId);
 
-        // EL1: Dữ liệu không hợp lệ - Kiểm tra trùng lặp phone với user khác
+        // Dữ liệu không hợp lệ - Kiểm tra trùng lặp phone với user khác
         if (dto.getPhone() != null && !dto.getPhone().isBlank()) {
             if (userRepository.existsByPhoneAndIdNot(dto.getPhone(), userId)) {
                 throw new RuntimeException("Số điện thoại đã được sử dụng bởi tài khoản khác!");
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    // ======================== UC06: XÁC THỰC HAI BƯỚC ========================
+    // XÁC THỰC HAI BƯỚC
 
     @Override
     public TwoFactorStatusResponseDTO getTwoFactorStatus(Long userId) {
@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
     public MessageResponseDTO requestTwoFactorSetup(Long userId, TwoFactorSetupRequestDTO dto) {
         User user = findUserById(userId);
 
-        // AF1: Khách hàng tắt xác thực 2 bước
+        // Khách hàng tắt xác thực 2 bước
         if (!dto.isEnable()) {
             user.setTwoFactorEnabled(false);
             userRepository.save(user);
@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
         try {
             emailService.sendVerificationEmail(user.getEmail(), "Mã xác thực 2 bước của bạn là: " + otpCode);
         } catch (Exception e) {
-            // EL2: Không gửi được mã xác thực
+            // Không gửi được mã xác thực
             throw new RuntimeException("Hệ thống không thể gửi mã xác thực! Vui lòng thử lại sau.");
         }
 
@@ -139,7 +139,7 @@ public class UserServiceImpl implements UserService {
     public TwoFactorStatusResponseDTO verifyTwoFactorOtp(Long userId, VerifyOtpRequestDTO dto) {
         User user = findUserById(userId);
 
-        // EL1: Mã xác thực không hợp lệ
+        // Mã xác thực không hợp lệ
         Otp otp = otpRepository.findByUserEmailAndCode(user.getEmail(), dto.getOtpCode())
                 .orElseThrow(() -> new RuntimeException("Mã xác thực không hợp lệ!"));
 
@@ -164,19 +164,19 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    // ======================== UC07: ĐỔI MẬT KHẨU ========================
+    // ĐỔI MẬT KHẨU
 
     @Override
     @Transactional
     public MessageResponseDTO changePassword(Long userId, ChangePasswordRequestDTO dto) {
         User user = findUserById(userId);
 
-        // EL1: Mật khẩu hiện tại không đúng
+        // Mật khẩu hiện tại không đúng
         if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
             throw new RuntimeException("Mật khẩu hiện tại không đúng!");
         }
 
-        // EL2: Mật khẩu mới không hợp lệ
+        // Mật khẩu mới không hợp lệ
         if (dto.getNewPassword().length() < 6) {
             throw new RuntimeException("Mật khẩu mới phải có ít nhất 6 ký tự!");
         }
@@ -194,7 +194,7 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    // ======================== PRIVATE HELPERS ========================
+    // PRIVATE HELPERS
 
     private User findUserById(Long userId) {
         return userRepository.findById(userId)

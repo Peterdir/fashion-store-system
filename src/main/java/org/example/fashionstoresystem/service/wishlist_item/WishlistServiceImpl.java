@@ -27,7 +27,7 @@ public class WishlistServiceImpl implements WishlistService {
     public List<WishlistItemResponseDTO> getWishlist(Long userId) {
         List<WishlistItem> items = wishlistItemRepository.findByUserId(userId);
 
-        // AF1: Danh sách mục yêu thích trống -> trả về list rỗng, Controller/View sẽ hiển thị thông báo
+        // Danh sách mục yêu thích trống -> trả về list rỗng, Controller/View sẽ hiển thị thông báo
         return items.stream()
                 .map(item -> WishlistItemResponseDTO.builder()
                         .wishlistItemId(item.getId())
