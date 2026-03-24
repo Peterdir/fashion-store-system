@@ -1,6 +1,9 @@
 package org.example.fashionstoresystem.service.return_request;
 
+import org.example.fashionstoresystem.dto.request.ProcessReturnRequestDTO;
 import org.example.fashionstoresystem.dto.request.SubmitReturnRequestDTO;
+import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
+import org.example.fashionstoresystem.dto.response.ReturnRequestResponseDTO;
 import org.example.fashionstoresystem.entity.jpa.Order;
 import org.example.fashionstoresystem.entity.jpa.OrderItem;
 import org.example.fashionstoresystem.entity.jpa.ReturnRequest;
@@ -12,4 +15,11 @@ public interface ReturnRequestService {
     Order getOrderForReturn(Long orderId);
     List<OrderItem> validateReturnEligibility(Long orderId, List<Long> itemIds);
     ReturnRequest submitReturnRequest(SubmitReturnRequestDTO dto, List<String> images);
+
+    // Admin
+    List<ReturnRequestResponseDTO> getAllReturnRequests();
+
+    ReturnRequestResponseDTO getReturnRequestDetail(Long requestId);
+
+    MessageResponseDTO processReturnRequest(Long requestId, ProcessReturnRequestDTO dto);
 }
