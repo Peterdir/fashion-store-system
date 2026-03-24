@@ -2,6 +2,11 @@ package org.example.fashionstoresystem.entity.jpa;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.fashionstoresystem.entity.enums.OrderStatus;
+import org.example.fashionstoresystem.entity.enums.RefundStatus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "order_items")
@@ -20,11 +25,20 @@ public class OrderItem {
     @Column(nullable = false)
     private Long quantity;
 
-    @Column(nullable = false)
-    private Double price;
-
     @Column
     private String productName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private OrderStatus status = OrderStatus.PENDING_PAYMENT;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private RefundStatus refundStatus;
+
+    @Column
+    private String cancellationReason;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
@@ -38,4 +52,7 @@ public class OrderItem {
     @JoinColumn(name = "variant_id")
     private ProductVariant productVariant;
 
+    @Builder.Default
+    @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderHistory> orderHistories = new ArrayList<>();
 }

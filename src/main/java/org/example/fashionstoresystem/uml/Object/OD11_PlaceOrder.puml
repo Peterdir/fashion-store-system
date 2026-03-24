@@ -37,14 +37,12 @@ object "order : Order" as order {
 object "item1 : OrderItem" as item1 {
     id = 201
     quantity = 2
-    price = 1250000.0
     productName = "Ao Thun Trang"
 }
 
 object "item2 : OrderItem" as item2 {
     id = 202
     quantity = 1
-    price = 850000.0
     productName = "Quan Jean Xanh"
 }
 
@@ -53,6 +51,7 @@ object "variant1 : ProductVariant" as v1 {
     id = 5
     size = "M"
     color = "White"
+    price = 1250000.0
     stockQuantity = 48
 }
 
@@ -60,6 +59,7 @@ object "variant2 : ProductVariant" as v2 {
     id = 12
     size = "L"
     color = "Blue"
+    price = 850000.0
     stockQuantity = 29
 }
 

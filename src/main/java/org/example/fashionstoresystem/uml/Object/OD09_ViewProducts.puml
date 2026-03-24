@@ -4,8 +4,12 @@ title Object Diagram: View Products (UC09)\nScenario: Customer searches for prod
 object "product1 : Product" as p1 {
     id = 5
     name = "Leather Jacket"
-    price = 1250000.0
     category = "Outerwear"
+}
+
+object "variant1 : ProductVariant" as v1 {
+    id = 1
+    price = 1250000.0
     size = 42
     color = "Black"
 }
@@ -13,8 +17,12 @@ object "product1 : Product" as p1 {
 object "product2 : Product" as p2 {
     id = 12
     name = "Denim Jacket"
-    price = 850000.0
     category = "Outerwear"
+}
+
+object "variant2 : ProductVariant" as v2 {
+    id = 2
+    price = 850000.0
     size = 40
     color = "Blue"
 }
@@ -22,11 +30,19 @@ object "product2 : Product" as p2 {
 object "product3 : Product" as p3 {
     id = 28
     name = "Bomber Jacket"
-    price = 980000.0
     category = "Outerwear"
+}
+
+object "variant3 : ProductVariant" as v3 {
+    id = 3
+    price = 980000.0
     size = 44
     color = "Green"
 }
+
+p1 *-- v1
+p2 *-- v2
+p3 *-- v3
 
 note bottom of p1
     Products returned from database
