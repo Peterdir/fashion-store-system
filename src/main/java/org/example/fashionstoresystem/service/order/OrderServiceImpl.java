@@ -204,8 +204,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public MessageResponseDTO cancelOrder(Long userId, CancelOrderRequestDTO dto) {
-        Order order = orderRepository.findByIdAndUserId(dto.getOrderId(), userId)
+    public MessageResponseDTO cancelOrder(Long userId, Long orderId, CancelOrderRequestDTO dto) {
+        Order order = orderRepository.findByIdAndUserId(orderId, userId)
                 .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại hoặc không thuộc quyền sở hữu của bạn!"));
 
         Set<OrderStatus> cancellableStatuses = Set.of(

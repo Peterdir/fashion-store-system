@@ -20,5 +20,5 @@ public interface OrderService {
     OrderDetailResponseDTO getMyOrderDetail(Long userId, Long orderId);
 
     // Hủy đơn hàng
-    MessageResponseDTO cancelOrder(Long userId, CancelOrderRequestDTO dto);
+    MessageResponseDTO cancelOrder(Long userId, Long orderId, CancelOrderRequestDTO dto);
 }
