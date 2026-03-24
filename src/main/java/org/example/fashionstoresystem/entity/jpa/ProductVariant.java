@@ -29,6 +29,9 @@ public class ProductVariant {
     @Column(nullable = false)
     private Long stockQuantity;
 
+    @Column(nullable = false)
+    private Double price;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;

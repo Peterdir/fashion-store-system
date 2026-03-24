@@ -63,7 +63,7 @@ group Order Management (Transaction)
         Service -> CartRepo : deleteAllById(selectedCartItemIds)
         CartRepo -> DB : DELETE FROM cart_items WHERE id IN (...)
 
-        Service --> Controller : OrderSuccessDTO
+        Service --> Controller : PlaceOrderResponseDTO
         Controller --> View : order_success.html
         View --> Customer : Display "Order Success" message!
     end

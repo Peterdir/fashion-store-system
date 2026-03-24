@@ -42,6 +42,7 @@ class EmailServiceImpl {
 
 interface UserRepository <<interface>> {
     + existsByEmail(email: String) : Boolean
+    + existsByPhone(phone: String) : Boolean
     + save(user: User) : User
 }
 

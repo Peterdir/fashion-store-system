@@ -27,5 +27,16 @@ public class RevenueReportDTO {
         private Double totalAmount;
         private OrderType type;
         private String orderDate;
+        private List<OrderItemDTO> items;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class OrderItemDTO {
+        private String productName;
+        private Long quantity;
+        private Double price;
     }
 }

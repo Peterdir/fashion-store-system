@@ -23,15 +23,17 @@ group Process product query
         DB --> Repository : List<Product>
         Repository --> Service : List<Product>
     else keyword is NOT empty (Search)
-        Service -> Repository : findByNameContaining(keyword)
-        Repository -> DB : SELECT ... WHERE name LIKE %keyword%
+        Service -> Repository : findByNameContainingIgnoreCase(keyword)
+        Repository -> DB : SELECT ... WHERE LOWER(name) LIKE LOWER(%keyword%)
         DB --> Repository : List<Product>
         Repository --> Service : List<Product>
     end
 end
 
+Service -> Service : mapToDTOs(List<Product>)
+
 alt Products available
-    Service --> Controller : List<Product>
+    Service --> Controller : List<ProductSummaryResponseDTO>
     Controller --> View : product_list.html (with products)
     View --> User : Display product list
 else No products found
@@ -48,5 +50,27 @@ Repository --[#red]> Service : throw DataAccessException
 Service --[#red]> Controller : forward exception
 Controller --> View : error.html
 View --> User : Display "Data Loading Error" message
+== View Product Detail (UC09) ==
+User -> View : Click on a Product
+View -> Controller : showProductDetail(productId)
+note right: GET /products/{id}
+Controller -> Service : getProductDetail(productId)
+
+Service -> Repository : findById(productId)
+Repository -> DB : SELECT * FROM products WHERE id = productId
+DB --> Repository : Product
+
+alt Product exists
+    Repository --> Service : Product
+    Service -> Service : mapToDetailDTO(Product)
+    Service --> Controller : ProductDetailResponseDTO
+    Controller --> View : product_detail.html
+    View --> User : Display Product Information
+else Product not found (EF1)
+    Repository --> Service : null / Optional.empty()
+    Service --> Controller : throw NotFoundException
+    Controller --> View : error.html
+    View --> User : Display "Product not found" message
+end
 
 @enduml

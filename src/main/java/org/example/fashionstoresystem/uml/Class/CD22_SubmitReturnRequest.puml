@@ -66,13 +66,13 @@ class ReturnRequest {
 
 class Order {
     - id : Long
-    - status : OrderStatus
-    - cancellationReason : String
-    - refundStatus : RefundStatus
 }
 
 class OrderItem {
     - id : Long
+    - status : OrderStatus
+    - refundStatus : RefundStatus
+    - cancellationReason : String
 }
 
 ' Relationships
