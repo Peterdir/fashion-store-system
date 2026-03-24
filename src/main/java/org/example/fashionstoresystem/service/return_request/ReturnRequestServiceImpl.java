@@ -36,24 +36,29 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
     @Override
     public List<OrderItem> validateReturnEligibility(Long orderId, List<Long> itemIds) {
         Order order = getOrderForReturn(orderId);
-        
-        if (order.getStatus() != OrderStatus.DELIVERED) {
-            throw new RuntimeException("Chỉ có thể hoàn trả đơn hàng đã giao thành công!");
+
+        // Kiểm tra từng OrderItem có trạng thái DELIVERED không (thay vì check Order.status)
+        List<OrderItem> selectedItems = order.getOrderItems().stream()
+                .filter(item -> itemIds.contains(item.getId()))
+                .toList();
+
+        for (OrderItem item : selectedItems) {
+            if (item.getStatus() != OrderStatus.DELIVERED) {
+                throw new RuntimeException("Sản phẩm '" + item.getProductName()
+                        + "' chưa được giao thành công, không thể hoàn trả!");
+            }
         }
 
         if (returnRepository.existsByOrderItemIdIn(itemIds)) {
             throw new RuntimeException("Một hoặc nhiều sản phẩm đã được yêu cầu hoàn trả trước đó!");
         }
 
-        return order.getOrderItems().stream()
-                .filter(item -> itemIds.contains(item.getId()))
-                .toList();
+        return selectedItems;
     }
 
     @Override
     @Transactional
     public ReturnRequest submitReturnRequest(SubmitReturnRequestDTO dto, List<String> images) {
-        // Validate
         validateReturnEligibility(dto.getOrderId(), dto.getItemIds());
 
         ReturnRequest returnRequest = new ReturnRequest();
