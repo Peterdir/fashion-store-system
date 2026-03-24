@@ -47,19 +47,26 @@ class MessageResponseDTO {
 class Order {
     - id : Long
     - totalAmount : Double
-    - status : OrderStatus
     - orderDate : Date
-    - cancellationReason : String
+}
+
+class OrderItem {
+    - id : Long
+    - status : OrderStatus
     - refundStatus : RefundStatus
+    - cancellationReason : String
 }
 
 class OrderHistory {
     - id : Long
-    - order : Order
+    - orderItem : OrderItem
     - previousStatus : OrderStatus
     - newStatus : OrderStatus
     - changeDate : Date
 }
+
+Order "1" *-- "1..*" OrderItem : contains >
+OrderItem "1" -- "N" OrderHistory
 
 ' Relationships
 

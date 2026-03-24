@@ -67,19 +67,18 @@ class Order {
     - id : Long
     - orderDate : Date
     - totalAmount : Double
-    - status : OrderStatus
     - shippingAddress : String
     - paymentMethod : PaymentMethod
     - type : OrderType
-    - cancellationReason : String
-    - refundStatus : RefundStatus
 }
 
 class OrderItem {
     - id : Long
     - quantity : Long
-    - price : Double
     - productName : String
+    - status : OrderStatus
+    - refundStatus : RefundStatus
+    - cancellationReason : String
 }
 
 class ProductVariant {
@@ -87,6 +86,7 @@ class ProductVariant {
     - size : String
     - color : String
     - stockQuantity : Long
+    - price : Double
 }
 
 class Coupon {

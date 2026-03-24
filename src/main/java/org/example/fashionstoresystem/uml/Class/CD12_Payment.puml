@@ -50,12 +50,18 @@ class PaymentResponseDTO {
 class Order {
     - id : Long
     - totalAmount : Double
-    - status : OrderStatus
     - paymentMethod : PaymentMethod
     - orderDate : Date
-    - cancellationReason : String
-    - refundStatus : RefundStatus
 }
+
+class OrderItem {
+    - id : Long
+    - status : OrderStatus
+    - refundStatus : RefundStatus
+    - cancellationReason : String
+}
+
+Order "1" *-- "1..*" OrderItem : contains >
 
 ' Relationships
 
