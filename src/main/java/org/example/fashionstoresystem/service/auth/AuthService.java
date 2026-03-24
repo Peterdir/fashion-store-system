@@ -1,12 +1,27 @@
 package org.example.fashionstoresystem.service.auth;
 
-import org.example.fashionstoresystem.dto.request.RegisterRequestDTO;
-import org.example.fashionstoresystem.dto.request.ResendVerificationEmailRequestDTO;
-import org.example.fashionstoresystem.dto.request.VerifyEmailRequestDTO;
+import org.example.fashionstoresystem.dto.request.*;
+import org.example.fashionstoresystem.dto.response.LoginResponseDTO;
+import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.dto.response.RegisterResponseDTO;
 
 public interface AuthService {
-    RegisterResponseDTO registerNewAccount (RegisterRequestDTO dto);
-    Boolean verifyEmail (VerifyEmailRequestDTO dto);
-    Boolean resendVerificationEmail (ResendVerificationEmailRequestDTO dto);
+    // Đăng ký tài khoản
+    RegisterResponseDTO registerNewAccount(RegisterRequestDTO dto);
+
+    // Xác thực email
+    Boolean verifyEmail(VerifyEmailRequestDTO dto);
+
+    // Gửi lại xác thực
+    Boolean resendVerificationEmail(ResendVerificationEmailRequestDTO dto);
+
+    // Đăng nhập
+    LoginResponseDTO login(LoginRequestDTO dto);
+
+    // Quên mật khẩu
+    MessageResponseDTO forgotPassword(ForgotPasswordRequestDTO dto);
+    MessageResponseDTO resetPassword(ResetPasswordRequestDTO dto);
+
+    // Đăng xuất
+    MessageResponseDTO logout(LogoutRequestDTO dto);
 }
