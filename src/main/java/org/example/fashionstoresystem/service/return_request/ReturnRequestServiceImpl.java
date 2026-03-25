@@ -63,10 +63,14 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
 
     @Override
     @Transactional
-    public ReturnRequest submitReturnRequest(SubmitReturnRequestDTO dto, List<String> images) {
-        validateReturnEligibility(dto.getOrderId(), dto.getItemIds());
+    public ReturnRequest submitReturnRequest(SubmitReturnRequestDTO dto) {
+        List<OrderItem> returnItems = validateReturnEligibility(dto.getOrderId(), dto.getItemIds());
+        Order order = returnItems.getFirst().getOrder();
 
         ReturnRequest returnRequest = new ReturnRequest();
+        returnRequest.setOrder(order);
+        returnRequest.setUser(order.getUser());
+        returnRequest.setReturnItems(returnItems);
         returnRequest.setStatus(ReturnStatus.PENDING);
         returnRequest.setReason(dto.getReason());
         returnRequest.setDescription(dto.getDescription());

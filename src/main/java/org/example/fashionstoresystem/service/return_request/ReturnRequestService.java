@@ -15,7 +15,7 @@ public interface ReturnRequestService {
     List<ReturnRequestResponseDTO> getReturnRequestsByCustomer(Long customerId);
     Order getOrderForReturn(Long orderId);
     List<OrderItem> validateReturnEligibility(Long orderId, List<Long> itemIds);
-    ReturnRequest submitReturnRequest(SubmitReturnRequestDTO dto, List<String> images);
+    ReturnRequest submitReturnRequest(SubmitReturnRequestDTO dto);
 
     // Admin
     List<ReturnRequestResponseDTO> getAllReturnRequests();
