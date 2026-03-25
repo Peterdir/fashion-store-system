@@ -4,13 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.AddToCartRequestDTO;
 import org.example.fashionstoresystem.dto.request.UpdateCartItemRequestDTO;
 import org.example.fashionstoresystem.dto.response.CartItemResponseDTO;
+import org.example.fashionstoresystem.dto.response.CartResponseDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.service.cart_item.CartService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -21,10 +20,10 @@ public class CartController {
 
     // XEM GIỎ HÀNG
     @GetMapping
-    public ResponseEntity<List<CartItemResponseDTO>> getCartItems(
+    public ResponseEntity<CartResponseDTO> getCartItems(
             @RequestParam Long userId
     ) {
-        List<CartItemResponseDTO> response = cartService.getCartItems(userId);
+        CartResponseDTO response = cartService.getCartItems(userId);
         return ResponseEntity.ok(response);
     }
 
