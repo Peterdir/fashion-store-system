@@ -22,8 +22,7 @@ public class ReviewController {
     @PostMapping
     public ResponseEntity<MessageResponseDTO> submitReview(
             @RequestParam Long userId,
-            @RequestBody SubmitReviewRequestDTO dto
-    ) {
+            @RequestBody SubmitReviewRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(reviewService.submitReview(userId, dto));
     }
@@ -32,8 +31,7 @@ public class ReviewController {
     @GetMapping("/products/{productId}")
     public ResponseEntity<Page<ReviewResponseDTO>> getReviewsByProduct(
             @PathVariable Long productId,
-            Pageable pageable
-    ) {
+            Pageable pageable) {
         return ResponseEntity.ok(reviewService.getReviewsByProduct(productId, pageable));
     }
 }

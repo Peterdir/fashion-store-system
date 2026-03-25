@@ -8,7 +8,6 @@ import org.example.fashionstoresystem.service.return_request.ReturnRequestServic
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
