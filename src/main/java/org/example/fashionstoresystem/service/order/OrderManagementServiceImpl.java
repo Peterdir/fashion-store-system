@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -56,8 +58,8 @@ public class OrderManagementServiceImpl implements OrderManagementService {
     }
 
     @Override
-    public List<OrderSummaryResponseDTO> getAllOrders() {
-        return orderRepository.findAll().stream().map(o -> {
+    public Page<OrderSummaryResponseDTO> getAllOrders(OrderStatus status, Date startDate, Date endDate, Pageable pageable) {
+        return orderRepository.searchOrders(status, startDate, endDate, pageable).map(o -> {
             Map<String, Integer> statusSummary = new HashMap<>();
             for (OrderItem item : o.getOrderItems()) {
                 String ss = item.getStatus().name();
@@ -71,7 +73,7 @@ public class OrderManagementServiceImpl implements OrderManagementService {
                     .itemCount(o.getOrderItems().size())
                     .statusSummary(statusSummary)
                     .build();
-        }).collect(Collectors.toList());
+        });
     }
 
     @Override

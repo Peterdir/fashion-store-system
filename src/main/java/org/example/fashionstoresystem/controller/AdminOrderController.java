@@ -10,6 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Date;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @RestController
 @RequestMapping("/api/admin/orders")
@@ -20,8 +24,13 @@ public class AdminOrderController {
 
     // DANH SÁCH TẤT CẢ ĐƠN HÀNG
     @GetMapping
-    public ResponseEntity<List<OrderSummaryResponseDTO>> getAllOrders() {
-        return ResponseEntity.ok(orderManagementService.getAllOrders());
+    public ResponseEntity<Page<OrderSummaryResponseDTO>> getAllOrders(
+            @RequestParam(required = false) OrderStatus status,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(orderManagementService.getAllOrders(status, startDate, endDate, pageable));
     }
 
     // XEM CHI TIẾT ĐƠN HÀNG
