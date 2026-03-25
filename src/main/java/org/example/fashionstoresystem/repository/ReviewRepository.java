@@ -1,6 +1,8 @@
 package org.example.fashionstoresystem.repository;
 
 import org.example.fashionstoresystem.entity.jpa.Review;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,5 +13,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // Hiển thị danh sách đánh giá của 1 sản phẩm
     List<Review> findByProductId(Long productId);
 
-    org.springframework.data.domain.Page<Review> findByProductId(Long productId, org.springframework.data.domain.Pageable pageable);
+    Page<Review> findByProductId(Long productId, Pageable pageable);
 }
