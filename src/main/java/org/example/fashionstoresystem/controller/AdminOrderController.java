@@ -25,20 +25,20 @@ public class AdminOrderController {
     }
 
     // XEM CHI TIẾT ĐƠN HÀNG
-    @GetMapping("/{id}")
+    @GetMapping("/{orderId}")
     public ResponseEntity<OrderDetailResponseDTO> getOrderDetail(
-            @PathVariable Long id
+            @PathVariable Long orderId
     ) {
-        return ResponseEntity.ok(orderManagementService.getOrderDetail(id));
+        return ResponseEntity.ok(orderManagementService.getOrderDetail(orderId));
     }
 
     // CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG
-    @PatchMapping("/{id}/status")
+    @PatchMapping("/{orderId}/status")
     public ResponseEntity<MessageResponseDTO> updateOrderStatus(
-            @PathVariable Long id,
+            @PathVariable Long orderId,
             @RequestParam OrderStatus status
     ) {
-        return ResponseEntity.ok(orderManagementService.updateOrderStatus(id, status));
+        return ResponseEntity.ok(orderManagementService.updateOrderStatus(orderId, status));
     }
 
     // CẬP NHẬT TRẠNG THÁI TỪNG SẢN PHẨM TRONG ĐƠN
