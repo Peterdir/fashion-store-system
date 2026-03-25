@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/admin/coupons")
@@ -21,8 +23,8 @@ public class AdminCouponController {
 
     // XEM TẤT CẢ MÃ
     @GetMapping
-    public ResponseEntity<List<CouponResponseDTO>> getAllCoupons() {
-        return ResponseEntity.ok(couponService.getAllCoupons());
+    public ResponseEntity<Page<CouponResponseDTO>> getAllCoupons(Pageable pageable) {
+        return ResponseEntity.ok(couponService.getAllCoupons(pageable));
     }
 
     // XEM CHI TIẾT MÃ
