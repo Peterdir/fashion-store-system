@@ -5,10 +5,8 @@ import org.example.fashionstoresystem.dto.request.SubmitReturnRequestDTO;
 import org.example.fashionstoresystem.dto.response.ReturnRequestResponseDTO;
 import org.example.fashionstoresystem.entity.jpa.ReturnRequest;
 import org.example.fashionstoresystem.service.return_request.ReturnRequestService;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
