@@ -3,6 +3,8 @@ package org.example.fashionstoresystem.service.user;
 import org.example.fashionstoresystem.dto.request.*;
 import org.example.fashionstoresystem.dto.response.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface UserService {
@@ -14,7 +16,7 @@ public interface UserService {
     MessageResponseDTO changePassword(Long userId, ChangePasswordRequestDTO dto);
 
     // Admin
-    List<CustomerSummaryResponseDTO> getAllCustomers(String keyword);
+    Page<CustomerSummaryResponseDTO> getAllCustomers(String keyword, Pageable pageable);
 
     CustomerDetailResponseDTO getCustomerDetail(Long customerId);
 

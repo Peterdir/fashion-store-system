@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -111,25 +113,21 @@ public class UserServiceImpl implements UserService {
     // CUSTOMER MANAGEMENT (ADMIN)
 
     @Override
-    public List<CustomerSummaryResponseDTO> getAllCustomers(String keyword) {
-        List<User> customers;
+    public Page<CustomerSummaryResponseDTO> getAllCustomers(String keyword, Pageable pageable) {
+        Page<User> customersPage;
         if (keyword == null || keyword.trim().isEmpty()) {
-            customers = userRepository.findByRole(Role.CUSTOMER);
+            customersPage = userRepository.findByRole(Role.CUSTOMER, pageable);
         } else {
-            customers = userRepository.findByRole(Role.CUSTOMER).stream()
-                    .filter(u -> u.getFullName().toLowerCase().contains(keyword.toLowerCase())
-                            || u.getEmail().toLowerCase().contains(keyword.toLowerCase())
-                            || u.getPhone().contains(keyword))
-                    .collect(Collectors.toList());
+            customersPage = userRepository.searchCustomers(Role.CUSTOMER, keyword.toLowerCase(), pageable);
         }
 
-        return customers.stream().map(u -> CustomerSummaryResponseDTO.builder()
+        return customersPage.map(u -> CustomerSummaryResponseDTO.builder()
                 .userId(u.getId())
                 .fullName(u.getFullName())
                 .email(u.getEmail())
                 .phone(u.getPhone())
                 .status(u.getStatus())
-                .build()).collect(Collectors.toList());
+                .build());
     }
 
     @Override

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.AddToCartRequestDTO;
 import org.example.fashionstoresystem.dto.request.UpdateCartItemRequestDTO;
 import org.example.fashionstoresystem.dto.response.CartItemResponseDTO;
+import org.example.fashionstoresystem.dto.response.CartResponseDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.entity.jpa.CartItem;
 import org.example.fashionstoresystem.entity.jpa.ProductVariant;
@@ -27,13 +28,21 @@ public class CartServiceImpl implements CartService {
 
     // Quản lý giỏ hàng - Xem toàn bộ giỏ hàng
     @Override
-    public List<CartItemResponseDTO> getCartItems(Long userId) {
+    public CartResponseDTO getCartItems(Long userId) {
         List<CartItem> items = cartItemRepository.findByUserId(userId);
 
-        // Giỏ hàng trống → trả về list rỗng, Controller/View hiển thị thông báo
-        return items.stream()
+        List<CartItemResponseDTO> itemDTOs =  items.stream()
                 .map(this::mapToCartItemResponse)
                 .toList();
+
+        double total = itemDTOs.stream()
+                .mapToDouble(dto -> dto.getPrice() * dto.getQuantity())
+                .sum();
+
+        return CartResponseDTO.builder()
+                .items(itemDTOs)
+                .totalAmount(total)
+                .build();
     }
 
     // Thêm vào giỏ hàng

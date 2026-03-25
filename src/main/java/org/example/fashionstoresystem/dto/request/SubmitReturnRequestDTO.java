@@ -16,4 +16,5 @@ public class SubmitReturnRequestDTO {
     private List<Long> itemIds;
     private String reason;
     private String description;
+    private List<String> imageUrls;
 }

@@ -3,13 +3,14 @@ package org.example.fashionstoresystem.service.cart_item;
 import org.example.fashionstoresystem.dto.request.AddToCartRequestDTO;
 import org.example.fashionstoresystem.dto.request.UpdateCartItemRequestDTO;
 import org.example.fashionstoresystem.dto.response.CartItemResponseDTO;
+import org.example.fashionstoresystem.dto.response.CartResponseDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 
 import java.util.List;
 
 public interface CartService {
     // Quản lý giỏ hàng - Xem giỏ hàng
-    List<CartItemResponseDTO> getCartItems(Long userId);
+    CartResponseDTO getCartItems(Long userId);
 
     // Thêm vào giỏ hàng
     CartItemResponseDTO addToCart(Long userId, AddToCartRequestDTO dto);
