@@ -3,6 +3,7 @@ package org.example.fashionstoresystem.service.review;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.SubmitReviewRequestDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
+import org.example.fashionstoresystem.dto.response.ReviewResponseDTO;
 import org.example.fashionstoresystem.entity.enums.OrderStatus;
 import org.example.fashionstoresystem.entity.jpa.Product;
 import org.example.fashionstoresystem.entity.jpa.Review;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -66,6 +69,29 @@ public class ReviewServiceImpl implements ReviewService {
 
         return MessageResponseDTO.builder()
                 .message("Gửi đánh giá thành công! Cảm ơn bạn đã đánh giá sản phẩm.")
+                .build();
+    }
+
+    @Override
+    public Page<ReviewResponseDTO> getReviewsByProduct(Long productId, Pageable pageable) {
+        return reviewRepository.findByProductId(productId, pageable).map(this::mapToDTO);
+    }
+    
+    @Override
+    public Page<ReviewResponseDTO> getAllReviews(Pageable pageable) {
+        return reviewRepository.findAll(pageable).map(this::mapToDTO);
+    }
+    
+    private ReviewResponseDTO mapToDTO(Review review) {
+        return ReviewResponseDTO.builder()
+                .reviewId(review.getId())
+                .productId(review.getProduct().getId())
+                .productName(review.getProduct().getName())
+                .userId(review.getUser().getId())
+                .customerName(review.getUser().getFullName())
+                .rating(review.getRating())
+                .comment(review.getComment())
+                .createdAt(review.getCreatedAt())
                 .build();
     }
 }

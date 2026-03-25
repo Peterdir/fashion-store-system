@@ -16,6 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // Tìm sản phẩm chứa keyword không phân biệt hoa thường
     List<Product> findByNameContainingIgnoreCase(String keyword);
+    Page<Product> findByNameContainingIgnoreCase(String keyword, Pageable pageable);
 
     // Tìm theo keyword + lọc trạng thái + phân trang
     Page<Product> findByNameContainingIgnoreCaseAndStatus(String keyword, ProductStatus status, Pageable pageable);

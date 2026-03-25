@@ -12,7 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.example.fashionstoresystem.entity.enums.OrderStatus;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -32,10 +34,12 @@ public class OrderController {
 
     // LẤY DANH SÁCH ĐƠN HÀNG
     @GetMapping
-    public ResponseEntity<List<OrderSummaryResponseDTO>> getMyOrders(
-            @RequestParam Long userId
+    public ResponseEntity<Page<OrderSummaryResponseDTO>> getMyOrders(
+            @RequestParam Long userId,
+            @RequestParam(required = false) OrderStatus status,
+            Pageable pageable
     ) {
-        List<OrderSummaryResponseDTO> response = orderService.getMyOrders(userId);
+        Page<OrderSummaryResponseDTO> response = orderService.getMyOrders(userId, status, pageable);
         return ResponseEntity.ok(response);
     }
 

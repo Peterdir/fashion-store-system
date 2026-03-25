@@ -1,7 +1,10 @@
 package org.example.fashionstoresystem.repository;
 
+import org.example.fashionstoresystem.entity.enums.OrderStatus;
 import org.example.fashionstoresystem.entity.enums.OrderType;
 import org.example.fashionstoresystem.entity.jpa.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -30,4 +33,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // Đếm số lượng đơn hàng trong khoảng thời gian
     @Query("SELECT COUNT(o) FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate")
     int countOrders(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+    @Query("SELECT DISTINCT o FROM Order o LEFT JOIN o.orderItems oi WHERE (?1 IS NULL OR oi.status = ?1) AND (CAST(?2 AS date) IS NULL OR o.orderDate >= ?2) AND (CAST(?3 AS date) IS NULL OR o.orderDate <= ?3)")
+    Page<Order> searchOrders(OrderStatus status, Date startDate, Date endDate, Pageable pageable);
+
+    @Query("SELECT DISTINCT o FROM Order o LEFT JOIN o.orderItems oi WHERE o.user.id = ?1 AND (?2 IS NULL OR oi.status = ?2)")
+    Page<Order> searchMyOrders(Long userId, OrderStatus status, Pageable pageable);
 }

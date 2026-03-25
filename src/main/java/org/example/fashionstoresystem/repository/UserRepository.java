@@ -2,16 +2,19 @@ package org.example.fashionstoresystem.repository;
 
 import org.example.fashionstoresystem.entity.enums.Role;
 import org.example.fashionstoresystem.entity.jpa.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     // Kiểm tra trùng lặp email/SĐT khi đăng ký
     boolean existsByEmail(String email);
+
     boolean existsByPhone(String phone);
 
     // Xác thực tài khoản qua link gửi về email
@@ -22,8 +25,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // Chặn trùng lặp data của user khác khi cập nhật thông tin cá nhân
     Boolean existsByEmailAndIdNot(String email, Long id);
+
     Boolean existsByPhoneAndIdNot(String phone, Long id);
 
     // Admin
-    List<User> findByRole(Role role);
+    Page<User> findByRole(Role role, Pageable pageable);
+
+    @Query("SELECT u FROM User u WHERE u.role = ?1 AND (LOWER(u.fullName) LIKE LOWER(CONCAT('%', ?2, '%')) OR LOWER(u.email) LIKE LOWER(CONCAT('%', ?2, '%')) OR LOWER(u.phone) LIKE LOWER(CONCAT('%', ?2, '%')))")
+    Page<User> searchCustomers(Role role, String keyword, Pageable pageable);
 }

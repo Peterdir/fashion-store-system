@@ -10,4 +10,6 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     // Hiển thị danh sách đánh giá của 1 sản phẩm
     List<Review> findByProductId(Long productId);
+
+    org.springframework.data.domain.Page<Review> findByProductId(Long productId, org.springframework.data.domain.Pageable pageable);
 }

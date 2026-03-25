@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -133,10 +135,10 @@ public class OrderServiceImpl implements OrderService {
     // THEO DÕI TRẠNG THÁI ĐƠN HÀNG - Xem danh sách
 
     @Override
-    public List<OrderSummaryResponseDTO> getMyOrders(Long userId) {
-        List<Order> orders = orderRepository.findByUserIdOrderByOrderDateDesc(userId);
+    public Page<OrderSummaryResponseDTO> getMyOrders(Long userId, OrderStatus status, Pageable pageable) {
+        Page<Order> orders = orderRepository.searchMyOrders(userId, status, pageable);
 
-        return orders.stream()
+        return orders
                 .map(order -> {
                     // Tổng hợp trạng thái từ các OrderItem
                     Map<String, Integer> statusSummary = order.getOrderItems().stream()
@@ -154,8 +156,7 @@ public class OrderServiceImpl implements OrderService {
                             .itemCount(order.getOrderItems().size())
                             .statusSummary(statusSummary)
                             .build();
-                })
-                .toList();
+                });
     }
 
     // THEO DÕI TRẠNG THÁI ĐƠN HÀNG - Xem chi tiết

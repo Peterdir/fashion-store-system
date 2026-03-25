@@ -7,6 +7,8 @@ import org.example.fashionstoresystem.service.product.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -19,11 +21,12 @@ public class ProductController {
 
     // LẤY DANH SÁCH SẢN PHẨM (SEARCH / FILTER)
     @GetMapping
-    public ResponseEntity<List<ProductSummaryResponseDTO>> getProducts(
-            @RequestParam(required = false) String keyword
+    public ResponseEntity<Page<ProductSummaryResponseDTO>> getProducts(
+            @RequestParam(required = false) String keyword,
+            Pageable pageable
     ) {
 
-        List<ProductSummaryResponseDTO> response = productService.getProducts(keyword);
+        Page<ProductSummaryResponseDTO> response = productService.getProducts(keyword, pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

@@ -6,15 +6,18 @@ import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderDetailResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderSummaryResponseDTO;
 import org.example.fashionstoresystem.dto.response.PlaceOrderResponseDTO;
+import org.example.fashionstoresystem.entity.enums.OrderStatus;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 
 public interface OrderService {
     // Đặt hàng
     PlaceOrderResponseDTO placeOrder(PlaceOrderRequestDTO dto);
 
     // Theo dõi trạng thái đơn hàng - Xem danh sách đơn hàng
-    List<OrderSummaryResponseDTO> getMyOrders(Long userId);
+    Page<OrderSummaryResponseDTO> getMyOrders(Long userId, OrderStatus status, Pageable pageable);
 
     // Theo dõi trạng thái đơn hàng - Xem chi tiết đơn hàng
     OrderDetailResponseDTO getMyOrderDetail(Long userId, Long orderId);

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,25 +26,24 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     @Override
-    public List<ProductSummaryResponseDTO> getProducts(String keyword) {
-        List<Product> products;
+    public Page<ProductSummaryResponseDTO> getProducts(String keyword, Pageable pageable) {
+        Page<Product> productsPage;
         
         // Nếu keyword trống thì lấy tất cả, ngược lại thì tìm kiếm
         if (keyword == null || keyword.trim().isEmpty()) {
-            products = productRepository.findAll();
+            productsPage = productRepository.findAll(pageable);
         } else {
-            products = productRepository.findByNameContainingIgnoreCase(keyword.trim());
+            productsPage = productRepository.findByNameContainingIgnoreCase(keyword.trim(), pageable);
         }
 
         // Map Entity sang DTO
-        return products.stream().map(product -> ProductSummaryResponseDTO.builder()
+        return productsPage.map(product -> ProductSummaryResponseDTO.builder()
                 .productId(product.getId())
                 .name(product.getName())
                 .price(product.getVariants().isEmpty() ? 0.0 : product.getVariants().get(0).getPrice())
                 .category(product.getCategory())
                 .status(product.getStatus())
-                // .primaryImageUrl(TODO: Lấy ảnh chính từ list images của product nếu có)
-                .build()).collect(Collectors.toList());
+                .build());
     }
 
     @Override

@@ -185,4 +185,14 @@ Qua quá trình phân tích thiết kế Controller, tôi nhận thấy các Ser
 5. **`ReturnRequestService`**:
    - `getAllReturnRequests()`: **Đòi hỏi `Pageable`** do số lượng record theo thời gian sẽ nhiều.
 
+6. **`OrderService` (Dành cho Customer)**:
+   - `getMyOrders(Long userId)`: Cần bổ sung tham số `Pageable` để phân trang danh sách lịch sử mua hàng, vì dữ liệu này sẽ dài ra theo thời gian. Khuyến nghị bổ sung thêm bộ lọc `OrderStatus status` để khách hàng có thể tra cứu theo tab (VD: Đang giao, Đã giao, Đã hủy).
+
+7. **`ReviewService`**:
+   - Hiện tại **đang thiếu hoàn toàn API lấy danh sách đánh giá**! Cần bổ sung `getReviewsByProduct(Long productId, Pageable pageable)` để hiển thị lên trang chi tiết sản phẩm.
+   - Bổ sung `getAllReviews(Pageable pageable)` (dành cho Admin) để quản lý và ẩn/xóa các nhận xét không phù hợp.
+
+8. **`CartService`**:
+   - `getCartItems(Long userId)`: Đang trả về một mảng `List<CartItemResponseDTO>`. Khuyến nghị đổi thành trả về một DTO bọc ngoài (VD: `CartResponseDTO`), trong đó chứa `List<CartItemResponseDTO> items` VÀ thuộc tính `Double totalAmount` (Tổng tiền). Dùng backend tính toán tổng tiền sẽ an toàn và nhất quán hơn là để Frontend tự cộng.
+
 > ***Quy chuẩn Controller:*** Toàn bộ API Controller nêu trên chỉ đóng vai trò nhận HTTP Request, trích xuất dữ liệu, pass qua cho `Service` xử lý (phù hợp với SOLID/Liskov Substitution/DIP) và bọc kết quả từ Service dưới dạng `ResponseEntity` hợp lệ (kèm HTTP Status 200, 201, 204...).
