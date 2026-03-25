@@ -8,6 +8,9 @@ import org.example.fashionstoresystem.entity.jpa.Order;
 import org.example.fashionstoresystem.entity.jpa.OrderItem;
 import org.example.fashionstoresystem.entity.jpa.ReturnRequest;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 public interface ReturnRequestService {
@@ -15,10 +18,10 @@ public interface ReturnRequestService {
     List<ReturnRequestResponseDTO> getReturnRequestsByCustomer(Long customerId);
     Order getOrderForReturn(Long orderId);
     List<OrderItem> validateReturnEligibility(Long orderId, List<Long> itemIds);
-    ReturnRequest submitReturnRequest(SubmitReturnRequestDTO dto, List<String> images);
+    ReturnRequest submitReturnRequest(SubmitReturnRequestDTO dto);
 
     // Admin
-    List<ReturnRequestResponseDTO> getAllReturnRequests();
+    Page<ReturnRequestResponseDTO> getAllReturnRequests(Pageable pageable);
 
     ReturnRequestResponseDTO getReturnRequestDetail(Long requestId);
 

@@ -16,6 +16,9 @@ import org.example.fashionstoresystem.repository.ReturnRequestRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.Date;
 import java.util.List;
 
@@ -63,10 +66,14 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
 
     @Override
     @Transactional
-    public ReturnRequest submitReturnRequest(SubmitReturnRequestDTO dto, List<String> images) {
-        validateReturnEligibility(dto.getOrderId(), dto.getItemIds());
+    public ReturnRequest submitReturnRequest(SubmitReturnRequestDTO dto) {
+        List<OrderItem> returnItems = validateReturnEligibility(dto.getOrderId(), dto.getItemIds());
+        Order order = returnItems.getFirst().getOrder();
 
         ReturnRequest returnRequest = new ReturnRequest();
+        returnRequest.setOrder(order);
+        returnRequest.setUser(order.getUser());
+        returnRequest.setReturnItems(returnItems);
         returnRequest.setStatus(ReturnStatus.PENDING);
         returnRequest.setReason(dto.getReason());
         returnRequest.setDescription(dto.getDescription());
@@ -77,8 +84,8 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
 
     // ADMIN API
     @Override
-    public List<ReturnRequestResponseDTO> getAllReturnRequests() {
-        return returnRepository.findAll().stream().map(this::mapToDTO).toList();
+    public Page<ReturnRequestResponseDTO> getAllReturnRequests(Pageable pageable) {
+        return returnRepository.findAll(pageable).map(this::mapToDTO);
     }
 
     @Override

@@ -8,6 +8,9 @@ import org.example.fashionstoresystem.dto.response.ApplyCouponResponseDTO;
 import org.example.fashionstoresystem.dto.response.CouponResponseDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 public interface CouponService {
@@ -21,7 +24,7 @@ public interface CouponService {
     ApplyCouponResponseDTO applyCoupon(Long userId, ApplyCouponRequestDTO dto, Double currentTotal);
 
     // Admin
-    List<CouponResponseDTO> getAllCoupons();
+    Page<CouponResponseDTO> getAllCoupons(Pageable pageable);
 
     CouponResponseDTO getCouponDetail(Long couponId);
 

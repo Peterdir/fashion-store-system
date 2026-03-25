@@ -5,10 +5,12 @@ import org.example.fashionstoresystem.dto.request.UpdateProductRequestDTO;
 import org.example.fashionstoresystem.dto.response.ProductDetailResponseDTO;
 import org.example.fashionstoresystem.dto.response.ProductSummaryResponseDTO;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ProductService {
-    List<ProductSummaryResponseDTO> getProducts(String keyword);
+    Page<ProductSummaryResponseDTO> getProducts(String keyword, Pageable pageable);
+
     ProductDetailResponseDTO getProductDetail(Long productId);
 
     // Admin
