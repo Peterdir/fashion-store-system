@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/admin/customers")
@@ -21,11 +23,12 @@ public class AdminUserController {
 
     // DANH SÁCH KHÁCH HÀNG
     @GetMapping
-    public ResponseEntity<List<CustomerSummaryResponseDTO>> getAllCustomers(
-            @RequestParam(required = false) String keyword
+    public ResponseEntity<Page<CustomerSummaryResponseDTO>> getAllCustomers(
+            @RequestParam(required = false) String keyword,
+            Pageable pageable
     ) {
 
-        List<CustomerSummaryResponseDTO> response = userService.getAllCustomers(keyword);
+        Page<CustomerSummaryResponseDTO> response = userService.getAllCustomers(keyword, pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
