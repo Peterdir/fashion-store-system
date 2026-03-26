@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.ProcessReturnRequestDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
@@ -36,7 +37,7 @@ public class AdminReturnRequestController {
     @PostMapping("/{requestId}/process")
     public ResponseEntity<MessageResponseDTO> processReturnRequest(
             @PathVariable Long requestId,
-            @RequestBody ProcessReturnRequestDTO dto
+            @Valid @RequestBody ProcessReturnRequestDTO dto
     ) {
         return ResponseEntity.ok(
                 returnRequestService.processReturnRequest(requestId, dto)

@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.dto.request;
 
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,11 +14,28 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 public class CreateCouponRequestDTO {
+    @NotBlank(message = "Mã giảm giá không được để trống")
+    @Size(min = 3, max = 50, message = "Mã giảm giá phải từ 3-50 ký tự")
+    @Pattern(regexp = "^[A-Z0-9_-]+$", message = "Mã chỉ được chứa chữ in hoa, số, gạch ngang và gạch dưới")
     private String code;
+
+    @NotNull(message = "Giá trị giảm không được để trống")
+    @Positive(message = "Giá trị giảm phải lớn hơn 0")
     private Double discountValue;
+
+    @NotNull(message = "Loại giảm giá không được để trống")
     private DiscountType discountType;
+
+    @NotNull(message = "Ngày bắt đầu không được để trống")
     private Instant startDate;
+
+    @NotNull(message = "Ngày hết hạn không được để trống")
+    @Future(message = "Ngày hết hạn phải trong tương lai")
     private Instant expiryDate;
+
+    @PositiveOrZero(message = "Giá trị đơn hàng tối thiểu không được âm")
     private Double minOrderAmount;
+
+    @Positive(message = "Giới hạn sử dụng phải lớn hơn 0")
     private Integer usageLimit;
 }

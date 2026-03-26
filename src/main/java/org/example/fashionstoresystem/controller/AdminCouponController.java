@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.CreateCouponRequestDTO;
 import org.example.fashionstoresystem.dto.request.UpdateCouponRequestDTO;
@@ -36,7 +37,7 @@ public class AdminCouponController {
     // TẠO MÃ GIẢM GIÁ
     @PostMapping
     public ResponseEntity<CouponResponseDTO> createCoupon(
-            @RequestBody CreateCouponRequestDTO dto) {
+            @Valid @RequestBody CreateCouponRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(couponService.createCoupon(dto));
     }
@@ -45,7 +46,7 @@ public class AdminCouponController {
     @PutMapping("/{couponId}")
     public ResponseEntity<CouponResponseDTO> updateCoupon(
             @PathVariable Long couponId,
-            @RequestBody UpdateCouponRequestDTO dto) {
+            @Valid @RequestBody UpdateCouponRequestDTO dto) {
         return ResponseEntity.ok(couponService.updateCoupon(couponId, dto));
     }
 

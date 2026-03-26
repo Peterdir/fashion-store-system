@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.ChangePasswordRequestDTO;
 import org.example.fashionstoresystem.dto.request.UpdateProfileRequestDTO;
@@ -32,8 +33,7 @@ public class UserController {
     // CẬP NHẬT THÔNG TIN
     @PutMapping("/me")
     public ResponseEntity<ProfileResponseDTO> updateProfile(
-            @RequestBody UpdateProfileRequestDTO dto
-    ) {
+            @Valid @RequestBody UpdateProfileRequestDTO dto) {
         Long userId = getAuthenticatedUserId();
         ProfileResponseDTO response = userService.updateProfile(userId, dto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -42,8 +42,7 @@ public class UserController {
     // ĐỔI MẬT KHẨU
     @PutMapping("/me/password")
     public ResponseEntity<MessageResponseDTO> changePassword(
-            @RequestBody ChangePasswordRequestDTO dto
-    ) {
+            @Valid @RequestBody ChangePasswordRequestDTO dto) {
         Long userId = getAuthenticatedUserId();
         MessageResponseDTO response = userService.changePassword(userId, dto);
         return ResponseEntity.status(HttpStatus.OK).body(response);

@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.*;
 import org.example.fashionstoresystem.dto.response.LoginResponseDTO;
@@ -20,7 +21,7 @@ public class AuthController {
     // ĐĂNG KÝ
     @PostMapping("/register")
     public ResponseEntity<RegisterResponseDTO> register(
-            @RequestBody RegisterRequestDTO dto
+            @Valid @RequestBody RegisterRequestDTO dto
     ) {
 
         RegisterResponseDTO response = authService.registerNewAccount(dto);
@@ -30,7 +31,7 @@ public class AuthController {
     // ĐĂNG NHẬP
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login (
-            @RequestBody LoginRequestDTO dto
+            @Valid @RequestBody LoginRequestDTO dto
     ) {
 
         LoginResponseDTO response = authService.login(dto);
@@ -40,7 +41,7 @@ public class AuthController {
     // ĐĂNG XUẤT
     @PostMapping("/logout")
     public ResponseEntity<MessageResponseDTO> logout (
-            @RequestBody LogoutRequestDTO dto
+            @Valid @RequestBody LogoutRequestDTO dto
     ) {
 
         MessageResponseDTO response = authService.logout(dto);
@@ -60,7 +61,7 @@ public class AuthController {
     // GỬI LẠI EMAIL XÁC THỰC
     @PostMapping("/resend-verification")
     public ResponseEntity<MessageResponseDTO> resendVerification (
-            @RequestBody ResendVerificationEmailRequestDTO dto
+            @Valid @RequestBody ResendVerificationEmailRequestDTO dto
     ) {
         MessageResponseDTO response = authService.resendVerificationEmail(dto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -69,7 +70,7 @@ public class AuthController {
     // QUÊN MẬT KHẨU
     @PostMapping("/forgot-password")
     public ResponseEntity<MessageResponseDTO> forgotPassword (
-            @RequestBody ForgotPasswordRequestDTO dto
+            @Valid @RequestBody ForgotPasswordRequestDTO dto
     ) {
 
         MessageResponseDTO response = authService.forgotPassword(dto);
@@ -79,7 +80,7 @@ public class AuthController {
     // ĐẶT LẠI MẬT KHẨU
     @PostMapping("/reset-password")
     public ResponseEntity<MessageResponseDTO> resetPassword (
-            @RequestBody ResetPasswordRequestDTO dto
+            @Valid @RequestBody ResetPasswordRequestDTO dto
     ) {
 
         MessageResponseDTO response = authService.resetPassword(dto);
@@ -89,7 +90,7 @@ public class AuthController {
     // LÀM MỚI TOKEN
     @PostMapping("/refresh-token")
     public ResponseEntity<LoginResponseDTO> refreshToken (
-            @RequestBody RefreshTokenRequestDTO dto
+            @Valid @RequestBody RefreshTokenRequestDTO dto
     ) {
         LoginResponseDTO response = authService.refreshToken(dto);
         return ResponseEntity.status(HttpStatus.OK).body(response);

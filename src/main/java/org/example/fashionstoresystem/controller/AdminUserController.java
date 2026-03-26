@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.UpdateCustomerStatusRequestDTO;
 import org.example.fashionstoresystem.dto.response.CustomerDetailResponseDTO;
@@ -47,7 +48,7 @@ public class AdminUserController {
     @PatchMapping("/{customerId}/status")
     public ResponseEntity<MessageResponseDTO> updateCustomerStatus(
             @PathVariable Long customerId,
-            @RequestBody UpdateCustomerStatusRequestDTO dto
+            @Valid @RequestBody UpdateCustomerStatusRequestDTO dto
     ) {
 
         MessageResponseDTO response = userService.updateCustomerStatus(customerId, dto);

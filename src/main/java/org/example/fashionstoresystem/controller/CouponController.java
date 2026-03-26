@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.ApplyCouponRequestDTO;
 import org.example.fashionstoresystem.dto.request.CollectCouponRequestDTO;
@@ -23,8 +24,7 @@ public class CouponController {
     // XEM DANH SÁCH MÃ
     @GetMapping
     public ResponseEntity<List<CouponResponseDTO>> getAvailableCoupons(
-            @RequestParam Long userId
-    ) {
+            @RequestParam Long userId) {
         return ResponseEntity.ok(couponService.getAvailableCoupons(userId));
     }
 
@@ -32,8 +32,7 @@ public class CouponController {
     @PostMapping("/collect")
     public ResponseEntity<MessageResponseDTO> collectCoupon(
             @RequestParam Long userId,
-            @RequestBody CollectCouponRequestDTO dto
-    ) {
+            @Valid @RequestBody CollectCouponRequestDTO dto) {
         return ResponseEntity.ok(couponService.collectCoupon(userId, dto));
     }
 
@@ -42,8 +41,7 @@ public class CouponController {
     public ResponseEntity<ApplyCouponResponseDTO> applyCoupon(
             @RequestParam Long userId,
             @RequestParam Double currentTotal,
-            @RequestBody ApplyCouponRequestDTO dto
-    ) {
+            @Valid @RequestBody ApplyCouponRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(couponService.applyCoupon(userId, dto, currentTotal));
     }

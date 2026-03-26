@@ -11,7 +11,6 @@ import org.example.fashionstoresystem.entity.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-
 public interface OrderService {
     // Đặt hàng
     PlaceOrderResponseDTO placeOrder(PlaceOrderRequestDTO dto);
