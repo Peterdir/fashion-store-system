@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.CreateProductRequestDTO;
 import org.example.fashionstoresystem.dto.request.UpdateProductRequestDTO;
@@ -19,7 +20,7 @@ public class AdminProductController {
     // THÊM SẢN PHẨM
     @PostMapping
     public ResponseEntity<ProductDetailResponseDTO> createProduct(
-            @RequestBody CreateProductRequestDTO dto
+            @Valid @RequestBody CreateProductRequestDTO dto
     ) {
 
         ProductDetailResponseDTO response = productService.createProduct(dto);
@@ -31,7 +32,7 @@ public class AdminProductController {
     @PutMapping("/{productId}")
     public ResponseEntity<ProductDetailResponseDTO> updateProduct(
             @PathVariable Long productId,
-            @RequestBody UpdateProductRequestDTO dto
+            @Valid @RequestBody UpdateProductRequestDTO dto
     ) {
 
         ProductDetailResponseDTO response = productService.updateProduct(productId, dto);

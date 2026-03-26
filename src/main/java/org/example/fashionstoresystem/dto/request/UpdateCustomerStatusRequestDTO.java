@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.dto.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,6 @@ import org.example.fashionstoresystem.entity.enums.UserStatus;
 @AllArgsConstructor
 @Builder
 public class UpdateCustomerStatusRequestDTO {
-    private Long userId;
+    @NotNull(message = "Trạng thái không được để trống")
     private UserStatus status;
 }

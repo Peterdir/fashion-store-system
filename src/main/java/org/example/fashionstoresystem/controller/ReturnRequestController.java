@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.SubmitReturnRequestDTO;
 import org.example.fashionstoresystem.dto.response.ReturnRequestResponseDTO;
@@ -20,20 +21,16 @@ public class ReturnRequestController {
     // LẤY DS YÊU CẦU TRẢ HÀNG
     @GetMapping
     public ResponseEntity<List<ReturnRequestResponseDTO>> getReturnRequestsByCustomer(
-            @RequestParam Long userId
-    ) {
+            @RequestParam Long userId) {
         return ResponseEntity.ok(
-                returnRequestService.getReturnRequestsByCustomer(userId)
-        );
+                returnRequestService.getReturnRequestsByCustomer(userId));
     }
 
     // GỬI YÊU CẦU TRẢ HÀNG (JSON)
     @PostMapping
     public ResponseEntity<ReturnRequest> submitReturnRequest(
-            @RequestBody SubmitReturnRequestDTO dto
-    ) {
+            @Valid @RequestBody SubmitReturnRequestDTO dto) {
         return ResponseEntity.ok(
-                returnRequestService.submitReturnRequest(dto)
-        );
+                returnRequestService.submitReturnRequest(dto));
     }
 }

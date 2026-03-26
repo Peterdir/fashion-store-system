@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.dto.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,5 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class WishlistRequestDTO {
+    @NotNull(message = "ID sản phẩm không được để trống")
     private Long productId;
 }

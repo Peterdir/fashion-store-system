@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.CancelOrderRequestDTO;
 import org.example.fashionstoresystem.dto.request.PlaceOrderRequestDTO;
@@ -26,8 +27,7 @@ public class OrderController {
     // ĐẶT HÀNG
     @PostMapping
     public ResponseEntity<PlaceOrderResponseDTO> placeOrder(
-            @RequestBody PlaceOrderRequestDTO dto
-    ) {
+            @Valid @RequestBody PlaceOrderRequestDTO dto) {
         PlaceOrderResponseDTO response = orderService.placeOrder(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -37,8 +37,7 @@ public class OrderController {
     public ResponseEntity<Page<OrderSummaryResponseDTO>> getMyOrders(
             @RequestParam Long userId,
             @RequestParam(required = false) OrderStatus status,
-            Pageable pageable
-    ) {
+            Pageable pageable) {
         Page<OrderSummaryResponseDTO> response = orderService.getMyOrders(userId, status, pageable);
         return ResponseEntity.ok(response);
     }
@@ -47,8 +46,7 @@ public class OrderController {
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderDetailResponseDTO> getMyOrderDetail(
             @RequestParam Long userId,
-            @PathVariable Long orderId
-    ) {
+            @PathVariable Long orderId) {
         OrderDetailResponseDTO response = orderService.getMyOrderDetail(userId, orderId);
         return ResponseEntity.ok(response);
     }
@@ -58,8 +56,7 @@ public class OrderController {
     public ResponseEntity<MessageResponseDTO> cancelOrder(
             @RequestParam Long userId,
             @PathVariable Long orderId,
-            @RequestBody CancelOrderRequestDTO dto
-    ) {
+            @Valid @RequestBody CancelOrderRequestDTO dto) {
         MessageResponseDTO response = orderService.cancelOrder(userId, orderId, dto);
         return ResponseEntity.ok(response);
     }

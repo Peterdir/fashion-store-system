@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.RecordOfflineSaleRequestDTO;
 import org.example.fashionstoresystem.dto.response.PlaceOrderResponseDTO;
@@ -21,7 +22,7 @@ public class OfflineSaleController {
     // GHI NHẬN BÁN TRỰC TIẾP
     @PostMapping
     public ResponseEntity<PlaceOrderResponseDTO> recordOfflineSale(
-            @RequestBody RecordOfflineSaleRequestDTO dto
+            @Valid @RequestBody RecordOfflineSaleRequestDTO dto
     ) {
 
         PlaceOrderResponseDTO response = offlineSaleService.recordOfflineSale(dto);

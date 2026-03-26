@@ -1,5 +1,7 @@
 package org.example.fashionstoresystem.dto.request;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +13,12 @@ import org.example.fashionstoresystem.entity.enums.ReturnStatus;
 @AllArgsConstructor
 @Builder
 public class ProcessReturnRequestDTO {
+    @NotNull(message = "ID yêu cầu hoàn trả không được để trống")
     private Long requestId;
+
+    @NotNull(message = "Trạng thái mới không được để trống")
     private ReturnStatus newStatus;
+
+    @Size(max = 500, message = "Lý do từ chối tối đa 500 ký tự")
     private String rejectionReason;
 }

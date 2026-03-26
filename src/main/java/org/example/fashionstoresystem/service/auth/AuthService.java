@@ -10,10 +10,10 @@ public interface AuthService {
     RegisterResponseDTO registerNewAccount(RegisterRequestDTO dto);
 
     // Xác thực email
-    Boolean verifyEmail(VerifyEmailRequestDTO dto);
+    Boolean verifyEmail(String token);
 
     // Gửi lại xác thực
-    Boolean resendVerificationEmail(ResendVerificationEmailRequestDTO dto);
+    MessageResponseDTO resendVerificationEmail(ResendVerificationEmailRequestDTO dto);
 
     // Đăng nhập
     LoginResponseDTO login(LoginRequestDTO dto);
@@ -24,4 +24,7 @@ public interface AuthService {
 
     // Đăng xuất
     MessageResponseDTO logout(LogoutRequestDTO dto);
+
+    // Làm mới token
+    LoginResponseDTO refreshToken(RefreshTokenRequestDTO dto);
 }

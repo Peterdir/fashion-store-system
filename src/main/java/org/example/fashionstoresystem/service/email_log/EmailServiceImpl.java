@@ -22,7 +22,7 @@ public class EmailServiceImpl implements EmailService {
         try {
             // Chuẩn bị nội dung Email
             String subject = "Xác thực tài khoản Fashion Store";
-            String link = "http://localhost:8080/api/auth/verify?token=" + token;
+            String link = "http://localhost:8080/api/auth/verify-email?token=" + token;
             content = "Chào bạn,\n\nVui lòng click vào link sau để xác thực tài khoản của bạn:\n" + link
                     + "\n\nCảm ơn bạn!";
 

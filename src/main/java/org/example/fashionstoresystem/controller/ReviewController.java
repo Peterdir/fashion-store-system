@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.SubmitReviewRequestDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
@@ -22,8 +23,7 @@ public class ReviewController {
     @PostMapping
     public ResponseEntity<MessageResponseDTO> submitReview(
             @RequestParam Long userId,
-            @RequestBody SubmitReviewRequestDTO dto
-    ) {
+            @Valid @RequestBody SubmitReviewRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(reviewService.submitReview(userId, dto));
     }
@@ -32,8 +32,7 @@ public class ReviewController {
     @GetMapping("/products/{productId}")
     public ResponseEntity<Page<ReviewResponseDTO>> getReviewsByProduct(
             @PathVariable Long productId,
-            Pageable pageable
-    ) {
+            Pageable pageable) {
         return ResponseEntity.ok(reviewService.getReviewsByProduct(productId, pageable));
     }
 }

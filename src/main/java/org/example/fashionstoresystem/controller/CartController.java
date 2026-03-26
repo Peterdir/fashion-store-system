@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.AddToCartRequestDTO;
 import org.example.fashionstoresystem.dto.request.UpdateCartItemRequestDTO;
@@ -21,8 +22,7 @@ public class CartController {
     // XEM GIỎ HÀNG
     @GetMapping
     public ResponseEntity<CartResponseDTO> getCartItems(
-            @RequestParam Long userId
-    ) {
+            @RequestParam Long userId) {
         CartResponseDTO response = cartService.getCartItems(userId);
         return ResponseEntity.ok(response);
     }
@@ -31,8 +31,7 @@ public class CartController {
     @PostMapping
     public ResponseEntity<CartItemResponseDTO> addToCart(
             @RequestParam Long userId,
-            @RequestBody AddToCartRequestDTO dto
-    ) {
+            @Valid @RequestBody AddToCartRequestDTO dto) {
         CartItemResponseDTO response = cartService.addToCart(userId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -41,8 +40,7 @@ public class CartController {
     @PutMapping("/items")
     public ResponseEntity<CartItemResponseDTO> updateCartItem(
             @RequestParam Long userId,
-            @RequestBody UpdateCartItemRequestDTO dto
-    ) {
+            @Valid @RequestBody UpdateCartItemRequestDTO dto) {
         CartItemResponseDTO response = cartService.updateCartItem(userId, dto);
         return ResponseEntity.ok(response);
     }
@@ -51,8 +49,7 @@ public class CartController {
     @DeleteMapping("/items/{itemId}")
     public ResponseEntity<MessageResponseDTO> removeCartItem(
             @RequestParam Long userId,
-            @PathVariable Long itemId
-    ) {
+            @PathVariable Long itemId) {
         MessageResponseDTO response = cartService.removeCartItem(userId, itemId);
         return ResponseEntity.ok(response);
     }
