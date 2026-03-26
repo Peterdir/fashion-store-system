@@ -8,14 +8,16 @@
 
 <div layout:fragment="content">
     <!-- Product Detail Section -->
-    <section class="editorial-spacing bg-white">
+    <section class="editorial-spacing bg-white" th:if="${product != null}">
         <div class="max-w-[1440px] mx-auto px-6">
             <div class="flex flex-col lg:flex-row gap-16 lg:gap-24">
                 
                 <!-- Main Image Area -->
                 <div class="w-full lg:w-2/3">
                     <div class="bg-surface-low aspect-[3/4] overflow-hidden">
-                        <img th:src="@{/images/p1_detail.png}" alt="Product Detail" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000 transform hover:scale-105">
+                        <img th:src="${product.mainImage != null ? product.mainImage : '/images/placeholder.png'}" 
+                             th:alt="${product.name}" 
+                             class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000 transform hover:scale-105">
                     </div>
                 </div>
 
@@ -25,25 +27,24 @@
                         <nav class="text-[10px] font-bold tracking-[0.2em] uppercase text-neutral-400 mb-8 flex space-x-2">
                             <a th:href="@{/}" class="hover:text-primary transition-colors">Home</a>
                             <span>/</span>
-                            <a th:href="@{/category}" class="hover:text-primary transition-colors">New Arrivals</a>
+                            <a th:href="@{/category}" class="hover:text-primary transition-colors" th:text="${product.categoryName}">Category</a>
                         </nav>
                         
-                        <h1 class="text-4xl md:text-5xl mb-6 leading-tight">Structured Wool Blazer</h1>
-                        <p class="text-2xl text-secondary font-bold mb-8">$495.00</p>
+                        <h1 class="text-4xl md:text-5xl mb-6 leading-tight" th:text="${product.name}">Product Name</h1>
+                        <p class="text-2xl text-secondary font-bold mb-8" th:text="${#numbers.formatCurrency(product.minPrice)}">$0.00</p>
                         
                         <div class="space-y-8 font-sans">
-                            <p class="text-neutral-600 leading-relaxed">
-                                A cornerstone of the SS26 Collection. This structured blazer is crafted from premium architectural wool, featuring sharp 0px radius architectural lines and a monochromatic finish.
+                            <p class="text-neutral-600 leading-relaxed" th:text="${product.description}">
+                                Product description goes here.
                             </p>
                             
-                            <!-- Variants -->
-                            <div class="space-y-4">
+                            <!-- Variants (Sizes) -->
+                            <div class="space-y-4" th:if="${product.variants != null and !product.variants.empty}">
                                 <h4 class="text-[10px] font-bold tracking-[0.2em] uppercase">Select Size</h4>
-                                <div class="flex space-x-3">
-                                    <button class="w-12 h-12 border border-outline/20 hover:border-primary transition-all text-[11px] font-bold no-radius">S</button>
-                                    <button class="w-12 h-12 border border-primary text-[11px] font-bold no-radius">M</button>
-                                    <button class="w-12 h-12 border border-outline/20 hover:border-primary transition-all text-[11px] font-bold no-radius">L</button>
-                                    <button class="w-12 h-12 border border-outline/20 hover:border-primary transition-all text-[11px] font-bold no-radius text-neutral-300 cursor-not-allowed">XL</button>
+                                <div class="flex flex-wrap gap-3">
+                                    <button th:each="v : ${product.variants}" 
+                                            class="px-6 py-3 border border-outline/20 hover:border-primary transition-all text-[11px] font-bold no-radius"
+                                            th:text="${v.size}">M</button>
                                 </div>
                             </div>
                         </div>

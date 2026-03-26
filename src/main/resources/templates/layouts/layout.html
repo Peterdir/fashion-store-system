@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">Fashion Store</title>
+    <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">H&Y | Digital Curator</title>
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
     
     <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -55,6 +56,13 @@
             }
             .editorial-spacing {
                 @apply py-16 lg:py-24;
+            }
+            .no-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+            .no-scrollbar {
+                -ms-overflow-style: none; /* IE and Edge */
+                scrollbar-width: none; /* Firefox */
             }
         }
     </style>

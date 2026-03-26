@@ -1,29 +1,33 @@
-<div th:fragment="productCard(image, name, price, oldPrice, isNew, isSale)" class="group cursor-pointer">
+<div th:fragment="productCard(product)" 
+     th:with="detailUrl=@{/product-detail/{id}(id=${product.id})}"
+     class="group cursor-pointer"
+     th:onclick="|window.location.href='${detailUrl}'|">
     <!-- Image Wrapper -->
     <div class="relative overflow-hidden bg-surface-low aspect-[3/4] mb-6">
-        <img th:src="${image}" th:alt="${name}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000">
+        <img th:src="${product.mainImage != null ? product.mainImage : '/images/placeholder.png'}" 
+             th:alt="${product.name}" 
+             class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000">
         
-        <!-- Badges -->
+        <!-- Badges (Ví dụ: Dùng trạng thái để hiển thị New/Sale nếu có trong DTO) -->
         <div class="absolute top-0 left-0 p-4 flex flex-col space-y-2">
-            <span th:if="${isNew}" class="bg-primary text-white text-[9px] font-bold tracking-[0.2em] uppercase px-3 py-1.5 no-radius">New Arrival</span>
-            <span th:if="${isSale}" class="bg-secondary text-white text-[9px] font-bold tracking-[0.2em] uppercase px-3 py-1.5 no-radius">Sale</span>
+            <span th:if="${product.status == 'NEW'}" class="bg-primary text-white text-[9px] font-bold tracking-[0.2em] uppercase px-3 py-1.5 no-radius">New Arrival</span>
         </div>
 
         <!-- Quick Buy Overlay -->
         <div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end">
             <button class="w-full bg-primary text-white py-4 text-[10px] font-bold tracking-[0.2em] uppercase translate-y-full group-hover:translate-y-0 transition-transform duration-500 no-radius">
-                Quick Add +
+                Quick View +
             </button>
         </div>
     </div>
 
     <!-- Product Info -->
     <div class="space-y-1.5">
-        <h4 class="text-[11px] font-bold tracking-[0.1em] text-neutral-400 uppercase">Collection SS26</h4>
-        <h3 class="text-sm font-medium tracking-tight h-5 overflow-hidden" th:text="${name}">Structured Blazer</h3>
+        <h4 class="text-[10px] font-bold tracking-[0.1em] text-neutral-400 uppercase" th:text="${product.categoryName}">CATEGORY</h4>
+        <h3 class="text-sm font-medium tracking-tight h-5 overflow-hidden" th:text="${product.name}">Product Name</h3>
         <div class="flex items-center space-x-3 pt-1">
-            <span class="text-secondary font-bold text-sm" th:text="${price}">$249.00</span>
-            <span th:if="${oldPrice}" class="text-neutral-400 line-through text-xs" th:text="${oldPrice}">$350.00</span>
+            <span class="text-secondary font-bold text-sm" 
+                  th:text="${#numbers.formatCurrency(product.minPrice)}">$0.00</span>
         </div>
     </div>
 </div>
