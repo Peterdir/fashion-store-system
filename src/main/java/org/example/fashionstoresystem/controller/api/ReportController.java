@@ -1,4 +1,4 @@
-package org.example.fashionstoresystem.controller;
+package org.example.fashionstoresystem.controller.api;
 
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.response.RevenueReportDTO;
@@ -7,7 +7,6 @@ import org.example.fashionstoresystem.service.report.ReportExportService;
 import org.example.fashionstoresystem.utils.MediaTypeUtils;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

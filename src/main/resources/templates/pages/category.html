@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE">New Arrivals - Digital Curator</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <!-- Category Header -->
+    <section class="pt-16 pb-8 border-b border-outline/10 bg-white">
+        <div class="max-w-[1440px] mx-auto px-6">
+            <div class="text-center md:text-left">
+                <nav class="text-[10px] font-bold tracking-[0.2em] uppercase text-neutral-400 mb-6 flex justify-center md:justify-start space-x-2">
+                    <a th:href="@{/}" class="hover:text-primary transition-colors">Home</a>
+                    <span>/</span>
+                    <span class="text-primary">New Arrivals</span>
+                </nav>
+                <h1 class="text-5xl md:text-7xl mb-8">New Arrivals</h1>
+                <div class="flex flex-col md:flex-row justify-between items-end border-t border-outline/10 pt-8">
+                    <p class="text-lg max-w-xl text-neutral-600 font-sans mb-8 md:mb-0">
+                        A curation of structural silhouettes and monochromatic layers designed for the editorial eye.
+                    </p>
+                    <div class="flex space-x-12 pb-2">
+                        <button class="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-primary pb-1">Filter (0)</button>
+                        <button class="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-primary pb-1">Sort By</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Listing Area -->
+    <section class="editorial-spacing bg-white">
+        <div class="max-w-[1440px] mx-auto px-6">
+            <div class="flex flex-col lg:flex-row gap-16">
+                
+                <!-- Sidebar (Desktop) -->
+                <aside class="hidden lg:block w-64 space-y-16 flex-shrink-0">
+                    <div>
+                        <h3 class="text-xs tracking-[0.3em] font-bold mb-8 text-neutral-400">Categories</h3>
+                        <ul class="space-y-4 text-[11px] font-bold tracking-[0.1em] uppercase">
+                            <li><a href="#" class="text-secondary">All Pieces</a></li>
+                            <li><a href="#" class="hover:text-secondary transition-colors">Tops & Shirts</a></li>
+                            <li><a href="#" class="hover:text-secondary transition-colors">Outers</a></li>
+                            <li><a href="#" class="hover:text-secondary transition-colors">Structured Pants</a></li>
+                            <li><a href="#" class="hover:text-secondary transition-colors">Accessories</a></li>
+                        </ul>
+                    </div>
+                </aside>
+
+                <!-- Grid -->
+                <div class="flex-grow">
+                    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-16">
+                        <!-- Iterating some dummy products using the component -->
+                        <div th:replace="~{fragments/components :: productCard('/images/p1.png', 'Structured Wool Blazer', '$495.00', null, true, false)}"></div>
+                        <div th:replace="~{fragments/components :: productCard('/images/p2.png', 'Minimalist Silk Shirt', '$185.00', '$250.00', false, true)}"></div>
+                        <div th:replace="~{fragments/components :: productCard('/images/p3.png', 'Architectural Trousers', '$320.00', null, false, false)}"></div>
+                        <div th:replace="~{fragments/components :: productCard('/images/p4.png', 'Mono Cotton Tote', '$85.00', null, true, false)}"></div>
+                        
+                        <div th:replace="~{fragments/components :: productCard('/images/p1.png', 'Structured Wool Blazer', '$495.00', null, false, false)}"></div>
+                        <div th:replace="~{fragments/components :: productCard('/images/p2.png', 'Minimalist Silk Shirt', '$185.00', '$250.00', false, true)}"></div>
+                        <div th:replace="~{fragments/components :: productCard('/images/p3.png', 'Architectural Trousers', '$320.00', null, true, false)}"></div>
+                        <div th:replace="~{fragments/components :: productCard('/images/p4.png', 'Mono Cotton Tote', '$85.00', null, false, false)}"></div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="mt-24 pt-12 border-t border-outline/10 flex justify-center">
+                        <nav class="flex items-center space-x-8 text-[11px] font-bold tracking-[0.2em] uppercase">
+                            <span class="text-neutral-400 cursor-default">Prev</span>
+                            <a href="#" class="text-secondary underline decoration-2 underline-offset-8">01</a>
+                            <a href="#" class="hover:text-secondary transition-colors">02</a>
+                            <a href="#" class="hover:text-secondary transition-colors">03</a>
+                            <a href="#" class="hover:text-secondary transition-colors">Next</a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+</body>
+</html>

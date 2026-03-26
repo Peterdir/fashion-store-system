@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE">Structured Wool Blazer - Digital Curator</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <!-- Product Detail Section -->
+    <section class="editorial-spacing bg-white">
+        <div class="max-w-[1440px] mx-auto px-6">
+            <div class="flex flex-col lg:flex-row gap-16 lg:gap-24">
+                
+                <!-- Main Image Area -->
+                <div class="w-full lg:w-2/3">
+                    <div class="bg-surface-low aspect-[3/4] overflow-hidden">
+                        <img th:src="@{/images/p1_detail.png}" alt="Product Detail" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000 transform hover:scale-105">
+                    </div>
+                </div>
+
+                <!-- Product Info Area -->
+                <div class="w-full lg:w-1/3 flex flex-col justify-between">
+                    <div>
+                        <nav class="text-[10px] font-bold tracking-[0.2em] uppercase text-neutral-400 mb-8 flex space-x-2">
+                            <a th:href="@{/}" class="hover:text-primary transition-colors">Home</a>
+                            <span>/</span>
+                            <a th:href="@{/category}" class="hover:text-primary transition-colors">New Arrivals</a>
+                        </nav>
+                        
+                        <h1 class="text-4xl md:text-5xl mb-6 leading-tight">Structured Wool Blazer</h1>
+                        <p class="text-2xl text-secondary font-bold mb-8">$495.00</p>
+                        
+                        <div class="space-y-8 font-sans">
+                            <p class="text-neutral-600 leading-relaxed">
+                                A cornerstone of the SS26 Collection. This structured blazer is crafted from premium architectural wool, featuring sharp 0px radius architectural lines and a monochromatic finish.
+                            </p>
+                            
+                            <!-- Variants -->
+                            <div class="space-y-4">
+                                <h4 class="text-[10px] font-bold tracking-[0.2em] uppercase">Select Size</h4>
+                                <div class="flex space-x-3">
+                                    <button class="w-12 h-12 border border-outline/20 hover:border-primary transition-all text-[11px] font-bold no-radius">S</button>
+                                    <button class="w-12 h-12 border border-primary text-[11px] font-bold no-radius">M</button>
+                                    <button class="w-12 h-12 border border-outline/20 hover:border-primary transition-all text-[11px] font-bold no-radius">L</button>
+                                    <button class="w-12 h-12 border border-outline/20 hover:border-primary transition-all text-[11px] font-bold no-radius text-neutral-300 cursor-not-allowed">XL</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-16 space-y-4">
+                        <button class="w-full bg-primary text-white py-6 text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-secondary transition-all no-radius shadow-xl">
+                            Add to Cart
+                        </button>
+                        <button class="w-full border border-primary py-6 text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-neutral-50 transition-all no-radius">
+                            Wishlist (Keep)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Tech Specs Section (Tonal Layering) -->
+    <section class="bg-surface-low border-y border-outline/10 py-24">
+        <div class="max-w-[1440px] mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-16">
+            <div>
+                <h4 class="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 text-neutral-400">Composition</h4>
+                <p class="text-sm font-sans uppercase tracking-[0.05em]">100% Virgin Wool<br>Lining: 100% Recycled Silk</p>
+            </div>
+            <div>
+                <h4 class="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 text-neutral-400">Tailoring</h4>
+                <p class="text-sm font-sans uppercase tracking-[0.05em]">Double-breasted closed<br>Architectural padded shoulders</p>
+            </div>
+            <div>
+                <h4 class="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 text-neutral-400">Ethical Curation</h4>
+                <p class="text-sm font-sans uppercase tracking-[0.05em]">Produced in limited runs<br>Studio craft / Hanoi, VN</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Related Products -->
+    <section class="editorial-spacing bg-white">
+        <div class="max-w-[1440px] mx-auto px-6">
+            <h3 class="text-xs tracking-[0.4em] font-bold mb-16 text-neutral-400 uppercase text-center">Complete the Silhouette</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <!-- Related -->
+                <div th:replace="~{fragments/components :: productCard('/images/p2.png', 'Minimalist Silk Shirt', '$185.00', null, false, false)}"></div>
+                <div th:replace="~{fragments/components :: productCard('/images/p3.png', 'Architectural Trousers', '$320.00', null, true, false)}"></div>
+                <div th:replace="~{fragments/components :: productCard('/images/p4.png', 'Mono Cotton Tote', '$85.00', null, false, false)}"></div>
+                <div th:replace="~{fragments/components :: productCard('/images/p1.png', 'Structured Wool Blazer', '$495.00', null, false, false)}"></div>
+            </div>
+        </div>
+    </section>
+</div>
+
+</body>
+</html>

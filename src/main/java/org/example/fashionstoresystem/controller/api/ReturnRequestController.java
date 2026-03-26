@@ -1,4 +1,4 @@
-package org.example.fashionstoresystem.controller;
+package org.example.fashionstoresystem.controller.api;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

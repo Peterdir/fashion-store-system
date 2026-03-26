@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE">Home - Digital Curator</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <!-- Hero Section -->
+    <section class="relative h-[90vh] bg-primary flex items-center overflow-hidden">
+        <img th:src="@{/images/hero.png}" alt="Fashion Hero" class="absolute inset-0 w-full h-full object-cover opacity-60">
+        <div class="relative z-10 max-w-[1440px] mx-auto px-6 w-full">
+            <div class="max-w-3xl">
+                <span class="block text-secondary text-xs font-bold tracking-[0.4em] uppercase mb-6">SS26 Collection</span>
+                <h1 class="text-white text-6xl md:text-8xl leading-[0.9] mb-12">The Zenith of<br>Minimalism</h1>
+                <p class="text-white/80 text-lg max-w-md mb-12 font-sans">
+                    Exploring the boundaries between brutalist architecture and wearable art. Curated for the intentional.
+                </p>
+                <div class="flex space-x-8">
+                    <a th:href="@{/category}" class="bg-white text-primary px-12 py-5 font-bold text-[11px] tracking-[0.2em] uppercase hover:bg-secondary hover:text-white transition-all duration-500 no-radius">
+                        Shop Collection
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Editorial Spacing / Quote -->
+    <section class="editorial-spacing bg-white border-b border-outline/10">
+        <div class="max-w-[1440px] mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-12 md:space-y-0">
+                <h2 class="text-3xl md:text-5xl max-w-2xl leading-tight">
+                    "Style is not an option, it's a silent curation of one's architectural essence."
+                </h2>
+                <div class="text-[11px] tracking-[0.3em] font-bold uppercase text-neutral-400">
+                    Est. 2026 / Studio Notes
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Collections Grid -->
+    <section class="bg-background editorial-spacing">
+        <div class="max-w-[1440px] mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-px border border-outline/10">
+                <!-- Collection 1 -->
+                <div class="bg-surface-card editorial-spacing px-12 group cursor-pointer border-r border-outline/10">
+                    <div class="overflow-hidden mb-12">
+                        <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&q=80&w=800" alt="Essentials" class="w-full grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000">
+                    </div>
+                    <h3 class="text-2xl mb-4">The Essentials</h3>
+                    <p class="text-neutral-500 text-sm mb-8 font-sans">Core pieces designed for daily endurance.</p>
+                    <span class="text-[10px] tracking-[0.2em] font-bold uppercase border-b-2 border-secondary pb-1">Explore</span>
+                </div>
+                
+                <!-- Collection 2 -->
+                <div class="bg-surface-card editorial-spacing px-12 group cursor-pointer">
+                    <div class="overflow-hidden mb-12">
+                        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800" alt="Avant Garde" class="w-full grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000">
+                    </div>
+                    <h3 class="text-2xl mb-4">Avant-Garde</h3>
+                    <p class="text-neutral-500 text-sm mb-8 font-sans">Breaking the silhouette of traditional luxury.</p>
+                    <span class="text-[10px] tracking-[0.2em] font-bold uppercase border-b-2 border-secondary pb-1">Explore</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Tonal Layering -->
+    <section class="bg-surface-low border-t border-outline/10 py-24">
+        <div class="max-w-[1440px] mx-auto px-6 text-center">
+            <h3 class="text-xs tracking-[0.4em] font-bold mb-12 text-neutral-400">The Curator's Journal</h3>
+            <h2 class="text-4xl md:text-6xl mb-12">Join the inner circle</h2>
+            <div class="max-w-xl mx-auto flex">
+                <input type="email" placeholder="Email Address" class="flex-grow bg-white border-outline/20 px-8 py-5 text-[11px] tracking-[0.1em] focus:outline-none focus:border-primary no-radius font-sans uppercase">
+                <button class="bg-primary text-white px-12 py-5 font-bold text-[11px] tracking-[0.2em] uppercase hover:bg-secondary transition-all no-radius">Subscribe</button>
+            </div>
+        </div>
+    </section>
+</div>
+
+</body>
+</html>

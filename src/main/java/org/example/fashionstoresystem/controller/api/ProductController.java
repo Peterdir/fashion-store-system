@@ -1,4 +1,4 @@
-package org.example.fashionstoresystem.controller;
+package org.example.fashionstoresystem.controller.api;
 
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.response.ProductDetailResponseDTO;

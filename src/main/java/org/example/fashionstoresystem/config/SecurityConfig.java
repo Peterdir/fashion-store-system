@@ -31,6 +31,10 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        // Cho phép truy cập giao diện Thymeleaf công khai
+                        .requestMatchers("/", "/category", "/product-detail").permitAll()
+                        // Cho phép truy cập tài nguyên tĩnh (CSS, JS, Images, ...)
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/vendor/**").permitAll()
                         // Cho phép truy cập Swagger UI và API docs
                         .requestMatchers(
                                 "/swagger-ui/**",
