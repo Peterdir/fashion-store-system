@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.UpdateCustomerStatusRequestDTO;
 import org.example.fashionstoresystem.dto.response.CustomerDetailResponseDTO;
@@ -10,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -48,7 +48,7 @@ public class AdminUserController {
     @PatchMapping("/{customerId}/status")
     public ResponseEntity<MessageResponseDTO> updateCustomerStatus(
             @PathVariable Long customerId,
-            @RequestBody UpdateCustomerStatusRequestDTO dto
+            @Valid @RequestBody UpdateCustomerStatusRequestDTO dto
     ) {
 
         MessageResponseDTO response = userService.updateCustomerStatus(customerId, dto);

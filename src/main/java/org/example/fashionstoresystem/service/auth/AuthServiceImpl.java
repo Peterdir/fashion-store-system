@@ -8,22 +8,22 @@ import org.example.fashionstoresystem.dto.response.RegisterResponseDTO;
 import org.example.fashionstoresystem.entity.enums.Role;
 import org.example.fashionstoresystem.entity.enums.UserStatus;
 import org.example.fashionstoresystem.entity.jpa.PasswordResetToken;
+import org.example.fashionstoresystem.entity.jpa.RefreshToken;
 import org.example.fashionstoresystem.entity.jpa.Token;
 import org.example.fashionstoresystem.entity.jpa.User;
 import org.example.fashionstoresystem.repository.PasswordResetTokenRepository;
+import org.example.fashionstoresystem.repository.RefreshTokenRepository;
 import org.example.fashionstoresystem.repository.TokenRepository;
 import org.example.fashionstoresystem.repository.UserRepository;
 import org.example.fashionstoresystem.service.email_log.EmailService;
+import org.example.fashionstoresystem.service.jwt.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +34,8 @@ public class AuthServiceImpl implements AuthService {
     private final EmailService emailService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final TokenRepository tokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtService jwtService;
 
     // ĐĂNG KÝ
 
@@ -65,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
 
         String message = "Đăng ký thành công. Vui lòng kiểm tra email để xác thực.";
         try {
-            emailService.sendVerificationEmail(user.getEmail(), token);
+            Boolean isSent = emailService.sendVerificationEmail(user.getEmail(), token);
         } catch (Exception e) {
             message = "Đăng ký thành công nhưng hệ thống gặp lỗi khi gửi email xác thực. Vui lòng sử dụng tính năng 'Gửi lại mã' sau.";
         }
@@ -80,8 +82,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Boolean verifyEmail(VerifyEmailRequestDTO dto) {
-        Optional<User> optionalUser = userRepository.findByVerificationToken(dto.getToken());
+    public Boolean verifyEmail(String token) {
+        Optional<User> optionalUser = userRepository.findByVerificationToken(token);
 
         if (optionalUser.isEmpty()) {
             throw new RuntimeException("Token xác thực không hợp lệ!");
@@ -101,7 +103,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Boolean resendVerificationEmail(ResendVerificationEmailRequestDTO dto) {
+    public MessageResponseDTO resendVerificationEmail(ResendVerificationEmailRequestDTO dto) {
         Optional<User> optionalUser = userRepository.findByEmail(dto.getEmail());
 
         if (optionalUser.isEmpty()) {
@@ -117,7 +119,9 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
         emailService.sendVerificationEmail(user.getEmail(), newToken);
 
-        return true;
+        return MessageResponseDTO.builder()
+                .message("Email xác thực đã được gửi lại thành công!")
+                .build();
     }
 
     // ĐĂNG NHẬP
@@ -155,9 +159,14 @@ public class AuthServiceImpl implements AuthService {
         });
         tokenRepository.saveAll(validTokens);
 
-        // Tạo token mới (placeholder - sẽ tích hợp JWT thực tế sau)
-        String accessToken = UUID.randomUUID().toString();
-        String refreshToken = UUID.randomUUID().toString();
+        // Tạo JWT access token
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("userId", user.getId());
+        extraClaims.put("role", user.getRole().name());
+        String accessToken = jwtService.generateAccessToken(extraClaims, user);
+
+        // Tạo JWT refresh token
+        String refreshToken = jwtService.generateRefreshToken(user);
 
         Token newToken = Token.builder()
                 .user(user)
@@ -166,6 +175,15 @@ public class AuthServiceImpl implements AuthService {
                 .revoked(false)
                 .build();
         tokenRepository.save(newToken);
+
+        // Lưu refresh token vào DB
+        RefreshToken newRefreshToken = RefreshToken.builder()
+                .user(user)
+                .token(refreshToken)
+                .expiryDate(Instant.now().plus(7, ChronoUnit.DAYS))
+                .revoked(false)
+                .build();
+        refreshTokenRepository.save(newRefreshToken);
 
         return LoginResponseDTO.builder()
                 .userId(user.getId())
@@ -257,6 +275,73 @@ public class AuthServiceImpl implements AuthService {
 
         return MessageResponseDTO.builder()
                 .message("Đăng xuất thành công!")
+                .build();
+    }
+
+    // LÀM MỚI TOKEN
+
+    @Override
+    @Transactional
+    public LoginResponseDTO refreshToken(RefreshTokenRequestDTO dto) {
+        // Tìm refresh token trong DB
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(dto.getRefreshToken())
+                .orElseThrow(() -> new RuntimeException("Refresh token không hợp lệ!"));
+
+        // Kiểm tra token đã bị thu hồi chưa
+        if (refreshToken.isRevoked()) {
+            throw new RuntimeException("Refresh token đã bị thu hồi!");
+        }
+
+        // Kiểm tra token đã hết hạn chưa
+        if (refreshToken.getExpiryDate().isBefore(Instant.now())) {
+            throw new RuntimeException("Refresh token đã hết hạn! Vui lòng đăng nhập lại.");
+        }
+
+        User user = refreshToken.getUser();
+
+        // Thu hồi refresh token cũ (Token Rotation)
+        refreshToken.setRevoked(true);
+        refreshTokenRepository.save(refreshToken);
+
+        // Vô hiệu hóa access token cũ
+        List<Token> validTokens = tokenRepository.findAllValidTokensByUser(user.getId());
+        validTokens.forEach(t -> {
+            t.setExpired(true);
+            t.setRevoked(true);
+        });
+        tokenRepository.saveAll(validTokens);
+
+        // Tạo JWT access token mới
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("userId", user.getId());
+        extraClaims.put("role", user.getRole().name());
+        String newAccessToken = jwtService.generateAccessToken(extraClaims, user);
+
+        Token newToken = Token.builder()
+                .user(user)
+                .token(newAccessToken)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(newToken);
+
+        // Tạo JWT refresh token mới
+        String newRefreshTokenStr = jwtService.generateRefreshToken(user);
+        RefreshToken newRefreshToken = RefreshToken.builder()
+                .user(user)
+                .token(newRefreshTokenStr)
+                .expiryDate(Instant.now().plus(7, ChronoUnit.DAYS))
+                .revoked(false)
+                .build();
+        refreshTokenRepository.save(newRefreshToken);
+
+        return LoginResponseDTO.builder()
+                .userId(user.getId())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshTokenStr)
                 .build();
     }
 

@@ -7,7 +7,7 @@ class AuthController {
     - authService : AuthService
     + showRegisterPage() : String
     + processRegistration(dto: RegisterRequestDTO) : RegisterResponseDTO
-    + verifyEmail(dto: VerifyEmailRequestDTO) : MessageResponseDTO
+    + verifyEmail(token: String) : Boolean
     + resendVerificationEmail(dto: ResendVerificationEmailRequestDTO) : MessageResponseDTO
 }
 
@@ -15,16 +15,16 @@ class AuthController {
 
 interface AuthService <<interface>> {
     + registerNewAccount(dto: RegisterRequestDTO) : RegisterResponseDTO
-    + verifyEmail(dto: VerifyEmailRequestDTO) : Boolean
-    + resendVerificationEmail(dto: ResendVerificationEmailRequestDTO) : Boolean
+    + verifyEmail(token: String) : Boolean
+    + resendVerificationEmail(dto: ResendVerificationEmailRequestDTO) : MessageResponseDTO
 }
 
 class AuthServiceImpl {
     - userRepository : UserRepository
     - emailService : EmailService
     + registerNewAccount(dto: RegisterRequestDTO) : RegisterResponseDTO
-    + verifyEmail(dto: VerifyEmailRequestDTO) : Boolean
-    + resendVerificationEmail(dto: ResendVerificationEmailRequestDTO) : Boolean
+    + verifyEmail(token: String) : Boolean
+    + resendVerificationEmail(dto: ResendVerificationEmailRequestDTO) : MessageResponseDTO
     - validateInfo(dto: RegisterRequestDTO) : Boolean
     - encodePassword(rawPassword: String) : void
     - createVerificationToken(user: User) : String
@@ -65,9 +65,7 @@ class RegisterResponseDTO {
     - message : String
 }
 
-class VerifyEmailRequestDTO {
-    - token : String
-}
+
 
 class ResendVerificationEmailRequestDTO {
     - email : String
@@ -107,13 +105,13 @@ AuthServiceImpl --> EmailService : - emailService
 ' Object Usage
 AuthController ..> RegisterRequestDTO : <<uses>>
 AuthController ..> RegisterResponseDTO : <<returns>>
-AuthController ..> VerifyEmailRequestDTO : <<uses>>
+
 AuthController ..> ResendVerificationEmailRequestDTO : <<uses>>
 AuthController ..> MessageResponseDTO : <<returns>>
 
 AuthServiceImpl ..> RegisterRequestDTO : <<uses>>
 AuthServiceImpl ..> RegisterResponseDTO : <<creates>>
-AuthServiceImpl ..> VerifyEmailRequestDTO : <<uses>>
+
 AuthServiceImpl ..> ResendVerificationEmailRequestDTO : <<uses>>
 AuthServiceImpl ..> User : <<creates>>
 UserRepository ..> User : <<manages>>

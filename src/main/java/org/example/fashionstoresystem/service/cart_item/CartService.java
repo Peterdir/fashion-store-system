@@ -6,7 +6,6 @@ import org.example.fashionstoresystem.dto.response.CartItemResponseDTO;
 import org.example.fashionstoresystem.dto.response.CartResponseDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 
-import java.util.List;
 
 public interface CartService {
     // Quản lý giỏ hàng - Xem giỏ hàng

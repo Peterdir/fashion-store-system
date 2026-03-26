@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.ProcessPaymentRequestDTO;
 import org.example.fashionstoresystem.dto.response.PaymentResponseDTO;
@@ -21,7 +22,7 @@ public class PaymentController {
     // XỬ LÝ THANH TOÁN
     @PostMapping("/process")
     public ResponseEntity<PaymentResponseDTO> processPayment(
-            @RequestBody ProcessPaymentRequestDTO dto
+            @Valid @RequestBody ProcessPaymentRequestDTO dto
     ) {
         PaymentResponseDTO response = paymentService.processPayment(dto);
         return ResponseEntity.status(HttpStatus.OK).body(response);

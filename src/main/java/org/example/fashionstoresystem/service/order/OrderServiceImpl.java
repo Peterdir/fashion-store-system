@@ -91,7 +91,8 @@ public class OrderServiceImpl implements OrderService {
                 totalAmount -= coupon.getDiscountValue();
             }
 
-            if (totalAmount < 0) totalAmount = 0.0;
+            if (totalAmount < 0)
+                totalAmount = 0.0;
         }
 
         // 4. Khởi tạo & Lưu Object Order chính (không còn status ở Order)
@@ -145,8 +146,7 @@ public class OrderServiceImpl implements OrderService {
                             .collect(Collectors.groupingBy(
                                     item -> item.getStatus().name(),
                                     LinkedHashMap::new,
-                                    Collectors.summingInt(i -> 1)
-                            ));
+                                    Collectors.summingInt(i -> 1)));
 
                     return OrderSummaryResponseDTO.builder()
                             .orderId(order.getId())
@@ -164,7 +164,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDetailResponseDTO getMyOrderDetail(Long userId, Long orderId) {
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
-                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại hoặc không thuộc quyền sở hữu của bạn!"));
+                .orElseThrow(
+                        () -> new RuntimeException("Đơn hàng không tồn tại hoặc không thuộc quyền sở hữu của bạn!"));
 
         List<OrderDetailResponseDTO.OrderItemDTO> itemDTOs = order.getOrderItems().stream()
                 .map(item -> {
@@ -207,13 +208,13 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public MessageResponseDTO cancelOrder(Long userId, Long orderId, CancelOrderRequestDTO dto) {
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
-                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại hoặc không thuộc quyền sở hữu của bạn!"));
+                .orElseThrow(
+                        () -> new RuntimeException("Đơn hàng không tồn tại hoặc không thuộc quyền sở hữu của bạn!"));
 
         Set<OrderStatus> cancellableStatuses = Set.of(
                 OrderStatus.PENDING_PAYMENT,
                 OrderStatus.PAID,
-                OrderStatus.PROCESSING
-        );
+                OrderStatus.PROCESSING);
 
         boolean hasRefund = false;
         boolean refundFailed = false;
