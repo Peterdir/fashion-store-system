@@ -47,4 +47,9 @@ public class ViewController {
     public String login() {
         return "pages/login";
     }
+
+    @GetMapping("/register")
+    public String register() {
+        return "pages/register";
+    }
 }
