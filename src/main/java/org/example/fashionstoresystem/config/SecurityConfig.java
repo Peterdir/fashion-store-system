@@ -25,6 +25,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationEntryPoint jwtAuthEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -32,7 +33,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         // Cho phép truy cập giao diện Thymeleaf công khai
-                        .requestMatchers("/", "/category", "/product-detail").permitAll()
+                        .requestMatchers("/", "/category", "/product-detail/**", "/login", "/register").permitAll()
                         // Cho phép truy cập tài nguyên tĩnh (CSS, JS, Images, ...)
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/vendor/**").permitAll()
                         // Cho phép truy cập Swagger UI và API docs
@@ -57,6 +58,7 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(jwtAuthEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

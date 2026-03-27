@@ -5,26 +5,25 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 @Component
-public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        // Trả về 401 Unauthorized thay vì 403 Forbidden khi chưa đăng nhập
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+        // Trả về 403 Forbidden khi đã đăng nhập nhưng không đủ quyền hạn
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
         MessageResponseDTO errorResponse = MessageResponseDTO.builder()
-                .message("Bạn chưa đăng nhập hoặc phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!")
+                .message("Bạn không có quyền truy cập vào tài nguyên này. Vui lòng kiểm tra quyền hạn của bạn!")
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();

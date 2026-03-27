@@ -42,4 +42,9 @@ public class ViewController {
         model.addAttribute("product", product);
         return "pages/product-detail";
     }
+
+    @GetMapping("/login")
+    public String login() {
+        return "pages/login";
+    }
 }
