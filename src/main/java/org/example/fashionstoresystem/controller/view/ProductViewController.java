@@ -15,21 +15,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
-public class ViewController {
+public class ProductViewController {
 
     private final ProductService productService;
-
-    @GetMapping("/")
-    public String index() {
-        return "pages/index";
-    }
 
     @GetMapping("/category")
     public String category(
             @RequestParam(required = false) String keyword,
             @PageableDefault(size = 12) Pageable pageable,
-            Model model
-    ) {
+            Model model) {
         Page<ProductSummaryResponseDTO> products = productService.getProducts(keyword, pageable);
         model.addAttribute("products", products);
         model.addAttribute("keyword", keyword);
@@ -41,15 +35,5 @@ public class ViewController {
         ProductDetailResponseDTO product = productService.getProductDetail(productId);
         model.addAttribute("product", product);
         return "pages/product-detail";
-    }
-
-    @GetMapping("/login")
-    public String login() {
-        return "pages/login";
-    }
-
-    @GetMapping("/register")
-    public String register() {
-        return "pages/register";
     }
 }

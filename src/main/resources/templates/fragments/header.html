@@ -37,7 +37,7 @@
             
             <!-- Cart Icon + Badge -->
             <button class="relative hover:text-secondary transition-colors duration-300 group">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="arcs"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="arcs"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
                 <span class="absolute -top-2.5 -right-2.5 bg-secondary text-white text-[8px] font-black w-4 h-4 flex items-center justify-center no-radius">0</span>
             </button>
         </div>
@@ -110,7 +110,7 @@
                         </div>
                         <div th:each="i : ${#numbers.sequence(1, 18)}" class="group/item cursor-pointer text-center flex flex-col items-center">
                             <div class="w-20 h-20 bg-surface-low overflow-hidden rounded-full mb-2 border border-outline/5 group-hover/item:border-secondary transition-colors relative">
-                                <img th:src="@{'/images/p' + (i % 4 + 1) + '.png'}" class="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500 opacity-90 group-hover/item:opacity-100">
+                                <img th:src="@{'/images/p' + ${i % 4 + 1} + '.png'}" class="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500 opacity-90 group-hover/item:opacity-100">
                             </div>
                             <span class="text-[8.5px] font-bold uppercase tracking-tighter group-hover/item:text-secondary transition-colors leading-tight max-w-[80px]" th:text="${i < 4 ? 'New Shirts' : 'Daily Wear'}">Item</span>
                         </div>
