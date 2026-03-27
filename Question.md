@@ -1,2 +1,0 @@
-Fix các phần còn đang thiếu:
-Điều chỉnh Spring Security trả về chuẩn lỗi 401 Unauthorized (Khuyên dùng) Trong chuẩn REST API, khi người dùng "chưa cung cấp token" thì đúng ra server cần trả về 401 Unauthorized thay vì 403 Forbidden (403 dùng khi "có token nhưng không đủ quyền", ví dụ Customer gọi API của Admin).
