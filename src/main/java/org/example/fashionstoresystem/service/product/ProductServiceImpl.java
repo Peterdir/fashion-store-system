@@ -3,13 +3,17 @@ package org.example.fashionstoresystem.service.product;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.CreateProductRequestDTO;
 import org.example.fashionstoresystem.dto.request.UpdateProductRequestDTO;
+import org.example.fashionstoresystem.dto.response.CategoryResponseDTO;
 import org.example.fashionstoresystem.dto.response.ProductDetailResponseDTO;
 import org.example.fashionstoresystem.dto.response.ProductSummaryResponseDTO;
 import org.example.fashionstoresystem.entity.enums.ProductStatus;
+import org.example.fashionstoresystem.entity.jpa.Category;
 import org.example.fashionstoresystem.entity.jpa.Product;
 import org.example.fashionstoresystem.entity.jpa.ProductImage;
 import org.example.fashionstoresystem.entity.jpa.ProductVariant;
+import org.example.fashionstoresystem.repository.CategoryRepository;
 import org.example.fashionstoresystem.repository.ProductRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +28,20 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+
+    // Helper: Lấy tên danh mục an toàn (null-safe)
+    private String getCategoryName(Product product) {
+        return product.getCategory() != null ? product.getCategory().getName() : "Uncategorized";
+    }
+
+    // Helper: Lấy tên danh mục cha an toàn
+    private String getParentCategoryName(Product product) {
+        if (product.getCategory() != null && product.getCategory().getParent() != null) {
+            return product.getCategory().getParent().getName();
+        }
+        return getCategoryName(product);
+    }
 
     @Override
     public Page<ProductSummaryResponseDTO> getProducts(String keyword, Pageable pageable) {
@@ -41,7 +59,8 @@ public class ProductServiceImpl implements ProductService {
                 .productId(product.getId())
                 .name(product.getName())
                 .price(product.getVariants().isEmpty() ? 0.0 : product.getVariants().get(0).getPrice())
-                .category(product.getCategory())
+                .category(getParentCategoryName(product))
+                .subcategory(getCategoryName(product))
                 .status(product.getStatus())
                 .primaryImageUrl(product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl())
                 .hoverImageUrl(product.getImages().size() > 1 ? product.getImages().get(1).getUrl() : (product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl()))
@@ -59,16 +78,17 @@ public class ProductServiceImpl implements ProductService {
                 .name(product.getName())
                 .price(product.getVariants().isEmpty() ? 0.0 : product.getVariants().get(0).getPrice())
                 .minPrice(product.getVariants().isEmpty() ? 0.0 : product.getVariants().stream().mapToDouble(ProductVariant::getPrice).min().orElse(0.0))
-                .category(product.getCategory())
-                .categoryName(product.getCategory())
+                .category(getParentCategoryName(product))
+                .categoryName(getCategoryName(product))
                 .description(product.getDescription())
                 .status(product.getStatus())
-                .mainImage(product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl())
-                .hoverImage(product.getImages().size() > 1 ? product.getImages().get(1).getUrl() : (product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl()))
+                .mainImage(formatImageUrl(product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl()))
+                .hoverImage(formatImageUrl(product.getImages().size() > 1 ? product.getImages().get(1).getUrl() : (product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl())))
                 .images(product.getImages().stream()
                         .map(img -> ProductDetailResponseDTO.ProductImageDTO.builder()
                                 .imageId(img.getId())
-                                .url(img.getUrl())
+                                .url(formatImageUrl(img.getUrl()))
+                                .color(img.getColor())
                                 .build())
                         .collect(Collectors.toList()))
                 .variants(product.getVariants().stream()
@@ -77,6 +97,7 @@ public class ProductServiceImpl implements ProductService {
                                 .size(v.getSize())
                                 .color(v.getColor())
                                 .stockQuantity(v.getStockQuantity())
+                                .price(v.getPrice())
                                 .build())
                         .collect(Collectors.toList()))
                 .reviews(product.getReviews().stream()
@@ -90,15 +111,64 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
+    private String formatImageUrl(String url) {
+        if (url == null) return "/images/placeholder.png";
+        if (url.startsWith("http") || url.startsWith("/")) return url;
+        return "/" + url;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductSummaryResponseDTO> getRelatedProducts(Long productId, int limit) {
+        Product currentProduct = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại!"));
+
+        if (currentProduct.getCategory() == null) {
+            return List.of();
+        }
+
+        // Tìm các sản phẩm cùng danh mục
+        Pageable pageable = PageRequest.of(0, limit + 1);
+        Page<Product> relatedProducts = productRepository.findByCategoryIds(
+                List.of(currentProduct.getCategory().getId()),
+                pageable
+        );
+
+        return relatedProducts.stream()
+                .filter(p -> !p.getId().equals(productId))
+                .limit(limit)
+                .map(this::mapToSummaryDTO)
+                .collect(Collectors.toList());
+    }
+
+    private ProductSummaryResponseDTO mapToSummaryDTO(Product p) {
+        return ProductSummaryResponseDTO.builder()
+                .productId(p.getId())
+                .name(p.getName())
+                .price(p.getVariants().isEmpty() ? 0.0 : p.getVariants().get(0).getPrice())
+                .minPrice(p.getVariants().isEmpty() ? 0.0 : p.getVariants().stream()
+                        .mapToDouble(ProductVariant::getPrice)
+                        .min().orElse(0.0))
+                .category(getCategoryName(p))
+                .primaryImageUrl(formatImageUrl(p.getImages().isEmpty() ? "/images/placeholder.png" : p.getImages().get(0).getUrl()))
+                .hoverImageUrl(formatImageUrl(p.getImages().size() > 1 ? p.getImages().get(1).getUrl() : (p.getImages().isEmpty() ? "/images/placeholder.png" : p.getImages().get(0).getUrl())))
+                .build();
+    }
+
     @Override
     @Transactional
     public ProductDetailResponseDTO createProduct(CreateProductRequestDTO dto) {
         if (dto.getPrice() == null || dto.getPrice() < 0) {
             throw new RuntimeException("Giá sản phẩm không hợp lệ");
         }
+
+        // Tìm hoặc tạo Category từ tên
+        Category category = categoryRepository.findByName(dto.getCategory())
+                .orElseGet(() -> categoryRepository.save(Category.builder().name(dto.getCategory()).build()));
+
         Product product = Product.builder()
                 .name(dto.getName())
-                .category(dto.getCategory())
+                .category(category)
                 .description(dto.getDescription())
                 .status(ProductStatus.ACTIVE)
                 .build();
@@ -144,7 +214,11 @@ public class ProductServiceImpl implements ProductService {
         }
 
         if (dto.getName() != null) product.setName(dto.getName());
-        if (dto.getCategory() != null) product.setCategory(dto.getCategory());
+        if (dto.getCategory() != null) {
+            Category category = categoryRepository.findByName(dto.getCategory())
+                    .orElseGet(() -> categoryRepository.save(Category.builder().name(dto.getCategory()).build()));
+            product.setCategory(category);
+        }
         if (dto.getDescription() != null) product.setDescription(dto.getDescription());
         if (dto.getStatus() != null) product.setStatus(dto.getStatus());
 
@@ -209,7 +283,17 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<String> getAllCategories() {
-        return productRepository.findDistinctCategories();
+    public List<CategoryResponseDTO> getAllCategories() {
+        // Trả về DTO của các danh mục gốc (không có cha)
+        List<Category> roots = categoryRepository.findByParentIsNull();
+        return roots.stream()
+                .map(cat -> CategoryResponseDTO.builder()
+                        .id(cat.getId())
+                        .name(cat.getName())
+                        .childCount(cat.getChildren() != null ? cat.getChildren().size() : 0)
+                        .build())
+                .collect(Collectors.toList());
     }
 }
+
+

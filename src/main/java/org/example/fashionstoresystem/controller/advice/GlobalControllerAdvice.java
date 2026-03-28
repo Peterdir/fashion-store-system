@@ -1,7 +1,8 @@
 package org.example.fashionstoresystem.controller.advice;
 
 import lombok.RequiredArgsConstructor;
-import org.example.fashionstoresystem.service.product.ProductService;
+import org.example.fashionstoresystem.dto.response.CategoryResponseDTO;
+import org.example.fashionstoresystem.service.category.CategoryService;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -11,10 +12,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GlobalControllerAdvice {
 
-    private final ProductService productService;
+    private final CategoryService categoryService;
 
     @ModelAttribute("categories")
-    public List<String> getCategories() {
-        return productService.getAllCategories();
+    public List<CategoryResponseDTO> getCategories() {
+        return categoryService.getRootCategories();
     }
 }

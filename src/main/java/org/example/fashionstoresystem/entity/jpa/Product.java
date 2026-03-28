@@ -25,8 +25,9 @@ public class Product {
     @Column(unique = true, nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @Column(columnDefinition = "TEXT")
     private String description;

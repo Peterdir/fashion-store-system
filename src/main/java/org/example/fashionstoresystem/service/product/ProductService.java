@@ -2,6 +2,7 @@ package org.example.fashionstoresystem.service.product;
 
 import org.example.fashionstoresystem.dto.request.CreateProductRequestDTO;
 import org.example.fashionstoresystem.dto.request.UpdateProductRequestDTO;
+import org.example.fashionstoresystem.dto.response.CategoryResponseDTO;
 import org.example.fashionstoresystem.dto.response.ProductDetailResponseDTO;
 import org.example.fashionstoresystem.dto.response.ProductSummaryResponseDTO;
 
@@ -14,6 +15,9 @@ public interface ProductService {
     Page<ProductSummaryResponseDTO> getProducts(String keyword, Pageable pageable);
 
     ProductDetailResponseDTO getProductDetail(Long productId);
+    
+    // Lấy sản phẩm liên quan (cùng danh mục)
+    List<ProductSummaryResponseDTO> getRelatedProducts(Long productId, int limit);
 
     // Admin
     ProductDetailResponseDTO createProduct(CreateProductRequestDTO dto);
@@ -22,5 +26,5 @@ public interface ProductService {
 
     void deleteProduct(Long productId);
 
-    List<String> getAllCategories();
+    List<CategoryResponseDTO> getAllCategories();
 }

@@ -8,89 +8,354 @@
 
 <div layout:fragment="content">
     <!-- Product Detail Section -->
-    <section class="editorial-spacing bg-white" th:if="${product != null}">
+    <section class=" editorial-spacing bg-white" th:if="${product != null}">
         <div class="max-w-[1440px] mx-auto px-6">
-            <div class="flex flex-col lg:flex-row gap-16 lg:gap-24">
+            <div class="flex flex-col lg:flex-row gap-8 lg:gap-16">
                 
-                <!-- Main Image Area -->
-                <div class="w-full lg:w-2/3">
-                    <div class="bg-surface-low aspect-[3/4] overflow-hidden group">
-                        <img th:src="${product.mainImage ?: '/images/placeholder.png'}" 
-                             th:alt="${product.name}" 
-                             class="w-full h-full object-cover transition-all duration-1000 transform group-hover:scale-105">
-                    </div>
+                <!-- 1. LEFT: Thumbnails (Vertical) -->
+                <div class="hidden lg:flex flex-col gap-4 w-20 flex-shrink-0" id="product-thumbnails-container">
+                    <!-- JS will populate this based on selected color -->
                 </div>
 
-                <!-- Product Info Area -->
-                <div class="w-full lg:w-1/3 flex flex-col justify-between">
-                    <div>
-                        <nav class="text-[10px] font-bold tracking-[0.2em] uppercase text-neutral-400 mb-8 flex space-x-2">
-                            <a th:href="@{/}" class="hover:text-primary transition-colors">Home</a>
-                            <span>/</span>
-                            <a th:href="@{/category}" class="hover:text-primary transition-colors" th:text="${product.categoryName}">Category</a>
-                        </nav>
+                <!-- 2. CENTER: Main Image Display -->
+                <div class="flex-1">
+                    <div class="bg-surface-low aspect-[3/4] overflow-hidden relative group">
+                        <img id="main-product-image" 
+                             th:src="${product.mainImage}" 
+                             th:alt="${product.name}" 
+                             class="w-full h-full object-cover transition-all duration-700">
                         
-                        <h1 class="text-4xl md:text-5xl mb-6 leading-tight" th:text="${product.name}">Product Name</h1>
-                        <p class="text-2xl text-secondary font-bold mb-8" 
-                           th:text="${#numbers.formatCurrency(product.minPrice != null ? product.minPrice : 0)}">$0.00</p>
-                        
-                        <div class="space-y-8 font-sans">
-                            <p class="text-neutral-600 leading-relaxed" th:text="${product.description}">
-                                Product description goes here.
-                            </p>
-                            
-                            <!-- Variants (Sizes) -->
-                            <div class="space-y-4" th:if="${product.variants != null && !product.variants.isEmpty()}">
-                                <h4 class="text-[10px] font-bold tracking-[0.2em] uppercase">Select Size</h4>
-                                <div class="flex flex-wrap gap-3">
-                                    <button th:each="v : ${product.variants}" 
-                                            class="px-6 py-3 border border-outline/20 hover:border-primary transition-all text-[11px] font-bold no-radius"
-                                            th:text="${v.size}">M</button>
-                                </div>
-                            </div>
+                        <!-- Mobile Thumbnails (Horizontal) -->
+                        <div class="flex lg:hidden absolute bottom-4 left-4 right-4 gap-2 overflow-x-auto pb-2 scrollbar-hide" id="mobile-thumbnails-container">
+                             <!-- JS will populate this -->
                         </div>
                     </div>
+                </div>
 
-                    <div class="mt-16 space-y-4">
-                        <button class="w-full bg-primary text-white py-6 text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-secondary transition-all no-radius shadow-xl">
-                            Add to Cart
-                        </button>
-                        <button class="w-full border border-primary py-6 text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-neutral-50 transition-all no-radius">
-                            Wishlist (Keep)
-                        </button>
+                <!-- 3. RIGHT: Product Info Area -->
+                <div class="w-full lg:w-[450px] flex-shrink-0">
+                    <div class="space-y-6">
+                        <!-- Breadcrumbs -->
+                        <nav class="text-[10px] font-bold tracking-[0.15em] uppercase text-neutral-400 flex items-center space-x-2">
+                            <a th:href="@{/}" class="hover:text-primary transition-colors">Home</a>
+                            <span class="text-neutral-300">/</span>
+                            <a th:href="@{/category}" class="hover:text-primary transition-colors" th:text="${product.category != null ? product.category : 'Shop'}">Category</a>
+                        </nav>
+                        
+                        <div class="flex justify-between items-start gap-4">
+                            <h1 class="text-2xl md:text-3xl font-light leading-tight text-neutral-800" th:text="${product.name}">Product Name</h1>
+                            <button class="p-2 border border-outline/10 text-neutral-400 hover:text-primary transition-all">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                            </button>
+                        </div>
+
+                        <!-- SKU & Ratings -->
+                        <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] font-medium font-sans">
+                            <span class="text-neutral-400 uppercase tracking-widest">SKU: <span class="text-neutral-600" th:text="${'sz' + product.productId + '00' + product.productId}">sz25042554846</span></span>
+                            <div class="flex items-center gap-2">
+                                <div class="flex text-secondary star-rating">
+                                    <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                    </th:block>
+                                </div>
+                                <span class="text-secondary">(1000+ Reviews)</span>
+                            </div>
+                        </div>
+
+                        <!-- Price & Discounts -->
+                        <div class="py-4 border-y border-outline/5 space-y-3">
+                            <div class="flex items-center gap-4">
+                                <span class="text-[12px] font-bold uppercase text-neutral-400">From</span>
+                                <span class="text-3xl font-bold text-primary" th:text="${#numbers.formatDecimal(product.minPrice != null ? product.minPrice : 0, 0, 'POINT', 0, 'COMMA') + ' ₫'}">20.900 ₫</span>
+                                <span class="bg-red-50 text-red-500 text-[10px] font-bold px-2 py-0.5 rounded">-75%</span>
+                                <span class="text-neutral-300 line-through text-sm">95.000 ₫</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2 text-[10px] uppercase font-bold tracking-wider">
+                                <span class="border border-red-200 text-red-400 px-3 py-1">75% OFF: No Min. Buy</span>
+                                <span class="border border-red-200 text-red-400 px-3 py-1">65% OFF For orders 260.400đ+</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-50/50 p-2 flex items-center justify-between text-[11px] font-sans border border-amber-100">
+                             <div class="flex items-center gap-2 text-amber-700">
+                                 <span class="bg-amber-500 text-white font-bold p-1 italic px-2">#6 Bestseller</span>
+                                 <span>in Women T-Shirts</span>
+                             </div>
+                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                        </div>
+
+                        <div class="bg-green-50 text-green-700 p-3 text-[11px] font-sans flex items-center gap-3 border border-green-100 italic">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                            Special Free Shipping Deal
+                        </div>
+
+                        <!-- Colors Selection (As Thumbnails) -->
+                        <div class="space-y-4 pt-4" th:if="${product.variants != null && !product.variants.isEmpty()}">
+                            <div class="flex justify-between text-[11px] font-bold uppercase tracking-widest">
+                                <span>Color: <span class="text-neutral-400" id="selected-color-name">Loading...</span></span>
+                                <a href="#" class="text-blue-500">Large Image</a>
+                            </div>
+                            <!-- Unique Colors will be rendered by JS for more control -->
+                            <div class="flex flex-wrap gap-3" id="color-selector-container">
+                                <!-- JS will populate this -->
+                            </div>
+                        </div>
+
+                        <!-- Size Guide & Selector -->
+                        <div class="space-y-4 pt-4" th:if="${product.variants != null && !product.variants.isEmpty()}">
+                            <div class="flex justify-between text-[11px] font-bold uppercase tracking-widest">
+                                <span>Select Size</span>
+                                <a href="#" class="text-neutral-400 border-b border-neutral-200">Size Guide</a>
+                            </div>
+                            <div class="flex flex-wrap gap-2" id="size-selector-container">
+                                <!-- JS will populate this -->
+                            </div>
+                        </div>
+
+                        <!-- Add to Cart (Add variant storage) -->
+                        <div class="pt-8 flex gap-4">
+                            <input type="hidden" id="selected-variant-id" value="">
+                            <button id="add-to-cart-btn" class="flex-1 bg-neutral-900 text-white py-6 text-[11px] font-bold tracking-[0.3em] uppercase hover:bg-black transition-all no-radius shadow-xl active:scale-[0.98] disabled:bg-neutral-300 disabled:cursor-not-allowed">
+                                ADD TO CART
+                            </button>
+                            <button class="w-16 h-16 border border-outline/20 flex items-center justify-center hover:bg-neutral-50 transition-all no-radius">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Detailed Tech Specs Section (Tonal Layering) -->
-    <section class="bg-surface-low border-y border-outline/10 py-24">
-        <div class="max-w-[1440px] mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-16">
+    <!-- Details Section Updates -->
+    <section class="bg-surface-low border-y border-outline/10 py-24 mt-16" th:if="${product != null}">
+        <div class="max-w-[1440px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
             <div>
-                <h4 class="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 text-neutral-400">Composition</h4>
-                <p class="text-sm font-sans uppercase tracking-[0.05em]">100% Virgin Wool<br>Lining: 100% Recycled Silk</p>
+                <h4 class="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 text-neutral-400 italic">Description</h4>
+                <p class="text-[11px] font-sans text-neutral-600 leading-relaxed" th:text="${product.description}">Detail text...</p>
             </div>
             <div>
-                <h4 class="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 text-neutral-400">Tailoring</h4>
-                <p class="text-sm font-sans uppercase tracking-[0.05em]">Double-breasted closed<br>Architectural padded shoulders</p>
+                <h4 class="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 text-neutral-400 italic">Stock Info</h4>
+                <div class="text-[10px] font-sans uppercase tracking-widest space-y-2">
+                    <p>Reference: <span th:text="${product.productId}">123</span></p>
+                    <p>Subcategory: <span th:text="${product.categoryName}">Category</span></p>
+                    <p>Availability: <span id="stock-display" class="font-bold text-primary">Select options</span></p>
+                </div>
             </div>
-            <div>
-                <h4 class="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 text-neutral-400">Ethical Curation</h4>
-                <p class="text-sm font-sans uppercase tracking-[0.05em]">Produced in limited runs<br>Studio craft / Hanoi, VN</p>
+            <div class="lg:col-span-2">
+                <h4 class="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 text-neutral-400 italic">Authenticity</h4>
+                <p class="text-[11px] font-sans text-neutral-500 uppercase tracking-widest leading-loose">
+                    All products are verified by our team of curators.<br>
+                    Hand-packaged in our digital studio.
+                </p>
             </div>
         </div>
     </section>
 
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const productVariants = /*[[${product.variants}]]*/ [];
+        const productImages = /*[[${product.images}]]*/ [];
+        const mainProductImage = /*[[${product.mainImage}]]*/ '/images/placeholder.png';
+        /*]]>*/
+
+        let currentSelectedColor = null;
+        let currentSelectedSize = null;
+
+        /**
+         * INITIALIZATION
+         */
+        function initVariants() {
+            if (!productVariants || productVariants.length === 0) return;
+
+            // 1. Get unique colors
+            const colors = [...new Set(productVariants.map(v => v.color))];
+            const colorContainer = document.getElementById('color-selector-container');
+            
+            colorContainer.innerHTML = colors.map((color, idx) => {
+                // Find a representative image for this color
+                const colorSpecificImage = productImages.find(img => img.color === color);
+                const thumbnailUrl = colorSpecificImage ? colorSpecificImage.url : mainProductImage;
+                
+                return `
+                    <div class="color-option relative w-12 h-16 border-2 transition-all cursor-pointer ${idx === 0 ? 'border-primary' : 'border-outline/10'} hover:border-primary" 
+                         data-color="${color}" onclick="selectColor('${color}', this)">
+                        <img src="${thumbnailUrl}" class="w-full h-full object-cover">
+                        ${idx < 1 ? '<span class="absolute -top-1 -right-1 bg-red-500 text-white text-[7px] font-bold px-1 rounded italic uppercase">HOT</span>' : ''}
+                    </div>
+                `;
+            }).join('');
+
+            // 2. Default selection: First color
+            if (colors.length > 0) {
+                selectColor(colors[0], colorContainer.querySelector('.color-option'));
+            }
+        }
+
+        /**
+         * COLOR SELECTION LOGIC
+         */
+        function selectColor(color, element) {
+            currentSelectedColor = color;
+            document.getElementById('selected-color-name').innerText = color;
+
+            // 1. Update UI for color options
+            document.querySelectorAll('.color-option').forEach(opt => {
+                opt.classList.remove('border-primary');
+                opt.classList.add('border-outline/10');
+            });
+            element.classList.remove('border-outline/10');
+            element.classList.add('border-primary');
+
+            // 2. Filter & Render Thumbnails for this color
+            renderGalleryForColor(color);
+
+            // 3. Filter sizes for this color
+            renderSizesForColor(color);
+            
+            // 4. Re-validate current selected size or pick first available for this color
+            const availableSizes = productVariants.filter(v => v.color === color && v.stockQuantity > 0);
+            if (availableSizes.length > 0) {
+                const stillAvailable = availableSizes.find(v => v.size === currentSelectedSize);
+                if (!stillAvailable) {
+                    const firstSizeEl = document.querySelector('.size-btn:not([disabled])');
+                    if (firstSizeEl) firstSizeEl.click();
+                } else {
+                    updateFinalVariant();
+                }
+            }
+        }
+
+        /**
+         * GALLERY (IMAGES) LOGIC
+         */
+        function renderGalleryForColor(color) {
+            // Filter images that match the color OR have no color assigned (general images)
+            const filteredImages = productImages.filter(img => !img.color || img.color === color);
+            
+            const desktopContainer = document.getElementById('product-thumbnails-container');
+            const mobileContainer = document.getElementById('mobile-thumbnails-container');
+
+            const galleryHtml = filteredImages.map((img, idx) => `
+                <div class="thumbnail-item cursor-pointer border-2 transition-all hover:border-primary overflow-hidden aspect-[3/4] ${idx === 0 ? 'border-primary' : 'border-transparent'}"
+                     data-large-src="${img.url}"
+                     onclick="changeMainImage(this)">
+                    <img src="${img.url}" class="w-full h-full object-cover">
+                </div>
+            `).join('');
+
+            const mobileHtml = filteredImages.map(img => `
+                <div class="w-16 h-20 flex-shrink-0 border-2 border-white/50 overflow-hidden shadow-lg"
+                     data-large-src="${img.url}"
+                     onclick="changeMainImage(this)">
+                    <img src="${img.url}" class="w-full h-full object-cover">
+                </div>
+            `).join('');
+
+            desktopContainer.innerHTML = galleryHtml;
+            mobileContainer.innerHTML = mobileHtml;
+
+            // Update main image to the first one available for this color
+            if (filteredImages.length > 0) {
+                document.getElementById('main-product-image').src = filteredImages[0].url;
+            }
+        }
+
+        /**
+         * SIZE SELECTION LOGIC
+         */
+        function renderSizesForColor(color) {
+            const sizeContainer = document.getElementById('size-selector-container');
+            const variantsForColor = productVariants.filter(v => v.color === color);
+            const allSizes = [...new Set(productVariants.map(v => v.size))];
+
+            sizeContainer.innerHTML = allSizes.map(size => {
+                const variant = variantsForColor.find(v => v.size === size);
+                const isAvailable = variant && variant.stockQuantity > 0;
+                
+                return `
+                    <button class="size-btn h-12 px-6 border transition-all text-xs font-bold no-radius uppercase font-sans ${currentSelectedSize === size ? 'border-primary bg-neutral-50' : 'border-outline/20 hover:border-primary'} ${!isAvailable ? 'opacity-30 cursor-not-allowed bg-neutral-100' : ''}"
+                            ${!isAvailable ? 'disabled' : ''} 
+                            onclick="selectSize('${size}', this)">
+                        ${size}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectSize(size, element) {
+            currentSelectedSize = size;
+            document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('border-primary', 'bg-neutral-50'));
+            element.classList.add('border-primary', 'bg-neutral-50');
+            updateFinalVariant();
+        }
+
+        /**
+         * FINAL VARIANT (PRICE/STOCK) LOGIC
+         */
+        function updateFinalVariant() {
+            const variant = productVariants.find(v => v.color === currentSelectedColor && v.size === currentSelectedSize);
+            
+            if (variant) {
+                const priceElements = document.querySelectorAll('.text-primary.font-bold, .text-3xl.font-bold.text-primary');
+                priceElements.forEach(el => el.innerText = new Intl.NumberFormat('vi-VN').format(variant.price) + ' ₫');
+
+                document.getElementById('stock-display').innerText = `${variant.stockQuantity} items available`;
+                document.getElementById('selected-variant-id').value = variant.variantId;
+                document.getElementById('add-to-cart-btn').disabled = variant.stockQuantity <= 0;
+            }
+        }
+
+        /**
+         * UI HELPERS
+         */
+        function changeMainImage(el) {
+            const largeUrl = el.getAttribute('data-large-src');
+            const mainImg = document.getElementById('main-product-image');
+            
+            document.querySelectorAll('.thumbnail-item').forEach(item => {
+                item.classList.remove('border-primary');
+                item.classList.add('border-transparent');
+            });
+            el.classList.add('border-primary');
+
+            mainImg.style.opacity = '0.3';
+            setTimeout(() => {
+                mainImg.src = largeUrl;
+                mainImg.style.opacity = '1';
+            }, 150);
+        }
+
+        document.addEventListener('DOMContentLoaded', initVariants);
+    </script>
+
     <!-- Related Products -->
-    <section class="editorial-spacing bg-white">
+    <section class="editorial-spacing bg-white" th:if="${relatedProducts != null && !relatedProducts.isEmpty()}">
         <div class="max-w-[1440px] mx-auto px-6">
             <h3 class="text-xs tracking-[0.4em] font-bold mb-16 text-neutral-400 uppercase text-center">Complete the Silhouette</h3>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <!-- Related (Temporary placeholder) -->
-                <p class="col-span-full text-center text-[10px] uppercase tracking-widest text-neutral-400">Related Collections Coming Soon</p>
+                <div th:each="rp : ${relatedProducts}" class="group cursor-pointer">
+                    <a th:href="@{'/product-detail/' + ${rp.productId}}" class="block">
+                        <div class="bg-surface-low aspect-[3/4] overflow-hidden mb-6 relative">
+                            <img th:src="${rp.primaryImageUrl}" th:alt="${rp.name}" 
+                                 class="w-full h-full object-cover transition-all duration-1000 group-hover:scale-105">
+                            <img th:src="${rp.hoverImageUrl}" th:alt="${rp.name}" 
+                                 class="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                        </div>
+                        <h4 class="text-[10px] font-bold uppercase tracking-[0.2em] mb-2 group-hover:text-secondary transition-colors" th:text="${rp.name}">Product Name</h4>
+                        <p class="text-[11px] font-medium text-neutral-400" 
+                           th:text="${#numbers.formatDecimal(rp.minPrice != null ? rp.minPrice : 0, 0, 'POINT', 0, 'COMMA') + ' ₫'}">0 ₫</p>
+                    </a>
+                </div>
             </div>
         </div>
+    </section>
+    
+    <!-- Empty state if no product -->
+    <section class="py-48 text-center" th:if="${product == null}">
+        <h2 class="text-4xl font-light mb-8">Product Not Found</h2>
+        <a th:href="@{/category}" class="text-[11px] font-bold uppercase tracking-widest border-b border-primary pb-1">Return to Collection</a>
     </section>
 </div>
 

@@ -34,6 +34,7 @@ public class ProductDetailResponseDTO {
     public static class ProductImageDTO {
         private Long imageId;
         private String url;
+        private String color;
     }
 
     @Data
@@ -45,6 +46,7 @@ public class ProductDetailResponseDTO {
         private String size;
         private String color;
         private Long stockQuantity;
+        private Double price;
     }
 
     @Data

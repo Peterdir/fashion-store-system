@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.example.fashionstoresystem.entity.enums.ProductStatus;
 
@@ -15,15 +16,22 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Lấy các sản phẩm có trạng thái còn bán
     List<Product> findByStatus(ProductStatus status);
 
-    // Tìm sản phẩm chứa keyword trong tên hoặc danh mục
-    @Query("SELECT p FROM Product p WHERE (LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-           "OR LOWER(p.category) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND p.status = 'ACTIVE'")
-    Page<Product> findByNameOrCategoryContaining(String keyword, Pageable pageable);
+    // Tìm sản phẩm chứa keyword trong tên hoặc tên danh mục
+    @Query("SELECT p FROM Product p LEFT JOIN p.category c WHERE " +
+           "(LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+           "OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+           "AND p.status = 'ACTIVE'")
+    Page<Product> findByNameOrCategoryContaining(@Param("keyword") String keyword, Pageable pageable);
+
+    // Tìm sản phẩm theo danh sách category IDs (bao gồm danh mục cha + con)
+    @Query("SELECT p FROM Product p WHERE p.category.id IN :categoryIds AND p.status = 'ACTIVE'")
+    Page<Product> findByCategoryIds(@Param("categoryIds") List<Long> categoryIds, Pageable pageable);
 
     // Tìm theo keyword + lọc trạng thái + phân trang
     Page<Product> findByNameContainingIgnoreCaseAndStatus(String keyword, ProductStatus status, Pageable pageable);
 
-    // Lấy danh sách các danh mục duy nhất
-    @Query("SELECT DISTINCT p.category FROM Product p")
+    // Lấy danh sách các danh mục duy nhất (giữ tương thích cũ)
+    @Query("SELECT DISTINCT c.name FROM Product p JOIN p.category c")
     List<String> findDistinctCategories();
 }
+

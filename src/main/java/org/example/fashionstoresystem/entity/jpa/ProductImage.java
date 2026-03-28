@@ -20,6 +20,9 @@ public class ProductImage {
     @Column(nullable = false)
     private String url;
 
+    @Column(length = 50)
+    private String color;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;

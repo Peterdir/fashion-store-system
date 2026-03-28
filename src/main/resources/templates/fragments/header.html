@@ -13,13 +13,13 @@
 
         <!-- Search Bar (Center) -->
         <div class="flex-grow flex justify-center">
-            <div class="w-full max-w-[500px] relative">
-                <input type="text" placeholder="Search for trends, styles..." 
+            <form th:action="@{/category}" method="get" class="w-full max-w-[500px] relative">
+                <input type="text" name="keyword" th:value="${keyword}" placeholder="Search for trends, styles..." 
                        class="w-full bg-white/5 border border-white/10 focus:border-white/30 focus:bg-white/10 px-4 py-1.5 text-[11px] font-medium tracking-tight no-radius focus:outline-none transition-all pr-12 text-white">
-                <button class="absolute right-4 top-1/2 -translate-y-1/2 hover:text-secondary transition-colors text-white/50 hover:text-white">
+                <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 hover:text-secondary transition-colors text-white/50 hover:text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="arcs"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </button>
-            </div>
+            </form>
         </div>
 
         <!-- Actions (Right) -->
@@ -57,9 +57,10 @@
                     Categories
                 </a>
                 <a th:each="cat : ${categories}" 
-                   th:href="@{/category(keyword=${cat})}" 
+                   th:href="@{/category(keyword=${cat.name})}" 
                    class="mega-trigger hover:text-white transition-colors" 
-                   th:text="${cat}">Category Name</a>
+                   th:attr="data-id=${cat.id}, data-name=${cat.name}"
+                   th:text="${cat.name}">Category Name</a>
             </div>
         </div>
 
@@ -70,7 +71,10 @@
     </div>
 
     <!-- Mega Menu Panel -->
-    <div id="mega-menu" class="absolute top-full left-1/2 -translate-x-1/2 w-full max-w-[1240px] bg-white text-primary shadow-2xl border-t border-outline/10 z-40 opacity-0 invisible translate-y-2 transition-all duration-300 ease-out pointer-events-none rounded-b-xl overflow-hidden">
+    <div id="mega-menu" 
+         th:data-first-category-id="${not #lists.isEmpty(categories) ? categories[0].id : null}"
+         th:data-first-category-name="${not #lists.isEmpty(categories) ? categories[0].name : null}"
+         class="absolute top-full left-1/2 -translate-x-1/2 w-full max-w-[1240px] bg-white text-primary shadow-2xl border-t border-outline/10 z-40 opacity-0 invisible translate-y-2 transition-all duration-300 ease-out pointer-events-none rounded-b-xl overflow-hidden">
         <div class="flex max-h-[70vh]">
             <!-- Left Sidebar -->
             <div class="w-[240px] bg-surface-low border-r border-outline/5 py-4 overflow-y-auto">
@@ -79,8 +83,8 @@
                     <button th:each="cat, iter : ${categories}" 
                             th:classappend="${iter.first} ? 'active bg-white border-l-4 border-secondary' : 'hover:bg-white/50'"
                             class="mega-menu-item flex items-center justify-between px-6 py-3 text-[10px] font-bold uppercase tracking-widest transition-all" 
-                            th:attr="data-target=${cat}">
-                        <span th:text="${cat}">Category Name</span>
+                            th:attr="data-id=${cat.id}, data-name=${cat.name}">
+                        <span th:text="${cat.name}">Category Name</span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
                 </div>
@@ -106,134 +110,5 @@
     </div>
 
     <!-- Scroll & Mega Menu Logic -->
-    <script th:inline="javascript">
-        document.addEventListener('DOMContentLoaded', () => {
-            const container = document.getElementById('nav-container');
-            const leftBtn = document.getElementById('nav-scroll-left');
-            const rightBtn = document.getElementById('nav-scroll-right');
-            const megaMenu = document.getElementById('mega-menu');
-            const menuGrid = document.getElementById('mega-menu-products-grid');
-            const menuTitle = document.getElementById('mega-menu-title');
-            const cache = {};
-
-            // Scroll Logic
-            const updateArrows = () => {
-                const scrollLeft = container.scrollLeft;
-                const maxScroll = container.scrollWidth - container.clientWidth;
-                leftBtn.disabled = scrollLeft <= 0;
-                rightBtn.disabled = scrollLeft >= maxScroll - 1;
-            };
-
-            leftBtn.addEventListener('click', () => container.scrollLeft -= 300);
-            rightBtn.addEventListener('click', () => container.scrollLeft += 300);
-            container.addEventListener('scroll', updateArrows);
-            window.addEventListener('resize', updateArrows);
-            updateArrows();
-
-            // Function to render products
-            const renderProducts = (products, category) => {
-                menuTitle.innerHTML = `<span class="w-1.5 h-1.5 bg-secondary block"></span> Latest in ${category}`;
-                
-                const headerHtml = `
-                    <div class="col-span-6 border-b border-outline/5 pb-2 mb-2">
-                        <h3 class="text-[10px] font-black tracking-widest uppercase flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 bg-secondary block"></span> Latest in ${category}
-                        </h3>
-                    </div>
-                `;
-
-                if (!products || products.length === 0) {
-                    menuGrid.innerHTML = headerHtml + `
-                        <div class="col-span-6 py-12 text-center text-[10px] uppercase tracking-widest text-neutral-400">
-                            No products found in this category
-                        </div>
-                    `;
-                    return;
-                }
-
-                const productsHtml = products.slice(0, 12).map(p => `
-                    <a href="/product-detail/${p.productId}" class="group/item cursor-pointer text-center flex flex-col items-center">
-                        <div class="w-20 h-20 bg-surface-low overflow-hidden rounded-full mb-2 border border-outline/5 group-hover/item:border-secondary transition-colors relative">
-                            <img src="${p.primaryImageUrl || '/images/placeholder.png'}" 
-                                 class="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500 opacity-90 group-hover/item:opacity-100">
-                        </div>
-                        <span class="text-[8.5px] font-bold uppercase tracking-tighter group-hover/item:text-secondary transition-colors leading-tight max-w-[80px] truncate w-full">
-                            ${p.name}
-                        </span>
-                        <span class="text-[8.5px] text-neutral-400 mt-1">
-                            $${p.price.toFixed(2)}
-                        </span>
-                    </a>
-                `).join('');
-
-                menuGrid.innerHTML = headerHtml + productsHtml;
-            };
-
-            // Function to fetch products
-            const fetchCategoryProducts = async (category) => {
-                if (cache[category]) {
-                    renderProducts(cache[category], category);
-                    return;
-                }
-
-                // Temporary loading state
-                menuGrid.style.opacity = '0.5';
-
-                try {
-                    const response = await fetch(`/api/products?keyword=${encodeURIComponent(category)}&size=12`);
-                    const data = await response.json();
-                    const products = data.content || [];
-                    cache[category] = products;
-                    renderProducts(products, category);
-                } catch (error) {
-                    console.error('Error fetching products:', error);
-                } finally {
-                    menuGrid.style.opacity = '1';
-                }
-            };
-
-            // Mega Menu Trigger Logic
-            const navLinks = document.querySelectorAll('.mega-trigger');
-            
-            navLinks.forEach(link => {
-                link.addEventListener('mouseenter', () => {
-                    megaMenu.classList.remove('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
-                    const catName = link.textContent.trim();
-                    if (catName !== 'Categories') {
-                        fetchCategoryProducts(catName);
-                    }
-                });
-            });
-
-            // Sidebar Switch Logic
-            const sidebarItems = document.querySelectorAll('.mega-menu-item');
-            sidebarItems.forEach(item => {
-                item.addEventListener('mouseenter', () => {
-                    sidebarItems.forEach(i => i.classList.remove('active', 'bg-white', 'border-l-4', 'border-secondary'));
-                    item.classList.add('active', 'bg-white', 'border-l-4', 'border-secondary');
-                    
-                    const category = item.getAttribute('data-target');
-                    fetchCategoryProducts(category);
-                });
-            });
-
-            // Hide Logic
-            megaMenu.addEventListener('mouseenter', () => {
-                megaMenu.classList.remove('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
-            });
-
-            document.addEventListener('mousemove', (e) => {
-                const header = document.querySelector('header');
-                if (!header.contains(e.target) && !megaMenu.contains(e.target)) {
-                    megaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
-                }
-            });
-
-            // Pre-load first category if exists
-            const firstCategory = /*[[${not #lists.isEmpty(categories) ? categories[0] : null}]]*/ null;
-            if (firstCategory) {
-                fetchCategoryProducts(firstCategory);
-            }
-        });
-    </script>
+    <script th:src="@{/js/components/header.js}"></script>
 </header>

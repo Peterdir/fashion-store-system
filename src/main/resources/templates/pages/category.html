@@ -42,10 +42,10 @@
                                    th:classappend="${keyword == null} ? 'text-secondary' : 'hover:text-secondary transition-colors'"
                                    class="transition-colors">All Pieces</a></li>
                             <li th:each="cat : ${categories}">
-                                <a th:href="@{/category(keyword=${cat})}" 
-                                   th:classappend="${keyword == cat} ? 'text-secondary' : 'hover:text-secondary transition-colors'"
+                                <a th:href="@{/category(keyword=${cat.name})}" 
+                                   th:classappend="${keyword == cat.name} ? 'text-secondary' : 'hover:text-secondary transition-colors'"
                                    class="transition-colors"
-                                   th:text="${cat}">Category</a>
+                                   th:text="${cat.name}">Category</a>
                             </li>
                         </ul>
                     </div>

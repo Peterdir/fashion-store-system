@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class ProductViewController {
@@ -33,7 +35,11 @@ public class ProductViewController {
     @GetMapping("/product-detail/{productId}")
     public String productDetail(@PathVariable Long productId, Model model) {
         ProductDetailResponseDTO product = productService.getProductDetail(productId);
+        List<ProductSummaryResponseDTO> relatedProducts = productService.getRelatedProducts(productId, 4);
+        
         model.addAttribute("product", product);
+        model.addAttribute("relatedProducts", relatedProducts);
+        
         return "pages/product-detail";
     }
 }

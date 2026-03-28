@@ -46,8 +46,8 @@ public class SecurityConfig {
                         ).permitAll()
                         // Cho phép truy cập API xác thực (login, register, ...)
                         .requestMatchers("/api/auth/**").permitAll()
-                        // Cho phép xem sản phẩm công khai
-                        .requestMatchers("/api/products/**").permitAll()
+                        // Cho phép xem sản phẩm và danh mục công khai
+                        .requestMatchers("/api/products/**", "/api/categories/**").permitAll()
                         // Admin endpoints - chỉ ADMIN mới truy cập được
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // Tất cả API còn lại yêu cầu xác thực
