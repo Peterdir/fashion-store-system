@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,11 +28,11 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductSummaryResponseDTO> getProducts(String keyword, Pageable pageable) {
         Page<Product> productsPage;
         
-        // Nếu keyword trống thì lấy tất cả, ngược lại thì tìm kiếm
+        // Nếu keyword trống thì lấy tất cả, ngược lại thì tìm kiếm thông minh theo Tên hoặc Category
         if (keyword == null || keyword.trim().isEmpty()) {
             productsPage = productRepository.findAll(pageable);
         } else {
-            productsPage = productRepository.findByNameContainingIgnoreCase(keyword.trim(), pageable);
+            productsPage = productRepository.findByNameOrCategoryContaining(keyword.trim(), pageable);
         }
 
         // Map Entity sang DTO
@@ -43,6 +42,7 @@ public class ProductServiceImpl implements ProductService {
                 .price(product.getVariants().isEmpty() ? 0.0 : product.getVariants().get(0).getPrice())
                 .category(product.getCategory())
                 .status(product.getStatus())
+                .primaryImageUrl(product.getImages().isEmpty() ? null : product.getImages().get(0).getUrl())
                 .build());
     }
 
@@ -180,5 +180,11 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại!"));
         productRepository.delete(product);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> getAllCategories() {
+        return productRepository.findDistinctCategories();
     }
 }

@@ -1,16 +1,16 @@
-<div th:fragment="productCard(product)" 
-     th:with="detailUrl=@{/product-detail/{id}(id=${product.id})}"
-     class="group cursor-pointer"
-     th:onclick="|window.location.href='${detailUrl}'|">
+<a th:fragment="productCard(product)"
+   th:if="${product != null}"
+   th:href="@{/product-detail/{id}(id=${product.productId})}"
+   class="group block cursor-pointer no-underline text-inherit">
     <!-- Image Wrapper -->
     <div class="relative overflow-hidden bg-surface-low aspect-[3/4] mb-6">
-        <img th:src="${product.mainImage != null ? product.mainImage : '/images/placeholder.png'}" 
+        <img th:src="${product.primaryImageUrl != null ? product.primaryImageUrl : '/images/placeholder.png'}" 
              th:alt="${product.name}" 
              class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000">
         
-        <!-- Badges (Ví dụ: Dùng trạng thái để hiển thị New/Sale nếu có trong DTO) -->
+        <!-- Badges -->
         <div class="absolute top-0 left-0 p-4 flex flex-col space-y-2">
-            <span th:if="${product.status == 'NEW'}" class="bg-primary text-white text-[9px] font-bold tracking-[0.2em] uppercase px-3 py-1.5 no-radius">New Arrival</span>
+            <span th:if="${product.status != null && product.status.name() == 'ACTIVE'}" class="bg-primary text-white text-[9px] font-bold tracking-[0.2em] uppercase px-3 py-1.5 no-radius">Active</span>
         </div>
 
         <!-- Quick Buy Overlay -->
@@ -23,11 +23,11 @@
 
     <!-- Product Info -->
     <div class="space-y-1.5">
-        <h4 class="text-[10px] font-bold tracking-[0.1em] text-neutral-400 uppercase" th:text="${product.categoryName}">CATEGORY</h4>
+        <h4 class="text-[10px] font-bold tracking-[0.1em] text-neutral-400 uppercase" th:text="${product.category}">CATEGORY</h4>
         <h3 class="text-sm font-medium tracking-tight h-5 overflow-hidden" th:text="${product.name}">Product Name</h3>
         <div class="flex items-center space-x-3 pt-1">
             <span class="text-secondary font-bold text-sm" 
-                  th:text="${#numbers.formatCurrency(product.minPrice)}">$0.00</span>
+                  th:text="${#numbers.formatCurrency(product.price)}">$0.00</span>
         </div>
     </div>
-</div>
+</a>

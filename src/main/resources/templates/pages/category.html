@@ -14,9 +14,13 @@
                 <nav class="text-[10px] font-bold tracking-[0.2em] uppercase text-neutral-400 mb-6 flex justify-center md:justify-start space-x-2">
                     <a th:href="@{/}" class="hover:text-primary transition-colors">Home</a>
                     <span>/</span>
-                    <span class="text-primary">New Arrivals</span>
+                    <a th:href="@{/category}" class="hover:text-primary transition-colors">Categories</a>
+                    <th:block th:if="${keyword != null}">
+                        <span>/</span>
+                        <span class="text-primary" th:text="${keyword}">Current Category</span>
+                    </th:block>
                 </nav>
-                <h1 class="text-5xl md:text-7xl mb-8">New Arrivals</h1>
+                <h1 class="text-5xl md:text-7xl mb-8" th:text="${keyword != null ? keyword : 'All Collections'}">New Arrivals</h1>
                 <div class="flex flex-col md:flex-row justify-between items-end border-t border-outline/10 pt-8">
                     <p class="text-lg max-w-xl text-neutral-600 font-sans mb-8 md:mb-0">
                         A curation of structural silhouettes and monochromatic layers designed for the editorial eye.
@@ -40,23 +44,27 @@
                     <div>
                         <h3 class="text-xs tracking-[0.3em] font-bold mb-8 text-neutral-400">Categories</h3>
                         <ul class="space-y-4 text-[11px] font-bold tracking-[0.1em] uppercase">
-                            <li><a href="#" class="text-secondary">All Pieces</a></li>
-                            <li><a href="#" class="hover:text-secondary transition-colors">Tops & Shirts</a></li>
-                            <li><a href="#" class="hover:text-secondary transition-colors">Outers</a></li>
-                            <li><a href="#" class="hover:text-secondary transition-colors">Structured Pants</a></li>
-                            <li><a href="#" class="hover:text-secondary transition-colors">Accessories</a></li>
+                            <li><a th:href="@{/category}" 
+                                   th:classappend="${keyword == null} ? 'text-secondary' : 'hover:text-secondary transition-colors'"
+                                   class="transition-colors">All Pieces</a></li>
+                            <li th:each="cat : ${categories}">
+                                <a th:href="@{/category(keyword=${cat})}" 
+                                   th:classappend="${keyword == cat} ? 'text-secondary' : 'hover:text-secondary transition-colors'"
+                                   class="transition-colors"
+                                   th:text="${cat}">Category</a>
+                            </li>
                         </ul>
                     </div>
                 </aside>
 
                 <!-- Main Grid -->
             <div class="flex-1">
-                <div th:if="${products.totalElements > 0}" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
-                    <!-- Product Card Loop -->
-                    <div th:each="prod : ${products.content}" 
-                         th:replace="~{fragments/components :: productCard(${prod})}">
+                    <div th:if="${products.totalElements > 0}" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
+                        <!-- Product Card Loop -->
+                        <th:block th:each="prod : ${products.content}">
+                            <div th:replace="~{fragments/components :: productCard(${prod})}"></div>
+                        </th:block>
                     </div>
-                </div>
 
                 <!-- Empty State -->
                 <div th:if="${products.totalElements == 0}" class="py-24 text-center">
