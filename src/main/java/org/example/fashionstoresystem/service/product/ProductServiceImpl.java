@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.util.stream.Collectors;
 import java.util.List;
 
 @Service
@@ -42,7 +43,8 @@ public class ProductServiceImpl implements ProductService {
                 .price(product.getVariants().isEmpty() ? 0.0 : product.getVariants().get(0).getPrice())
                 .category(product.getCategory())
                 .status(product.getStatus())
-                .primaryImageUrl(product.getImages().isEmpty() ? null : product.getImages().get(0).getUrl())
+                .primaryImageUrl(product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl())
+                .hoverImageUrl(product.getImages().size() > 1 ? product.getImages().get(1).getUrl() : (product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl()))
                 .build());
     }
 
@@ -56,12 +58,35 @@ public class ProductServiceImpl implements ProductService {
                 .productId(product.getId())
                 .name(product.getName())
                 .price(product.getVariants().isEmpty() ? 0.0 : product.getVariants().get(0).getPrice())
+                .minPrice(product.getVariants().isEmpty() ? 0.0 : product.getVariants().stream().mapToDouble(ProductVariant::getPrice).min().orElse(0.0))
                 .category(product.getCategory())
+                .categoryName(product.getCategory())
                 .description(product.getDescription())
                 .status(product.getStatus())
-                // .images(...)
-                // .variants(...)
-                // .reviews(...)
+                .mainImage(product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl())
+                .hoverImage(product.getImages().size() > 1 ? product.getImages().get(1).getUrl() : (product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl()))
+                .images(product.getImages().stream()
+                        .map(img -> ProductDetailResponseDTO.ProductImageDTO.builder()
+                                .imageId(img.getId())
+                                .url(img.getUrl())
+                                .build())
+                        .collect(Collectors.toList()))
+                .variants(product.getVariants().stream()
+                        .map(v -> ProductDetailResponseDTO.ProductVariantDTO.builder()
+                                .variantId(v.getId())
+                                .size(v.getSize())
+                                .color(v.getColor())
+                                .stockQuantity(v.getStockQuantity())
+                                .build())
+                        .collect(Collectors.toList()))
+                .reviews(product.getReviews().stream()
+                        .map(r -> ProductDetailResponseDTO.ReviewDTO.builder()
+                                .reviewId(r.getId())
+                                .rating(r.getRating())
+                                .comment(r.getComment())
+                                .reviewerName(r.getUser() != null ? r.getUser().getFullName() : "Anonymous")
+                                .build())
+                        .collect(Collectors.toList()))
                 .build();
     }
 

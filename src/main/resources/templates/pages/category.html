@@ -8,10 +8,10 @@
 
 <div layout:fragment="content">
     <!-- Category Header -->
-    <section class="pt-16 pb-8 border-b border-outline/10 bg-white">
+    <section class="py-4 border-b border-outline/10 bg-white">
         <div class="max-w-[1440px] mx-auto px-6">
-            <div class="text-center md:text-left">
-                <nav class="text-[10px] font-bold tracking-[0.2em] uppercase text-neutral-400 mb-6 flex justify-center md:justify-start space-x-2">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <nav class="text-[10px] font-bold tracking-[0.2em] uppercase text-neutral-400 flex justify-center md:justify-start space-x-2">
                     <a th:href="@{/}" class="hover:text-primary transition-colors">Home</a>
                     <span>/</span>
                     <a th:href="@{/category}" class="hover:text-primary transition-colors">Categories</a>
@@ -20,22 +20,16 @@
                         <span class="text-primary" th:text="${keyword}">Current Category</span>
                     </th:block>
                 </nav>
-                <h1 class="text-5xl md:text-7xl mb-8" th:text="${keyword != null ? keyword : 'All Collections'}">New Arrivals</h1>
-                <div class="flex flex-col md:flex-row justify-between items-end border-t border-outline/10 pt-8">
-                    <p class="text-lg max-w-xl text-neutral-600 font-sans mb-8 md:mb-0">
-                        A curation of structural silhouettes and monochromatic layers designed for the editorial eye.
-                    </p>
-                    <div class="flex space-x-12 pb-2">
-                        <button class="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-primary pb-1">Filter (0)</button>
-                        <button class="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-primary pb-1">Sort By</button>
-                    </div>
+                <div class="flex space-x-12 mt-4 md:mt-0">
+                    <button class="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-primary pb-1">Filter (0)</button>
+                    <button class="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-primary pb-1">Sort By</button>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Product Listing Area -->
-    <section class="editorial-spacing bg-white">
+    <section class="py-12 bg-white">
         <div class="max-w-[1440px] mx-auto px-6">
             <div class="flex flex-col lg:flex-row gap-16">
                 

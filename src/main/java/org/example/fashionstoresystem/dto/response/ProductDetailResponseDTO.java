@@ -19,6 +19,10 @@ public class ProductDetailResponseDTO {
     private String category;
     private String description;
     private ProductStatus status;
+    private String mainImage;
+    private String hoverImage;
+    private Double minPrice;
+    private String categoryName;
     private List<ProductImageDTO> images;
     private List<ProductVariantDTO> variants;
     private List<ReviewDTO> reviews;

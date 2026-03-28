@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout}">
 <head>
-    <title layout:title-pattern="$CONTENT_TITLE">Structured Wool Blazer - Digital Curator</title>
+    <title th:text="${product != null ? product.name + ' - Digital Curator' : 'Product Detail - Digital Curator'}">Product Detail</title>
 </head>
 <body>
 
@@ -14,10 +14,10 @@
                 
                 <!-- Main Image Area -->
                 <div class="w-full lg:w-2/3">
-                    <div class="bg-surface-low aspect-[3/4] overflow-hidden">
-                        <img th:src="${product.mainImage != null ? product.mainImage : '/images/placeholder.png'}" 
+                    <div class="bg-surface-low aspect-[3/4] overflow-hidden group">
+                        <img th:src="${product.mainImage ?: '/images/placeholder.png'}" 
                              th:alt="${product.name}" 
-                             class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000 transform hover:scale-105">
+                             class="w-full h-full object-cover transition-all duration-1000 transform group-hover:scale-105">
                     </div>
                 </div>
 
@@ -31,7 +31,8 @@
                         </nav>
                         
                         <h1 class="text-4xl md:text-5xl mb-6 leading-tight" th:text="${product.name}">Product Name</h1>
-                        <p class="text-2xl text-secondary font-bold mb-8" th:text="${#numbers.formatCurrency(product.minPrice)}">$0.00</p>
+                        <p class="text-2xl text-secondary font-bold mb-8" 
+                           th:text="${#numbers.formatCurrency(product.minPrice != null ? product.minPrice : 0)}">$0.00</p>
                         
                         <div class="space-y-8 font-sans">
                             <p class="text-neutral-600 leading-relaxed" th:text="${product.description}">
@@ -39,7 +40,7 @@
                             </p>
                             
                             <!-- Variants (Sizes) -->
-                            <div class="space-y-4" th:if="${product.variants != null and !product.variants.empty}">
+                            <div class="space-y-4" th:if="${product.variants != null && !product.variants.isEmpty()}">
                                 <h4 class="text-[10px] font-bold tracking-[0.2em] uppercase">Select Size</h4>
                                 <div class="flex flex-wrap gap-3">
                                     <button th:each="v : ${product.variants}" 

@@ -17,4 +17,5 @@ public class ProductSummaryResponseDTO {
     private String category;
     private ProductStatus status;
     private String primaryImageUrl;
+    private String hoverImageUrl;
 }

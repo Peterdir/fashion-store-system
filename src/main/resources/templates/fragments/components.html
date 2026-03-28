@@ -3,10 +3,16 @@
    th:href="@{/product-detail/{id}(id=${product.productId})}"
    class="group block cursor-pointer no-underline text-inherit">
     <!-- Image Wrapper -->
-    <div class="relative overflow-hidden bg-surface-low aspect-[3/4] mb-6">
+    <div class="relative overflow-hidden bg-surface-low aspect-[3/4] mb-6 group">
+        <!-- Main Image -->
         <img th:src="${product.primaryImageUrl != null ? product.primaryImageUrl : '/images/placeholder.png'}" 
              th:alt="${product.name}" 
-             class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000">
+             class="w-full h-full object-cover opacity-100 group-hover:opacity-0 transition-opacity duration-700 ease-in-out">
+        
+        <!-- Hover Image -->
+        <img th:src="${product.hoverImageUrl != null ? product.hoverImageUrl : product.primaryImageUrl}" 
+             th:alt="${product.name}" 
+             class="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out scale-105 group-hover:scale-100">
         
         <!-- Badges -->
         <div class="absolute top-0 left-0 p-4 flex flex-col space-y-2">
