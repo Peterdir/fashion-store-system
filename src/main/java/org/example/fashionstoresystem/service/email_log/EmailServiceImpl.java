@@ -1,10 +1,13 @@
 package org.example.fashionstoresystem.service.email_log;
 
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.entity.jpa.EmailLog;
 import org.example.fashionstoresystem.repository.EmailLogRepository;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -15,30 +18,33 @@ public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
     private final EmailLogRepository emailLogRepository;
+    private final SpringTemplateEngine templateEngine;
 
     @Override
     public Boolean sendVerificationEmail(String email, String token) {
-        String content = "";
         try {
-            // Chuẩn bị nội dung Email
-            String subject = "Xác thực tài khoản Fashion Store";
-            String link = "http://localhost:8080/api/auth/verify-email?token=" + token;
-            content = "Chào bạn,\n\nVui lòng click vào link sau để xác thực tài khoản của bạn:\n" + link
-                    + "\n\nCảm ơn bạn!";
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            // Gửi email
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(email);
-            message.setSubject(subject);
-            message.setText(content);
+            String subject = "Xác thực tài khoản H&Y | Digital Curator";
+            String verificationLink = "http://localhost:8080/verify-email?token=" + token;
+            
+            // Render HTML using Thymeleaf TemplateEngine
+            Context context = new Context();
+            context.setVariable("verificationLink", verificationLink);
+            String htmlContent = templateEngine.process("mail/verification-email", context);
+
+            helper.setTo(email);
+            helper.setSubject(subject);
+            helper.setText(htmlContent, true); // true = HTML
+
             mailSender.send(message);
 
             // Lưu log
-            saveLog(email, "SUCCESS: " + content);
+            saveLog(email, "HTML Verification Email Sent via Template to " + email);
             return true;
         } catch (Exception e) {
-            // Lưu log lỗi
-            saveLog(email, "FAILED: " + e.getMessage());
+            saveLog(email, "FAILED to send HTML email: " + e.getMessage());
             throw new RuntimeException("Không thể gửi email xác thực!");
         }
     }

@@ -92,8 +92,12 @@
     <!-- Footer Fragment -->
     <div th:replace="~{fragments/footer :: footer}"></div>
 
+    <!-- Global Components -->
+    <script th:src="@{/js/components/toast.js}"></script>
+    <script th:src="@{/js/components/auth-utils.js}"></script>
     <script th:src="@{/js/main.js}"></script>
     <!-- Page specific scripts -->
+    <th:block layout:fragment="scripts"></th:block>
     <th:block layout:fragment="script"></th:block>
 </body>
 </html>

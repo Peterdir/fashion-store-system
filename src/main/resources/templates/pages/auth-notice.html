@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>H&Y | Confirm Your Email</title>
+</head>
+<body>
+<div layout:fragment="content" class="min-h-[80vh] flex items-center justify-center py-20 px-4 bg-surface">
+    <div class="max-w-md w-full text-center space-y-10">
+        <!-- Animated Icon -->
+        <div class="relative inline-block">
+            <div class="w-24 h-24 bg-surface-container-highest rounded-full flex items-center justify-center mx-auto mb-6">
+                <span class="material-symbols-outlined text-5xl text-primary animate-pulse">mail</span>
+            </div>
+            <div class="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full border-4 border-surface"></div>
+        </div>
+
+        <!-- Text Content -->
+        <div class="space-y-4">
+            <h1 class="text-3xl font-black uppercase tracking-widest text-on-surface">Check Your Inbox</h1>
+            <p class="text-sm text-on-surface-variant leading-relaxed">
+                We've sent a verification link to <span th:text="${email}" class="font-bold text-on-surface">user@example.com</span>. 
+                Please click the link in the email to activate your account.
+            </p>
+        </div>
+
+        <!-- Info Box -->
+        <div class="bg-surface-container p-6 rounded-sm border border-outline/10 text-left space-y-3">
+            <h3 class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">info</span>
+                Can't find the email?
+            </h3>
+            <ul class="text-[11px] text-on-surface-variant space-y-2 list-disc pl-4">
+                <li>Check your spam or promotions folder.</li>
+                <li>Make sure the email address provided is correct.</li>
+                <li>Wait a few minutes for the delivery.</li>
+            </ul>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col gap-4 pt-4">
+            <button id="resendBtn" 
+                    class="w-full py-4 bg-on-surface text-surface text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                Resend Verification Email
+            </button>
+            <a href="/login" class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors">
+                Back to Sign In
+            </a>
+        </div>
+        
+        <p id="countdownMsg" class="text-[10px] italic text-on-surface-variant hidden">
+            You can resend the email again in <span id="timer">60</span> seconds.
+        </p>
+    </div>
+    
+    <!-- Hidden data for JS -->
+    <input type="hidden" id="userEmail" th:value="${email}">
+</div>
+
+<th:block layout:fragment="scripts">
+    <script src="/js/pages/auth-notice.js"></script>
+</th:block>
+</body>
+</html>

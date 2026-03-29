@@ -5,6 +5,7 @@ import org.example.fashionstoresystem.dto.response.ProfileResponseDTO;
 import org.example.fashionstoresystem.dto.response.RecentlyViewedResponseDTO;
 import org.example.fashionstoresystem.dto.response.WishlistItemResponseDTO;
 import org.example.fashionstoresystem.entity.jpa.User;
+import org.example.fashionstoresystem.service.auth.AuthService;
 import org.example.fashionstoresystem.service.user.UserService;
 import org.example.fashionstoresystem.service.wishlist_item.WishlistService;
 import org.example.fashionstoresystem.service.recently_viewed.RecentlyViewedService;
@@ -21,9 +22,30 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserViewController {
 
+    private final AuthService authService;
     private final UserService userService;
     private final WishlistService wishlistService;
     private final RecentlyViewedService recentlyViewedService;
+
+    @GetMapping("/auth-notice")
+    public String authNotice(String email, String type, Model model) {
+        model.addAttribute("email", email);
+        model.addAttribute("type", type); // 'verify-email' or 'reset-password'
+        return "pages/auth-notice";
+    }
+
+    @GetMapping("/verify-email")
+    public String verifyEmail(String token, Model model) {
+        try {
+            boolean success = authService.verifyEmail(token);
+            model.addAttribute("success", success);
+            model.addAttribute("message", "Tài khoản của bạn đã được xác thực thành công!");
+        } catch (Exception e) {
+            model.addAttribute("success", false);
+            model.addAttribute("message", e.getMessage());
+        }
+        return "pages/verify-email-result";
+    }
 
     @GetMapping("/personal-center")
     public String personalCenter(Model model) {
