@@ -24,17 +24,20 @@
                 <!-- Left Sidebar Navigation -->
                 <aside class="lg:col-span-3 space-y-8">
                     <div class="bg-white p-6 shadow-sm border border-outline/5">
-                        <h2 class="text-xs font-black tracking-[0.2em] uppercase mb-8 pb-4 border-b border-outline/10 text-primary">Navigation</h2>
+                        <button class="tab-link w-full text-left text-xs font-black tracking-[0.2em] uppercase mb-8 pb-4 border-b border-outline/10 text-on-surface-variant hover:text-secondary transition-colors" 
+                                data-tab="dashboard">
+                            Personal Center
+                        </button>
                         
                         <nav class="space-y-1">
                             <!-- My Account -->
                             <div id="my-account-group" class="group">
-                                <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] text-secondary transition-colors text-left toggle-menu-btn"
+                                <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left toggle-menu-btn"
                                         data-target="my-account-sub">
                                     My Account
-                                    <span id="my-account-arrow" class="material-symbols-outlined text-sm transition-transform rotate-180">expand_more</span>
+                                    <span id="my-account-arrow" class="material-symbols-outlined text-sm transition-transform">expand_more</span>
                                 </button>
-                                <div id="my-account-sub" class="pl-4 space-y-2 py-2">
+                                <div id="my-account-sub" class="pl-4 space-y-2 py-2 hidden">
                                     <button class="tab-link block w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="profile">My Profile</button>
                                     <button class="tab-link block w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="address">Address Book</button>
                                     <button class="tab-link block w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="payment">My Payment Options</button>
@@ -43,24 +46,71 @@
                             </div>
                             
                             <!-- My Assets -->
-                            <div class="group">
-                                <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left">
+                            <div id="my-assets-group" class="group">
+                                <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left toggle-menu-btn"
+                                        data-target="my-assets-sub">
                                     My Assets
-                                    <span class="material-symbols-outlined text-sm">expand_more</span>
+                                    <span id="my-assets-arrow" class="material-symbols-outlined text-sm transition-transform">expand_more</span>
                                 </button>
+                                <div id="my-assets-sub" class="pl-4 space-y-2 py-2 hidden">
+                                    <button class="tab-link block w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="coupons">My Coupons</button>
+                                </div>
                             </div>
                             
                             <!-- My Orders -->
-                            <div class="group">
-                                <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary text-left tab-link"
-                                        data-tab="dashboard">
+                            <div id="my-orders-group" class="group">
+                                <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left toggle-menu-btn"
+                                        data-target="my-orders-sub">
                                     My Orders
-                                    <span class="material-symbols-outlined text-sm">expand_more</span>
+                                    <span id="my-orders-arrow" class="material-symbols-outlined text-sm transition-transform">expand_more</span>
                                 </button>
+                                <div id="my-orders-sub" class="pl-4 space-y-2 py-2 hidden">
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="all">
+                                        <span class="material-symbols-outlined text-base">inventory</span>
+                                        All Orders
+                                    </button>
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="unpaid">
+                                        <span class="material-symbols-outlined text-base">account_balance_wallet</span>
+                                        Unpaid Orders
+                                    </button>
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="processing">
+                                        <span class="material-symbols-outlined text-base">package_2</span>
+                                        Processing Orders
+                                    </button>
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="shipped">
+                                        <span class="material-symbols-outlined text-base">local_shipping</span>
+                                        Shipped Orders
+                                    </button>
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="review">
+                                        <span class="material-symbols-outlined text-base">rate_review</span>
+                                        Review Orders
+                                    </button>
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="return">
+                                        <span class="material-symbols-outlined text-base">assignment_return</span>
+                                        Return Orders
+                                    </button>
+                                </div>
                             </div>
                             
                             <!-- Other static links -->
-                            <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left">My Favorites</button>
+                             <!-- My Favorites -->
+                             <div id="my-favorites-group" class="group">
+                                 <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left toggle-menu-btn"
+                                         data-target="my-favorites-sub" data-arrow="my-favorites-arrow">
+                                     My Favorites
+                                     <span id="my-favorites-arrow" class="material-symbols-outlined text-sm transition-transform">expand_more</span>
+                                 </button>
+                                 <div id="my-favorites-sub" class="pl-4 space-y-2 py-2 hidden">
+                                     <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="favorites">
+                                         <span class="material-symbols-outlined text-base">favorite</span>
+                                         Wish List
+                                     </button>
+                                     <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="recently-viewed">
+                                         <span class="material-symbols-outlined text-base">schedule</span>
+                                         Recently Viewed
+                                     </button>
+                                 </div>
+                             </div>
                             <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left">Customer Service</button>
                             
                             <div class="h-px bg-outline/10 my-4"></div>
@@ -74,88 +124,295 @@
                     </div>
                 </aside>
 
-                <!-- Middle Content Area -->
-                <div class="lg:col-span-6 space-y-6">
-                    <!-- Tab: Dashboard Overview (Default) -->
-                    <div id="tab-dashboard" class="tab-content space-y-6">
-                        <div class="bg-white p-8 shadow-sm border border-outline/5 relative overflow-hidden">
-                            <div class="flex items-start justify-between relative z-10">
-                                <div class="flex items-center gap-6">
-                                    <div class="w-20 h-20 bg-surface-low rounded-full border-4 border-white shadow-sm flex items-center justify-center overflow-hidden">
-                                        <span class="material-symbols-outlined text-4xl text-outline/40">person</span>
+                <!-- Main Content Area -->
+                <div class="lg:col-span-9 space-y-6">
+                    <!-- Tab: Dashboard Overview -->
+                    <div id="tab-dashboard" class="tab-content space-y-6 animate-in fade-in duration-500">
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                            
+                            <!-- Left Column: Primary Cards -->
+                            <div class="md:col-span-8 space-y-6">
+                                
+                                <!-- Profile & Assets Card -->
+                                <div class="bg-white p-8 shadow-sm border border-outline/5 transition-all hover:shadow-md">
+                                    <div class="flex items-start justify-between mb-10">
+                                        <div class="flex items-center gap-6">
+                                            <div class="w-16 h-16 bg-surface-low rounded-full border-2 border-white shadow-sm flex items-center justify-center overflow-hidden">
+                                                <span class="material-symbols-outlined text-3xl text-outline/40">person</span>
+                                            </div>
+                                            <div>
+                                                <h2 class="text-xl font-black tracking-tighter uppercase flex items-center gap-3">
+                                                    Hi, <span th:text="${username ?: 'User'}">Guest User</span>
+                                                    <span class="bg-surface-low/50 text-[10px] font-black px-2 py-0.5 rounded border border-outline/10 text-on-surface-variant/40 flex items-center gap-1">
+                                                        <span class="material-symbols-outlined text-[12px]">grade</span> S0
+                                                        <span class="material-symbols-outlined text-[10px]">chevron_right</span>
+                                                    </span>
+                                                </h2>
+                                            </div>
+                                        </div>
+                                        <button class="tab-link text-[11px] font-bold text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors" data-tab="profile">
+                                            My Profile <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+                                        </button>
                                     </div>
-                                    <div>
-                                        <h1 class="text-xl font-black tracking-tighter uppercase mb-1">Hi, <span th:text="${username ?: 'User'}">Guest User</span></h1>
-                                        <div class="flex items-center gap-2">
-                                            <span class="bg-secondary/10 text-secondary text-[8px] font-black px-2 py-0.5 uppercase tracking-widest border border-secondary/20 flex items-center gap-1">
-                                                <span class="material-symbols-outlined text-[10px]">grade</span> S0 Member
-                                            </span>
-                                            <button class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary flex items-center gap-1 tab-link" data-tab="profile">My Profile <span class="material-symbols-outlined text-[12px]">chevron_right</span></button>
+
+                                    <!-- Asset Counts -->
+                                    <div class="grid grid-cols-4 gap-8">
+                                        <div class="text-center group cursor-pointer tab-link" data-tab="coupons">
+                                            <p class="text-[18px] font-black tracking-tighter text-black mb-1">***</p>
+                                            <p class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Coupons</p>
+                                        </div>
+                                        <div class="text-center group cursor-pointer">
+                                            <p class="text-[18px] font-black tracking-tighter text-black mb-1">***</p>
+                                            <p class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Points</p>
+                                        </div>
+                                        <div class="text-center group cursor-pointer">
+                                            <p class="text-[18px] font-black tracking-tighter text-black mb-1">***</p>
+                                            <p class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Wallet</p>
+                                        </div>
+                                        <div class="text-center group cursor-pointer flex flex-col items-center">
+                                            <div class="w-8 h-8 flex items-center justify-center mb-1 bg-surface-low/50 rounded group-hover:bg-secondary/10 transition-colors">
+                                                <span class="material-symbols-outlined text-on-surface-variant/80 group-hover:text-secondary">card_membership</span>
+                                            </div>
+                                            <p class="text-[11px] font-medium text-on-surface-variant group-hover:text-secondary transition-colors">Gift Card</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Asset visibility toggle -->
+                                    <div class="mt-4 flex justify-end">
+                                        <span class="material-symbols-outlined text-on-surface-variant/20 cursor-pointer hover:text-primary">visibility_off</span>
+                                    </div>
+                                </div>
+
+                                <!-- My Orders Card -->
+                                <div class="bg-white p-8 shadow-sm border border-outline/5 transition-all hover:shadow-md">
+                                    <div class="flex items-center justify-between mb-10">
+                                        <h3 class="text-sm font-black tracking-widest uppercase">My Orders</h3>
+                                        <button class="tab-link text-[11px] font-bold text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors" data-tab="orders">
+                                            View All <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-5 gap-2 text-center mb-12">
+                                        <div class="group cursor-pointer tab-link" data-tab="orders">
+                                            <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-2">account_balance_wallet</span>
+                                            <span class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Unpaid</span>
+                                        </div>
+                                        <div class="group cursor-pointer tab-link" data-tab="orders">
+                                            <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-2">package_2</span>
+                                            <span class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Processing</span>
+                                        </div>
+                                        <div class="group cursor-pointer tab-link" data-tab="orders">
+                                            <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-2">local_shipping</span>
+                                            <span class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Shipped</span>
+                                        </div>
+                                        <div class="group cursor-pointer tab-link" data-tab="orders">
+                                            <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-2">rate_review</span>
+                                            <span class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Review</span>
+                                        </div>
+                                        <div class="group cursor-pointer tab-link" data-tab="orders">
+                                            <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-2">assignment_return</span>
+                                            <span class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Returns</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Empty State Illustration -->
+                                    <div class="py-12 flex flex-col items-center justify-center opacity-40">
+                                        <div class="mb-4">
+                                            <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M50 20C40 20 35 30 35 30H65C65 30 60 20 50 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                                <path d="M30 40H70V80H30V40Z" stroke="currentColor" stroke-width="2"/>
+                                                <circle cx="50" cy="55" r="5" stroke="currentColor" stroke-width="2"/>
+                                                <path d="M40 70H60" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                                <path d="M80 60 L85 55 M85 65 L80 60" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                                <path d="M15 45 L20 40 M20 50 L15 45" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                            </svg>
+                                        </div>
+                                        <p class="text-[11px] font-medium uppercase tracking-[0.2em]">It is empty here :-(</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Secondary Cards -->
+                            <div class="md:col-span-4 space-y-6">
+                                
+                                <!-- Customer Service Card -->
+                                <div class="bg-white p-8 shadow-sm border border-outline/5 transition-all hover:shadow-md">
+                                    <h3 class="text-sm font-black tracking-widest uppercase mb-10">Customer Service</h3>
+                                    <div class="grid grid-cols-2 gap-8">
+                                        <div class="text-center group cursor-pointer">
+                                            <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-3">mail</span>
+                                            <p class="text-[10px] font-medium text-on-surface-variant uppercase tracking-widest">My Message</p>
+                                        </div>
+                                        <div class="text-center group cursor-pointer">
+                                            <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-3">edit_note</span>
+                                            <p class="text-[10px] font-medium text-on-surface-variant uppercase tracking-widest leading-tight">Service Records</p>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="grid grid-cols-4 gap-4 mt-10 pt-8 border-t border-outline/5">
-                                <div class="text-center group cursor-pointer">
-                                    <p class="text-lg font-black tracking-tight text-primary">0</p>
-                                    <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-secondary transition-colors">Coupons</p>
-                                </div>
-                                <div class="text-center group cursor-pointer">
-                                    <p class="text-lg font-black tracking-tight text-primary">0</p>
-                                    <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-secondary transition-colors">Points</p>
-                                </div>
-                                <div class="text-center group cursor-pointer">
-                                    <p class="text-lg font-black tracking-tight text-primary">0.00</p>
-                                    <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-secondary transition-colors">Wallet</p>
-                                </div>
-                                <div class="text-center group cursor-pointer">
-                                    <div class="flex flex-col items-center">
-                                        <span class="material-symbols-outlined text-on-surface-variant/80 mb-1 group-hover:text-secondary transition-colors">card_membership</span>
-                                        <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-secondary transition-colors">Gift Card</p>
+                                <!-- Wishlist Card -->
+                                <div class="bg-white p-8 shadow-sm border border-outline/5 transition-all hover:shadow-md h-[220px]">
+                                    <div class="flex items-center justify-between mb-8">
+                                        <h3 class="text-sm font-black tracking-widest uppercase">Wishlist</h3>
+                                        <button class="text-[11px] font-bold text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors">
+                                            More <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+                                        </button>
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <div class="w-16 h-20 bg-surface-low/50 rounded overflow-hidden flex items-center justify-center opacity-30 border-2 border-dashed border-outline/10">
+                                            <span class="material-symbols-outlined text-xl">favorite</span>
+                                        </div>
+                                        <div class="w-16 h-20 bg-surface-low/50 rounded overflow-hidden flex items-center justify-center opacity-30 border-2 border-dashed border-outline/10">
+                                            <span class="material-symbols-outlined text-xl">favorite</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <!-- My Orders Section -->
-                        <div class="bg-white p-8 shadow-sm border border-outline/5">
-                            <h2 class="text-sm font-black tracking-widest uppercase mb-10">My Orders</h2>
-                            <div class="grid grid-cols-5 gap-4 text-center">
-                                <div class="group cursor-pointer">
-                                    <div class="w-12 h-12 bg-surface-low rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary/5 transition-colors mx-auto">
-                                        <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-secondary transition-colors">account_balance_wallet</span>
+                                <!-- Simple Activity Rows -->
+                                <div class="space-y-4">
+                                    <div class="bg-white px-8 py-4 shadow-sm border border-outline/5 flex items-center justify-between group hover:border-secondary transition-colors cursor-pointer">
+                                        <span class="text-sm font-black tracking-widest uppercase">Following</span>
+                                        <span class="text-[10px] font-black uppercase text-on-surface-variant group-hover:text-secondary">0 item <span class="material-symbols-outlined text-[14px] align-middle ml-1">chevron_right</span></span>
                                     </div>
-                                    <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant">Unpaid</span>
-                                </div>
-                                <div class="group cursor-pointer">
-                                    <div class="w-12 h-12 bg-surface-low rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary/5 transition-colors mx-auto">
-                                        <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-secondary transition-colors">package_2</span>
+                                    <div class="bg-white px-8 py-4 shadow-sm border border-outline/5 flex items-center justify-between group hover:border-secondary transition-colors cursor-pointer">
+                                        <span class="text-sm font-black tracking-widest uppercase">Recently Viewed</span>
+                                        <span class="text-[10px] font-black uppercase text-on-surface-variant group-hover:text-secondary">More <span class="material-symbols-outlined text-[14px] align-middle ml-1">chevron_right</span></span>
                                     </div>
-                                    <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant">Processing</span>
-                                </div>
-                                <div class="group cursor-pointer">
-                                    <div class="w-12 h-12 bg-surface-low rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary/5 transition-colors mx-auto">
-                                        <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-secondary transition-colors">local_shipping</span>
-                                    </div>
-                                    <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant">Shipped</span>
-                                </div>
-                                <div class="group cursor-pointer">
-                                    <div class="w-12 h-12 bg-surface-low rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary/5 transition-colors mx-auto">
-                                        <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-secondary transition-colors">rate_review</span>
-                                    </div>
-                                    <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant">Review</span>
-                                </div>
-                                <div class="group cursor-pointer">
-                                    <div class="w-12 h-12 bg-surface-low rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary/5 transition-colors mx-auto">
-                                        <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-secondary transition-colors">assignment_return</span>
-                                    </div>
-                                    <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant">Returns</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Tab: My Coupons -->
+                    <div id="tab-coupons" class="tab-content hidden space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div class="text-center py-4">
+                            <h2 class="text-2xl font-black tracking-widest uppercase text-primary">MY COUPONS</h2>
+                        </div>
+                        
+                        <!-- Coupon Tabs -->
+                        <div class="flex items-center justify-center gap-12 border-b border-outline/10 pb-px">
+                            <button class="coupon-subtab relative py-4 text-[11px] font-black uppercase tracking-widest text-primary border-b-2 border-primary">Unused Coupons</button>
+                            <button class="coupon-subtab py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors">Used</button>
+                            <button class="coupon-subtab py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors">Expired Coupons</button>
+                        </div>
+                        
+                        <!-- Filter Pills -->
+                        <div class="flex flex-wrap items-center gap-3">
+                            <button class="px-5 py-1.5 rounded-full border border-primary bg-primary text-white text-[9px] font-black uppercase tracking-widest">All</button>
+                            <button class="px-5 py-1.5 rounded-full border border-outline/10 bg-surface-low text-on-surface-variant text-[9px] font-bold uppercase tracking-widest hover:border-secondary transition-colors">Expiring Soon</button>
+                            <button class="px-5 py-1.5 rounded-full border border-outline/10 bg-surface-low text-on-surface-variant text-[9px] font-bold uppercase tracking-widest hover:border-secondary transition-colors">New</button>
+                            <button class="px-5 py-1.5 rounded-full border border-outline/10 bg-surface-low text-on-surface-variant text-[9px] font-bold uppercase tracking-widest hover:border-secondary transition-colors">Shipping</button>
+                            <button class="px-5 py-1.5 rounded-full border border-outline/10 bg-surface-low text-on-surface-variant text-[9px] font-bold uppercase tracking-widest hover:border-secondary transition-colors">Discount</button>
+                        </div>
+                        
+                        <!-- Exclusive Offers Section -->
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-2 text-amber-500">
+                                <span class="material-symbols-outlined text-lg">star</span>
+                                <h3 class="text-[10px] font-black uppercase tracking-widest">Exclusive offers just for you</h3>
+                            </div>
+                            
+                            <!-- Large Featured Coupon (Special Design) -->
+                            <div class="bg-[#FFF8F6] border border-[#FFE4DE] rounded-sm overflow-hidden flex flex-col group hover:shadow-md transition-shadow">
+                                <div class="flex h-32">
+                                    <div class="w-1/3 bg-white flex flex-col items-center justify-center p-6 border-r border-dashed border-[#FFE4DE] relative">
+                                        <!-- Top/Bottom semi-circles for ticket effect -->
+                                        <div class="absolute -top-3 -right-3 w-6 h-6 bg-white border border-[#FFE4DE] rounded-full"></div>
+                                        <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-white border border-[#FFE4DE] rounded-full"></div>
+                                        
+                                        <div class="text-secondary flex items-baseline gap-1">
+                                            <span class="text-4xl font-black tracking-tighter">67.00</span>
+                                            <span class="text-xs font-black uppercase">%OFF</span>
+                                        </div>
+                                        <p class="text-[9px] font-medium text-on-surface-variant/60 mt-2 uppercase tracking-tight">Orders 236.700đ+</p>
+                                    </div>
+                                    <div class="flex-1 bg-white p-6 relative">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <h4 class="text-base font-black tracking-tight text-primary uppercase mb-1">Sitewide Coupon</h4>
+                                                <div class="flex items-center gap-1 text-on-surface-variant/60">
+                                                    <p class="text-[10px] font-medium">Expires in 07/04/2026 22:59</p>
+                                                    <span class="material-symbols-outlined text-xs">expand_more</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-[#FFFCFB] border-t border-[#FFE4DE] px-6 py-4 flex items-center justify-between">
+                                    <p class="text-[10px] font-medium text-on-surface-variant/80 italic">Get 67.00% OFF after placing an order of 2.600đ</p>
+                                    <button class="bg-black text-white px-8 py-2 text-[10px] font-black uppercase tracking-widest hover:opacity-80 transition-all">Add</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Standard Coupons Section -->
+                        <div class="space-y-6">
+                            <h3 class="text-[11px] font-black uppercase tracking-[0.2em] border-l-4 border-secondary pl-3">My Coupons</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Standard Coupon 1 -->
+                                <div class="bg-[#FFF8F6] border border-[#FFE4DE] rounded-sm overflow-hidden flex group hover:shadow-md transition-shadow relative">
+                                    <div class="w-2/5 bg-white flex flex-col items-center justify-center p-6 border-r border-dashed border-[#FFE4DE] relative">
+                                        <div class="absolute -top-3 -right-3 w-6 h-6 bg-white border border-[#FFE4DE] rounded-full"></div>
+                                        <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-white border border-[#FFE4DE] rounded-full"></div>
+                                        
+                                        <div class="text-secondary flex items-baseline gap-1">
+                                            <span class="text-3xl font-black tracking-tighter">45</span>
+                                            <span class="text-[10px] font-black uppercase">%OFF</span>
+                                        </div>
+                                        <p class="text-[8px] font-medium text-on-surface-variant/60 mt-2 uppercase tracking-tight">Orders 786.500đ+</p>
+                                    </div>
+                                    <div class="flex-1 bg-white p-4 flex flex-col justify-between">
+                                        <div>
+                                            <h4 class="text-xs font-black tracking-tight text-primary uppercase mb-1">Sitewide Coupon</h4>
+                                            <p class="text-[9px] font-black uppercase text-on-surface-variant/60">Capped at <span class="text-secondary">710.200đ</span></p>
+                                            <p class="text-[9px] font-medium text-on-surface-variant/40 italic">For selected products</p>
+                                        </div>
+                                        <div class="flex items-center justify-between mt-4">
+                                            <div class="flex items-center gap-1">
+                                                <span class="text-[9px] font-medium text-on-surface-variant/60 leading-none">Expires in</span>
+                                                <div class="flex items-center gap-0.5 bg-surface-low px-1 py-0.5 rounded text-[9px] font-black text-primary border border-outline/5">
+                                                    <span>10</span>:<span>41</span>:<span>29</span>
+                                                </div>
+                                                <span class="material-symbols-outlined text-[10px] text-on-surface-variant/40">expand_more</span>
+                                            </div>
+                                            <button class="bg-black text-white px-5 py-1.5 text-[9px] font-black uppercase tracking-widest hover:opacity-80 transition-all shadow-sm">Shop</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Standard Coupon 2 -->
+                                <div class="bg-[#FFF8F6] border border-[#FFE4DE] rounded-sm overflow-hidden flex group hover:shadow-md transition-shadow relative">
+                                    <div class="w-2/5 bg-white flex flex-col items-center justify-center p-6 border-r border-dashed border-[#FFE4DE] relative">
+                                        <div class="absolute -top-3 -right-3 w-6 h-6 bg-white border border-[#FFE4DE] rounded-full"></div>
+                                        <div class="absolute -bottom-3 -right-3 w-6 h-6 bg-white border border-[#FFE4DE] rounded-full"></div>
+                                        
+                                        <div class="text-secondary flex items-baseline gap-1">
+                                            <span class="text-3xl font-black tracking-tighter">55</span>
+                                            <span class="text-[10px] font-black uppercase">%OFF</span>
+                                        </div>
+                                        <p class="text-[8px] font-medium text-on-surface-variant/60 mt-2 uppercase tracking-tight">Orders 523.400đ+</p>
+                                    </div>
+                                    <div class="flex-1 bg-white p-4 flex flex-col justify-between">
+                                        <div>
+                                            <h4 class="text-xs font-black tracking-tight text-primary uppercase mb-1">Sitewide Coupon</h4>
+                                            <p class="text-[9px] font-black uppercase text-on-surface-variant/60">Capped at <span class="text-secondary">499.800đ</span></p>
+                                            <p class="text-[9px] font-medium text-on-surface-variant/40 italic">For selected products</p>
+                                        </div>
+                                        <div class="flex items-center justify-between mt-4">
+                                            <div class="flex items-center gap-1">
+                                                <span class="text-[9px] font-medium text-on-surface-variant/60 leading-none">Expires in</span>
+                                                <div class="flex items-center gap-0.5 bg-surface-low px-1 py-0.5 rounded text-[9px] font-black text-primary border border-outline/5">
+                                                    <span>10</span>:<span>41</span>:<span>29</span>
+                                                </div>
+                                                <span class="material-symbols-outlined text-[10px] text-on-surface-variant/40">expand_more</span>
+                                            </div>
+                                            <button class="bg-black text-white px-5 py-1.5 text-[9px] font-black uppercase tracking-widest hover:opacity-80 transition-all shadow-sm">Shop</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Tab: My Profile -->
                     <div id="tab-profile" class="tab-content hidden space-y-6">
                         <div class="bg-white p-10 shadow-sm border border-outline/5 animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -196,7 +453,6 @@
                             <div class="p-6 border border-primary bg-secondary/5 relative">
                                 <span class="absolute top-0 right-0 bg-primary text-white text-[8px] font-black px-3 py-1 uppercase tracking-widest">Default</span>
                                 <div class="space-y-2">
-                                    <p class="text-xs font-black uppercase tracking-tight" th:text="${fullName ?: 'User'}">User</p>
                                     <p class="text-[11px] font-bold text-on-surface-variant leading-relaxed" th:text="${address ?: 'No address added yet'}">Address</p>
                                 </div>
                             </div>
@@ -248,31 +504,253 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Right Sidebar -->
-                <aside class="lg:col-span-3 space-y-6">
-                    <div class="bg-white p-6 shadow-sm border border-outline/5">
-                        <h2 class="text-[11px] font-black tracking-widest uppercase mb-8 pb-4 border-b border-outline/5">Support</h2>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="text-center group cursor-pointer">
-                                <div class="w-10 h-10 bg-surface-low mx-auto flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-all">
-                                    <span class="material-symbols-outlined text-lg">mail</span>
+                    <!-- Tab: My Orders (Detailed) -->
+                    <div id="tab-orders" class="tab-content hidden space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <!-- Top Header -->
+                        <div class="relative flex items-center justify-center py-6">
+                            <h2 class="text-3xl font-black tracking-tighter uppercase">My Orders</h2>
+                        </div>
+
+                        <!-- Orders Sub-navigation -->
+                        <div class="bg-white border-b border-outline/10 px-2 flex items-center justify-between">
+                            <div id="order-subtabs-container" class="flex items-center gap-8 overflow-x-auto no-scrollbar">
+                                <button class="order-subtab py-4 text-[11px] font-black uppercase tracking-widest text-primary border-b-2 border-primary whitespace-nowrap" data-status="all">All orders</button>
+                                <button class="order-subtab py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="unpaid">Unpaid</button>
+                                <button class="order-subtab py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="processing">Processing</button>
+                                <button class="order-subtab py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="shipped">Shipped</button>
+                                <button class="order-subtab py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="review">Review</button>
+                                <div class="order-subtab flex items-center gap-2 group cursor-pointer py-4" data-status="return">
+                                    <span class="text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/60 group-hover:text-primary transition-colors">Returns</span>
+                                    <span class="material-symbols-outlined text-[14px] text-on-surface-variant/40 group-hover:text-primary transition-colors">chevron_right</span>
                                 </div>
-                                <p class="text-[9px] font-bold uppercase tracking-widest">Message</p>
+                                <button class="order-subtab py-4 text-[11px] font-medium uppercase tracking-widest text-on-surface-variant/30 hover:text-primary transition-colors whitespace-nowrap" data-status="deleted">Deleted Orders History</button>
                             </div>
-                            <div class="text-center group cursor-pointer">
-                                <div class="w-10 h-10 bg-surface-low mx-auto flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-all">
-                                    <span class="material-symbols-outlined text-lg">history</span>
+                            <button class="p-4 hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-xl">search</span>
+                            </button>
+                        </div>
+
+                        <!-- Simulated Loading Area -->
+                        <div id="order-loading" class="hidden flex items-center justify-center min-h-[400px]">
+                            <div class="flex gap-2">
+                                <div id="order-dot-1" class="w-2.5 h-2.5 bg-black rounded-full animate-bounce [animation-delay:-0.3s] transition-all duration-300"></div>
+                                <div id="order-dot-2" class="w-2.5 h-2.5 bg-black rounded-full animate-bounce [animation-delay:-0.15s] transition-all duration-300"></div>
+                                <div id="order-dot-3" class="w-2.5 h-2.5 bg-black rounded-full animate-bounce transition-all duration-300"></div>
+                            </div>
+                        </div>
+
+                        <!-- Order Content (with animation trigger) -->
+                        <div id="order-tab-content-area" class="bg-white p-20 shadow-sm border border-outline/5 flex flex-col items-center justify-center min-h-[400px] animate-in fade-in duration-300">
+                            <div class="mb-6 opacity-20 scale-150">
+                                <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M30 20H70V80H30V20Z" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M40 35H60" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M40 45H60" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M40 55H50" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    <circle cx="65" cy="70" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M65 65V70L68 73" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <p class="text-[11px] font-medium text-on-surface-variant/40 uppercase tracking-[0.2em]">It is empty here :-(</p>
+                        </div>
+
+                        <!-- Can't find order footer -->
+                        <div class="space-y-4 pt-8">
+                            <h3 class="text-sm font-black tracking-tight uppercase">Can't find your order?</h3>
+                            <div class="bg-white border border-outline/10 p-4 max-w-sm group cursor-pointer flex items-center justify-between hover:border-primary transition-all">
+                                            <span class="material-symbols-outlined text-on-surface-variant/40 group-hover:text-primary transition-colors">chevron_right</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p class="text-[9px] font-bold uppercase tracking-widest">History</p>
+                                <!-- Tab: My Favorites (Detailed) -->
+                                <div id="tab-favorites" class="tab-content hidden space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                    <!-- Top Header -->
+                                    <div class="flex flex-col items-center justify-center py-8">
+                                        <h2 class="text-3xl font-black tracking-tighter uppercase">My Wishlist</h2>
+                                        <div class="h-1 w-12 bg-secondary mt-2"></div>
+                                    </div>
+
+                                    <!-- Minimalist Filter Bar -->
+                                    <div class="bg-surface-low/50 p-4 flex items-center justify-center gap-4">
+                                        <!-- Category Dropdown -->
+                                        <div class="relative group">
+                                            <button class="bg-white border border-outline/10 px-4 py-2 flex items-center gap-4 text-[11px] font-black uppercase tracking-widest hover:border-primary transition-all">
+                                                <span id="wishlist-category-label">Category</span>
+                                                <span class="material-symbols-outlined text-sm">expand_more</span>
+                                            </button>
+                                            <!-- Dropdown Content -->
+                                            <div class="absolute left-0 top-full w-48 pt-2 z-50 hidden group-hover:block animate-in fade-in slide-in-from-top-2 duration-200">
+                                                <div class="bg-white shadow-xl border border-outline/5 p-2 space-y-1">
+                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
+                                                            data-filter-type="category" data-filter-value="all">
+                                                        <span class="w-2.5 h-2.5 rounded-full border-2 border-outline/20 group-hover/opt:border-secondary transition-colors"></span>
+                                                        All Categories
+                                                    </button>
+                                                    <th:block th:each="cat : ${wishlistCategories}">
+                                                        <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
+                                                                data-filter-type="category" th:data-filter-value="${cat}">
+                                                            <span class="w-2.5 h-2.5 rounded-full border-2 border-outline/20 group-hover/opt:border-secondary transition-colors"></span>
+                                                            <span th:text="${cat}">Category Name</span>
+                                                        </button>
+                                                    </th:block>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Status Dropdown -->
+                                        <div class="relative group">
+                                            <button class="bg-white border border-outline/10 px-4 py-2 flex items-center gap-4 text-[11px] font-black uppercase tracking-widest hover:border-primary transition-all">
+                                                <span id="wishlist-status-label">Status</span>
+                                                <span class="material-symbols-outlined text-sm">expand_more</span>
+                                            </button>
+                                            <!-- Dropdown Content -->
+                                            <div class="absolute left-0 top-full w-48 pt-2 z-50 hidden group-hover:block animate-in fade-in slide-in-from-top-2 duration-200">
+                                                <div class="bg-white shadow-xl border border-outline/5 p-2 space-y-1">
+                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
+                                                            data-filter-type="status" data-filter-value="all">
+                                                        <span class="w-3 h-3 rounded-full border-2 border-outline/20 group-hover/opt:border-secondary transition-colors"></span>
+                                                        All Status
+                                                    </button>
+                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
+                                                            data-filter-type="status" data-filter-value="in-stock">
+                                                        <span class="w-3 h-3 rounded-full border-2 border-outline/20 group-hover/opt:border-secondary transition-colors"></span>
+                                                        In Stock
+                                                    </button>
+                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
+                                                            data-filter-type="status" data-filter-value="out-of-stock">
+                                                        <span class="w-3 h-3 rounded-full border-2 border-outline/20 group-hover/opt:border-secondary transition-colors"></span>
+                                                        Out of Stock
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Empty State Illustration -->
+                                    <div th:if="${#lists.isEmpty(wishlist)}" class="bg-white p-20 shadow-sm border border-outline/5 flex flex-col items-center justify-center min-h-[400px]">
+                                        <div class="mb-6 opacity-20 scale-150">
+                                            <span class="material-symbols-outlined text-6xl">favorite</span>
+                                        </div>
+                                        <p class="text-[11px] font-medium text-on-surface-variant/40 uppercase tracking-[0.2em]">It is empty here :-(</p>
+                                    </div>
+
+                                    <!-- Wishlist Content Area -->
+                                    <div th:if="${!#lists.isEmpty(wishlist)}" id="wishlist-content-area" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-in fade-in duration-500">
+                                        <!-- Dynamic Wishlist Cards -->
+                                        <div th:each="item : ${wishlist}" class="wishlist-item group cursor-pointer" 
+                                             th:data-category="${item.categoryName}" 
+                                             th:data-status="${item.inStock ? 'in-stock' : 'out-of-stock'}">
+                                            <div class="relative aspect-[3/4] overflow-hidden bg-surface-low mb-4">
+                                                <img th:src="${item.primaryImageUrl != null ? item.primaryImageUrl : 'https://placehold.co/600x800?text=No+Image'}" 
+                                                     th:alt="${item.productName}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                                
+                                                <!-- Out of Stock Overlay -->
+                                                <div th:if="${!item.inStock}" class="absolute inset-0 bg-white/40 backdrop-blur-[2px] flex items-center justify-center">
+                                                    <span class="bg-black text-white px-4 py-1.5 text-[10px] font-black uppercase tracking-widest">Out of Stock</span>
+                                                </div>
+
+                                                <!-- Social Proof Tag -->
+                                                <div class="absolute top-2 right-2 bg-white/80 backdrop-blur-md px-2 py-1 flex items-center gap-1.5 shadow-sm">
+                                                    <span class="text-[9px] font-black tracking-tighter">36.2k</span>
+                                                    <span class="material-symbols-outlined text-[12px] text-secondary fill-[1]">favorite</span>
+                                                </div>
+                                                <!-- Quick Add Action -->
+                                                <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-black/60 to-transparent">
+                                                    <button th:if="${item.inStock}" class="w-full py-2 bg-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-secondary hover:text-white transition-colors">Add to Cart</button>
+                                                    <button th:if="${!item.inStock}" class="w-full py-2 bg-black/20 text-white/40 cursor-not-allowed text-[10px] font-black uppercase tracking-[0.2em]">Add to Cart</button>
+                                                </div>
+                                            </div>
+                                            <div class="space-y-1">
+                                                <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/40" th:text="${item.categoryName}">Category</p>
+                                                <h3 class="text-xs font-black uppercase tracking-tight truncate" th:text="${item.productName}">Product Name</h3>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-xs font-black" th:text="${#numbers.formatCurrency(item.productPrice)}">$0.00</span>
+                                                    <span th:if="${!item.inStock}" class="text-[9px] text-secondary font-black uppercase tracking-tighter">Temporarily unavailable</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab: Recently Viewed -->
+                                <div id="tab-recently-viewed" class="tab-content hidden space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                    <!-- Top Header -->
+                                    <div class="flex flex-col items-center justify-center py-8">
+                                        <h2 class="text-3xl font-black tracking-tighter uppercase">Recently Viewed</h2>
+                                        <div class="h-1 w-12 bg-secondary mt-2"></div>
+                                    </div>
+
+                                    <!-- Action Bar -->
+                                    <div th:if="${!#lists.isEmpty(recentlyViewed)}" class="flex justify-end pr-4">
+                                        <button class="text-[11px] font-bold text-on-surface-variant/60 hover:text-primary transition-colors flex items-center gap-2">
+                                            Select
+                                        </button>
+                                    </div>
+
+                                    <!-- Empty State Illustration (Matches Provided Design) -->
+                                    <div th:if="${#lists.isEmpty(recentlyViewed)}" class="py-24 flex flex-col items-center justify-center min-h-[450px]">
+                                        <!-- Illustration Icon -->
+                                        <div class="mb-8 opacity-20 relative">
+                                            <span class="material-symbols-outlined text-[80px] font-light">history_edu</span>
+                                            <div class="absolute -bottom-2 -right-2 bg-white rounded-full p-1">
+                                                <span class="material-symbols-outlined text-2xl font-light">schedule</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Message -->
+                                        <p class="text-sm font-medium text-on-surface-variant/40 mb-10 tracking-wide text-center">
+                                            You have not viewed anything.
+                                        </p>
+                                        
+                                        <!-- Action Button -->
+                                        <a href="/category" 
+                                           class="inline-flex items-center justify-center bg-black text-white px-12 py-4 text-[13px] font-bold tracking-[0.1em] hover:bg-neutral-800 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95">
+                                            Go Shopping
+                                        </a>
+                                    </div>
+
+                                    <!-- Product Grid -->
+                                    <div th:if="${!#lists.isEmpty(recentlyViewed)}" class="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10">
+                                        <div th:each="item : ${recentlyViewed}" class="group cursor-pointer">
+                                            <!-- Image Section -->
+                                            <div class="relative aspect-[3/4] overflow-hidden bg-surface-low mb-3">
+                                                <img th:src="${item.imageUrl}" th:alt="${item.productName}" 
+                                                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                                                
+                                                <!-- Brand Label -->
+                                                <span class="absolute top-4 left-4 text-sm font-medium text-on-surface/40" th:text="${item.brandName}">Dazy</span>
+
+                                                <!-- Discount Badge -->
+                                                <div class="absolute bottom-4 left-4 bg-red-50 text-red-500 px-1.5 py-0.5 text-[10px] font-black">
+                                                    -<span th:text="${item.discountPercent}">0</span>%
+                                                </div>
+                                            </div>
+
+                                            <!-- Info Section -->
+                                            <div class="space-y-1">
+                                                <h3 class="text-[11px] font-medium text-on-surface line-clamp-1 group-hover:text-secondary transition-colors" th:text="${item.productName}">Product Name</h3>
+                                                
+                                                <div class="flex items-end justify-between">
+                                                    <div>
+                                                        <div class="flex items-center gap-2">
+                                                            <span class="text-sm font-black text-secondary" th:text="${#numbers.formatDecimal(item.productPrice, 0, 'COMMA', 0, 'POINT') + 'đ'}">107.100đ</span>
+                                                        </div>
+                                                        <p class="text-[10px] text-on-surface-variant/40">Estimated</p>
+                                                    </div>
+                                                    
+                                                    <!-- Add to Cart Icon -->
+                                                    <button class="w-8 h-8 rounded-full border border-outline/10 flex items-center justify-center hover:bg-secondary hover:text-white transition-all">
+                                                        <span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </aside>
-            </div>
-        </div>
-    </div>
 
     <th:block layout:fragment="script">
         <script th:src="@{/js/pages/personal-center.js}"></script>

@@ -29,16 +29,22 @@ public class WishlistServiceImpl implements WishlistService {
 
         // Danh sách mục yêu thích trống -> trả về list rỗng, Controller/View sẽ hiển thị thông báo
         return items.stream()
-                .map(item -> WishlistItemResponseDTO.builder()
-                        .wishlistItemId(item.getId())
-                        .productId(item.getProduct().getId())
-                        .productName(item.getProduct().getName())
-                        .productPrice(
-                                item.getProduct().getVariants().isEmpty()
-                                        ? 0.0
-                                        : item.getProduct().getVariants().get(0).getPrice()
-                        )
-                        .build())
+                .map((WishlistItem item) -> {
+                    Product product = item.getProduct();
+                    return WishlistItemResponseDTO.builder()
+                            .wishlistItemId(item.getId())
+                            .productId(product.getId())
+                            .productName(product.getName())
+                            .productPrice(
+                                    product.getVariants().isEmpty()
+                                            ? 0.0
+                                            : product.getVariants().get(0).getPrice()
+                            )
+                            .categoryName(product.getCategory() != null ? product.getCategory().getName() : "Uncategorized")
+                            .inStock(product.getStatus() == org.example.fashionstoresystem.entity.enums.ProductStatus.ACTIVE)
+                            .primaryImageUrl(!product.getImages().isEmpty() ? product.getImages().get(0).getUrl() : null)
+                            .build();
+                })
                 .toList();
     }
 

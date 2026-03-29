@@ -6,15 +6,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class WishlistItemResponseDTO {
-    private Long wishlistItemId;
-    private Long productId;
+public class RecentlyViewedResponseDTO {
+    private Long id;
     private String productName;
     private Double productPrice;
-    private String primaryImageUrl;
-    private String categoryName;
-    private Boolean inStock;
+    private Double originalPrice;
+    private Integer discountPercent;
+    private String brandName;
+    private String imageUrl;
+    private boolean inStock;
 }
