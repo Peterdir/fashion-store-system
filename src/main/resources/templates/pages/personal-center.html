@@ -3,247 +3,279 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout}">
 <head>
-    <title>Personal Center | H&Y Digital Curator</title>
+    <title>Personal Center - H&Y</title>
 </head>
 <body>
-    <main layout:fragment="content" class="bg-[#f9f9f9] min-h-screen py-8 px-4 md:px-8 max-w-[1440px] mx-auto">
-        <!-- Breadcrumb -->
-        <nav class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60 mb-8">
-            <a th:href="@{/}" class="hover:text-primary transition-colors">Home</a>
-            <span class="material-symbols-outlined text-[12px]">chevron_right</span>
-            <span class="text-primary">Personal Center</span>
-        </nav>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Left Sidebar Navigation -->
-            <aside class="lg:col-span-3 space-y-4">
-                <div class="bg-white p-6 shadow-sm border border-outline/5">
-                    <h2 class="text-lg font-black tracking-tighter uppercase mb-6 border-b border-outline/10 pb-4">Personal Center</h2>
-                    
-                    <nav class="space-y-1">
-                        <!-- My Account -->
-                        <div class="group">
-                            <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left">
-                                My Account
-                                <span class="material-symbols-outlined text-sm group-hover:rotate-180 transition-transform">expand_more</span>
-                            </button>
-                        </div>
-                        
-                        <!-- My Assets -->
-                        <div class="group">
-                            <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left">
-                                My Assets
-                                <span class="material-symbols-outlined text-sm">expand_more</span>
-                            </button>
-                        </div>
-                        
-                        <!-- My Orders -->
-                        <div class="group">
-                            <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] text-secondary text-left">
-                                My Orders
-                                <span class="material-symbols-outlined text-sm">expand_more</span>
-                            </button>
-                            <div class="pl-4 space-y-2 py-2">
-                                <a href="#" class="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary">All Orders</a>
-                                <a href="#" class="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary">Returns</a>
-                            </div>
-                        </div>
-                        
-                        <!-- My Favorites -->
-                        <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left">
-                            My Favorites
-                            <span class="material-symbols-outlined text-sm">expand_more</span>
-                        </button>
-                        
-                        <!-- Customer Service -->
-                        <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left">
-                            Customer Service
-                            <span class="material-symbols-outlined text-sm">expand_more</span>
-                        </button>
-                        
-                        <!-- Other Services -->
-                        <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left">
-                            Other Services
-                            <span class="material-symbols-outlined text-sm">expand_more</span>
-                        </button>
-                        
-                        <!-- Policy -->
-                        <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left">
-                            Policy
-                            <span class="material-symbols-outlined text-sm">expand_more</span>
-                        </button>
-                        
-                        <div class="h-px bg-outline/10 my-4"></div>
-                        
-                        <!-- Sign Out -->
-                        <a th:href="@{/logout}" class="flex items-center gap-2 py-3 text-[11px] font-black uppercase tracking-[0.15em] text-red-500 hover:text-red-700 transition-colors">
-                            <span class="material-symbols-outlined text-lg">logout</span>
-                            Sign Out
-                        </a>
-                    </nav>
+    <div layout:fragment="content">
+        <!-- Hero/Breadcrumb Section -->
+        <div class="bg-surface-low border-b border-outline/5 py-4">
+            <div class="max-w-[1440px] mx-auto px-6 lg:px-12">
+                <div class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60">
+                    <a th:href="@{/}" class="hover:text-primary transition-colors">Home</a>
+                    <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+                    <span class="text-primary">Personal Center</span>
                 </div>
-            </aside>
+            </div>
+        </div>
 
-            <!-- Middle Content Area -->
-            <div class="lg:col-span-6 space-y-6">
-                <!-- Profile Header Card -->
-                <div class="bg-white p-8 shadow-sm border border-outline/5 relative overflow-hidden">
-                    <div class="flex items-start justify-between relative z-10">
-                        <div class="flex items-center gap-6">
-                            <div class="w-20 h-20 bg-surface-low rounded-full border-4 border-white shadow-sm flex items-center justify-center overflow-hidden">
-                                <span class="material-symbols-outlined text-4xl text-outline/40">person</span>
+        <div class="max-w-[1440px] mx-auto px-6 lg:px-12 py-12">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                
+                <!-- Left Sidebar Navigation -->
+                <aside class="lg:col-span-3 space-y-8">
+                    <div class="bg-white p-6 shadow-sm border border-outline/5">
+                        <h2 class="text-xs font-black tracking-[0.2em] uppercase mb-8 pb-4 border-b border-outline/10 text-primary">Navigation</h2>
+                        
+                        <nav class="space-y-1">
+                            <!-- My Account -->
+                            <div id="my-account-group" class="group">
+                                <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] text-secondary transition-colors text-left toggle-menu-btn"
+                                        data-target="my-account-sub">
+                                    My Account
+                                    <span id="my-account-arrow" class="material-symbols-outlined text-sm transition-transform rotate-180">expand_more</span>
+                                </button>
+                                <div id="my-account-sub" class="pl-4 space-y-2 py-2">
+                                    <button class="tab-link block w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="profile">My Profile</button>
+                                    <button class="tab-link block w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="address">Address Book</button>
+                                    <button class="tab-link block w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="payment">My Payment Options</button>
+                                    <button class="tab-link block w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="manage">Manage My Account</button>
+                                </div>
                             </div>
-                            <div>
-                                <h1 class="text-xl font-black tracking-tighter uppercase mb-1">Hi, <span th:text="${username ?: 'User'}">lamkhanhduy123kg</span></h1>
-                                <div class="flex items-center gap-2">
-                                    <span class="bg-secondary/10 text-secondary text-[8px] font-black px-2 py-0.5 uppercase tracking-widest border border-secondary/20 flex items-center gap-1">
-                                        <span class="material-symbols-outlined text-[10px]">grade</span> S0 Member
-                                    </span>
-                                    <a href="#" class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary flex items-center gap-1">My Profile <span class="material-symbols-outlined text-[12px]">chevron_right</span></a>
+                            
+                            <!-- My Assets -->
+                            <div class="group">
+                                <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left">
+                                    My Assets
+                                    <span class="material-symbols-outlined text-sm">expand_more</span>
+                                </button>
+                            </div>
+                            
+                            <!-- My Orders -->
+                            <div class="group">
+                                <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary text-left tab-link"
+                                        data-tab="dashboard">
+                                    My Orders
+                                    <span class="material-symbols-outlined text-sm">expand_more</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Other static links -->
+                            <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left">My Favorites</button>
+                            <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left">Customer Service</button>
+                            
+                            <div class="h-px bg-outline/10 my-4"></div>
+                            
+                            <!-- Sign Out -->
+                            <a th:href="@{/logout}" class="flex items-center gap-2 py-3 text-[11px] font-black uppercase tracking-[0.15em] text-red-500 hover:text-red-700 transition-colors">
+                                <span class="material-symbols-outlined text-lg">logout</span>
+                                Sign Out
+                            </a>
+                        </nav>
+                    </div>
+                </aside>
+
+                <!-- Middle Content Area -->
+                <div class="lg:col-span-6 space-y-6">
+                    <!-- Tab: Dashboard Overview (Default) -->
+                    <div id="tab-dashboard" class="tab-content space-y-6">
+                        <div class="bg-white p-8 shadow-sm border border-outline/5 relative overflow-hidden">
+                            <div class="flex items-start justify-between relative z-10">
+                                <div class="flex items-center gap-6">
+                                    <div class="w-20 h-20 bg-surface-low rounded-full border-4 border-white shadow-sm flex items-center justify-center overflow-hidden">
+                                        <span class="material-symbols-outlined text-4xl text-outline/40">person</span>
+                                    </div>
+                                    <div>
+                                        <h1 class="text-xl font-black tracking-tighter uppercase mb-1">Hi, <span th:text="${username ?: 'User'}">Guest User</span></h1>
+                                        <div class="flex items-center gap-2">
+                                            <span class="bg-secondary/10 text-secondary text-[8px] font-black px-2 py-0.5 uppercase tracking-widest border border-secondary/20 flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-[10px]">grade</span> S0 Member
+                                            </span>
+                                            <button class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary flex items-center gap-1 tab-link" data-tab="profile">My Profile <span class="material-symbols-outlined text-[12px]">chevron_right</span></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-4 gap-4 mt-10 pt-8 border-t border-outline/5">
+                                <div class="text-center group cursor-pointer">
+                                    <p class="text-lg font-black tracking-tight text-primary">0</p>
+                                    <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-secondary transition-colors">Coupons</p>
+                                </div>
+                                <div class="text-center group cursor-pointer">
+                                    <p class="text-lg font-black tracking-tight text-primary">0</p>
+                                    <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-secondary transition-colors">Points</p>
+                                </div>
+                                <div class="text-center group cursor-pointer">
+                                    <p class="text-lg font-black tracking-tight text-primary">0.00</p>
+                                    <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-secondary transition-colors">Wallet</p>
+                                </div>
+                                <div class="text-center group cursor-pointer">
+                                    <div class="flex flex-col items-center">
+                                        <span class="material-symbols-outlined text-on-surface-variant/80 mb-1 group-hover:text-secondary transition-colors">card_membership</span>
+                                        <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-secondary transition-colors">Gift Card</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <button class="material-symbols-outlined text-on-surface-variant/40 hover:text-primary transition-colors">visibility_off</button>
-                    </div>
 
-                    <!-- Mini Stats Grid -->
-                    <div class="grid grid-cols-4 gap-4 mt-10 pt-8 border-t border-outline/5">
-                        <div class="text-center group cursor-pointer">
-                            <p class="text-lg font-black tracking-tight text-primary">***</p>
-                            <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-secondary transition-colors">Coupons</p>
-                        </div>
-                        <div class="text-center group cursor-pointer">
-                            <p class="text-lg font-black tracking-tight text-primary">***</p>
-                            <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-secondary transition-colors">Points</p>
-                        </div>
-                        <div class="text-center group cursor-pointer">
-                            <p class="text-lg font-black tracking-tight text-primary">***</p>
-                            <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-secondary transition-colors">Wallet</p>
-                        </div>
-                        <div class="text-center group cursor-pointer">
-                            <div class="flex flex-col items-center">
-                                <span class="material-symbols-outlined text-on-surface-variant/80 mb-1 group-hover:text-secondary transition-colors">card_membership</span>
-                                <p class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-secondary transition-colors">Gift Card</p>
+                        <!-- My Orders Section -->
+                        <div class="bg-white p-8 shadow-sm border border-outline/5">
+                            <h2 class="text-sm font-black tracking-widest uppercase mb-10">My Orders</h2>
+                            <div class="grid grid-cols-5 gap-4 text-center">
+                                <div class="group cursor-pointer">
+                                    <div class="w-12 h-12 bg-surface-low rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary/5 transition-colors mx-auto">
+                                        <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-secondary transition-colors">account_balance_wallet</span>
+                                    </div>
+                                    <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant">Unpaid</span>
+                                </div>
+                                <div class="group cursor-pointer">
+                                    <div class="w-12 h-12 bg-surface-low rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary/5 transition-colors mx-auto">
+                                        <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-secondary transition-colors">package_2</span>
+                                    </div>
+                                    <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant">Processing</span>
+                                </div>
+                                <div class="group cursor-pointer">
+                                    <div class="w-12 h-12 bg-surface-low rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary/5 transition-colors mx-auto">
+                                        <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-secondary transition-colors">local_shipping</span>
+                                    </div>
+                                    <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant">Shipped</span>
+                                </div>
+                                <div class="group cursor-pointer">
+                                    <div class="w-12 h-12 bg-surface-low rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary/5 transition-colors mx-auto">
+                                        <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-secondary transition-colors">rate_review</span>
+                                    </div>
+                                    <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant">Review</span>
+                                </div>
+                                <div class="group cursor-pointer">
+                                    <div class="w-12 h-12 bg-surface-low rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary/5 transition-colors mx-auto">
+                                        <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-secondary transition-colors">assignment_return</span>
+                                    </div>
+                                    <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant">Returns</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Notification Banner -->
-                    <div class="mt-6 bg-amber-50 border border-amber-100 p-4 flex items-center justify-between group">
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-amber-600 text-lg">notification_important</span>
-                            <span class="text-[10px] font-bold text-amber-800 uppercase tracking-widest">You have 4 coupon(s) that will expire!</span>
+                    <!-- Tab: My Profile -->
+                    <div id="tab-profile" class="tab-content hidden space-y-6">
+                        <div class="bg-white p-10 shadow-sm border border-outline/5 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            <h2 class="text-xl font-black tracking-tighter uppercase mb-10 pb-6 border-b border-outline/10">Personal Information</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                <div class="space-y-6">
+                                    <div class="space-y-1">
+                                        <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant/60">Full Name</label>
+                                        <p class="text-sm font-bold uppercase tracking-tight" th:text="${fullName ?: 'Not Set'}">Full Name</p>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant/60">Email Address</label>
+                                        <p class="text-sm font-bold" th:text="${email ?: 'Not Set'}">Email</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-6">
+                                    <div class="space-y-1">
+                                        <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant/60">Phone Number</label>
+                                        <p class="text-sm font-bold" th:text="${phone ?: 'Not Set'}">Phone</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-12">
+                                <button class="bg-primary text-white px-10 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-90 transition-all">Edit Profile</button>
+                            </div>
                         </div>
-                        <button class="material-symbols-outlined text-[14px] text-amber-400 hover:text-amber-600 opacity-0 group-hover:opacity-100 transition-opacity">close</button>
+                    </div>
+
+                    <!-- Tab: Address Book -->
+                    <div id="tab-address" class="tab-content hidden space-y-6">
+                        <div class="bg-white p-10 shadow-sm border border-outline/5 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            <div class="flex items-center justify-between mb-10 pb-6 border-b border-outline/10">
+                                <h2 class="text-xl font-black tracking-tighter uppercase">Address Book</h2>
+                                <button class="bg-primary text-white px-6 py-2.5 text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-all flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-sm">add</span> Add New
+                                </button>
+                            </div>
+                            <div class="p-6 border border-primary bg-secondary/5 relative">
+                                <span class="absolute top-0 right-0 bg-primary text-white text-[8px] font-black px-3 py-1 uppercase tracking-widest">Default</span>
+                                <div class="space-y-2">
+                                    <p class="text-xs font-black uppercase tracking-tight" th:text="${fullName ?: 'User'}">User</p>
+                                    <p class="text-[11px] font-bold text-on-surface-variant leading-relaxed" th:text="${address ?: 'No address added yet'}">Address</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Payment Options -->
+                    <div id="tab-payment" class="tab-content hidden space-y-6">
+                        <div class="bg-white p-10 shadow-sm border border-outline/5 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            <h2 class="text-xl font-black tracking-tighter uppercase mb-10 pb-6 border-b border-outline/10">Payment Methods</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <button class="p-8 border-2 border-dashed border-outline/20 hover:border-secondary/30 hover:bg-secondary/5 transition-all flex flex-col items-center justify-center gap-4 group aspect-video">
+                                    <span class="material-symbols-outlined text-4xl text-outline/40 group-hover:text-secondary transition-all">add_circle</span>
+                                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant/40 group-hover:text-secondary">Add New Method</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Manage My Account -->
+                    <div id="tab-manage" class="tab-content hidden space-y-6">
+                        <div class="bg-white p-10 shadow-sm border border-outline/5 animate-in fade-in slide-in-from-bottom-2 duration-500 text-center">
+                            <h2 class="text-2xl font-black tracking-tighter uppercase mb-12">MANAGE MY ACCOUNT</h2>
+                            <div class="space-y-4 max-w-[600px] mx-auto text-left">
+                                <div class="p-8 bg-surface-low/30 border border-outline/5 flex items-center justify-between">
+                                    <div class="space-y-2">
+                                        <h3 class="text-[11px] font-black uppercase tracking-widest">Email Address</h3>
+                                        <p class="text-sm font-bold text-on-surface-variant/60" th:text="${email ?: 'Not Set'}">Email</p>
+                                    </div>
+                                    <button class="border border-primary px-8 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Change</button>
+                                </div>
+                                <div class="p-8 bg-surface-low/30 border border-outline/5 flex items-center justify-between">
+                                    <div class="space-y-2">
+                                        <h3 class="text-[11px] font-black uppercase tracking-widest">2-Step Verification</h3>
+                                        <p class="text-[10px] font-bold text-on-surface-variant/60">Extra layer of security via email</p>
+                                    </div>
+                                    <div class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" th:checked="${twoFactorEnabled}" class="sr-only peer">
+                                        <div class="w-12 h-6 bg-outline/20 rounded-full peer-checked:bg-secondary transition-colors relative after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-white after:rounded-full after:h-[18px] after:w-[18px] after:transition-all peer-checked:after:translate-x-6"></div>
+                                    </div>
+                                </div>
+                                <div class="p-8 bg-red-50/30 border border-red-100 flex items-center justify-between group cursor-pointer">
+                                    <div class="space-y-2">
+                                        <h3 class="text-[11px] font-black uppercase tracking-widest text-red-600">Delete Account</h3>
+                                        <p class="text-[9px] font-bold text-red-400 uppercase tracking-widest">Account will not be recoverable</p>
+                                    </div>
+                                    <span class="material-symbols-outlined text-red-300 group-hover:text-red-600 transition-all">chevron_right</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- My Orders Card -->
-                <div class="bg-white p-8 shadow-sm border border-outline/5">
-                    <div class="flex items-center justify-between mb-10">
-                        <h2 class="text-sm font-black tracking-widest uppercase">My Orders</h2>
-                        <a href="#" class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant/60 hover:text-secondary transition-colors flex items-center gap-1">View All <span class="material-symbols-outlined text-[12px]">chevron_right</span></a>
-                    </div>
-
-                    <div class="grid grid-cols-5 gap-4">
-                        <div class="flex flex-col items-center group cursor-pointer">
-                            <div class="w-12 h-12 bg-surface-low rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary/5 transition-colors relative">
-                                <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-secondary transition-colors">account_balance_wallet</span>
+                <!-- Right Sidebar -->
+                <aside class="lg:col-span-3 space-y-6">
+                    <div class="bg-white p-6 shadow-sm border border-outline/5">
+                        <h2 class="text-[11px] font-black tracking-widest uppercase mb-8 pb-4 border-b border-outline/5">Support</h2>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center group cursor-pointer">
+                                <div class="w-10 h-10 bg-surface-low mx-auto flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-all">
+                                    <span class="material-symbols-outlined text-lg">mail</span>
+                                </div>
+                                <p class="text-[9px] font-bold uppercase tracking-widest">Message</p>
                             </div>
-                            <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-primary">Unpaid</span>
-                        </div>
-                        <div class="flex flex-col items-center group cursor-pointer">
-                            <div class="w-12 h-12 bg-surface-low rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary/5 transition-colors">
-                                <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-secondary transition-colors">package_2</span>
+                            <div class="text-center group cursor-pointer">
+                                <div class="w-10 h-10 bg-surface-low mx-auto flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-all">
+                                    <span class="material-symbols-outlined text-lg">history</span>
+                                </div>
+                                <p class="text-[9px] font-bold uppercase tracking-widest">History</p>
                             </div>
-                            <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-primary">Processing</span>
-                        </div>
-                        <div class="flex flex-col items-center group cursor-pointer">
-                            <div class="w-12 h-12 bg-surface-low rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary/5 transition-colors">
-                                <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-secondary transition-colors">local_shipping</span>
-                            </div>
-                            <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-primary">Shipped</span>
-                        </div>
-                        <div class="flex flex-col items-center group cursor-pointer">
-                            <div class="w-12 h-12 bg-surface-low rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary/5 transition-colors">
-                                <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-secondary transition-colors">rate_review</span>
-                            </div>
-                            <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-primary">Review</span>
-                        </div>
-                        <div class="flex flex-col items-center group cursor-pointer">
-                            <div class="w-12 h-12 bg-surface-low rounded-xl flex items-center justify-center mb-3 group-hover:bg-secondary/5 transition-colors">
-                                <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-secondary transition-colors">assignment_return</span>
-                            </div>
-                            <span class="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant group-hover:text-primary">Returns</span>
                         </div>
                     </div>
-
-                    <!-- Empty State Placeholder -->
-                    <div class="mt-12 py-16 border-t border-dashed border-outline/20 text-center opacity-40">
-                        <span class="material-symbols-outlined text-5xl mb-4">inventory_2</span>
-                        <p class="text-[10px] font-bold uppercase tracking-[0.2em]">No order history found</p>
-                    </div>
-                </div>
+                </aside>
             </div>
-
-            <!-- Right Column Sidebar -->
-            <aside class="lg:col-span-3 space-y-6">
-                <!-- Customer Service -->
-                <div class="bg-white p-6 shadow-sm border border-outline/5">
-                    <h2 class="text-[11px] font-black tracking-widest uppercase mb-8">Customer Service</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="text-center group cursor-pointer">
-                            <div class="w-10 h-10 bg-surface-low mx-auto flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-all">
-                                <span class="material-symbols-outlined text-lg">mail</span>
-                            </div>
-                            <p class="text-[9px] font-bold uppercase tracking-widest">My Message</p>
-                        </div>
-                        <div class="text-center group cursor-pointer">
-                            <div class="w-10 h-10 bg-surface-low mx-auto flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-all">
-                                <span class="material-symbols-outlined text-lg">history</span>
-                            </div>
-                            <p class="text-[9px] font-bold uppercase tracking-widest">Records</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Wishlist Teaser -->
-                <div class="bg-white p-6 shadow-sm border border-outline/5">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-[11px] font-black tracking-widest uppercase">Wishlist</h2>
-                        <a href="#" class="text-[8px] font-bold uppercase tracking-widest hover:text-secondary transition-colors">More ></a>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="aspect-[3/4] bg-surface-low overflow-hidden relative group cursor-pointer">
-                            <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                            <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        </div>
-                        <div class="aspect-[3/4] bg-surface-low overflow-hidden relative group cursor-pointer">
-                            <img src="https://images.unsplash.com/photo-1529139513402-e20997969a24?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                            <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stats Summary -->
-                <div class="space-y-4">
-                    <a href="#" class="bg-white p-5 shadow-sm border border-outline/5 flex items-center justify-between group hover:border-primary transition-colors">
-                        <span class="text-[10px] font-black uppercase tracking-widest">Following</span>
-                        <div class="flex items-center gap-1">
-                            <span class="text-[10px] font-bold text-on-surface-variant">0 item</span>
-                            <span class="material-symbols-outlined text-sm text-on-surface-variant/40 group-hover:translate-x-1 transition-transform">chevron_right</span>
-                        </div>
-                    </a>
-                    <a href="#" class="bg-white p-5 shadow-sm border border-outline/5 flex items-center justify-between group hover:border-primary transition-colors">
-                        <span class="text-[10px] font-black uppercase tracking-widest">Recently Viewed</span>
-                        <div class="flex items-center gap-1">
-                            <span class="text-[10px] font-bold text-on-surface-variant">More</span>
-                            <span class="material-symbols-outlined text-sm text-on-surface-variant/40 group-hover:translate-x-1 transition-transform">chevron_right</span>
-                        </div>
-                    </a>
-                </div>
-            </aside>
         </div>
-    </main>
+    </div>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/pages/personal-center.js}"></script>
+    </th:block>
 </body>
 </html>

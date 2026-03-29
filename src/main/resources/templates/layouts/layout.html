@@ -93,5 +93,7 @@
     <div th:replace="~{fragments/footer :: footer}"></div>
 
     <script th:src="@{/js/main.js}"></script>
+    <!-- Page specific scripts -->
+    <th:block layout:fragment="script"></th:block>
 </body>
 </html>

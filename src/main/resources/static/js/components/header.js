@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const megaMenu = document.getElementById('mega-menu');
     const menuGrid = document.getElementById('mega-menu-products-grid');
     const menuTitle = document.getElementById('mega-menu-title');
+    const headerElement = document.querySelector('header');
+    let closeTimer;
     const productCache = {};
     const subcategoryCache = {};
 
@@ -188,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = link.getAttribute('data-id');
             const name = link.getAttribute('data-name') || link.textContent.trim();
             
-            if (megaMenu) megaMenu.classList.remove('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
+            openMenu();
             
             if (name !== 'Categories') {
                 // Đồng bộ sidebar active state
@@ -218,13 +220,56 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Close logic
-    document.addEventListener('mousemove', (e) => {
-        const header = document.querySelector('header');
-        if (header && megaMenu && !header.contains(e.target) && !megaMenu.contains(e.target)) {
-            megaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
+    // ==================== CLOSE LOGIC ====================
+    const navBottomBar = document.getElementById('nav-bottom-bar');
+    const topHeader = headerElement ? headerElement.querySelector('div:first-child') : null;
+
+    const openMenu = () => {
+        if (closeTimer) clearTimeout(closeTimer);
+        if (megaMenu) {
+            megaMenu.classList.remove('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
         }
-    });
+    };
+
+    const closeMenu = () => {
+        closeTimer = setTimeout(() => {
+            if (megaMenu) {
+                megaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
+            }
+        }, 100); // Small delay for better UX
+    };
+
+    // Global Header leave -> Close all
+    if (headerElement) {
+        headerElement.addEventListener('mouseleave', closeMenu);
+    }
+
+    // Hover Nav Bar triggers or keep open
+    if (navBottomBar) {
+        navBottomBar.addEventListener('mouseenter', openMenu);
+        navBottomBar.addEventListener('mouseleave', (e) => {
+            // Only close if NOT moving into the Mega Menu
+            if (megaMenu && !megaMenu.contains(e.relatedTarget)) {
+                closeMenu();
+            }
+        });
+    }
+
+    // Explicitly close when moving UP to Top Header
+    if (topHeader) {
+        topHeader.addEventListener('mouseenter', closeMenu);
+    }
+
+    // Keep menu open when hovering inside the mega menu itself
+    if (megaMenu) {
+        megaMenu.addEventListener('mouseenter', openMenu);
+        megaMenu.addEventListener('mouseleave', (e) => {
+            // Only close if NOT moving back up to the Nav Bar
+            if (navBottomBar && !navBottomBar.contains(e.relatedTarget)) {
+                closeMenu();
+            }
+        });
+    }
 
     // Initial state
     if (megaMenu) {
