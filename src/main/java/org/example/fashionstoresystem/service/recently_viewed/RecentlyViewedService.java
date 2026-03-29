@@ -9,4 +9,5 @@ public interface RecentlyViewedService {
     void trackView(String userEmail, Long productId);
     List<RecentlyViewedResponseDTO> getRecentlyViewed(Long userId);
     void clearHistory(Long userId);
+    void deleteItems(Long userId, List<Long> productIds);
 }

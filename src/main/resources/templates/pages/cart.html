@@ -43,79 +43,21 @@
 
                 <!-- Cart Items List -->
                 <div class="bg-surface-container-lowest border border-outline/5">
-                    <!-- Empty State -->
-                    <div th:if="${#lists.isEmpty(cartItems)}" class="py-24 text-center">
-                        <span class="material-symbols-outlined text-6xl text-outline/30 mb-6">shopping_bag</span>
-                        <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-8">Giỏ hàng của bạn đang trống</p>
-                        <a th:href="@{/category}" class="inline-block bg-primary text-white px-12 py-4 text-xs font-black uppercase tracking-[0.2em] hover:opacity-90 transition-opacity">Tiếp tục mua sắm</a>
+                    <!-- CSS Loader (Hidden by default, shown during JS load if needed) -->
+                    <div id="cart-loading" class="hidden py-24 text-center">
+                        <div class="inline-block w-8 h-8 border-4 border-outline/20 border-t-primary rounded-full animate-spin"></div>
                     </div>
 
-                    <!-- Items Loop -->
-                    <div th:unless="${#lists.isEmpty(cartItems)}">
-                        <div th:each="item : ${cartItems}" class="p-8 border-b border-outline/5 last:border-0 group/item">
-                            <!-- Shop Name (Optional/Mock) -->
-                            <div class="flex items-center gap-2 mb-6 opacity-60">
-                                <span class="material-symbols-outlined text-sm">storefront</span>
-                                <span class="text-[10px] font-bold uppercase tracking-widest">Dazy Official</span>
-                            </div>
+                    <!-- Empty State -->
+                    <div id="cart-empty-state" class="py-24 text-center">
+                        <span class="material-symbols-outlined text-6xl text-outline/30 mb-6">shopping_bag</span>
+                        <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-8">Giỏ hàng của bạn đang trống</p>
+                        <a th:href="@{/category}" class="inline-block bg-primary text-white px-12 py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-90 transition-opacity no-radius shadow-lg shadow-primary/20 hover:-translate-y-0.5">Tiếp tục mua sắm</a>
+                    </div>
 
-                            <div class="flex flex-col md:flex-row gap-8">
-                                <!-- Checkbox & Image -->
-                                <div class="flex gap-6">
-                                    <div class="flex items-start pt-2">
-                                        <input type="checkbox" checked class="item-checkbox w-4 h-4 border border-outline text-primary focus:ring-0 no-radius cursor-pointer"/>
-                                    </div>
-                                    <div class="w-32 h-44 bg-surface-low overflow-hidden shrink-0 border border-outline/5 relative group-hover/item:border-primary/20 transition-colors">
-                                        <img th:src="${item.primaryImageUrl}" th:alt="${item.productName}" class="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-700">
-                                        <!-- Sale Tag -->
-                                        <div th:if="${item.discount > 0}" class="absolute top-0 left-0 bg-secondary text-white text-[9px] font-black px-2 py-1 uppercase" th:text="'-' + ${item.discount} + '%'">-20%</div>
-                                    </div>
-                                </div>
-
-                                <!-- Details -->
-                                <div class="flex-grow flex flex-col justify-between py-1">
-                                    <div class="space-y-4">
-                                        <div class="flex justify-between items-start gap-4">
-                                            <h3 class="text-sm font-black leading-snug tracking-tight uppercase" th:text="${item.productName}">Product Name</h3>
-                                            <div class="flex gap-4 text-on-surface-variant">
-                                                <button class="hover:text-primary transition-colors"><span class="material-symbols-outlined text-xl">favorite</span></button>
-                                                <button class="hover:text-secondary transition-colors delete-item"><span class="material-symbols-outlined text-xl">delete</span></button>
-                                            </div>
-                                        </div>
-                                        <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-[0.1em]" th:text="'SKU: ' + ${item.sku}">SKU: 000000</p>
-                                        
-                                        <!-- Variant Selectors -->
-                                        <div class="flex gap-3 pt-2">
-                                            <div class="border border-outline/10 px-4 py-2 text-[9px] font-black uppercase tracking-widest flex items-center gap-2 cursor-pointer bg-white hover:border-primary transition-colors">
-                                                MÀU: <span th:text="${item.color}">TRẮNG</span> <span class="material-symbols-outlined text-sm">expand_more</span>
-                                            </div>
-                                            <div class="border border-outline/10 px-4 py-2 text-[9px] font-black uppercase tracking-widest flex items-center gap-2 cursor-pointer bg-white hover:border-primary transition-colors">
-                                                CỠ: <span th:text="${item.size}">M</span> <span class="material-symbols-outlined text-sm">expand_more</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Price & Quantity -->
-                                    <div class="flex justify-between items-end mt-8">
-                                        <div class="space-y-1">
-                                            <span class="text-[11px] text-on-surface-variant line-through opacity-50" th:if="${item.oldPrice > 0}" th:text="${#numbers.formatDecimal(item.oldPrice, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
-                                            <div class="text-xl font-black text-secondary tracking-tighter" th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</div>
-                                        </div>
-                                        
-                                        <!-- Quantity Selector -->
-                                        <div class="flex items-center border border-outline/20 bg-white">
-                                            <button class="qty-btn minus px-3 py-2 hover:bg-surface-low transition-colors disabled:opacity-20">
-                                                <span class="material-symbols-outlined text-sm font-bold">remove</span>
-                                            </button>
-                                            <span class="qty-val px-5 py-2 text-xs font-black border-x border-outline/20 min-w-[48px] text-center" th:text="${item.quantity}">1</span>
-                                            <button class="qty-btn plus px-3 py-2 hover:bg-surface-low transition-colors">
-                                                <span class="material-symbols-outlined text-sm font-bold">add</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Items Container (Populated by JS) -->
+                    <div id="cart-items-container" class="hidden">
+                        <!-- JS Will inject cart items here -->
                     </div>
                 </div>
 
@@ -141,40 +83,37 @@
             <div class="lg:col-span-4">
                 <div class="sticky top-24 space-y-8">
                     <!-- Order Summary Card -->
-                    <div class="bg-surface-container-lowest p-10 border border-outline/5 shadow-[40px_40px_40px_4%_rgba(26,28,28,0.02)]">
+                    <div id="order-summary-card" class="bg-surface-container-lowest p-10 border border-outline/5 shadow-[40px_40px_40px_4%_rgba(26,28,28,0.02)] hidden">
                         <h2 class="font-black text-2xl tracking-tighter uppercase mb-10 pb-6 border-b border-outline/10">Tóm tắt đơn hàng</h2>
                         
                         <!-- Mini Selection Display -->
                         <div class="flex items-center gap-6 mb-10 opacity-60">
-                            <div class="flex -space-x-4">
-                                <div th:each="item, stat : ${cartItems}" th:if="${stat.index < 3}" class="w-10 h-14 bg-surface-low border border-white overflow-hidden shrink-0">
-                                    <img th:src="${item.primaryImageUrl}" class="w-full h-full object-cover">
-                                </div>
+                            <div id="cart-summary-images" class="flex -space-x-4">
+                                <!-- JS Populated -->
                             </div>
-                            <span class="text-[10px] font-black uppercase tracking-widest" th:text="${totalItems ?: 0} + ' Sản phẩm đã chọn'">0 Sản phẩm đã chọn</span>
+                            <span id="cart-summary-count" class="text-[10px] font-black uppercase tracking-widest">0 Sản phẩm đã chọn</span>
                         </div>
 
                         <div class="space-y-5 mb-10">
                             <div class="flex justify-between text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
                                 <span>Giá bán lẻ</span>
-                                <span class="text-primary" th:text="${#numbers.formatDecimal(subtotal ?: 0, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
+                                <span id="cart-summary-subtotal" class="text-primary">0₫</span>
                             </div>
                             <div class="flex justify-between text-[11px] font-bold uppercase tracking-widest">
                                 <span class="text-on-surface-variant">Giá dự kiến</span>
-                                <span class="text-secondary text-xl font-black tracking-tighter" th:text="${#numbers.formatDecimal(grandTotal ?: 0, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</span>
+                                <span id="cart-summary-grandtotal" class="text-secondary text-xl font-black tracking-tighter">0₫</span>
                             </div>
                             <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest pt-6 border-t border-dashed border-outline/20">
                                 <span class="text-on-surface-variant">Tiết kiệm</span>
-                                <span class="text-secondary" th:text="'-' + ${#numbers.formatDecimal(discount ?: 0, 0, 'COMMA', 0, 'POINT')} + '₫'">-0₫</span>
+                                <span id="cart-summary-discount" class="text-secondary">-0₫</span>
                             </div>
                             <div class="flex justify-between text-[9px] font-black uppercase tracking-widest bg-surface-low p-3 mt-4">
                                 <span class="text-on-surface-variant">Điểm thưởng</span>
-                                <span class="text-primary" th:text="'+' + ${#numbers.formatDecimal((grandTotal ?: 0) / 1000, 0, 'COMMA', 0, 'POINT')} + ' pts'">+0 pts</span>
+                                <span id="cart-summary-points" class="text-primary">+0 pts</span>
                             </div>
                         </div>
 
-                        <button class="w-full bg-primary text-white font-black py-5 uppercase tracking-[0.3em] text-xs hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-20 disabled:pointer-events-none" 
-                                th:disabled="${#lists.isEmpty(cartItems)}">
+                        <button id="cart-checkout-btn" class="w-full bg-primary text-white font-black py-5 uppercase tracking-[0.3em] text-xs hover:opacity-90 transition-all active:scale-[0.98] shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-0.5 no-radius">
                             Thanh toán ngay
                         </button>
                         
@@ -209,5 +148,9 @@
             </div>
         </div>
     </main>
+
+    <th:block layout:fragment="scripts">
+        <script th:src="@{/js/pages/cart-page.js}"></script>
+    </th:block>
 </body>
 </html>

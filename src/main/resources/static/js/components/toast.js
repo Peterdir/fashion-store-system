@@ -24,30 +24,34 @@ const Toast = (() => {
     };
 
     const COLORS = {
-        success: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-800', icon: 'text-emerald-500', bar: 'bg-emerald-500' },
-        error:   { bg: 'bg-red-50',     border: 'border-red-200',     text: 'text-red-800',     icon: 'text-red-500',     bar: 'bg-red-500' },
-        warning: { bg: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-800',   icon: 'text-amber-500',   bar: 'bg-amber-500' },
-        info:    { bg: 'bg-blue-50',    border: 'border-blue-200',    text: 'text-blue-800',    icon: 'text-blue-500',    bar: 'bg-blue-500' }
+        success: { bg: 'bg-white', border: 'border-transparent', text: 'text-[#1a1c1c]', icon: 'text-[#58b76c]', bar: 'bg-[#58b76c]' },
+        error:   { bg: 'bg-white', border: 'border-transparent', text: 'text-[#1a1c1c]', icon: 'text-red-500', bar: 'bg-red-500' },
+        warning: { bg: 'bg-white', border: 'border-transparent', text: 'text-[#1a1c1c]', icon: 'text-amber-500', bar: 'bg-amber-500' },
+        info:    { bg: 'bg-white', border: 'border-transparent', text: 'text-[#1a1c1c]', icon: 'text-blue-500', bar: 'bg-blue-500' }
     };
 
-    function show(message, type = 'info', duration = 4000) {
+    /**
+     * Show a toast notification
+     */
+    function show(message, type = 'info', duration = 3000) {
         const c = COLORS[type] || COLORS.info;
         const icon = ICONS[type] || ICONS.info;
         const wrapper = getContainer();
 
         const toast = document.createElement('div');
-        toast.className = `pointer-events-auto min-w-[320px] max-w-[420px] ${c.bg} border ${c.border} shadow-lg overflow-hidden transform translate-x-full opacity-0 transition-all duration-500 ease-out`;
+        // Shadow and animation to match screenshot feel
+        toast.className = `pointer-events-auto min-w-[260px] max-w-[400px] ${c.bg} shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-outline/5 rounded-sm overflow-hidden transform translate-y-4 opacity-0 transition-all duration-500 ease-out relative`;
         toast.innerHTML = `
-            <div class="flex items-start gap-3 px-5 py-4">
-                <span class="material-symbols-outlined ${c.icon} text-xl flex-shrink-0 mt-0.5">${icon}</span>
+            <div class="flex items-center gap-4 px-6 py-5">
+                <span class="material-symbols-outlined ${c.icon} text-[36px] flex-shrink-0" style="font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48">${icon}</span>
                 <div class="flex-grow">
-                    <p class="${c.text} text-[11px] font-bold uppercase tracking-[0.1em] leading-relaxed">${message}</p>
+                    <p class="${c.text} text-[16px] font-medium tracking-tight">${message}</p>
                 </div>
-                <button class="toast-close flex-shrink-0 ${c.text} opacity-40 hover:opacity-100 transition-opacity">
-                    <span class="material-symbols-outlined text-base">close</span>
+                <button class="toast-close ml-2 text-on-surface-variant/20 hover:text-on-surface-variant transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">close</span>
                 </button>
             </div>
-            <div class="h-[3px] ${c.bar} toast-progress" style="width: 100%; transition: width ${duration}ms linear;"></div>
+            <div class="absolute bottom-0 left-0 h-[2px] ${c.bar} toast-progress" style="width: 100%; transition: width ${duration}ms linear;"></div>
         `;
 
         wrapper.appendChild(toast);
@@ -57,8 +61,8 @@ const Toast = (() => {
 
         // Animate in
         requestAnimationFrame(() => {
-            toast.classList.remove('translate-x-full', 'opacity-0');
-            toast.classList.add('translate-x-0', 'opacity-100');
+            toast.classList.remove('translate-y-4', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
         });
 
         // Progress bar
@@ -72,7 +76,8 @@ const Toast = (() => {
     }
 
     function removeToast(toast) {
-        toast.classList.add('translate-x-full', 'opacity-0');
+        toast.classList.add('translate-y-4', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
         setTimeout(() => {
             if (toast.parentNode) toast.parentNode.removeChild(toast);
         }, 500);

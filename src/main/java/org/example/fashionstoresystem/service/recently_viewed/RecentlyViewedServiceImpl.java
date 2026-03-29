@@ -62,6 +62,12 @@ public class RecentlyViewedServiceImpl implements RecentlyViewedService {
     }
 
     @Override
+    @Transactional
+    public void deleteItems(Long userId, List<Long> productIds) {
+        recentlyViewedItemRepository.deleteByUserIdAndProductIdIn(userId, productIds);
+    }
+
+    @Override
     public List<RecentlyViewedResponseDTO> getRecentlyViewed(Long userId) {
         List<RecentlyViewedItem> items = recentlyViewedItemRepository.findTop10ByUserIdOrderByViewedAtDesc(userId);
 
