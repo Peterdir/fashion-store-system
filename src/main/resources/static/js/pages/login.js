@@ -13,12 +13,25 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleIcon.textContent = type === 'password' ? 'visibility' : 'visibility_off';
     });
 
+    // --- REMEMBER ME AUTO-FILL ---
+    const REMEMBER_KEY = 'hy_remembered_email';
+    const emailInput = document.getElementById('email');
+    const rememberMeCheckbox = document.getElementById('rememberMe');
+    
+    // Load remembered email on startup
+    const savedEmail = localStorage.getItem(REMEMBER_KEY);
+    if (savedEmail && emailInput && rememberMeCheckbox) {
+        emailInput.value = savedEmail;
+        rememberMeCheckbox.checked = true;
+    }
+
     // Form submission
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const email = document.getElementById('email').value.trim();
         const password = passwordInput.value;
+        const rememberMe = document.getElementById('rememberMe').checked;
 
         // Client-side validation
         if (!email || !password) {
@@ -33,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/auth/cookie/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email, password, rememberMe })
             });
 
             const data = await response.json();
@@ -46,6 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     email: data.email,
                     role: data.role
                 });
+
+                // Xử lý Remember Me: Lưu hoặc xóa email đã nhớ
+                if (rememberMe) {
+                    localStorage.setItem(REMEMBER_KEY, email);
+                } else {
+                    localStorage.removeItem(REMEMBER_KEY);
+                }
 
                 Toast.success(`Welcome back, ${data.fullName}!`);
 

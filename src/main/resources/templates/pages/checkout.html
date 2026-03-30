@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>Thanh toán | H&Y Digital Curator</title>
+    <style>
+        .payment-option.selected {
+            border-color: var(--md-sys-color-primary);
+            background: rgba(var(--md-sys-color-primary-rgb), 0.02);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+        }
+        .payment-option {
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .payment-option:hover:not(.selected) {
+            transform: translateY(-2px);
+            border-color: rgba(var(--md-sys-color-primary-rgb), 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(var(--md-sys-color-outline-rgb), 0.1);
+            border-radius: 10px;
+        }
+        .confirm-btn-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .confirm-btn-shine::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+        @keyframes shine {
+            0% { left: -150%; }
+            100% { left: 150%; }
+        }
+    </style>
+</head>
+<body>
+    <main layout:fragment="content" class="pt-12 pb-24 px-4 md:px-8 max-w-[1440px] mx-auto min-h-screen">
+        <!-- Progress Stepper -->
+        <div class="flex items-center justify-center gap-4 mb-12 text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase text-on-surface-variant">
+            <span class="opacity-40">Giỏ hàng</span>
+            <span class="material-symbols-outlined text-[16px] opacity-20">chevron_right</span>
+            <span class="text-primary border-b-2 border-primary pb-1">Đặt hàng</span>
+            <span class="material-symbols-outlined text-[16px] opacity-20">chevron_right</span>
+            <span class="opacity-40">Thanh toán</span>
+            <span class="material-symbols-outlined text-[16px] opacity-20">chevron_right</span>
+            <span class="opacity-40">Hoàn tất</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <!-- Left: Checkout Form -->
+            <div class="lg:col-span-8 space-y-10">
+                <!-- Section: Shipping Address -->
+                <section class="bg-surface-container-lowest p-8 md:p-12 border border-outline/5 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex items-center gap-4 mb-10 border-b border-outline/10 pb-6">
+                        <span class="w-10 h-10 bg-primary text-white flex items-center justify-center font-black text-sm no-radius">01</span>
+                        <h2 class="font-black text-2xl tracking-tighter uppercase">Địa chỉ giao hàng</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase tracking-widest opacity-40">Họ và tên</label>
+                            <input type="text" id="checkout-fullname" class="w-full bg-surface-low border border-outline/10 p-4 text-sm font-bold focus:border-primary outline-none transition-all no-radius" placeholder="VD: Nguyễn Văn A">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase tracking-widest opacity-40">Số điện thoại</label>
+                            <input type="tel" id="checkout-phone" class="w-full bg-surface-low border border-outline/10 p-4 text-sm font-bold focus:border-primary outline-none transition-all no-radius" placeholder="0xxx xxx xxx">
+                        </div>
+                        <div class="md:col-span-2 space-y-2">
+                            <label class="text-[10px] font-black uppercase tracking-widest opacity-40">Địa chỉ cụ thể</label>
+                            <textarea id="checkout-address" rows="3" class="w-full bg-surface-low border border-outline/10 p-4 text-sm font-bold focus:border-primary outline-none transition-all no-radius resize-none" placeholder="Số nhà, tên đường, Phường/Xã, Quận/Huyện, Tỉnh/Thành phố..."></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section: Payment Method -->
+                <section class="bg-surface-container-lowest p-8 md:p-12 border border-outline/5 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex items-center gap-4 mb-10 border-b border-outline/10 pb-6">
+                        <span class="w-10 h-10 bg-primary text-white flex items-center justify-center font-black text-sm no-radius">02</span>
+                        <h2 class="font-black text-2xl tracking-tighter uppercase">Phương thức thanh toán</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="payment-methods">
+                        <!-- MoMo -->
+                        <div class="payment-option group cursor-pointer border-2 border-outline/10 p-6 flex items-center gap-6 transition-all hover:border-primary/50 relative overflow-hidden" data-method="MOMO">
+                            <div class="w-16 h-16 bg-white shrink-0 flex items-center justify-center p-2 rounded-xl shadow-sm border border-outline/5">
+                                <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo" class="w-full h-full object-contain">
+                            </div>
+                            <div class="flex-grow">
+                                <h4 class="font-black text-sm uppercase tracking-tight">Ví điện tử MoMo</h4>
+                                <p class="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-1">Thanh toán trực tuyến nhanh chóng</p>
+                            </div>
+                            <div class="radio-indicator absolute top-4 right-4 w-5 h-5 border-2 border-outline/20 rounded-full flex items-center justify-center transition-all group-[.selected]:border-primary group-[.selected]:bg-primary">
+                                <div class="w-2 h-2 bg-white rounded-full opacity-0 group-[.selected]:opacity-100"></div>
+                            </div>
+                        </div>
+
+                        <!-- COD -->
+                        <div class="payment-option group cursor-pointer border-2 border-outline/10 p-6 flex items-center gap-6 transition-all hover:border-primary/50 relative overflow-hidden" data-method="COD">
+                            <div class="w-16 h-16 bg-white shrink-0 flex items-center justify-center p-2 rounded-xl shadow-sm border border-outline/5">
+                                <span class="material-symbols-outlined text-3xl text-primary">local_shipping</span>
+                            </div>
+                            <div class="flex-grow">
+                                <h4 class="font-black text-sm uppercase tracking-tight">Thanh toán khi nhận hàng</h4>
+                                <p class="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-1">Giao hàng và thu tiền tận nơi (COD)</p>
+                            </div>
+                            <div class="radio-indicator absolute top-4 right-4 w-5 h-5 border-2 border-outline/20 rounded-full flex items-center justify-center transition-all group-[.selected]:border-primary group-[.selected]:bg-primary">
+                                <div class="w-2 h-2 bg-white rounded-full opacity-0 group-[.selected]:opacity-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right: Order Summary -->
+            <div class="lg:col-span-4">
+                <div class="sticky top-24 space-y-8">
+                    <div class="bg-surface-container-lowest p-10 border border-outline/5 shadow-[40px_40px_40px_4%_rgba(26,28,28,0.02)]">
+                        <h2 class="font-black text-2xl tracking-tighter uppercase mb-10 pb-6 border-b border-outline/10">Tóm tắt đơn hàng</h2>
+                        
+                        <!-- Mini Selection Display -->
+                        <div id="checkout-items-list" class="space-y-6 mb-10 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                            <!-- JS Populated -->
+                        </div>
+
+                        <div class="space-y-5 mb-10 border-t border-outline/10 pt-10">
+                            <div class="flex justify-between text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
+                                <span>Tạm tính</span>
+                                <span id="checkout-subtotal" class="text-primary font-black">0₫</span>
+                            </div>
+                            <div class="flex justify-between text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
+                                <span>Phí vận chuyển</span>
+                                <span class="text-emerald-600 font-bold">MIỄN PHÍ</span>
+                            </div>
+                            <div id="checkout-coupon-row" class="hidden flex justify-between text-[11px] font-bold uppercase tracking-widest text-secondary">
+                                <span>Giảm giá</span>
+                                <span id="checkout-discount">-0₫</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-end pt-6 border-t border-dashed border-outline/20">
+                                <span class="text-[11px] font-black uppercase tracking-widest text-on-surface-variant">Tổng cộng</span>
+                                <span id="checkout-grandtotal" class="text-secondary text-3xl font-black tracking-tighter">0₫</span>
+                            </div>
+                        </div>
+
+                        <button id="place-order-btn" class="w-full bg-primary text-white font-black py-5 uppercase tracking-[0.3em] text-xs hover:opacity-90 transition-all active:scale-[0.98] shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-0.5 no-radius disabled:opacity-50 disabled:cursor-not-allowed confirm-btn-shine">
+                            Xác nhận đặt hàng
+                        </button>
+                    </div>
+
+                    <div class="p-8 border border-outline/10 bg-surface-low flex items-start gap-4">
+                        <span class="material-symbols-outlined text-primary text-xl">shield</span>
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-black uppercase tracking-widest">Giao dịch bảo mật</p>
+                            <p class="text-[9px] font-bold opacity-40 uppercase tracking-widest leading-relaxed">Dữ liệu cá nhân của bạn sẽ được sử dụng để hỗ trợ trải nghiệm của bạn trên trang web này.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <th:block layout:fragment="scripts">
+        <script th:src="@{/js/pages/checkout.js}"></script>
+    </th:block>
+</body>
+</html>

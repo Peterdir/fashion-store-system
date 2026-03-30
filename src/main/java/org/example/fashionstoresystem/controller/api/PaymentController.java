@@ -1,30 +1,46 @@
 package org.example.fashionstoresystem.controller.api;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.fashionstoresystem.dto.request.ProcessPaymentRequestDTO;
-import org.example.fashionstoresystem.dto.response.PaymentResponseDTO;
 import org.example.fashionstoresystem.service.payment.PaymentService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/payments")
+@RequestMapping("/api/payment")
 @RequiredArgsConstructor
 public class PaymentController {
 
     private final PaymentService paymentService;
 
-    // XỬ LÝ THANH TOÁN
-    @PostMapping("/process")
-    public ResponseEntity<PaymentResponseDTO> processPayment(
-            @Valid @RequestBody ProcessPaymentRequestDTO dto
-    ) {
-        PaymentResponseDTO response = paymentService.processPayment(dto);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    /**
+     * MoMo IPN (Instant Payment Notification)
+     * Server-to-Server callback
+     */
+    @PostMapping("/momo/ipn")
+    public ResponseEntity<?> momoIPN(@RequestBody Map<String, Object> payload) {
+        try {
+            paymentService.processMomoIPN(payload);
+        } catch (Exception e) {
+            // Log lỗi nhưng trả về No Content để MoMo không retry vô hạn nếu lỗi logic
+            System.err.println("Lỗi IPN MoMo: " + e.getMessage());
+        }
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * MoMo Return URL
+     * Redirect từ trình duyệt người dùng sau khi thanh toán
+     */
+    @GetMapping("/momo/return")
+    public ResponseEntity<?> momoReturn(@RequestParam Map<String, String> allParams) {
+        String status = paymentService.processMomoReturn(allParams);
+        String orderId = allParams.get("orderId");
+
+        // Redirect người dùng về trang thông báo trên Frontend
+        String redirectUrl = "/personal-center?orderId=" + orderId + "&paymentStatus=" + status;
+        
+        return ResponseEntity.status(302).header("Location", redirectUrl).build();
     }
 }

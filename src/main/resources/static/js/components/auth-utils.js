@@ -47,10 +47,19 @@ const AuthUtils = (() => {
                 // Thêm tên user vào đầu dropdown
                 const existingGreeting = dropdownMenu.querySelector('.auth-greeting');
                 if (!existingGreeting) {
+                    const formatName = (name) => {
+                        if (!name) return 'User';
+                        return name.split(/\s+/).map(word => {
+                            if (!word) return "";
+                            return word.charAt(0).toUpperCase() + word.substring(1).toLowerCase();
+                        }).join(' ');
+                    };
+                    const displayName = formatName(user.fullName);
+
                     const greeting = document.createElement('div');
                     greeting.className = 'auth-greeting px-6 py-3 border-b border-outline/5';
                     greeting.innerHTML = `
-                        <p class="text-[10px] font-black uppercase tracking-[0.15em] text-on-surface truncate">Hi, ${user.fullName || 'User'}</p>
+                        <p class="text-[10px] font-black tracking-[0.15em] text-on-surface truncate">Hi, ${displayName}</p>
                         <p class="text-[8px] font-medium text-on-surface-variant/60 mt-0.5 truncate">${user.email || ''}</p>
                     `;
                     dropdownMenu.insertBefore(greeting, dropdownMenu.firstChild.nextSibling);

@@ -24,6 +24,7 @@ import org.example.fashionstoresystem.repository.OrderHistoryRepository;
 import org.example.fashionstoresystem.repository.OrderItemRepository;
 import org.example.fashionstoresystem.repository.OrderRepository;
 import org.example.fashionstoresystem.repository.ProductVariantRepository;
+import org.example.fashionstoresystem.service.payment.MomoService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +48,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderHistoryRepository orderHistoryRepository;
     private final CartItemRepository cartItemRepository;
     private final CouponRepository couponRepository;
+    private final MomoService momoService;
 
     // ĐẶT HÀNG
 
@@ -105,6 +107,10 @@ public class OrderServiceImpl implements OrderService {
         order = orderRepository.save(order);
 
         // 5. Khởi tạo OrderItem (mỗi item có status riêng) và Trừ Kho
+        OrderStatus initialStatus = (dto.getPaymentMethod() == PaymentMethod.COD) 
+                ? OrderStatus.PENDING_CONFIRMATION 
+                : OrderStatus.PENDING_PAYMENT;
+
         for (CartItem item : cartItems) {
             ProductVariant variant = item.getProductVariant();
 
@@ -113,7 +119,7 @@ public class OrderServiceImpl implements OrderService {
                     .productVariant(variant)
                     .quantity((long) item.getQuantity())
                     .productName(variant.getProduct().getName())
-                    .status(OrderStatus.PENDING_PAYMENT) // Trạng thái ban đầu ở item
+                    .status(initialStatus)
                     .build();
             orderItemRepository.save(orderItem);
 
@@ -124,12 +130,21 @@ public class OrderServiceImpl implements OrderService {
         // 6. Xóa các mục này khỏi giỏ hàng
         cartItemRepository.deleteAll(cartItems);
 
-        // 7. Trả về kết quả
+        // 7. Xử lý Thanh toán trực tuyến (MoMo)
+        String paymentUrl = null;
+        if (order.getPaymentMethod() == PaymentMethod.MOMO) {
+            paymentUrl = momoService.createPaymentUrl(order.getId(), order.getTotalAmount());
+        }
+
+        // 8. Trả về kết quả
         return PlaceOrderResponseDTO.builder()
                 .orderId(order.getId())
                 .totalAmount(order.getTotalAmount())
-                .status(OrderStatus.PENDING_PAYMENT) // Tất cả item cùng status lúc đặt
-                .message("Đặt hàng thành công! Đang chuyển hướng sang trang thanh toán...")
+                .status(initialStatus)
+                .paymentUrl(paymentUrl)
+                .message(order.getPaymentMethod() == PaymentMethod.MOMO 
+                    ? "Đang chuyển hướng sang trang thanh toán MoMo..." 
+                    : "Đặt hàng thành công! Đơn hàng của bạn đang chờ xác nhận.")
                 .build();
     }
 

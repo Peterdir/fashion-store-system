@@ -15,4 +15,5 @@ public class PlaceOrderResponseDTO {
     private Double totalAmount;
     private OrderStatus status;
     private String message;
+    private String paymentUrl;
 }

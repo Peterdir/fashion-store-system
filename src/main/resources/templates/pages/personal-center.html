@@ -115,10 +115,10 @@
                             <div class="h-px bg-outline/10 my-4"></div>
                             
                             <!-- Sign Out -->
-                            <a th:href="@{/logout}" class="flex items-center gap-2 py-3 text-[11px] font-black uppercase tracking-[0.15em] text-red-500 hover:text-red-700 transition-colors">
-                                <span class="material-symbols-outlined text-lg">logout</span>
-                                Sign Out
-                            </a>
+                             <a th:href="@{/logout}" class="flex items-center gap-2 py-3 text-[11px] font-black uppercase tracking-[0.15em] text-red-500 hover:text-red-700 transition-colors">
+                                 <span class="material-symbols-outlined text-lg">logout</span>
+                                 Sign Out
+                             </a>
                         </nav>
                     </div>
                 </aside>
@@ -137,11 +137,11 @@
                                     <div class="flex items-start justify-between mb-10">
                                         <div class="flex items-center gap-6">
                                             <div>
-                                                <h2 id="pc-dashboard-name-container" class="text-xl font-black tracking-tighter flex items-center gap-3 select-none normal-case">
-                                                    Hi, <span class="font-bold tracking-tight">Guest User</span>
-                                                    <span class="bg-surface-low/50 text-[10px] font-black px-2 py-0.5 rounded border border-outline/10 text-on-surface-variant/40 flex items-center gap-1">
-                                                        <span class="material-symbols-outlined text-[12px]">grade</span> S0
-                                                        <span class="material-symbols-outlined text-[10px]">chevron_right</span>
+                                                <h2 id="pc-dashboard-name-container" class="text-xl font-bold tracking-tight flex items-center gap-2 select-none normal-case">
+                                                    <span class="text-on-surface-variant/40 font-medium">Hi,</span>
+                                                    <span id="pc-dashboard-name" class="text-on-surface">Guest User</span>
+                                                    <span class="inline-flex items-center justify-center bg-primary/5 text-primary text-[10px] font-black px-2 py-0.5 rounded-full border border-primary/10 ml-1">
+                                                        <span class="material-symbols-outlined text-[12px] mr-1">verified</span> Member
                                                     </span>
                                                 </h2>
                                             </div>
@@ -157,19 +157,21 @@
                                             <p class="text-[18px] font-black tracking-tighter text-black mb-1">***</p>
                                             <p class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Coupons</p>
                                         </div>
-                                        <div class="text-center group cursor-pointer">
-                                            <p class="text-[18px] font-black tracking-tighter text-black mb-1">***</p>
-                                            <p class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Points</p>
+                                        <div class="text-center group cursor-pointer tab-link" data-tab="wishlist">
+                                            <p class="text-[18px] font-black tracking-tighter text-black mb-1 group-hover:text-secondary transition-colors">***</p>
+                                            <p class="text-[11px] font-medium text-on-surface-variant group-hover:text-secondary transition-colors">Wishlist</p>
                                         </div>
-                                        <div class="text-center group cursor-pointer">
-                                            <p class="text-[18px] font-black tracking-tighter text-black mb-1">***</p>
-                                            <p class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Wallet</p>
-                                        </div>
-                                        <div class="text-center group cursor-pointer flex flex-col items-center">
-                                            <div class="w-8 h-8 flex items-center justify-center mb-1 bg-surface-low/50 rounded group-hover:bg-secondary/10 transition-colors">
-                                                <span class="material-symbols-outlined text-on-surface-variant/80 group-hover:text-secondary">card_membership</span>
+                                        <div class="text-center group cursor-pointer tab-link" data-tab="address">
+                                            <div class="w-full flex justify-center mb-1">
+                                                <span class="material-symbols-outlined text-2xl text-on-surface-variant/40 group-hover:text-primary transition-colors">location_on</span>
                                             </div>
-                                            <p class="text-[11px] font-medium text-on-surface-variant group-hover:text-secondary transition-colors">Gift Card</p>
+                                            <p class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Addresses</p>
+                                        </div>
+                                        <div class="text-center group cursor-pointer tab-link" data-tab="profile">
+                                            <div class="w-full flex justify-center mb-1">
+                                                <span class="material-symbols-outlined text-2xl text-on-surface-variant/40 group-hover:text-primary transition-colors">settings</span>
+                                            </div>
+                                            <p class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Settings</p>
                                         </div>
                                     </div>
                                     
@@ -230,27 +232,11 @@
 
                             <!-- Right Column: Secondary Cards -->
                             <div class="md:col-span-4 space-y-6">
-                                
-                                <!-- Customer Service Card -->
-                                <div class="bg-white p-8 shadow-sm border border-outline/5 transition-all hover:shadow-md">
-                                    <h3 class="text-sm font-black tracking-widest uppercase mb-10">Customer Service</h3>
-                                    <div class="grid grid-cols-2 gap-8">
-                                        <div class="text-center group cursor-pointer">
-                                            <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-3">mail</span>
-                                            <p class="text-[10px] font-medium text-on-surface-variant uppercase tracking-widest">My Message</p>
-                                        </div>
-                                        <div class="text-center group cursor-pointer">
-                                            <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-3">edit_note</span>
-                                            <p class="text-[10px] font-medium text-on-surface-variant uppercase tracking-widest leading-tight">Service Records</p>
-                                        </div>
-                                    </div>
-                                </div>
-
                                 <!-- Wishlist Card -->
                                 <div class="bg-white p-8 shadow-sm border border-outline/5 transition-all hover:shadow-md h-[220px]">
                                     <div class="flex items-center justify-between mb-8">
                                         <h3 class="text-sm font-black tracking-widest uppercase">Wishlist</h3>
-                                        <button class="text-[11px] font-bold text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors">
+                                        <button class="tab-link text-[11px] font-bold text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors" data-tab="wishlist">
                                             More <span class="material-symbols-outlined text-[12px]">chevron_right</span>
                                         </button>
                                     </div>
@@ -264,15 +250,11 @@
                                     </div>
                                 </div>
 
-                                <!-- Simple Activity Rows -->
+                                <!-- Activity Rows -->
                                 <div class="space-y-4">
-                                    <div class="bg-white px-8 py-4 shadow-sm border border-outline/5 flex items-center justify-between group hover:border-secondary transition-colors cursor-pointer">
-                                        <span class="text-sm font-black tracking-widest uppercase">Following</span>
-                                        <span class="text-[10px] font-black uppercase text-on-surface-variant group-hover:text-secondary">0 item <span class="material-symbols-outlined text-[14px] align-middle ml-1">chevron_right</span></span>
-                                    </div>
-                                    <div class="bg-white px-8 py-4 shadow-sm border border-outline/5 flex items-center justify-between group hover:border-secondary transition-colors cursor-pointer">
+                                    <div class="bg-white px-8 py-5 shadow-sm border border-outline/5 flex items-center justify-between group hover:border-secondary transition-colors cursor-pointer">
                                         <span class="text-sm font-black tracking-widest uppercase">Recently Viewed</span>
-                                        <span class="text-[10px] font-black uppercase text-on-surface-variant group-hover:text-secondary">More <span class="material-symbols-outlined text-[14px] align-middle ml-1">chevron_right</span></span>
+                                        <span class="text-[10px] font-black uppercase text-on-surface-variant group-hover:text-secondary">View All <span class="material-symbols-outlined text-[14px] align-middle ml-1">chevron_right</span></span>
                                     </div>
                                 </div>
                             </div>
@@ -491,34 +473,108 @@
                     <div id="tab-manage" class="tab-content hidden space-y-6">
                         <div class="bg-white p-10 shadow-sm border border-outline/5 animate-in fade-in slide-in-from-bottom-2 duration-500 text-center">
                             <h2 class="text-2xl font-black tracking-tighter uppercase mb-12">MANAGE MY ACCOUNT</h2>
+                            
                             <div class="space-y-4 max-w-[600px] mx-auto text-left">
-                                <div class="p-8 bg-surface-low/30 border border-outline/5 flex items-center justify-between">
-                                    <div class="space-y-2">
-                                        <h3 class="text-[11px] font-black uppercase tracking-widest">Email Address</h3>
-                                        <p id="pc-manage-email" class="text-sm font-bold text-on-surface-variant/60">Not Set</p>
+                                <!-- Change Email Section -->
+                                <div class="p-8 bg-surface-low/30 border border-outline/5 flex items-start justify-between">
+                                    <div class="space-y-2 flex-grow pr-4">
+                                        <div class="flex items-center gap-2">
+                                            <h3 class="text-[11px] font-black uppercase tracking-widest">Email Address</h3>
+                                            <!-- Verified Badge -->
+                                            <span id="pc-email-verified-badge" class="hidden flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase tracking-tighter border border-emerald-100">
+                                                <span class="material-symbols-outlined text-[12px]">verified</span>
+                                                Verified
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-3">
+                                            <p id="pc-manage-email" class="text-sm font-bold text-on-surface-variant/60">Not Set</p>
+                                            <button id="pc-resend-verify-btn" class="hidden text-[10px] font-black uppercase tracking-widest text-primary hover:text-black underline transition-colors">
+                                                Verify Now
+                                            </button>
+                                        </div>
+
+                                        <p id="pc-email-pending-note" class="hidden text-[10px] font-medium text-blue-500 italic mt-1">
+                                            * A verification link has been sent to your new email. Verified to complete the change.
+                                        </p>
+
+                                        <div id="pc-email-edit-container" class="hidden mt-4 pt-4 border-t border-outline/5">
+                                            <input type="email" id="pc-new-email-input" class="w-full bg-white border border-outline/20 px-4 py-2 text-sm focus:border-secondary transition-colors outline-none" placeholder="Enter new email">
+                                            <p class="text-[9px] text-on-surface-variant/40 mt-1 italic">Note: You must verify the new email before the change takes effect.</p>
+                                            <div class="flex gap-2 mt-3">
+                                                <button id="pc-save-email-btn" class="bg-secondary text-white px-4 py-1.5 text-[9px] font-black uppercase tracking-widest hover:bg-black transition-all">Save Email</button>
+                                                <button id="pc-cancel-email-btn" class="bg-outline/20 text-on-surface-variant px-4 py-1.5 text-[9px] font-black uppercase tracking-widest hover:bg-outline/40 transition-all">Cancel</button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <button class="border border-primary px-8 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Change</button>
+                                    <button id="pc-change-email-toggle" class="flex-shrink-0 border border-primary px-8 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Change</button>
                                 </div>
-                                <div class="p-8 bg-surface-low/30 border border-outline/5 flex items-center justify-between">
-                                    <div class="space-y-2">
-                                        <h3 class="text-[11px] font-black uppercase tracking-widest">2-Step Verification</h3>
-                                        <p class="text-[10px] font-bold text-on-surface-variant/60">Extra layer of security via email</p>
+
+                                <!-- Change Password Section (New) -->
+                                <div class="p-8 bg-surface-low/30 border border-outline/5">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div class="space-y-2">
+                                            <h3 class="text-[11px] font-black uppercase tracking-widest">Security Password</h3>
+                                            <p class="text-[10px] font-bold text-on-surface-variant/60">Update your account password</p>
+                                        </div>
+                                        <button id="pc-change-password-toggle" class="border border-primary px-8 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Update</button>
                                     </div>
-                                    <div class="relative inline-flex items-center cursor-pointer">
-                                        <input type="checkbox" th:checked="${twoFactorEnabled}" class="sr-only peer">
-                                        <div class="w-12 h-6 bg-outline/20 rounded-full peer-checked:bg-secondary transition-colors relative after:content-[''] after:absolute after:top-[3px] after:left-[3px] after:bg-white after:rounded-full after:h-[18px] after:w-[18px] after:transition-all peer-checked:after:translate-x-6"></div>
+                                    
+                                    <div id="pc-password-edit-container" class="hidden space-y-4 mt-6 pt-6 border-t border-outline/10">
+                                        <div class="space-y-1">
+                                            <label class="text-[9px] font-black uppercase text-on-surface-variant/40">Current Password</label>
+                                            <div class="relative">
+                                                <input type="password" id="pc-current-password" class="w-full bg-white border border-outline/20 px-4 py-2.5 pr-10 text-sm focus:border-secondary transition-colors outline-none shadow-sm">
+                                                <button type="button" class="password-toggle absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-secondary transition-colors">
+                                                    <span class="material-symbols-outlined text-sm">visibility</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div class="space-y-1">
+                                                <label class="text-[9px] font-black uppercase text-on-surface-variant/40">New Password</label>
+                                                <div class="relative">
+                                                    <input type="password" id="pc-new-password" class="w-full bg-white border border-outline/20 px-4 py-2.5 pr-10 text-sm focus:border-secondary transition-colors outline-none shadow-sm">
+                                                    <button type="button" class="password-toggle absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-secondary transition-colors">
+                                                        <span class="material-symbols-outlined text-sm">visibility</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="space-y-1">
+                                                <label class="text-[9px] font-black uppercase text-on-surface-variant/40">Confirm New</label>
+                                                <div class="relative">
+                                                    <input type="password" id="pc-confirm-password" class="w-full bg-white border border-outline/20 px-4 py-2.5 pr-10 text-sm focus:border-secondary transition-colors outline-none shadow-sm">
+                                                    <button type="button" class="password-toggle absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-secondary transition-colors">
+                                                        <span class="material-symbols-outlined text-sm">visibility</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-2 pt-2">
+                                            <button id="pc-save-password-btn" class="bg-secondary text-white px-8 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg flex items-center gap-2">
+                                                <span>Save New Password</span>
+                                            </button>
+                                            <button id="pc-cancel-password-btn" class="bg-outline/10 text-on-surface-variant px-8 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-outline/20 transition-all">Cancel</button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="p-8 bg-red-50/30 border border-red-100 flex items-center justify-between group cursor-pointer">
+
+
+
+                                <!-- Delete Account Section -->
+                                <div id="pc-delete-account-btn" class="p-8 bg-red-50/30 border border-red-100 flex items-center justify-between group cursor-pointer hover:bg-red-50 transition-colors">
                                     <div class="space-y-2">
                                         <h3 class="text-[11px] font-black uppercase tracking-widest text-red-600">Delete Account</h3>
                                         <p class="text-[9px] font-bold text-red-400 uppercase tracking-widest">Account will not be recoverable</p>
                                     </div>
-                                    <span class="material-symbols-outlined text-red-300 group-hover:text-red-600 transition-all">chevron_right</span>
+                                    <span class="material-symbols-outlined text-red-300 group-hover:text-red-600 transition-all group-hover:translate-x-1">chevron_right</span>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+
+
 
                     <!-- Tab: My Orders (Detailed) -->
                     <div id="tab-orders" class="tab-content hidden space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -769,8 +825,47 @@
                         </div>
                     </div>
 
+                    <!-- Success Modal for Password Change -->
+                    <div id="pc-password-success-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6 pointer-events-none">
+                        <div class="absolute inset-0 bg-white/40 backdrop-blur-md opacity-0 transition-opacity duration-700 bg-backdrop"></div>
+                        <div class="relative bg-white w-full max-w-[320px] p-10 shadow-[0_30px_70px_rgba(0,0,0,0.15)] border border-outline/5 text-center transform scale-90 opacity-0 transition-all duration-500 bg-modal">
+                            <div class="success-checkmark mb-8">
+                                <div class="check-icon">
+                                    <span class="icon-line line-tip"></span>
+                                    <span class="icon-line line-long"></span>
+                                    <div class="icon-circle"></div>
+                                    <div class="icon-fix"></div>
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-black uppercase tracking-tighter mb-2">Password Updated</h3>
+                            <p class="text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Your account is now more secure</p>
+                        </div>
+                    </div>
+
+                    <style>
+                        .success-checkmark { width: 80px; height: 80px; margin: 0 auto; position: relative; }
+                        .check-icon { width: 80px; height: 80px; position: relative; border-radius: 50%; box-sizing: content-box; border: 4px solid #58b76c; }
+                        .check-icon::before { top: 3px; left: -2px; width: 30px; transform-origin: 100% 50%; border-radius: 100px 0 0 100px; }
+                        .check-icon::after { top: 0; left: 30px; width: 60px; transform-origin: 0 50%; border-radius: 0 100px 100px 0; animation: rotate-circle 4.25s ease-in; }
+                        .check-icon::before, .check-icon::after { content: ''; height: 100px; position: absolute; background: #FFFFFF; transform: rotate(-45deg); }
+                        .icon-line { height: 5px; background-color: #58b76c; display: block; border-radius: 2px; position: absolute; z-index: 10; }
+                        .icon-line.line-tip { top: 46px; left: 14px; width: 25px; transform: rotate(45deg); animation: icon-line-tip 0.75s; }
+                        .icon-line.line-long { top: 38px; right: 8px; width: 47px; transform: rotate(-45deg); animation: icon-line-long 0.75s; }
+                        .icon-circle { top: -4px; left: -4px; z-index: 10; width: 80px; height: 80px; border-radius: 50%; position: absolute; box-sizing: content-box; border: 4px solid rgba(88, 183, 108, .5); }
+                        .icon-fix { top: 8px; width: 5px; left: 28px; z-index: 1; height: 85px; position: absolute; transform: rotate(-45deg); background-color: #FFFFFF; }
+                        @keyframes rotate-circle { 0% { transform: rotate(-45deg); } 5% { transform: rotate(-45deg); } 12% { transform: rotate(-405deg); } 100% { transform: rotate(-405deg); } }
+                        @keyframes icon-line-tip { 0% { width: 0; left: 1px; top: 19px; } 54% { width: 0; left: 1px; top: 19px; } 70% { width: 50px; left: -8px; top: 37px; } 84% { width: 17px; left: 21px; top: 48px; } 100% { width: 25px; left: 14px; top: 46px; } }
+                        @keyframes icon-line-long { 0% { width: 0; right: 46px; top: 54px; } 65% { width: 0; right: 46px; top: 54px; } 84% { width: 55px; right: 0px; top: 35px; } 100% { width: 47px; right: 8px; top: 38px; } }
+                        .bg-backdrop.show { opacity: 1; }
+                        .bg-modal.show { opacity: 1; transform: scale(1); }
+                    </style>
+
     <th:block layout:fragment="script">
         <script th:src="@{/js/pages/personal-center.js}"></script>
+        <script th:src="@{/js/pages/personal/profile.js}"></script>
+        <script th:src="@{/js/pages/personal/wishlist.js}"></script>
+        <script th:src="@{/js/pages/personal/recently-viewed.js}"></script>
+        <script th:src="@{/js/pages/personal/manage.js}"></script>
     </th:block>
 </body>
 </html>

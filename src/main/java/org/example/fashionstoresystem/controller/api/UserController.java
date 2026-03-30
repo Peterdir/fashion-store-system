@@ -48,6 +48,22 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    // XÓA TÀI KHOẢN
+    @DeleteMapping("/me")
+    public ResponseEntity<MessageResponseDTO> deleteAccount() {
+        Long userId = getAuthenticatedUserId();
+        MessageResponseDTO response = userService.deleteAccount(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    // GỬI LẠI EMAIL XÁC THỰC
+    @PostMapping("/me/resend-verification")
+    public ResponseEntity<MessageResponseDTO> resendVerification() {
+        Long userId = getAuthenticatedUserId();
+        MessageResponseDTO response = userService.resendVerification(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     // TRÍCH XUẤT userId TỪ SECURITY CONTEXT
     private Long getAuthenticatedUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

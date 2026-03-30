@@ -22,7 +22,7 @@ public class ChangePasswordRequestDTO {
     private String currentPassword;
 
     @NotBlank(message = "Mật khẩu mới không được để trống")
-    @Size(min = 8, max = 128, message = "Mật khẩu phải từ 8-128 ký tự")
+    @Size(min = 6, max = 128, message = "Mật khẩu phải từ 6-128 ký tự")
     private String newPassword;
 
     @NotBlank(message = "Xác nhận mật khẩu mới không được để trống")

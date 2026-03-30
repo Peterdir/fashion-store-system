@@ -55,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user = new User();
         user.setEmail(dto.getEmail());
-        user.setFullName(dto.getFullName());
+        user.setFullName(capitalizeName(dto.getFullName()));
         user.setPhone(dto.getPhone());
         user.setPassword(encodedPassword);
         user.setStatus(UserStatus.PENDING);
@@ -67,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
 
         String message = "Đăng ký thành công. Vui lòng kiểm tra email để xác thực.";
         try {
-            Boolean isSent = emailService.sendVerificationEmail(user.getEmail(), token);
+            emailService.sendVerificationEmail(user.getEmail(), token);
         } catch (Exception e) {
             message = "Đăng ký thành công nhưng hệ thống gặp lỗi khi gửi email xác thực. Vui lòng sử dụng tính năng 'Gửi lại mã' sau.";
         }
@@ -94,6 +94,13 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Token xác thực đã hết hạn!");
         }
 
+        // Nếu đang trong quy trình đổi email (có pendingEmail)
+        if (user.getPendingEmail() != null) {
+            user.setEmail(user.getPendingEmail());
+            user.setPendingEmail(null);
+        }
+
+        user.setEmailVerified(true);
         user.setStatus(UserStatus.ACTIVE);
         user.setVerificationToken(null);
         user.setVerificationTokenExpiryDate(null);
@@ -216,7 +223,7 @@ public class AuthServiceImpl implements AuthService {
         passwordResetTokenRepository.save(passwordResetToken);
 
         // Gửi email chứa liên kết khôi phục
-        String resetLink = "http://localhost:8080/auth/reset-password?token=" + resetToken;
+        String resetLink = "http://localhost:8080/reset-password?token=" + resetToken;
         emailService.sendVerificationEmail(user.getEmail(), resetLink);
 
         return MessageResponseDTO.builder()
@@ -283,27 +290,22 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public LoginResponseDTO refreshToken(RefreshTokenRequestDTO dto) {
-        // Tìm refresh token trong DB
         RefreshToken refreshToken = refreshTokenRepository.findByToken(dto.getRefreshToken())
                 .orElseThrow(() -> new RuntimeException("Refresh token không hợp lệ!"));
 
-        // Kiểm tra token đã bị thu hồi chưa
         if (refreshToken.isRevoked()) {
             throw new RuntimeException("Refresh token đã bị thu hồi!");
         }
 
-        // Kiểm tra token đã hết hạn chưa
         if (refreshToken.getExpiryDate().isBefore(Instant.now())) {
             throw new RuntimeException("Refresh token đã hết hạn! Vui lòng đăng nhập lại.");
         }
 
         User user = refreshToken.getUser();
 
-        // Thu hồi refresh token cũ (Token Rotation)
         refreshToken.setRevoked(true);
         refreshTokenRepository.save(refreshToken);
 
-        // Vô hiệu hóa access token cũ
         List<Token> validTokens = tokenRepository.findAllValidTokensByUser(user.getId());
         validTokens.forEach(t -> {
             t.setExpired(true);
@@ -311,7 +313,6 @@ public class AuthServiceImpl implements AuthService {
         });
         tokenRepository.saveAll(validTokens);
 
-        // Tạo JWT access token mới
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("userId", user.getId());
         extraClaims.put("role", user.getRole().name());
@@ -325,7 +326,6 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         tokenRepository.save(newToken);
 
-        // Tạo JWT refresh token mới
         String newRefreshTokenStr = jwtService.generateRefreshToken(user);
         RefreshToken newRefreshToken = RefreshToken.builder()
                 .user(user)
@@ -358,5 +358,19 @@ public class AuthServiceImpl implements AuthService {
         user.setVerificationToken(token);
         user.setVerificationTokenExpiryDate(Instant.now().plus(24, ChronoUnit.HOURS));
         return token;
+    }
+
+    private String capitalizeName(String name) {
+        if (name == null || name.isBlank()) return "";
+        String[] words = name.toLowerCase().split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                sb.append(Character.toUpperCase(word.charAt(0)))
+                  .append(word.substring(1).toLowerCase())
+                  .append(" ");
+            }
+        }
+        return sb.toString().trim();
     }
 }

@@ -7,9 +7,10 @@
 </head>
 <body>
     <main layout:fragment="content" class="flex-grow flex flex-col items-center justify-center py-12 px-4 bg-background">
-        <!-- Promotional Banner -->
-        <div class="mb-10 w-full max-w-md bg-zinc-900 text-white px-4 py-3 text-center no-radius shadow-sm">
-            <p class="text-[10px] font-black tracking-[0.2em] uppercase">Sign up and get 15% off your first order!</p>
+        <!-- Welcome Header -->
+        <div class="mb-10 w-full max-w-md text-center space-y-1">
+            <p class="text-[10px] font-black tracking-[0.4em] uppercase text-primary/40">H&Y Premium Store</p>
+            <h2 class="text-xs font-medium tracking-tight text-on-surface-variant/60 italic">"Style is a way to say who you are without having to speak."</h2>
         </div>
 
         <!-- Login Card -->
@@ -32,7 +33,7 @@
                 <div class="space-y-2">
                     <div class="flex justify-between items-center">
                         <label class="block text-[9px] font-black uppercase tracking-[0.15em] text-on-surface-variant">Password</label>
-                        <a href="#" class="text-[9px] font-black uppercase tracking-[0.15em] text-secondary hover:text-primary transition-colors underline underline-offset-4 decoration-secondary/30">Forgot Password?</a>
+                        <a th:href="@{/forgot-password}" class="text-[9px] font-black uppercase tracking-[0.15em] text-secondary hover:text-primary transition-colors underline underline-offset-4 decoration-secondary/30">Forgot Password?</a>
                     </div>
                     <div class="relative group">
                         <input type="password" id="password" 
@@ -44,6 +45,12 @@
                     </div>
                 </div>
 
+                <!-- Remember Me -->
+                <div class="flex items-center gap-2 group cursor-pointer">
+                    <input type="checkbox" id="rememberMe" class="w-3.5 h-3.5 border-outline/20 rounded-none bg-surface-container-highest text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer">
+                    <label for="rememberMe" class="text-[9px] font-black uppercase tracking-[0.1em] text-on-surface-variant/60 group-hover:text-primary transition-colors cursor-pointer select-none">Remember Me</label>
+                </div>
+
                 <!-- Login Button -->
                 <button type="submit" 
                         class="w-full bg-primary hover:bg-zinc-800 text-white font-black py-5 no-radius transition-all duration-500 active:scale-[0.98] shadow-2xl shadow-black/10 uppercase tracking-[0.25em] text-[10px] mt-4">
@@ -51,31 +58,8 @@
                 </button>
             </form>
 
-            <!-- OR Divider -->
-            <div class="relative my-12">
-                <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-outline/10"></div>
-                </div>
-                <div class="relative flex justify-center text-[9px]">
-                    <span class="bg-white px-6 text-outline font-black tracking-[0.3em] uppercase">OR</span>
-                </div>
-            </div>
-
-            <!-- Social Logins -->
-            <div class="grid grid-cols-3 gap-4 mb-10">
-                <button class="flex items-center justify-center py-4 border border-outline/10 no-radius hover:bg-surface-container-low transition-all duration-300 group">
-                    <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">mail</span>
-                </button>
-                <button class="flex items-center justify-center py-4 border border-outline/10 no-radius hover:bg-surface-container-low transition-all duration-300 group">
-                    <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">groups</span>
-                </button>
-                <button class="flex items-center justify-center py-4 border border-outline/10 no-radius hover:bg-surface-container-low transition-all duration-300 group">
-                    <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">apple</span>
-                </button>
-            </div>
-
             <!-- Sign Up Prompt -->
-            <div class="text-center pt-4 border-t border-outline/5">
+            <div class="text-center pt-8 border-t border-outline/5">
                 <p class="text-[11px] font-medium tracking-tight text-on-surface-variant">
                     Don't have an account? 
                     <a th:href="@{/register}" class="text-primary font-black uppercase tracking-widest ml-2 hover:underline underline-offset-4">Sign Up</a>

@@ -41,9 +41,19 @@ public class CookieAuthController {
     ) {
         LoginResponseDTO loginResponse = authService.login(dto);
 
-        // Set JWT vào HttpOnly Cookie (chuyển ms → giây)
-        addCookie(response, ACCESS_TOKEN_COOKIE, loginResponse.getAccessToken(), accessTokenExpirationMs / 1000);
-        addCookie(response, REFRESH_TOKEN_COOKIE, loginResponse.getRefreshToken(), refreshTokenExpirationMs / 1000);
+        // Thiết lập thời gian hết hạn của Cookie
+        long accessExpiry = accessTokenExpirationMs / 1000;
+        long refreshExpiry = refreshTokenExpirationMs / 1000;
+
+        // Nếu tích chọn "Remember Me", kéo dài thời gian sống của Cookie lên 30 ngày
+        if (dto.isRememberMe()) {
+            accessExpiry = 30 * 24 * 60 * 60; // 30 ngày
+            refreshExpiry = 30 * 24 * 60 * 60;
+        }
+
+        // Set JWT vào HttpOnly Cookie
+        addCookie(response, ACCESS_TOKEN_COOKIE, loginResponse.getAccessToken(), accessExpiry);
+        addCookie(response, REFRESH_TOKEN_COOKIE, loginResponse.getRefreshToken(), refreshExpiry);
 
         // Trả về thông tin user (không gửi token trong body)
         return ResponseEntity.ok(Map.of(

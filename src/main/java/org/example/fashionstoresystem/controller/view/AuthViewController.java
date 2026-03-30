@@ -15,4 +15,14 @@ public class AuthViewController {
     public String register() {
         return "pages/register";
     }
+
+    @GetMapping("/forgot-password")
+    public String forgotPassword() {
+        return "pages/forgot-password";
+    }
+
+    @GetMapping("/reset-password")
+    public String resetPassword() {
+        return "pages/reset-password";
+    }
 }
