@@ -69,9 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 Toast.success(`Welcome back, ${data.fullName}!`);
 
-                // Chuyển hướng sau 1.5s để user thấy toast
+                // Chuyển hướng theo role: ADMIN → admin dashboard, CUSTOMER → trang chủ
+                const redirectUrl = data.role === 'ADMIN' ? '/admin/dashboard' : '/';
                 setTimeout(() => {
-                    window.location.href = '/';
+                    window.location.href = redirectUrl;
                 }, 1500);
             } else {
                 // Xử lý lỗi từ Server
