@@ -125,15 +125,6 @@ Object.assign(PersonalCenter, {
             dashboardAddress.textContent = profile.address || 'No address set';
         }
 
-        if (addressText) {
-            addressText.textContent = profile.address || 'None';
-            if (profile.address && currentAddressDisplay) {
-                currentAddressDisplay.classList.remove('hidden');
-            } else if (currentAddressDisplay) {
-                currentAddressDisplay.classList.add('hidden');
-            }
-        }
-
         // Update Name Input
         const nameInput = document.getElementById('pc-profile-name-input');
         if (nameInput) {
