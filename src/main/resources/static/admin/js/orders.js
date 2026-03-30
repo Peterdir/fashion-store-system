@@ -123,6 +123,10 @@ const AdminOrders = (() => {
 
         try {
             const res = await fetch(`${API.LIST}?${params.toString()}`);
+            if (res.status === 401 || res.status === 403) {
+                window.location.href = '/admin/login';
+                return;
+            }
             if (!res.ok) throw new Error('Lỗi khi tải danh sách đơn hàng');
             const data = await res.json();
 
@@ -252,6 +256,10 @@ const AdminOrders = (() => {
 
         try {
             const res = await fetch(API.DETAIL(orderId));
+            if (res.status === 401 || res.status === 403) {
+                window.location.href = '/admin/login';
+                return;
+            }
             if (!res.ok) throw new Error('Lỗi khi tải chi tiết đơn hàng');
             const order = await res.json();
 
@@ -360,6 +368,10 @@ const AdminOrders = (() => {
             const res = await fetch(`${API.UPDATE_ITEM_STATUS(itemId)}?status=${newStatus}`, {
                 method: 'PATCH',
             });
+            if (res.status === 401 || res.status === 403) {
+                window.location.href = '/admin/login';
+                return;
+            }
             if (!res.ok) {
                 const err = await res.json().catch(() => ({}));
                 throw new Error(err.message || 'Cập nhật thất bại');

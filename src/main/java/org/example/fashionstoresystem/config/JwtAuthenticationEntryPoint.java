@@ -21,7 +21,11 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         String acceptHeader = request.getHeader("Accept");
         if (acceptHeader != null && acceptHeader.contains("text/html")) {
             // Đây là request từ trình duyệt lấy giao diện HTML, nên chuyển hướng về trang đăng nhập
-            response.sendRedirect("/login");
+            if (request.getRequestURI().startsWith("/admin")) {
+                response.sendRedirect("/admin/login");
+            } else {
+                response.sendRedirect("/login");
+            }
             return;
         }
 

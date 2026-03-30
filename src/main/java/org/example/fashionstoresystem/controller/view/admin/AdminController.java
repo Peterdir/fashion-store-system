@@ -29,7 +29,7 @@ public class AdminController {
 
     @GetMapping("/products")
     public String showProducts() {
-        return "admin/pages/dashboard"; // TODO: tạo products.html riêng
+        return "admin/pages/products";
     }
 
     @GetMapping("/customers")

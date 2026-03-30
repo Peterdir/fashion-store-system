@@ -68,6 +68,27 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Page<ProductSummaryResponseDTO> getAdminProducts(String keyword, ProductStatus status, Pageable pageable) {
+        Page<Product> productsPage = productRepository.findForAdmin(
+                (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null,
+                status,
+                pageable
+        );
+
+        // Map Entity sang DTO
+        return productsPage.map(product -> ProductSummaryResponseDTO.builder()
+                .productId(product.getId())
+                .name(product.getName())
+                .price(product.getVariants().isEmpty() ? 0.0 : product.getVariants().get(0).getPrice())
+                .category(getParentCategoryName(product))
+                .subcategory(getCategoryName(product))
+                .status(product.getStatus())
+                .primaryImageUrl(product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl())
+                .hoverImageUrl(product.getImages().size() > 1 ? product.getImages().get(1).getUrl() : (product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl()))
+                .build());
+    }
+
+    @Override
     public ProductDetailResponseDTO getProductDetail(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại hoặc đã bị ngừng kinh doanh!"));

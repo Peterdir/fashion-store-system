@@ -30,6 +30,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Tìm theo keyword + lọc trạng thái + phân trang
     Page<Product> findByNameContainingIgnoreCaseAndStatus(String keyword, ProductStatus status, Pageable pageable);
 
+    // Admin tìm kiếm sản phẩm theo từ khóa (tên hoặc danh mục) và trạng thái (tùy chọn)
+    @Query("SELECT p FROM Product p LEFT JOIN p.category c WHERE " +
+           "(:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+           "OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+           "AND (:status IS NULL OR p.status = :status)")
+    Page<Product> findForAdmin(@Param("keyword") String keyword, @Param("status") ProductStatus status, Pageable pageable);
+
     // Lấy danh sách các danh mục duy nhất (giữ tương thích cũ)
     @Query("SELECT DISTINCT c.name FROM Product p JOIN p.category c")
     List<String> findDistinctCategories();
