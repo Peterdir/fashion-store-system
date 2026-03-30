@@ -8,6 +8,7 @@ import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderDetailResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderSummaryResponseDTO;
 import org.example.fashionstoresystem.dto.response.PlaceOrderResponseDTO;
+import org.example.fashionstoresystem.dto.response.OrderItemSummaryDTO;
 import org.example.fashionstoresystem.entity.enums.DiscountType;
 import org.example.fashionstoresystem.entity.enums.OrderStatus;
 import org.example.fashionstoresystem.entity.enums.OrderType;
@@ -178,8 +179,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<OrderSummaryResponseDTO> getMyOrders(Long userId, OrderStatus status, Pageable pageable) {
-        Page<Order> orders = orderRepository.searchMyOrders(userId, status, pageable);
+    public Page<OrderSummaryResponseDTO> getMyOrders(Long userId, List<OrderStatus> statuses, Pageable pageable) {
+        Page<Order> orders;
+        if (statuses == null || statuses.isEmpty()) {
+            orders = orderRepository.findAllMyOrders(userId, pageable);
+        } else {
+            orders = orderRepository.searchMyOrdersByStatuses(userId, statuses, pageable);
+        }
 
         return orders
                 .map(order -> {
@@ -199,6 +205,37 @@ public class OrderServiceImpl implements OrderService {
                             .statusSummary(statusSummary)
                             .build();
                 });
+    }
+
+    // THEO DÕI TRẠNG THÁI ĐƠN HÀNG - Xem danh sách Từng món (OrderItem)
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrderItemSummaryDTO> getMyOrderItems(Long userId, List<OrderStatus> statuses, Pageable pageable) {
+        Page<OrderItem> items = orderItemRepository.findByOrderUserIdAndStatusInOrderByOrderOrderDateDesc(userId, statuses, pageable);
+
+        return items.map(item -> OrderItemSummaryDTO.builder()
+                .orderItemId(item.getId())
+                .orderId(item.getOrder().getId())
+                .orderDate(item.getOrder().getOrderDate())
+                .paymentMethod(item.getOrder().getPaymentMethod())
+                .productName(item.getProductName())
+                .productImage(
+                        item.getProductVariant() != null && 
+                        item.getProductVariant().getProduct() != null && 
+                        item.getProductVariant().getProduct().getImages() != null && 
+                        !item.getProductVariant().getProduct().getImages().isEmpty() 
+                            ? item.getProductVariant().getProduct().getImages().get(0).getUrl() 
+                            : null
+                )
+                .size(item.getProductVariant() != null ? item.getProductVariant().getSize() : null)
+                .color(item.getProductVariant() != null ? item.getProductVariant().getColor() : null)
+                .quantity(item.getQuantity())
+                .price(item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0)
+                .itemTotalAmount(item.getQuantity() * (item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0))
+                .status(item.getStatus())
+                .refundStatus(item.getRefundStatus())
+                .cancellationReason(item.getCancellationReason())
+                .build());
     }
 
     // THEO DÕI TRẠNG THÁI ĐƠN HÀNG - Xem chi tiết

@@ -122,38 +122,8 @@ const PersonalCenter = {
                     });
                 }
 
-                // 3. Simulation: Staggered Loading
-                if (orderContentArea && orderLoadingArea) {
-                    orderContentArea.classList.add('hidden');
-                    orderLoadingArea.classList.remove('hidden');
-                    
-                    const dots = [
-                        document.getElementById('order-dot-1'),
-                        document.getElementById('order-dot-2'),
-                        document.getElementById('order-dot-3')
-                    ];
-                    
-                    dots.forEach(dot => { if(dot) { dot.style.opacity = '1'; dot.style.transform = 'scale(1)'; }});
-
-                    // Staggered disappearance
-                    setTimeout(() => { if(dots[0]) dots[0].style.opacity = '0'; dots[0].style.transform = 'scale(0.5)'; }, 200);
-                    setTimeout(() => { if(dots[1]) dots[1].style.opacity = '0'; dots[1].style.transform = 'scale(0.5)'; }, 350);
-                    setTimeout(() => { 
-                        if(dots[2]) { dots[2].style.opacity = '0'; dots[2].style.transform = 'scale(0.5)'; }
-                        
-                        orderLoadingArea.classList.add('hidden');
-                        orderContentArea.classList.remove('hidden');
-                        
-                        orderContentArea.style.animation = 'none';
-                        orderContentArea.offsetHeight; 
-                        orderContentArea.style.animation = '';
-
-                        // REAL DATA LOAD: Call OrderModule
-                        if (window.OrderModule && status) {
-                            window.OrderModule.loadOrders(status);
-                        }
-                    }, 500);
-                }
+                // 3. Delegation cho OrderModule xử lý hiển thị Loading và Logic Load
+                // Logic click đã được orders.js tự bắt thông qua setupListeners(), không cần gọi ở đây nữa.
             });
         });
 
@@ -234,8 +204,31 @@ const PersonalCenter = {
             }
             if (tabId === 'orders' && window.OrderModule) {
                 const urlParams = new URLSearchParams(window.location.search);
-                const status = urlParams.get('status') || 'all';
+                let status = urlParams.get('status') || 'all';
+
+                if (clickedElement && clickedElement.hasAttribute('data-status')) {
+                    status = clickedElement.getAttribute('data-status');
+                    // Cập nhật lại URL ngầm định
+                    const newUrl = new URL(window.location);
+                    newUrl.searchParams.set('tab', 'orders');
+                    newUrl.searchParams.set('status', status);
+                    window.history.pushState({}, '', newUrl);
+                }
+
+                window.OrderModule.currentStatus = status;
                 window.OrderModule.loadOrders(status);
+
+                // Đồng bộ thanh order-subtabs hiển thị ngang
+                const orderSubtabs = document.querySelectorAll('.order-subtab');
+                orderSubtabs.forEach(s => {
+                    if (s.getAttribute('data-status') === status) {
+                        s.classList.add('text-primary', 'border-b-2', 'border-primary', 'font-black');
+                        s.classList.remove('text-on-surface-variant/60', 'font-bold');
+                    } else {
+                        s.classList.remove('text-primary', 'border-b-2', 'border-primary', 'font-black');
+                        s.classList.add('text-on-surface-variant/60', 'font-bold');
+                    }
+                });
             }
         } else {
             console.error('Target tab content not found: tab-' + tabId);
