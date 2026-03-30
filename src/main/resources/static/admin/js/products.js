@@ -452,19 +452,27 @@ const AdminProducts = (() => {
         }
     }
 
+    // ===== DEBOUNCE HELPER =====
+    function debounce(func, timeout = 300) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => { func.apply(this, args); }, timeout);
+        };
+    }
+
+    const debouncedFetch = debounce(() => fetchProducts(0));
+
     // ===== INIT =====
     function init() {
-        // Filter buttons
-        $('btn-filter').addEventListener('click', () => fetchProducts(0));
+        // Filter inputs (Live search)
+        $('filter-keyword').addEventListener('input', debouncedFetch);
+        $('filter-status').addEventListener('change', () => fetchProducts(0));
+
         $('btn-reset-filter').addEventListener('click', () => {
             $('filter-keyword').value = '';
             $('filter-status').value = '';
             fetchProducts(0);
-        });
-
-        // Search on Enter key
-        $('filter-keyword').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') fetchProducts(0);
         });
 
         // Add product button

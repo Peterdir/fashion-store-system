@@ -396,8 +396,11 @@ const AdminOrders = (() => {
 
     // ===== INIT =====
     function init() {
-        // Filter button
-        $('btn-filter').addEventListener('click', () => fetchOrders(0));
+        // Filter inputs (Automatic filtering)
+        $('filter-status').addEventListener('change', () => fetchOrders(0));
+        $('filter-start-date').addEventListener('change', () => fetchOrders(0));
+        $('filter-end-date').addEventListener('change', () => fetchOrders(0));
+
         $('btn-reset-filter').addEventListener('click', () => {
             $('filter-status').value = '';
             $('filter-start-date').value = '';

@@ -4,11 +4,11 @@
 
 | Module | API Backend | Giao Diện (HTML + JS) | Trạng Thái |
 |---|---|---|---|
-| 🔐 Đăng nhập Admin | ✅ Dùng chung `/api/auth/cookie/login` | ✅ `admin/pages/login.html` | **Xong** |
+| 🔐 Đăng nhập Admin | ✅ Dùng chung `/api/auth/cookie/login` | ✅ `admin/pages/login.html` | ✅ **Xong** |
 | 📊 Dashboard (Tổng Quan) | ❌ Chưa có API riêng (data cứng) | ✅ `admin/pages/dashboard.html` | **⚠️ Data giả** |
-| 📦 Quản Lý Đơn Hàng | ✅ `AdminOrderController` | ❌ Chưa có giao diện | **🔴 Thiếu** |
-| 👕 Quản Lý Sản Phẩm | ✅ `AdminProductController` | ❌ Chưa có giao diện | **🔴 Thiếu** |
-| 👥 Quản Lý Khách Hàng | ✅ `AdminUserController` | ❌ Chưa có giao diện | **🔴 Thiếu** |
+| 📦 Quản Lý Đơn Hàng | ✅ `AdminOrderController` | ✅ `admin/pages/orders.html` | ✅ **Xong** |
+| 👕 Quản Lý Sản Phẩm | ✅ `AdminProductController` | ✅ `admin/pages/products.html` | ✅ **Xong** |
+| 👥 Quản Lý Khách Hàng | ✅ `AdminUserController` | ✅ `admin/pages/customers.html` | ✅ **Xong** |
 | 🎟️ Quản Lý Mã Giảm Giá | ✅ `AdminCouponController` | ❌ Chưa có giao diện | **🔴 Thiếu** |
 | 🔄 Yêu Cầu Hoàn Trả | ✅ `AdminReturnRequestController` | ❌ Chưa có giao diện | **🔴 Thiếu** |
 | 📈 Báo Cáo Doanh Thu | ✅ `ReportController` | ❌ Chưa có giao diện | **🔴 Thiếu** |
@@ -35,10 +35,14 @@
 
 **Trạng thái đơn hàng:** `PENDING_CONFIRMATION` → `PENDING_PAYMENT` → `PAID` → `PROCESSING` → `SHIPPING` → `DELIVERED` → `COMPLETED` | `CANCELLED` | `PAYMENT_FAILED` | `PAYMENT_EXPIRED`
 
-**Giao diện cần có:**
-- Bảng danh sách đơn hàng (phân trang, lọc theo status/ngày)
-- Modal hoặc trang chi tiết đơn hàng
-- Dropdown để chuyển trạng thái đơn/từng item
+**Giao diện:** ✅ [orders.html](file:///d:/Subject/CongNghePhanMemHDT/FinalProject/fashion-store-system/src/main/resources/templates/admin/pages/orders.html) + [orders.js](file:///d:/Subject/CongNghePhanMemHDT/FinalProject/fashion-store-system/src/main/resources/static/admin/js/orders.js)
+
+**Tính năng đã có:**
+- ✅ Danh sách đơn hàng, phân trang.
+- ✅ Bộ lọc trạng thái, ngày tháng (Tự động cập nhật tức thì).
+- ✅ Xem chi tiết đơn hàng (Modal).
+- ✅ Cập nhật trạng thái từng sản phẩm trong đơn.
+- ✅ Tự động chuyển hướng Login nếu hết hạn.
 
 ---
 
@@ -54,10 +58,14 @@
 | `PUT /api/admin/products/{productId}` | Cập nhật sản phẩm |
 | `DELETE /api/admin/products/{productId}` | Xóa sản phẩm |
 
-**Giao diện cần có:**
-- Bảng danh sách sản phẩm (tên, giá, tồn kho, hình ảnh)
-- Form thêm/sửa sản phẩm (modal hoặc trang riêng)
-- Nút xóa sản phẩm (có confirm)
+**Giao diện:** ✅ [products.html](file:///d:/Subject/CongNghePhanMemHDT/FinalProject/fashion-store-system/src/main/resources/templates/admin/pages/products.html) + [products.js](file:///d:/Subject/CongNghePhanMemHDT/FinalProject/fashion-store-system/src/main/resources/static/admin/js/products.js)
+
+**Tính năng đã có:**
+- ✅ Danh sách sản phẩm, phân trang.
+- ✅ Tìm kiếm theo tên (Live Search 300ms debounce), lọc trạng thái.
+- ✅ Thêm/Sửa sản phẩm với hình ảnh và biến thể (Modal Slide-over).
+- ✅ Xóa sản phẩm (Confirm).
+- ✅ Validation form chi tiết.
 
 ---
 
@@ -74,10 +82,13 @@
 
 **Trạng thái:** `PENDING` (Chờ kích hoạt) · `ACTIVE` · `BLOCKED`
 
-**Giao diện cần có:**
-- Bảng danh sách KH (tên, email, SĐT, trạng thái)
-- Ô tìm kiếm theo tên/email
-- Nút Khóa/Mở khóa tài khoản
+**Giao diện:** ✅ [customers.html](file:///d:/Subject/CongNghePhanMemHDT/FinalProject/fashion-store-system/src/main/resources/templates/admin/pages/customers.html) + [customers.js](file:///d:/Subject/CongNghePhanMemHDT/FinalProject/fashion-store-system/src/main/resources/static/admin/js/customers.js)
+
+**Tính năng đã có:**
+- ✅ Danh sách khách hàng, phân trang.
+- ✅ Tìm kiếm Tên/Email/SĐT (Live Search 300ms debounce).
+- ✅ Xem chi tiết & Lịch sử mua hàng (Modal).
+- ✅ Khóa/Mở khóa tài khoản ngay lập tức.
 
 ---
 
