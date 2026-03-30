@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/admin-layout}">
+<head>
+    <title>Quản Lý Mã Giảm Giá</title>
+</head>
+<body>
+
+    <div layout:fragment="content">
+
+        <!-- Page Header -->
+        <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-xl font-black tracking-tight text-primary uppercase">Mã Giảm Giá</h1>
+                <p class="text-[11px] text-neutral-400 font-medium mt-1">Quản lý và theo dõi các chương trình khuyến mãi</p>
+            </div>
+            <button id="btn-add-coupon" class="bg-primary text-white px-5 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-800 transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]">add</span> Tạo Mã Mới
+            </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white border border-neutral-100 p-4 mb-5 flex flex-wrap items-end gap-3">
+            <!-- Search Keyword -->
+            <div class="flex-1 min-w-[280px] space-y-1">
+                <label class="text-[9px] font-black uppercase tracking-[0.15em] text-neutral-400">Tìm kiếm</label>
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-[18px]">search</span>
+                    <input type="text" id="filter-keyword" placeholder="Nhập mã CODE..." 
+                           class="w-full pl-10 pr-4 py-2 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors">
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex gap-2">
+                <button id="btn-reset-filter" class="bg-neutral-100 text-neutral-500 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-200 transition-colors">
+                    Làm mới
+                </button>
+            </div>
+        </div>
+
+        <!-- Coupons Table -->
+        <div class="bg-white border border-neutral-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-neutral-50/80 border-b border-neutral-100">
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Mã CODE</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Giảm giá</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Thời hạn</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Trạng thái</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="coupons-table-body" class="divide-y divide-neutral-50">
+                        <!-- JS renders rows here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="coupons-empty" class="hidden py-16 text-center">
+                <span class="material-symbols-outlined text-5xl text-neutral-200 mb-3">confirmation_number</span>
+                <p class="text-[12px] font-bold text-neutral-400">Không tìm thấy mã giảm giá nào</p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="coupons-loading" class="py-16 text-center">
+                <span class="material-symbols-outlined text-3xl text-neutral-300 animate-spin">sync</span>
+                <p class="text-[11px] font-medium text-neutral-400 mt-2">Đang tải dữ liệu...</p>
+            </div>
+
+            <!-- Pagination -->
+            <div id="coupons-pagination" class="hidden px-5 py-3 border-t border-neutral-100 flex items-center justify-between text-[11px]">
+                <span class="text-neutral-400 font-medium" id="pagination-info"></span>
+                <div class="flex items-center gap-1" id="pagination-buttons"></div>
+            </div>
+        </div>
+
+        <!-- ADD / EDIT COUPON MODAL (Slide-over panel) -->
+        <div id="coupon-modal" class="fixed inset-0 z-50 hidden">
+            <!-- Overlay -->
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="AdminCoupons.closeModal()"></div>
+            <!-- Modal Content -->
+            <div class="absolute right-0 top-0 h-full w-full max-w-xl bg-white shadow-2xl overflow-y-auto transform transition-transform duration-300">
+                <!-- Modal Header -->
+                <div class="sticky top-0 z-10 bg-white border-b border-neutral-100 px-6 py-4 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-sm font-black uppercase tracking-[0.1em]" id="modal-title">Tạo Mã Giảm Giá</h2>
+                        <p class="text-[10px] text-neutral-400 font-medium mt-0.5" id="modal-subtitle">H&Y Digital Curator</p>
+                    </div>
+                    <button onclick="AdminCoupons.closeModal()" class="p-1.5 hover:bg-neutral-100 rounded transition-colors">
+                        <span class="material-symbols-outlined text-neutral-400">close</span>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <form id="coupon-form" class="p-6 space-y-6">
+                    <input type="hidden" id="form-coupon-id">
+
+                    <!-- Thông tin cơ bản -->
+                    <div class="space-y-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Mã Code <span class="text-red-500">*</span></label>
+                            <input type="text" id="form-code" required maxlength="50" placeholder="VD: SUMMER2026"
+                                   class="w-full px-3 py-2.5 text-[12px] font-black border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors uppercase">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Loại giảm giá <span class="text-red-500">*</span></label>
+                                <select id="form-discount-type" required class="w-full px-3 py-2.5 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary">
+                                    <option value="PERCENTAGE">Phần trăm (%)</option>
+                                    <option value="FIXED_AMOUNT">Số tiền cố định (đ)</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Giá trị giảm <span class="text-red-500">*</span></label>
+                                <input type="number" id="form-discount-value" required min="1" step="any" placeholder="10"
+                                       class="w-full px-3 py-2.5 text-[11px] font-bold border border-neutral-200 bg-neutral-50 outline-none focus:border-primary">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Đơn tối thiểu (đ)</label>
+                                <input type="number" id="form-min-order" min="0" step="any" placeholder="0"
+                                       class="w-full px-3 py-2.5 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Số lượt sử dụng</label>
+                                <input type="number" id="form-usage-limit" min="1" placeholder="100"
+                                       class="w-full px-3 py-2.5 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Ngày bắt đầu <span class="text-red-500">*</span></label>
+                                <input type="datetime-local" id="form-start-date" required
+                                       class="w-full px-3 py-2.5 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Ngày kết thúc <span class="text-red-500">*</span></label>
+                                <input type="datetime-local" id="form-expiry-date" required
+                                       class="w-full px-3 py-2.5 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-2">
+                            <input type="checkbox" id="form-active" class="w-4 h-4 border-neutral-300 rounded focus:ring-primary accent-black">
+                            <label for="form-active" class="text-[11px] font-bold text-neutral-600 uppercase">Kích hoạt mã ngay</label>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-neutral-100">
+                        <button type="button" onclick="AdminCoupons.closeModal()" class="px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-neutral-500 hover:bg-neutral-100 transition-colors">
+                            Hủy
+                        </button>
+                        <button type="submit" id="btn-submit" class="bg-primary text-white px-6 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-800 transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[14px]">save</span> Lưu Mã Giảm Giá
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div id="admin-toast" class="fixed bottom-6 right-6 z-[100] space-y-2"></div>
+
+        <script th:src="@{/admin/js/coupons.js}"></script>
+    </div>
+</body>
+</html>

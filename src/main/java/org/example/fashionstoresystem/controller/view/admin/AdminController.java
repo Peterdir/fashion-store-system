@@ -39,7 +39,7 @@ public class AdminController {
 
     @GetMapping("/coupons")
     public String showCoupons() {
-        return "admin/pages/dashboard"; // TODO: tạo coupons.html riêng
+        return "admin/pages/coupons";
     }
 
     @GetMapping("/returns")

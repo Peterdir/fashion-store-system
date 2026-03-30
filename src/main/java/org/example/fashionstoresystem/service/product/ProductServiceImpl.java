@@ -15,9 +15,9 @@ import org.example.fashionstoresystem.repository.CategoryRepository;
 import org.example.fashionstoresystem.repository.ProductRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
 
+import org.example.fashionstoresystem.repository.ProductCleanupRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.stream.Collectors;
@@ -29,6 +29,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductCleanupRepository cleanupRepository;
 
     // Helper: Lấy tên danh mục an toàn (null-safe)
     private String getCategoryName(Product product) {
@@ -62,8 +63,8 @@ public class ProductServiceImpl implements ProductService {
                 .category(getParentCategoryName(product))
                 .subcategory(getCategoryName(product))
                 .status(product.getStatus())
-                .primaryImageUrl(product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl())
-                .hoverImageUrl(product.getImages().size() > 1 ? product.getImages().get(1).getUrl() : (product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl()))
+                .primaryImageUrl(formatImageUrl(product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl()))
+                .hoverImageUrl(formatImageUrl(product.getImages().size() > 1 ? product.getImages().get(1).getUrl() : (product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl())))
                 .build());
     }
 
@@ -83,8 +84,8 @@ public class ProductServiceImpl implements ProductService {
                 .category(getParentCategoryName(product))
                 .subcategory(getCategoryName(product))
                 .status(product.getStatus())
-                .primaryImageUrl(product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl())
-                .hoverImageUrl(product.getImages().size() > 1 ? product.getImages().get(1).getUrl() : (product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl()))
+                .primaryImageUrl(formatImageUrl(product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl()))
+                .hoverImageUrl(formatImageUrl(product.getImages().size() > 1 ? product.getImages().get(1).getUrl() : (product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl())))
                 .build());
     }
 
@@ -297,9 +298,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public void deleteProduct(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại!"));
-        productRepository.delete(product);
+        if (!productRepository.existsById(productId)) {
+            throw new RuntimeException("Sản phẩm không tồn tại!");
+        }
+
+        try {
+            // High-fidelity cleanup using a dedicated repository (SOLID)
+            cleanupRepository.nuclearDelete(productId);
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi hệ thống: Không thể xóa sản phẩm. Chi tiết: " + e.getMessage());
+        }
     }
 
     @Override

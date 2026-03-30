@@ -23,8 +23,10 @@ public class AdminCouponController {
 
     // XEM TẤT CẢ MÃ
     @GetMapping
-    public ResponseEntity<Page<CouponResponseDTO>> getAllCoupons(Pageable pageable) {
-        return ResponseEntity.ok(couponService.getAllCoupons(pageable));
+    public ResponseEntity<Page<CouponResponseDTO>> getAllCoupons(
+            @RequestParam(required = false) String keyword,
+            Pageable pageable) {
+        return ResponseEntity.ok(couponService.getAllCoupons(keyword, pageable));
     }
 
     // XEM CHI TIẾT MÃ

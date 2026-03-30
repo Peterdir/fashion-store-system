@@ -81,7 +81,8 @@ const AdminProducts = (() => {
         $('products-pagination').classList.add('hidden');
 
         try {
-            const res = await fetch(`${API.LIST}?${params.toString()}`);
+            // Thêm timestamp để ép trình duyệt tải dữ liệu thực tế từ DB, bỏ qua cache
+            const res = await fetch(`${API.LIST}?${params.toString()}&_t=${new Date().getTime()}`);
             if (!res.ok) throw new Error('Lỗi khi tải danh sách sản phẩm');
             const data = await res.json();
 
@@ -205,7 +206,7 @@ const AdminProducts = (() => {
         const row = document.createElement('div');
         row.className = 'flex items-center gap-2 image-row';
         row.innerHTML = `
-            <input type="url" placeholder="https://example.com/image.jpg" value="${value}"
+            <input type="text" placeholder="/images/products/example.jpg" value="${value}"
                    class="image-url-input flex-1 px-3 py-2 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors">
             <button type="button" onclick="this.closest('.image-row').remove()" class="p-1.5 text-neutral-300 hover:text-red-500 transition-colors flex-shrink-0">
                 <span class="material-symbols-outlined text-[16px]">close</span>
@@ -443,7 +444,7 @@ const AdminProducts = (() => {
 
             showToast('Xóa sản phẩm thành công!');
             closeDeleteModal();
-            fetchProducts(currentPage);
+            fetchProducts(0); // Luôn load lại từ trang đầu để đảm bảo thấy thay đổi
         } catch (err) {
             showToast(err.message, 'error');
         } finally {

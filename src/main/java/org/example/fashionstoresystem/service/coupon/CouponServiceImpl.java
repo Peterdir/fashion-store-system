@@ -133,8 +133,8 @@ public class CouponServiceImpl implements CouponService {
 
     // ADMIN API
     @Override
-    public Page<CouponResponseDTO> getAllCoupons(Pageable pageable) {
-        return couponRepository.findAll(pageable).map(this::mapToDTO);
+    public Page<CouponResponseDTO> getAllCoupons(String keyword, Pageable pageable) {
+        return couponRepository.findAllForAdmin(keyword, pageable).map(this::mapToDTO);
     }
 
     @Override
@@ -159,7 +159,7 @@ public class CouponServiceImpl implements CouponService {
                 .expiryDate(dto.getExpiryDate())
                 .minOrderAmount(dto.getMinOrderAmount())
                 .usageLimit(dto.getUsageLimit())
-                .active(true)
+                .active(dto.isActive())
                 .build();
         
         return mapToDTO(couponRepository.save(coupon));
@@ -211,7 +211,9 @@ public class CouponServiceImpl implements CouponService {
                 .startDate(coupon.getStartDate())
                 .expiryDate(coupon.getExpiryDate())
                 .minOrderAmount(coupon.getMinOrderAmount())
-                .collected(false) // Assuming collected isn't relevant for Admin view or handle appropriately
+                .usageLimit(coupon.getUsageLimit())
+                .active(coupon.isActive())
+                .collected(false)
                 .build();
     }
 }
