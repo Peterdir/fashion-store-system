@@ -24,7 +24,7 @@ public class AdminController {
 
     @GetMapping("/orders")
     public String showOrders() {
-        return "admin/pages/dashboard"; // TODO: tạo orders.html riêng
+        return "admin/pages/orders";
     }
 
     @GetMapping("/products")

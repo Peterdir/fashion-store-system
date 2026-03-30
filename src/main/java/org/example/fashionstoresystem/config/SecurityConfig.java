@@ -35,7 +35,7 @@ public class SecurityConfig {
                         // Cho phép truy cập giao diện Thymeleaf công khai
                         .requestMatchers("/", "/admin/**", "/category", "/product-detail/**", "/login", "/register", "/forgot-password", "/reset-password", "/cart", "/error", "/personal-center", "/auth-notice", "/verify-email").permitAll()
                         // Cho phép truy cập tài nguyên tĩnh (CSS, JS, Images, ...)
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/vendor/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/vendor/**", "/admin/**").permitAll()
                         // Cho phép truy cập Swagger UI và API docs
                         .requestMatchers(
                                 "/swagger-ui/**",
