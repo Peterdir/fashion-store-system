@@ -107,4 +107,10 @@ public class UserViewController {
         
         return "pages/personal-center";
     }
+
+    @GetMapping("/personal/order/{id}")
+    public String orderDetail(@org.springframework.web.bind.annotation.PathVariable Long id, Model model) {
+        model.addAttribute("orderId", id);
+        return "pages/order-detail";
+    }
 }

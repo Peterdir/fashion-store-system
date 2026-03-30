@@ -61,7 +61,13 @@ public class SecurityConfig {
                         .accessDeniedHandler(customAccessDeniedHandler)
                 )
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .deleteCookies("accessToken", "refreshToken")
+                        .logoutSuccessUrl("/login?logout=true")
+                        .permitAll()
+                );
 
         return http.build();
     }

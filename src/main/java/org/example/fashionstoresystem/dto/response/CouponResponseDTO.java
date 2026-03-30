@@ -20,5 +20,6 @@ public class CouponResponseDTO {
     private Instant startDate;
     private Instant expiryDate;
     private Double minOrderAmount;
+    private boolean used;
     private boolean collected;
 }

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán bảo mật MoMo</title>
+    <!-- Tailwind CSS (via CDN for local mock) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .momo-pink { background-color: #a50064; }
+        .momo-text { color: #a50064; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+        
+        <!-- Header -->
+        <div class="momo-pink p-6 text-center text-white">
+            <h1 class="text-xl font-bold tracking-tight">Thanh toán qua MoMo</h1>
+            <p class="text-sm opacity-90 mt-1">Sử dụng App MoMo hoặc ứng dụng Camera hỗ trợ QR code để quét mã.</p>
+        </div>
+
+        <!-- Body -->
+        <div class="p-8">
+            <div class="flex flex-col items-center justify-center">
+                
+                <!-- Gợi ý Logo (Có thể là Momo placeholder) -->
+                <div class="w-16 h-16 rounded-xl bg-gray-50 flex items-center justify-center mb-6 shadow-sm border border-gray-100">
+                    <svg class="w-8 h-8 momo-text" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                        <path d="M11 7h2v6h-2zm0 8h2v2h-2z"/>
+                    </svg>
+                </div>
+
+                <!-- Info -->
+                <h2 class="text-3xl font-black text-gray-800 tracking-tight" th:text="${#numbers.formatDecimal(amount, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</h2>
+                <div class="mt-2 text-sm text-gray-500 font-medium">Mã đơn hàng: <span class="text-gray-900 font-bold" th:text="'#' + ${orderId}">#0</span></div>
+
+                <!-- QR Code Giả lập -->
+                <div class="mt-8 p-4 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 w-full flex flex-col items-center justify-center">
+                    <img th:src="@{'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=MoMo-Mock-Order-' + ${orderId}}" alt="QR Code" class="w-48 h-48 rounded shadow-sm opacity-90 mix-blend-multiply">
+                    <p class="text-xs text-gray-400 mt-4 text-center font-medium">Đây là mã QR mô phỏng<br/>(Chỉ dành cho môi trường phát triển cục bộ)</p>
+                </div>
+
+            </div>
+
+            <!-- Nút xác nhận giả lập -->
+            <div class="mt-8 space-y-3">
+                <a th:href="${returnUrl}" class="block w-full momo-pink rounded-xl text-white font-bold text-center py-4 hover:opacity-90 transition-opacity focus:ring-4 focus:ring-pink-200">
+                    Tôi đã thanh toán thành công
+                </a>
+                <a th:href="@{/personal-center(tab='orders')}" class="block w-full bg-gray-100 text-gray-700 rounded-xl font-bold text-center py-4 hover:bg-gray-200 transition-colors">
+                    Hủy giao dịch
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 p-4 text-center text-xs text-gray-400 font-medium border-t border-gray-100">
+            Hệ thống thanh toán mô phỏng (Mock Gateway)
+        </div>
+    </div>
+
+</body>
+</html>

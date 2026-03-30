@@ -113,8 +113,25 @@ Object.assign(PersonalCenter, {
         
         // Update Address Input
         const addressInput = document.getElementById('pc-address-input');
+        const dashboardAddress = document.getElementById('pc-dashboard-address');
+        const currentAddressDisplay = document.getElementById('pc-current-address-display');
+        const addressText = document.getElementById('pc-address-text');
+
         if (addressInput) {
             addressInput.value = profile.address || '';
+        }
+        
+        if (dashboardAddress) {
+            dashboardAddress.textContent = profile.address || 'No address set';
+        }
+
+        if (addressText) {
+            addressText.textContent = profile.address || 'None';
+            if (profile.address && currentAddressDisplay) {
+                currentAddressDisplay.classList.remove('hidden');
+            } else if (currentAddressDisplay) {
+                currentAddressDisplay.classList.add('hidden');
+            }
         }
 
         // Update Name Input
@@ -174,6 +191,7 @@ Object.assign(PersonalCenter, {
             const updateData = {
                 fullName: newName,
                 phone: this.originalProfile ? this.originalProfile.phone : '',
+                email: this.originalProfile ? this.originalProfile.email : '',
                 address: this.originalProfile ? this.originalProfile.address : ''
             };
 
@@ -272,6 +290,7 @@ Object.assign(PersonalCenter, {
             const updateData = {
                 fullName: this.originalProfile ? this.originalProfile.fullName : '',
                 phone: this.originalProfile ? this.originalProfile.phone : '',
+                email: this.originalProfile ? this.originalProfile.email : '',
                 address: newAddress
             };
 

@@ -1,6 +1,7 @@
 package org.example.fashionstoresystem.service.order;
 
 import lombok.RequiredArgsConstructor;
+import org.example.fashionstoresystem.repository.UserCouponRepository;
 import org.example.fashionstoresystem.dto.request.CancelOrderRequestDTO;
 import org.example.fashionstoresystem.dto.request.PlaceOrderRequestDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
@@ -18,12 +19,14 @@ import org.example.fashionstoresystem.entity.jpa.Order;
 import org.example.fashionstoresystem.entity.jpa.OrderHistory;
 import org.example.fashionstoresystem.entity.jpa.OrderItem;
 import org.example.fashionstoresystem.entity.jpa.ProductVariant;
+import org.example.fashionstoresystem.entity.jpa.User;
 import org.example.fashionstoresystem.repository.CartItemRepository;
 import org.example.fashionstoresystem.repository.CouponRepository;
 import org.example.fashionstoresystem.repository.OrderHistoryRepository;
 import org.example.fashionstoresystem.repository.OrderItemRepository;
 import org.example.fashionstoresystem.repository.OrderRepository;
 import org.example.fashionstoresystem.repository.ProductVariantRepository;
+import org.example.fashionstoresystem.repository.UserRepository;
 import org.example.fashionstoresystem.service.payment.MomoService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +51,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderHistoryRepository orderHistoryRepository;
     private final CartItemRepository cartItemRepository;
     private final CouponRepository couponRepository;
+    private final UserRepository userRepository;
+    private final UserCouponRepository userCouponRepository;
     private final MomoService momoService;
 
     // ĐẶT HÀNG
@@ -55,6 +60,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public PlaceOrderResponseDTO placeOrder(PlaceOrderRequestDTO dto) {
+        // 0. Tìm người dùng
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại!"));
 
         // 1. Lấy danh sách sản phẩm trong giỏ hàng
         List<CartItem> cartItems = cartItemRepository.findAllById(dto.getCartItemIds());
@@ -95,6 +103,14 @@ public class OrderServiceImpl implements OrderService {
 
             if (totalAmount < 0)
                 totalAmount = 0.0;
+            
+            // 3.5. Kiểm tra xem người dùng đã dùng mã này chưa
+            userCouponRepository.findByUserIdAndCouponCode(user.getId(), dto.getCouponCode().trim())
+                .ifPresent(uc -> {
+                    if (uc.isUsed()) {
+                        throw new RuntimeException("Mã giảm giá này đã được sử dụng!");
+                    }
+                });
         }
 
         // 4. Khởi tạo & Lưu Object Order chính (không còn status ở Order)
@@ -104,6 +120,7 @@ public class OrderServiceImpl implements OrderService {
         order.setShippingAddress(dto.getShippingAddress());
         order.setPaymentMethod(dto.getPaymentMethod());
         order.setType(OrderType.ONLINE);
+        order.setUser(user);
         order = orderRepository.save(order);
 
         // 5. Khởi tạo OrderItem (mỗi item có status riêng) và Trừ Kho
@@ -136,6 +153,15 @@ public class OrderServiceImpl implements OrderService {
             paymentUrl = momoService.createPaymentUrl(order.getId(), order.getTotalAmount());
         }
 
+        // 7.5. Đánh dấu Coupon đã sử dụng (Nếu có)
+        if (dto.getCouponCode() != null && !dto.getCouponCode().trim().isEmpty()) {
+            userCouponRepository.findByUserIdAndCouponCode(user.getId(), dto.getCouponCode().trim())
+                .ifPresent(uc -> {
+                    uc.setUsed(true);
+                    userCouponRepository.save(uc);
+                });
+        }
+
         // 8. Trả về kết quả
         return PlaceOrderResponseDTO.builder()
                 .orderId(order.getId())
@@ -151,6 +177,7 @@ public class OrderServiceImpl implements OrderService {
     // THEO DÕI TRẠNG THÁI ĐƠN HÀNG - Xem danh sách
 
     @Override
+    @Transactional(readOnly = true)
     public Page<OrderSummaryResponseDTO> getMyOrders(Long userId, OrderStatus status, Pageable pageable) {
         Page<Order> orders = orderRepository.searchMyOrders(userId, status, pageable);
 
@@ -177,6 +204,7 @@ public class OrderServiceImpl implements OrderService {
     // THEO DÕI TRẠNG THÁI ĐƠN HÀNG - Xem chi tiết
 
     @Override
+    @Transactional(readOnly = true)
     public OrderDetailResponseDTO getMyOrderDetail(Long userId, Long orderId) {
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
                 .orElseThrow(

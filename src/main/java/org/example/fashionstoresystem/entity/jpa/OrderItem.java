@@ -29,7 +29,7 @@ public class OrderItem {
     private String productName;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     @Builder.Default
     private OrderStatus status = OrderStatus.PENDING_PAYMENT;
 

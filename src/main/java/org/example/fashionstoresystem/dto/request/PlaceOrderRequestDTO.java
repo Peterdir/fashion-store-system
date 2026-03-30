@@ -17,6 +17,9 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class PlaceOrderRequestDTO {
+    @NotNull(message = "Người dùng không được để trống")
+    private Long userId;
+
     @NotEmpty(message = "Danh sách sản phẩm thanh toán không được rỗng")
     private List<Long> cartItemIds;
 

@@ -28,6 +28,20 @@ class MiniCart {
                 this.open();
             });
         }
+        // Checkout button click handler
+        const checkoutBtn = document.getElementById('mini-cart-checkout-btn');
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', (e) => {
+                const cart = CartUtils.getCart();
+                if (cart.length > 0) {
+                    const selectedIds = cart.map(item => String(item.variantId || item.id));
+                    localStorage.setItem('hy_checkout_ids', JSON.stringify(selectedIds));
+                } else {
+                    e.preventDefault();
+                    if (window.Toast) Toast.error('Giỏ hàng của bạn đang trống!');
+                }
+            });
+        }
     }
 
     static open() {

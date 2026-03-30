@@ -35,19 +35,23 @@ public class CouponServiceImpl implements CouponService {
     // Xem danh sách mã giảm giá đang có
     @Override
     public List<CouponResponseDTO> getAvailableCoupons(Long userId) {
-        List<Coupon> activeCoupons = couponRepository.findByActiveTrue();
+        List<Coupon> allActiveCoupons = couponRepository.findByActiveTrue();
 
-        return activeCoupons.stream()
-                .map(coupon -> CouponResponseDTO.builder()
-                        .couponId(coupon.getId())
-                        .code(coupon.getCode())
-                        .discountValue(coupon.getDiscountValue())
-                        .discountType(coupon.getDiscountType())
-                        .startDate(coupon.getStartDate())
-                        .expiryDate(coupon.getExpiryDate())
-                        .minOrderAmount(coupon.getMinOrderAmount())
-                        .collected(userCouponRepository.existsByUserIdAndCouponId(userId, coupon.getId()))
-                        .build())
+        return allActiveCoupons.stream()
+                .map(coupon -> {
+                    var userCouponOpt = userCouponRepository.findByUserIdAndCouponId(userId, coupon.getId());
+                    return CouponResponseDTO.builder()
+                            .couponId(coupon.getId())
+                            .code(coupon.getCode())
+                            .discountValue(coupon.getDiscountValue())
+                            .discountType(coupon.getDiscountType())
+                            .startDate(coupon.getStartDate())
+                            .expiryDate(coupon.getExpiryDate())
+                            .minOrderAmount(coupon.getMinOrderAmount())
+                            .collected(userCouponOpt.isPresent())
+                            .used(userCouponOpt.map(UserCoupon::isUsed).orElse(false))
+                            .build();
+                })
                 .toList();
     }
 

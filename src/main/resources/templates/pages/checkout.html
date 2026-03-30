@@ -98,7 +98,7 @@
                         <!-- MoMo -->
                         <div class="payment-option group cursor-pointer border-2 border-outline/10 p-6 flex items-center gap-6 transition-all hover:border-primary/50 relative overflow-hidden" data-method="MOMO">
                             <div class="w-16 h-16 bg-white shrink-0 flex items-center justify-center p-2 rounded-xl shadow-sm border border-outline/5">
-                                <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo" class="w-full h-full object-contain">
+                                <img src="/images/momo_logo_clean_1774838615190.png" th:src="@{/images/momo_logo_clean_1774838615190.png}" alt="MoMo" class="w-full h-full object-contain">
                             </div>
                             <div class="flex-grow">
                                 <h4 class="font-black text-sm uppercase tracking-tight">Ví điện tử MoMo</h4>
@@ -132,9 +132,38 @@
                     <div class="bg-surface-container-lowest p-10 border border-outline/5 shadow-[40px_40px_40px_4%_rgba(26,28,28,0.02)]">
                         <h2 class="font-black text-2xl tracking-tighter uppercase mb-10 pb-6 border-b border-outline/10">Tóm tắt đơn hàng</h2>
                         
-                        <!-- Mini Selection Display -->
                         <div id="checkout-items-list" class="space-y-6 mb-10 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                             <!-- JS Populated -->
+                        </div>
+
+                        <!-- Coupon Section -->
+                        <div class="mb-10 pt-6 border-t border-outline/10">
+                            <div class="flex justify-between items-center mb-3">
+                                <label class="text-[10px] font-black uppercase tracking-widest opacity-40">Mã giảm giá</label>
+                                <button id="open-coupon-selector-btn" class="text-[9px] font-black uppercase text-secondary border-b border-secondary/20 hover:border-secondary transition-all">Chọn từ ví</button>
+                            </div>
+                            
+                            <!-- Input Area -->
+                            <div id="coupon-input-group" class="flex gap-2">
+                                <input type="text" id="coupon-input" class="flex-grow bg-surface-low border border-outline/10 px-4 py-3 text-xs font-bold focus:border-primary outline-none transition-all no-radius uppercase placeholder:normal-case" placeholder="Nhập mã tại đây...">
+                                <button id="apply-coupon-btn" class="bg-primary text-white px-6 text-[10px] font-black uppercase tracking-widest hover:bg-primary/90 transition-all no-radius">Áp dụng</button>
+                            </div>
+
+                            <!-- Applied Tag Area -->
+                            <div id="applied-coupon-tag" class="hidden flex items-center justify-between bg-primary/5 border border-primary/20 p-4 no-radius animate-fade-in">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-primary text-lg">sell</span>
+                                    <div>
+                                        <p id="applied-coupon-name" class="text-[10px] font-black uppercase tracking-widest text-primary">SUMMER2026</p>
+                                        <p id="applied-coupon-description" class="text-[8px] font-bold opacity-60 uppercase text-primary">Tiết kiệm 50.000₫</p>
+                                    </div>
+                                </div>
+                                <button id="remove-coupon-btn" class="text-on-surface-variant hover:text-red-500 transition-colors p-1">
+                                    <span class="material-symbols-outlined text-[18px]">close</span>
+                                </button>
+                            </div>
+
+                            <p id="coupon-message" class="text-[9px] font-bold mt-2 hidden"></p>
                         </div>
 
                         <div class="space-y-5 mb-10 border-t border-outline/10 pt-10">
@@ -169,6 +198,36 @@
                             <p class="text-[9px] font-bold opacity-40 uppercase tracking-widest leading-relaxed">Dữ liệu cá nhân của bạn sẽ được sử dụng để hỗ trợ trải nghiệm của bạn trên trang web này.</p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coupon Selector Modal -->
+        <div id="coupon-selector-modal" class="fixed inset-0 bg-black/40 z-[100] hidden backdrop-blur-sm transition-all duration-300 opacity-0 items-center justify-center p-4">
+            <div class="bg-white w-full max-w-lg shadow-2xl relative flex flex-col max-h-[80vh]">
+                <!-- Modal Header -->
+                <div class="p-8 border-b border-outline/10 flex justify-between items-center bg-surface-container-lowest">
+                    <div>
+                        <h3 class="text-xl font-black uppercase tracking-tighter">Ví mã giảm giá</h3>
+                        <p class="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-1">Chọn ưu đãi tốt nhất cho bạn</p>
+                    </div>
+                    <button id="close-coupon-modal" class="w-10 h-10 border border-outline/10 flex items-center justify-center hover:bg-surface-low transition-colors no-radius">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                </div>
+                
+                <!-- Modal Body (List) -->
+                <div id="coupon-selection-list" class="flex-grow overflow-y-auto p-8 space-y-6 custom-scrollbar bg-surface-low/30">
+                    <!-- JS Populated -->
+                    <div class="animate-pulse space-y-4">
+                        <div class="h-24 bg-outline/5 no-radius"></div>
+                        <div class="h-24 bg-outline/5 no-radius"></div>
+                    </div>
+                </div>
+                
+                <!-- Modal Footer (Optional Tip) -->
+                <div class="p-4 bg-primary/5 text-center">
+                    <p class="text-[9px] font-bold text-primary opacity-60 uppercase tracking-widest">Tối đa áp dụng 01 mã cho mỗi đơn hàng</p>
                 </div>
             </div>
         </div>

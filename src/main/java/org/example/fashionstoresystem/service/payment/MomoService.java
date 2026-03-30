@@ -2,79 +2,79 @@ package org.example.fashionstoresystem.service.payment;
 
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.config.MomoConfig;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.util.Formatter;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class MomoService {
 
     private final MomoConfig momoConfig;
-    private final RestTemplate restTemplate = new RestTemplate();
 
     /**
      * Tạo URL thanh toán MoMo
      */
     public String createPaymentUrl(Long orderId, Double amount) {
-        String requestId = String.valueOf(System.currentTimeMillis());
-        String orderInfo = "Thanh toán đơn hàng #" + orderId;
-        String extraData = ""; // Có thể dùng để lưu trữ thêm thông tin (Base64)
-        
-        // Chuỗi dữ liệu để tạo chữ ký (theo đúng thứ tự MoMo yêu cầu)
-        String rawSignature = "accessKey=" + momoConfig.getAccessKey() +
-                "&amount=" + amount.longValue() +
+        // [MOCK PAYMENT] Thay vì gọi API của MoMo (đang bị lỗi môi trường 11007),
+        // Ta chuyển hướng người dùng đến trang Mock giao diện quét QR cục bộ.
+        return "/mock/momo-payment?orderId=" + orderId + "&amount=" + amount.longValue();
+    }
+
+    /**
+     * Tạo URL Return giả lập (Mock) với chữ ký hợp lệ 100%
+     * Được dùng bởi trang Mock MoMo khi người dùng bấm "Đã quét mã".
+     */
+    public String generateMockReturnUrl(String orderId, String amount) {
+        String accessKey = momoConfig.getAccessKey().trim();
+        String partnerCode = momoConfig.getPartnerCode().trim();
+        String secretKey = momoConfig.getSecretKey().trim();
+        String returnUrl = momoConfig.getReturnUrl().trim();
+
+        String extraData = "";
+        String message = "Thanh toan thanh cong";
+        String orderInfo = "Thanh toan don hang " + orderId;
+        String orderType = "momo_wallet";
+        String requestId = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
+        String responseTime = String.valueOf(System.currentTimeMillis());
+        String resultCode = "0"; // 0 = Thành công
+        String transId = String.valueOf(System.currentTimeMillis() * 2);
+
+        // Chuỗi dữ liệu để Verify (alphabet của key)
+        String rawSignature = "accessKey=" + accessKey +
+                "&amount=" + amount +
                 "&extraData=" + extraData +
-                "&ipnUrl=" + momoConfig.getNotifyUrl() +
+                "&message=" + message +
                 "&orderId=" + orderId +
                 "&orderInfo=" + orderInfo +
-                "&partnerCode=" + momoConfig.getPartnerCode() +
+                "&orderType=" + orderType +
+                "&partnerCode=" + partnerCode +
                 "&requestId=" + requestId +
-                "&returnUrl=" + momoConfig.getReturnUrl() +
-                "&requestType=captureWallet";
+                "&responseTime=" + responseTime +
+                "&resultCode=" + resultCode +
+                "&transId=" + transId;
 
-        String signature = hmacSha256(rawSignature, momoConfig.getSecretKey());
+        String signature = hmacSha256(rawSignature, secretKey);
 
-        // Body request
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("partnerCode", momoConfig.getPartnerCode());
-        requestBody.put("accessKey", momoConfig.getAccessKey());
-        requestBody.put("requestId", requestId);
-        requestBody.put("amount", amount.longValue());
-        requestBody.put("orderId", String.valueOf(orderId));
-        requestBody.put("orderInfo", orderInfo);
-        requestBody.put("returnUrl", momoConfig.getReturnUrl());
-        requestBody.put("ipnUrl", momoConfig.getNotifyUrl());
-        requestBody.put("extraData", extraData);
-        requestBody.put("requestType", "captureWallet");
-        requestBody.put("signature", signature);
-        requestBody.put("lang", "vi");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-
-        try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> response = restTemplate.postForObject(momoConfig.getApiUrl(), entity, Map.class);
-            if (response != null && response.containsKey("payUrl")) {
-                return (String) response.get("payUrl");
-            } else {
-                String message = response != null ? (String) response.get("message") : "Không có phản hồi từ MoMo";
-                throw new RuntimeException("Lỗi tạo thanh toán MoMo: " + message);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi kết nối API MoMo: " + e.getMessage());
-        }
+        return returnUrl +
+                "?partnerCode=" + partnerCode +
+                "&accessKey=" + accessKey +
+                "&orderId=" + orderId +
+                "&requestId=" + requestId +
+                "&amount=" + amount +
+                "&orderInfo=" + orderInfo +
+                "&orderType=" + orderType +
+                "&transId=" + transId +
+                "&resultCode=" + resultCode +
+                "&message=" + message +
+                "&payType=qr" +
+                "&responseTime=" + responseTime +
+                "&extraData=" + extraData +
+                "&signature=" + signature;
     }
 
     /**
@@ -99,7 +99,9 @@ public class MomoService {
                 "&resultCode=" + allParams.get("resultCode") +
                 "&transId=" + allParams.get("transId");
 
-        String recalculatedSignature = hmacSha256(rawSignature, momoConfig.getSecretKey());
+        String recalculatingSecretKey = momoConfig.getSecretKey().trim();
+        System.out.println("MoMo Raw Signature (Verify): " + rawSignature);
+        String recalculatedSignature = hmacSha256(rawSignature, recalculatingSecretKey);
         return recalculatedSignature.equalsIgnoreCase(signature);
     }
 
@@ -119,11 +121,12 @@ public class MomoService {
     }
 
     private String toHexString(byte[] bytes) {
-        try (Formatter formatter = new Formatter()) {
-            for (byte b : bytes) {
-                formatter.format("%02x", b);
-            }
-            return formatter.toString();
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) sb.append('0');
+            sb.append(hex);
         }
+        return sb.toString();
     }
 }

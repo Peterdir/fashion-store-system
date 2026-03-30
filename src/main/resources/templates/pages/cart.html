@@ -4,6 +4,50 @@
       layout:decorate="~{layouts/layout}">
 <head>
     <title>Giỏ hàng | H&Y Digital Curator</title>
+    <style>
+        .qty-popover {
+            display: none;
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15);
+            z-index: 50;
+            padding: 12px;
+            border-radius: 12px;
+            width: 140px;
+            animation: qtyPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes qtyPop {
+            from { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.95); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+        }
+        .qty-popover.active { display: block; }
+        .qty-opt {
+            padding: 8px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 6px;
+        }
+        .qty-opt:hover { background: var(--primary); color: white; }
+        
+        .elite-qty-btn {
+            background: #f8f9fa;
+            border: 1px solid #eee;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .elite-qty-btn:hover {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 4px 15px -5px rgba(0,0,0,0.05);
+        }
+    </style>
 </head>
 <body>
     <main layout:fragment="content" class="pt-12 pb-24 px-4 md:px-8 max-w-[1440px] mx-auto">
@@ -64,17 +108,8 @@
                 <!-- Recommendations Teaser -->
                 <div class="pt-24 pb-12 border-t border-outline/5 mt-12">
                     <h4 class="text-xs font-black uppercase tracking-[0.3em] mb-12 text-center opacity-40">Có thể bạn cũng thích</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        <div th:each="i : ${#numbers.sequence(1, 4)}" class="space-y-4 group cursor-pointer">
-                            <div class="aspect-[3/4] bg-surface-low relative overflow-hidden">
-                                <img th:src="@{'/images/p' + ${i} + '.png'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                                <div class="absolute top-0 left-0 bg-primary text-white text-[8px] font-black px-2 py-1 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Quick View</div>
-                            </div>
-                            <div class="space-y-1">
-                                <p class="text-[10px] font-black uppercase tracking-widest truncate" th:text="'Sản phẩm gợi ý ' + ${i}">Recommended Product</p>
-                                <p class="text-xs font-black text-secondary tracking-tighter">450.000₫</p>
-                            </div>
-                        </div>
+                    <div id="recommendations-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <!-- Sản phẩm thật sẽ được load bằng JS -->
                     </div>
                 </div>
             </div>
@@ -106,10 +141,6 @@
                             <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest pt-6 border-t border-dashed border-outline/20">
                                 <span class="text-on-surface-variant">Tiết kiệm</span>
                                 <span id="cart-summary-discount" class="text-secondary">-0₫</span>
-                            </div>
-                            <div class="flex justify-between text-[9px] font-black uppercase tracking-widest bg-surface-low p-3 mt-4">
-                                <span class="text-on-surface-variant">Điểm thưởng</span>
-                                <span id="cart-summary-points" class="text-primary">+0 pts</span>
                             </div>
                         </div>
 

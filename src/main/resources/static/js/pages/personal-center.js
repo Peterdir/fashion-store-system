@@ -18,6 +18,26 @@ const PersonalCenter = {
                 if (this.setupAddressEditing) this.setupAddressEditing();
                 if (this.setupWishlistFilters) this.setupWishlistFilters();
                 if (this.setupManageAccount) this.setupManageAccount();
+
+                // Initialize Orders Module
+                console.log('Checking OrderModule initialization conditions...');
+                if (window.OrderModule && this.originalProfile && this.originalProfile.userId) {
+                    console.log('Initializing OrderModule with ID:', this.originalProfile.userId);
+                    window.OrderModule.init(this.originalProfile.userId);
+                    
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const currentTab = urlParams.get('tab');
+                    const currentStatus = urlParams.get('status') || 'all';
+                    if (currentTab === 'orders' || !currentTab) { // Load orders if tab is orders or on dashboard
+                        window.OrderModule.loadOrders(currentStatus);
+                    }
+                } else {
+                    console.warn('OrderModule skipped. Condition failed:', {
+                        moduleFound: !!window.OrderModule,
+                        profileFound: !!this.originalProfile,
+                        userId: this.originalProfile ? this.originalProfile.userId : 'N/A'
+                    });
+                }
             }).catch(err => {
                 console.error('Initial loadUserData failed:', err);
             });
@@ -67,20 +87,6 @@ const PersonalCenter = {
                 if (tabId) {
                     this.switchTab(tabId, link);
                 }
-            });
-        });
-
-        // Handle Coupon Sub-tabs
-        const couponSubtabs = document.querySelectorAll('.coupon-subtab');
-        couponSubtabs.forEach(subtab => {
-            subtab.addEventListener('click', () => {
-                couponSubtabs.forEach(s => {
-                    s.classList.remove('text-primary', 'border-b-2', 'border-primary');
-                    s.classList.add('text-on-surface-variant/60', 'font-bold');
-                    s.classList.remove('font-black');
-                });
-                subtab.classList.add('text-primary', 'border-b-2', 'border-primary', 'font-black');
-                subtab.classList.remove('text-on-surface-variant/60', 'font-bold');
             });
         });
 
@@ -141,6 +147,11 @@ const PersonalCenter = {
                         orderContentArea.style.animation = 'none';
                         orderContentArea.offsetHeight; 
                         orderContentArea.style.animation = '';
+
+                        // REAL DATA LOAD: Call OrderModule
+                        if (window.OrderModule && status) {
+                            window.OrderModule.loadOrders(status);
+                        }
                     }, 500);
                 }
             });
@@ -217,6 +228,14 @@ const PersonalCenter = {
             // Load data if needed (if method exists)
             if (tabId === 'favorites' && this.loadWishlist) {
                 this.loadWishlist();
+            }
+            if (tabId === 'coupons' && window.CouponModule) {
+                window.CouponModule.init();
+            }
+            if (tabId === 'orders' && window.OrderModule) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const status = urlParams.get('status') || 'all';
+                window.OrderModule.loadOrders(status);
             }
         } else {
             console.error('Target tab content not found: tab-' + tabId);
