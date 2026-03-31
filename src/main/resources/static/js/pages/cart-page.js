@@ -45,66 +45,75 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Error fetching wish items for cart:', e);
             }
         }
-        
+
         let html = '';
         cart.forEach((item, index) => {
-            // Kiểm tra kỹ productId từ nhiều nguồn tiềm năng trong object item
             const pId = String(item.productId || item.variantId || item.id);
             const isWishlisted = wishlistProductIds.includes(pId);
             
             html += `
-                <div class="p-8 border-b border-outline/5 last:border-0 group/item bg-white relative">
-                    <!-- Shop Name -->
-                    <div class="flex items-center gap-2 mb-6 opacity-60">
-                        <span class="material-symbols-outlined text-sm">storefront</span>
-                        <span class="text-[10px] font-bold uppercase tracking-widest">Store Official</span>
-                    </div>
-
-                    <div class="flex flex-col md:flex-row gap-8">
-                        <div class="flex gap-6">
+                <div class="p-10 border-b border-outline/5 last:border-0 group/item bg-white relative transition-all hover:bg-neutral-50/50">
+                    <div class="flex flex-col md:flex-row gap-10">
+                        <!-- Checkbox & Image -->
+                        <div class="flex gap-6 shrink-0">
                             <div class="flex items-start pt-2">
-                                <input type="checkbox" checked data-id="${item.variantId || item.id}" value="${item.variantId || item.id}" class="item-checkbox w-4 h-4 border border-outline text-primary focus:ring-0 no-radius cursor-pointer"/>
+                                <input type="checkbox" checked data-id="${item.variantId || item.id}" value="${item.variantId || item.id}" 
+                                       class="item-checkbox w-5 h-5 border-2 border-outline !rounded-none text-primary focus:ring-0 cursor-pointer"/>
                             </div>
-                            <div class="w-32 h-44 bg-surface-low overflow-hidden shrink-0 border border-outline/5 relative group-hover/item:border-primary/20 transition-colors">
-                                <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-700">
+                            <div class="w-36 h-48 bg-surface-low overflow-hidden shrink-0 border border-outline/5 relative shadow-sm group-hover/item:shadow-md transition-all duration-500">
+                                <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-1000">
+                                <div class="absolute inset-0 bg-black/0 group-hover/item:bg-black/5 transition-colors"></div>
                             </div>
                         </div>
 
-                        <div class="flex-grow flex flex-col justify-between py-1">
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-start gap-4">
-                                    <h3 class="text-sm font-black leading-snug tracking-tight uppercase">${item.name}</h3>
-                                    <div class="flex gap-4 text-on-surface-variant">
-                                        <button onclick="CartPage.toggleWishlist('${item.productId || item.id}', this)" class="hover:text-primary transition-colors ${isWishlisted ? 'text-red-600' : ''}">
+                        <!-- Content Area -->
+                        <div class="flex-grow flex flex-col justify-between">
+                            <div class="space-y-6">
+                                <!-- Title & Basic Info -->
+                                <div class="flex justify-between items-start gap-6">
+                                    <div class="space-y-1">
+                                        <h3 class="text-base font-black leading-tight tracking-tighter uppercase mb-2">${item.name}</h3>
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <button onclick="CartPage.toggleWishlist('${item.productId || item.id}', this)" 
+                                                title="Lưu để mua sau"
+                                                class="w-10 h-10 border border-outline/10 flex items-center justify-center hover:bg-white hover:text-secondary hover:border-secondary/20 transition-all ${isWishlisted ? 'text-secondary bg-white' : 'text-on-surface-variant'}">
                                             <span class="material-symbols-outlined text-xl ${isWishlisted ? 'fill-1' : ''}" style="${isWishlisted ? 'font-variation-settings: \'FILL\' 1;' : ''}">favorite</span>
                                         </button>
-                                        <button class="hover:text-secondary transition-colors" onclick="CartPage.removeItem('${item.id}')"><span class="material-symbols-outlined text-xl">delete</span></button>
+                                        <button class="w-10 h-10 border border-outline/10 flex items-center justify-center hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all text-on-surface-variant" 
+                                                onclick="CartPage.removeItem('${item.id}')">
+                                            <span class="material-symbols-outlined text-xl">delete</span>
+                                        </button>
                                     </div>
                                 </div>
-                                <p class="text-[10px] text-on-surface-variant font-bold uppercase tracking-[0.1em]">SKU: ${item.id}</p>
-                                
-                                <div class="flex gap-3 pt-2">
-                                    ${item.color !== 'N/A' ? `<div class="bg-surface-low px-3 py-1 text-[8.5px] font-black uppercase tracking-widest text-on-surface-variant/70">${item.color}</div>` : ''}
-                                    ${item.size !== 'N/A' ? `<div class="bg-surface-low px-3 py-1 text-[8.5px] font-black uppercase tracking-widest text-on-surface-variant/70">${item.size}</div>` : ''}
+
+                                <!-- Detailed Specs Grid -->
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-black/5">
+                                    <div>
+                                        <p class="text-[8px] font-black uppercase tracking-widest text-on-surface-variant/40 mb-1">Màu sắc</p>
+                                        <p class="text-[10px] font-black uppercase tracking-widest">${item.color || 'Màu tiêu chuẩn'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[8px] font-black uppercase tracking-widest text-on-surface-variant/40 mb-1">Kích cỡ</p>
+                                        <p class="text-[10px] font-black uppercase tracking-widest">${item.size || 'F'}</p>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="flex justify-between items-end mt-8">
-                                <div class="space-y-1">
-                                    <div class="text-xl font-black text-secondary tracking-tighter">${formatVND(item.price)}</div>
+                                <div class="flex items-baseline gap-3">
+                                    <div class="text-2xl font-black text-black tracking-tighter">${formatVND(item.price)}</div>
                                 </div>
                                 
-                                <!-- Elite Quantity Selector -->
                                 <div class="relative">
-                                    <div class="elite-qty-btn flex items-center justify-between gap-4 px-4 h-10 rounded-full cursor-pointer min-w-[100px]"
+                                    <div class="elite-qty-btn flex items-center justify-between gap-6 px-6 h-12 rounded-none border-2 border-black/5 hover:border-black cursor-pointer min-w-[120px] transition-all"
                                          onclick="event.stopPropagation(); CartPage.toggleQtyPopover('${item.id}')">
-                                        <span class="text-[11px] font-black tracking-widest uppercase opacity-40">Qty</span>
-                                        <span class="text-xs font-black" id="qty-val-${item.id}">${item.quantity}</span>
-                                        <span class="material-symbols-outlined text-sm opacity-40">expand_more</span>
+                                        <span class="text-[10px] font-black tracking-widest uppercase opacity-40">Qty</span>
+                                        <span class="text-sm font-black" id="qty-val-${item.id}">${String(item.quantity).padStart(2, '0')}</span>
+                                        <span class="material-symbols-outlined text-base opacity-40">unfold_more</span>
                                     </div>
                                     
-                                    <!-- Popover Menu -->
-                                    <div id="qty-popover-${item.id}" class="qty-popover" onclick="event.stopPropagation()">
+                                    <div id="qty-popover-${item.id}" class="qty-popover !rounded-none !border-black" onclick="event.stopPropagation()">
                                         <div class="grid grid-cols-2 gap-2">
                                             <div class="qty-opt" onclick="CartPage.selectQty('${item.id}', 1)">01</div>
                                             <div class="qty-opt" onclick="CartPage.selectQty('${item.id}', 2)">02</div>
@@ -118,12 +127,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                                    oninput="if(this.value.startsWith('0')) this.value = this.value.replace(/^0+/, '')"
                                                    onchange="CartPage.selectQty('${item.id}', this.value)"
                                                    placeholder="Khác..."
-                                                   class="w-full h-8 text-center text-xs font-black border border-black/5 bg-transparent outline-none focus:border-primary transition-colors rounded-lg">
+                                                   class="w-full h-10 text-center text-[10px] font-black border border-black/10 bg-transparent outline-none focus:border-black transition-colors rounded-none">
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
                     </div>
                 </div>
             `;

@@ -60,13 +60,14 @@ const OrderModule = {
      * Fetch orders from API
      */
     async loadOrders(status = 'all', page = 0) {
+        this.currentPage = page;
         const contentArea = document.getElementById('order-tab-content-area');
         const loadingArea = document.getElementById('order-loading');
 
         if (loadingArea) loadingArea.classList.remove('hidden');
         if (contentArea) {
             contentArea.classList.add('hidden');
-            contentArea.innerHTML = '';
+            // We don't clear innerHTML immediately to avoid flicker if it's just a page change
         }
 
         try {
@@ -83,19 +84,21 @@ const OrderModule = {
                 url += `&statuses=${backendStatus}`;
             }
 
-            console.log('Fetching orders from URL:', url);
-
             const response = await fetch(`${url}&_t=${new Date().getTime()}`);
             if (!response.ok) throw new Error('Failed to fetch orders');
 
             const data = await response.json();
 
             // Render the data with the correct card format
-            this.renderOrders(data.content || [], isItemCard);
+            this.renderOrders(data, isItemCard);
 
             // Hide loading
             if (loadingArea) loadingArea.classList.add('hidden');
             if (contentArea) contentArea.classList.remove('hidden');
+
+            // Scroll to top of tab content if it's a page change
+            const tabHeader = document.querySelector('.personal-tabs-header');
+            if (tabHeader && page > 0) tabHeader.scrollIntoView({ behavior: 'smooth' });
 
         } catch (error) {
             console.error('Order/Query error:', error);
@@ -108,68 +111,93 @@ const OrderModule = {
     },
 
     /**
-     * Render the list of orders
+     * Render the list of orders with pagination
      */
-    renderOrders(orders, isItemCard = false) {
+    renderOrders(pageData, isItemCard = false) {
         const container = document.getElementById('order-tab-content-area');
         if (!container) return;
 
-        if (orders.length === 0) {
+        const orders = pageData.content || [];
+
+        if (orders.length === 0 && pageData.number === 0) {
+            // ... (keep existing empty state logic)
             let emptyIcon = 'package_2';
             let emptyTitle = 'Trống Trơn!';
             let emptyDesc = 'Bạn chưa có bất kỳ đơn hàng nào trong hệ thống.';
 
             switch (this.currentStatus) {
-                case 'unpaid':
-                    emptyIcon = 'account_balance_wallet';
-                    emptyTitle = 'Tuyệt vời!';
-                    emptyDesc = 'Bạn không có đơn hàng nào đang bị nợ hay chờ thanh toán.';
-                    break;
-                case 'processing':
-                    emptyIcon = 'inventory_2';
-                    emptyTitle = 'Tất cả đã sẵn sàng!';
-                    emptyDesc = 'Không có đơn hàng nào đang bị kẹt ở khâu xử lý hay đóng gói.';
-                    break;
-                case 'shipped':
-                    emptyIcon = 'local_shipping';
-                    emptyTitle = 'Đường thông hè thoáng!';
-                    emptyDesc = 'Hiện tại không có kiện hàng nào của bạn đang trên đường vận chuyển.';
-                    break;
-                case 'review':
-                    emptyIcon = 'rate_review';
-                    emptyTitle = 'Chưa có lịch sử nhận hàng!';
-                    emptyDesc = 'Những đơn hàng đã giao thành công và hoàn tất sẽ xuất hiện lưu trữ ở đây.';
-                    break;
-                case 'return':
-                    emptyIcon = 'assignment_return';
-                    emptyTitle = 'Thật đáng mừng!';
-                    emptyDesc = 'Bạn không có đơn hàng nào bị hủy, giao dịch lỗi hay phải hoàn trả.';
-                    break;
-                case 'all':
-                default:
-                    emptyIcon = 'shopping_bag';
-                    emptyTitle = 'Tủ đồ của bạn đang trống!';
-                    emptyDesc = 'Tất cả các giao dịch mua sắm của bạn trong quá khứ sẽ được thống kê tại đây.';
-                    break;
+                case 'unpaid': emptyIcon = 'account_balance_wallet'; emptyTitle = 'Tuyệt vời!'; emptyDesc = 'Bạn không có đơn hàng nào chờ thanh toán.'; break;
+                case 'processing': emptyIcon = 'inventory_2'; emptyTitle = 'Sẵn sàng!'; emptyDesc = 'Không có đơn hàng nào đang xử lý.'; break;
+                case 'shipped': emptyIcon = 'local_shipping'; emptyTitle = 'Đường thông!'; emptyDesc = 'Không có đơn hàng nào đang vận chuyển.'; break;
+                case 'review': emptyIcon = 'rate_review'; emptyTitle = 'Chưa có lịch sử!'; emptyDesc = 'Đơn hàng hoàn tất sẽ xuất hiện ở đây.'; break;
+                case 'return': emptyIcon = 'assignment_return'; emptyTitle = 'Đáng mừng!'; emptyDesc = 'Bạn không có đơn hàng nào bị hủy/lỗi.'; break;
             }
 
             container.innerHTML = `
-                <div class="flex flex-col items-center justify-center py-20 opacity-40 hover:opacity-100 transition-opacity">
+                <div class="flex flex-col items-center justify-center py-20 opacity-40">
                     <span class="material-symbols-outlined text-teal-600 text-6xl mb-4">${emptyIcon}</span>
                     <h3 class="text-sm font-black uppercase tracking-[0.1em] text-black mb-1">${emptyTitle}</h3>
-                    <p class="text-[10px] font-bold tracking-widest text-center text-gray-500 max-w-sm leading-relaxed">${emptyDesc}</p>
-                    <a href="/category" class="mt-8 border border-black text-black px-10 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-sm">Bắt đầu mua sắm</a>
+                    <p class="text-[10px] font-bold tracking-widest text-center text-gray-500 max-w-sm">${emptyDesc}</p>
                 </div>
             `;
             return;
         }
 
-        // Reset container style for list
         container.classList.remove('items-center', 'justify-center', 'min-h-[400px]');
-        container.classList.add('block', 'p-0', 'border-none', 'shadow-none', 'bg-transparent', 'space-y-6');
+        container.classList.add('block', 'p-0', 'border-none', 'shadow-none', 'bg-transparent', 'space-y-4');
 
-        const html = orders.map(order => isItemCard ? this.renderOrderItemCard(order) : this.renderOrderCard(order)).join('');
-        container.innerHTML = html;
+        const cardsHtml = orders.map(order => isItemCard ? this.renderOrderItemCard(order) : this.renderOrderCard(order)).join('');
+        const paginationHtml = this.renderPagination(pageData);
+        
+        container.innerHTML = `
+            <div class="space-y-4">${cardsHtml}</div>
+            <div class="mt-10 mb-6">${paginationHtml}</div>
+        `;
+    },
+
+    /**
+     * Create Pagination UI
+     */
+    renderPagination(data) {
+        if (data.totalPages <= 1) return '';
+
+        const current = data.number;
+        const total = data.totalPages;
+        let pages = [];
+
+        // Simple pagination logic
+        for (let i = 0; i < total; i++) {
+            if (i === 0 || i === total - 1 || (i >= current - 1 && i <= current + 1)) {
+                pages.push(i);
+            } else if (pages[pages.length - 1] !== '...') {
+                pages.push('...');
+            }
+        }
+
+        const buttons = pages.map(p => {
+            if (p === '...') return `<span class="px-3 py-2 text-gray-400 text-[10px] font-black">...</span>`;
+            const active = p === current ? 'bg-black text-white' : 'bg-white text-black hover:bg-neutral-50';
+            return `
+                <button onclick="OrderModule.loadOrders('${this.currentStatus}', ${p})" 
+                        class="${active} border border-black px-4 py-2 text-[10px] font-black transition-all">
+                    ${p + 1}
+                </button>
+            `;
+        }).join('');
+
+        return `
+            <div class="flex items-center justify-center gap-2">
+                <button ${current === 0 ? 'disabled' : ''} onclick="OrderModule.loadOrders('${this.currentStatus}', ${current - 1})" 
+                        class="border border-black px-3 py-2 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-neutral-50 transition-all">
+                    <span class="material-symbols-outlined text-sm">chevron_left</span>
+                </button>
+                ${buttons}
+                <button ${current === total - 1 ? 'disabled' : ''} onclick="OrderModule.loadOrders('${this.currentStatus}', ${current + 1})" 
+                        class="border border-black px-3 py-2 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-neutral-50 transition-all">
+                    <span class="material-symbols-outlined text-sm">chevron_right</span>
+                </button>
+            </div>
+        `;
     },
 
     /**
@@ -219,75 +247,70 @@ const OrderModule = {
             };
             const config = statusMap[item.refundStatus] || { text: item.refundStatus, class: 'bg-gray-50 text-gray-600 border-gray-100' };
             refundBadge = `
-                <div class="inline-flex items-center px-2 py-0.5 rounded-full border ${config.class} text-[8px] font-black uppercase tracking-wider mb-2">
-                    <span class="w-1 h-1 rounded-full bg-current mr-1.5 animate-pulse"></span>
+                <div class="inline-flex items-center px-2 py-0.5 rounded-full border ${config.class} text-[7px] font-black uppercase tracking-wider">
+                    <span class="w-1 h-1 rounded-full bg-current mr-1 animate-pulse"></span>
                     ${config.text}
                 </div>
             `;
         }
 
-        // Return button logic: Only show if Delivered/Completed AND no active refund/return request
+        // Return button logic
         let returnBtn = '';
         if ((statusEnum === 'DELIVERED' || statusEnum === 'COMPLETED') && (!item.refundStatus || item.refundStatus === 'NONE')) {
             returnBtn = `
                 <button onclick="OrderModule.openReturnModal(${item.orderId}, ${item.orderItemId}, '${item.productName.replace(/'/g, "\\'")}', '${imgUrl}', '${item.color || 'Màu tiêu chuẩn'}', '${item.size || 'F'}')" 
-                        class="flex-1 text-center border border-red-200 text-red-500 px-3 py-2 text-[9px] font-black tracking-[0.1em] uppercase hover:bg-red-50 transition-colors cursor-pointer">
+                        class="text-center border border-red-200 text-red-500 px-3 py-1.5 text-[8px] font-black tracking-widest uppercase hover:bg-red-50 transition-colors">
                     Trả hàng
                 </button>
             `;
         }
 
         return `
-            <div class="border border-black flex flex-col group hover:shadow-[3px_3px_0_0_#000] transition-all duration-300 relative overflow-hidden bg-white mb-4">
+            <div class="border border-black flex flex-col group hover:shadow-[3px_3px_0_0_#000] transition-all duration-300 relative overflow-hidden bg-white">
                 
-                <!-- Card Header -->
-                <div class="border-b border-black p-3 flex flex-wrap gap-3 justify-between items-center bg-gray-50/40">
+                <!-- Card Header (Slightly Larger) -->
+                <div class="border-b border-black p-3.5 flex justify-between items-center bg-gray-50/40">
                     <div class="flex items-center gap-3">
-                        <div class="bg-black text-white px-2 py-1 text-[9px] font-black tracking-widest uppercase truncate max-w-[120px]">
-                            ID: ${strProductId}
+                        <div class="bg-black text-white px-2.5 py-0.5 text-[9px] font-black uppercase tracking-widest truncate">
+                            ${strProductId}
                         </div>
-                        <span class="text-[10px] font-bold text-gray-400 font-mono flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">calendar_today</span> ${date}</span>
+                        <span class="text-[10px] font-bold text-gray-400 font-mono flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[13px]">calendar_today</span> ${date}
+                        </span>
                     </div>
-                    <div class="px-2 py-[2px] border text-[9px] font-black tracking-widest uppercase ${statusColor}">
-                        ${statusString}
+                    <div class="flex items-center gap-2">
+                        ${refundBadge}
+                        <span class="px-2.5 py-0.5 text-[10px] font-black tracking-widest uppercase border ${statusColor}">${statusString}</span>
                     </div>
                 </div>
 
-                <!-- Card Body (Product Info) -->
-                <div class="p-4 flex flex-col sm:flex-row gap-4 items-start">
-                    <!-- Image Layout -->
-                    <div class="relative w-16 h-20 flex-shrink-0 group-hover:scale-[1.03] transition-transform duration-300 origin-bottom border border-gray-100">
-                         <img src="${imgUrl}" alt="${item.productName}" class="w-full h-full object-cover" onerror="this.src='${fallbackImg}'">
+                <!-- Main Content -->
+                <div class="flex items-center p-5 gap-5">
+                    <div class="w-16 h-20 shrink-0 shadow-sm border border-black/5">
+                        <img src="${imgUrl}" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" onerror="this.src='${fallbackImg}'">
                     </div>
                     
-                    <div class="flex-1 w-full space-y-2">
-                        ${refundBadge}
-                        <h4 class="font-bold text-xs uppercase tracking-wide text-black line-clamp-2 leading-tight">${item.productName}</h4>
-                        
-                        <!-- Variation -->
-                        <div class="flex flex-wrap gap-2 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
-                            <span class="bg-gray-50 px-2 py-[3px] border border-gray-100">${item.color || 'Màu tiêu chuẩn'}</span>
-                            <span class="bg-gray-50 px-2 py-[3px] border border-gray-100 text-black">Size ${item.size || 'F'}</span>
-                            <span class="bg-gray-50 px-2 py-[3px] border border-gray-100 text-black font-black">SL: ${item.quantity}</span>
-                        </div>
-
-                        <!-- Price summary -->
-                        <div class="pt-1 flex items-center gap-2">
-                            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Tổng tiền hóa đơn: <span class="text-xs font-black text-black ml-1">${finalOrderTotal}đ</span></p>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-xs font-black text-black uppercase tracking-tight truncate mb-1">${item.productName}</h4>
+                        <div class="flex gap-2 mt-1 text-[9px] font-black uppercase tracking-widest text-gray-400">
+                            <span>${item.color || 'FREE'}</span>
+                            <span class="text-black/10">•</span>
+                            <span>${item.size || 'FREE'}</span>
+                            <span class="text-black/10">•</span>
+                            <span class="text-black">x${item.quantity}</span>
                         </div>
                     </div>
 
-                    <!-- Right Action Button -->
-                    <div class="flex flex-row sm:flex-col gap-2 mt-2 sm:mt-0 w-full sm:w-[130px] flex-shrink-0">
-                        <a href="/personal/order/${item.orderId}" class="flex-1 text-center flex items-center justify-center border border-black bg-black text-white px-3 py-2 text-[9px] font-black tracking-[0.1em] uppercase hover:bg-white hover:text-black transition-colors">
-                            Chi tiết
-                        </a>
-                        ${returnBtn || `
-                        <button onclick="window.location.href='/category'" class="flex-1 text-center border border-gray-200 text-gray-500 px-3 py-2 text-[9px] font-black tracking-[0.1em] uppercase hover:border-black hover:text-black transition-colors cursor-pointer">
-                            Mua lại
-                        </button>
-                        `}
+                    <div class="text-right shrink-0">
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Thành tiền</p>
+                        <p class="text-base font-black text-black tracking-tighter">${finalOrderTotal}đ</p>
                     </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="border-t border-black/5 flex divide-x divide-black/5">
+                    <a href="/personal/order/${item.orderId}" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase hover:bg-neutral-50 transition-colors">Chi tiết đơn hàng</a>
+                    ${returnBtn ? returnBtn : `<button class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 hover:text-black transition-colors" onclick="window.location.href='/category'">Mua lại sản phẩm</button>`}
                 </div>
             </div>
         `;
@@ -522,12 +545,14 @@ const OrderModule = {
     },
 
     /**
-     * Create HTML for individual (Whole) order card
+     * Create HTML for individual (Whole) order card (Compact)
      */
     renderOrderCard(order) {
         const date = new Date(order.orderDate).toLocaleDateString('vi-VN');
         const total = new Intl.NumberFormat('vi-VN').format(order.totalAmount);
         const fallbackImg = 'https://vietcetera.com/uploads/images/15-apr-2021/screen-shot-2021-04-15-at-13-21-47-1618467727402.png';
+
+        const strOrderId = 'ORD-' + String(order.orderId).padStart(6, '0');
 
         // Status display
         let statusHtml = '';
@@ -538,85 +563,55 @@ const OrderModule = {
                 if (status === 'DELIVERED' || status === 'COMPLETED') colorClass = 'bg-emerald-50 text-emerald-600 border-emerald-100';
                 if (status === 'SHIPPING') colorClass = 'bg-blue-50 text-blue-600 border-blue-100';
                 if (status.includes('PENDING')) colorClass = 'bg-amber-50 text-amber-600 border-amber-100';
-
-                return `<span class="${colorClass} px-2 py-1 text-[8px] font-black uppercase tracking-wider border rounded-sm">${label} (${count})</span>`;
+                return `<span class="${colorClass} px-1.5 py-0.5 text-[7px] font-black uppercase tracking-wider border rounded-sm">${label} (${count})</span>`;
             }).join(' ');
         }
 
-        // Items Preview Gallery
-        let itemsHtml = '';
+        // Mini Gallery (Moderately Sized)
+        let galleryHtml = '';
         if (order.items && order.items.length > 0) {
-            const displayItems = order.items.slice(0, 4);
-            const remaining = order.items.length - 4;
-
-            itemsHtml = `
-                <div class="mt-4 flex items-center gap-3 overflow-hidden">
-                    <div class="flex -space-x-2 overflow-hidden items-center group/gallery">
-                        ${displayItems.map(item => `
-                            <div class="relative w-12 h-14 border border-white rounded-sm overflow-hidden flex-shrink-0 shadow-sm transition-transform duration-300 hover:z-10 hover:scale-110">
-                                <img src="${item.productImage || fallbackImg}" alt="${item.productName}" class="w-full h-full object-cover" onerror="this.src='${fallbackImg}'">
-                                <div class="absolute bottom-0 right-0 bg-black/80 text-white text-[7px] font-black px-1 min-w-[12px] text-center">x${item.quantity}</div>
-                            </div>
-                        `).join('')}
-                        ${remaining > 0 ? `
-                            <div class="relative w-12 h-14 bg-neutral-100 border border-white rounded-sm flex items-center justify-center flex-shrink-0 shadow-sm z-0">
-                                <span class="text-[9px] font-black text-neutral-500">+${remaining}</span>
-                            </div>
-                        ` : ''}
-                    </div>
-                    
-                    <div class="flex-1 ml-2">
-                        <p class="text-[10px] font-black text-black uppercase tracking-wide truncate max-w-[200px]">
-                            ${order.items[0].productName}
-                            ${order.items.length > 1 ? `<span class="lowercase text-gray-400 font-bold ml-1">...và ${order.items.length - 1} sản phẩm khác</span>` : ''}
-                        </p>
-                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Tổng cộng ${order.itemCount} sản phẩm</p>
-                    </div>
+            const displayItems = order.items.slice(0, 3);
+            const remaining = order.items.length - 3;
+            galleryHtml = `
+                <div class="flex -space-x-2 items-center">
+                    ${displayItems.map(item => `
+                        <div class="relative w-10 h-12 border border-white rounded-sm overflow-hidden flex-shrink-0 shadow-md z-0">
+                            <img src="${item.productImage || fallbackImg}" class="w-full h-full object-cover" onerror="this.src='${fallbackImg}'">
+                        </div>
+                    `).join('')}
+                    ${remaining > 0 ? `<div class="relative w-10 h-12 bg-neutral-100 border border-white rounded-sm flex items-center justify-center flex-shrink-0 shadow-md text-[9px] font-black text-neutral-500">+${remaining}</div>` : ''}
                 </div>
             `;
         }
 
-        const strOrderId = 'ORD-' + String(order.orderId).padStart(6, '0');
-
         return `
-            <div class="bg-white p-5 border border-black hover:shadow-[5px_5px_0_0_#000] transition-all duration-300 group mb-6">
-                <!-- Header -->
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-black/5">
-                    <div class="flex items-center gap-3">
-                        <span class="bg-black text-white px-2.5 py-1 text-[10px] font-black tracking-widest uppercase truncate shadow-sm group-hover:bg-primary transition-colors">${strOrderId}</span>
-                        <span class="text-[10px] font-bold text-gray-400 font-mono flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">calendar_today</span> ${date}</span>
+            <div class="bg-white border border-black hover:shadow-[4px_4px_0_0_#000] transition-all duration-300 relative overflow-hidden">
+                <div class="flex items-center p-5 gap-6">
+                    <!-- Gallery -->
+                    <div class="shrink-0">
+                        ${galleryHtml}
                     </div>
-                    <div class="flex flex-wrap items-center gap-1.5">
-                        ${statusHtml}
-                    </div>
-                </div>
 
-                <!-- Products Preview -->
-                ${itemsHtml}
-
-                <!-- Footer / Totals -->
-                <div class="mt-6 pt-4 border-t border-dashed border-neutral-200 flex flex-wrap items-end justify-between gap-4">
-                    <div class="space-y-3">
-                        <div class="flex items-center gap-3">
-                            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Phương thức:</span>
-                            <span class="text-[10px] font-black uppercase tracking-widest text-black bg-neutral-50 px-2 py-0.5 border border-neutral-100">${order.paymentMethod || 'COD'}</span>
+                    <!-- Info -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-3 mb-1.5">
+                            <span class="text-[10px] font-black tracking-widest text-black">${strOrderId}</span>
+                            <span class="text-[9px] font-bold text-gray-400 font-mono">${date}</span>
                         </div>
-                        <a href="/personal/order/${order.orderId}" class="inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-black group-hover:text-primary transition-colors">
-                            CHI TIẾT ĐƠN HÀNG <span class="material-symbols-outlined text-[14px] transition-transform group-hover:translate-x-1">arrow_forward</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            ${statusHtml}
+                        </div>
+                    </div>
+
+                    <!-- Total & Action -->
+                    <div class="text-right shrink-0 border-l border-black/5 pl-6">
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5 leading-none">TỔNG CỘNG</p>
+                        <p class="text-base font-black text-black tracking-tighter mb-2.5">${total}đ</p>
+                        <a href="/personal/order/${order.orderId}" class="inline-block bg-black text-white px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-primary transition-all">
+                            XEM CHI TIẾT
                         </a>
                     </div>
-                    <div class="text-right">
-                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">TỔNG THANH TOÁN</p>
-                        <p class="text-xl font-black text-black tracking-tighter">${total}<span class="text-xs ml-0.5 uppercase">đ</span></p>
-                    </div>
                 </div>
-
-                <!-- Contextual Actions (only for Pending payment) -->
-                ${order.paymentMethod === 'MOMO' && order.statusSummary && order.statusSummary['PENDING_PAYMENT'] ? `
-                    <div class="mt-4 flex justify-end">
-                        <button class="bg-primary text-white w-full md:w-auto px-10 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-lg active:scale-95">Thanh toán ngay</button>
-                    </div>
-                ` : ''}
             </div>
         `;
     },

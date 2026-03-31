@@ -26,7 +26,6 @@ function initVariants() {
                 <div class="color-option relative w-12 h-16 border-2 transition-all cursor-pointer ${idx === 0 ? 'border-primary' : 'border-outline/10'} hover:border-primary" 
                      data-color="${color}" onclick="selectColor('${color}', this)">
                     <img src="${thumbnailUrl}" class="w-full h-full object-cover">
-                    ${idx < 1 ? '<span class="absolute -top-1 -right-1 bg-red-500 text-white text-[7px] font-bold px-1 rounded italic uppercase">HOT</span>' : ''}
                 </div>
             `;
         }).join('');
@@ -158,7 +157,7 @@ function updateFinalVariant() {
     const variant = productVariants.find(v => v.color === currentSelectedColor && v.size === currentSelectedSize);
     
     if (variant) {
-        const priceElements = document.querySelectorAll('.text-primary.font-bold, .text-3xl.font-bold.text-primary');
+        const priceElements = document.querySelectorAll('.text-primary.font-bold, .text-3xl.font-bold.text-primary, .text-2xl.font-bold.text-primary');
         priceElements.forEach(el => el.innerText = new Intl.NumberFormat('vi-VN').format(variant.price) + ' ₫');
 
         const stockDisplay = document.getElementById('stock-display');
@@ -170,6 +169,50 @@ function updateFinalVariant() {
         const addToCartBtn = document.getElementById('add-to-cart-btn');
         if (addToCartBtn) addToCartBtn.disabled = variant.stockQuantity <= 0;
     }
+}
+
+/**
+ * LIGHTBOX LOGIC
+ */
+function openLightbox() {
+    const mainImg = document.getElementById('main-product-image');
+    const lightbox = document.getElementById('image-lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    
+    if (!mainImg || !lightbox || !lightboxImg) return;
+
+    lightboxImg.src = mainImg.src;
+    
+    // Show modal
+    lightbox.classList.remove('hidden');
+    // Force reflow for animation
+    void lightbox.offsetWidth;
+    
+    lightbox.classList.add('opacity-100');
+    lightboxImg.classList.add('scale-100');
+    lightboxImg.classList.remove('scale-95');
+    
+    // Lock scroll
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    
+    const lightbox = document.getElementById('image-lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    
+    if (!lightbox || !lightboxImg) return;
+
+    lightbox.classList.remove('opacity-100');
+    lightboxImg.classList.remove('scale-100');
+    lightboxImg.classList.add('scale-95');
+    
+    setTimeout(() => {
+        lightbox.classList.add('hidden');
+        // Unlock scroll
+        document.body.style.overflow = '';
+    }, 400);
 }
 
 /**
@@ -196,6 +239,18 @@ function changeMainImage(el) {
 
 document.addEventListener('DOMContentLoaded', () => {
     initVariants();
+
+    // Init image preview & lightbox
+    const mainImg = document.getElementById('main-product-image');
+    if (mainImg) {
+        mainImg.classList.add('cursor-zoom-in');
+        mainImg.addEventListener('click', openLightbox);
+    }
+
+    // Keyboard support - Escape to close lightbox
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeLightbox();
+    });
 
     // 1. Wishlist Logic
     const wishlistBtn = document.getElementById('add-to-wishlist-btn');

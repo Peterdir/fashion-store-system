@@ -47,10 +47,22 @@
             background: white;
             box-shadow: 0 4px 15px -5px rgba(0,0,0,0.05);
         }
+        /* Focused Checkout: Hide Global Header/Footer */
+        header, footer { display: none !important; }
+        #image-lightbox { z-index: 1000; }
     </style>
 </head>
 <body>
-    <main layout:fragment="content" class="pt-12 pb-24 px-4 md:px-8 max-w-[1440px] mx-auto">
+    <main layout:fragment="content" class="pt-8 pb-24 px-4 md:px-8 max-w-[1440px] mx-auto">
+        <!-- Focused Logo -->
+        <div class="flex justify-center mb-12">
+            <a th:href="@{/}" class="group">
+                <span class="text-3xl font-black tracking-[0.3em] uppercase block hover:text-secondary transition-colors">
+                    H<span class="text-secondary">&</span>Y
+                </span>
+            </a>
+        </div>
+
         <!-- Checkout Progress Header -->
         <div class="flex items-center justify-center gap-4 mb-12 text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase text-on-surface-variant">
             <span class="text-primary border-b-2 border-primary pb-1">Giỏ hàng</span>

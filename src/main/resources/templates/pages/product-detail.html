@@ -7,10 +7,10 @@
 <body>
 
 <div layout:fragment="content">
-    <!-- Product Detail Section -->
-    <section class=" editorial-spacing bg-white" th:if="${product != null}">
-        <div class="max-w-[1440px] mx-auto px-6">
-            <div class="flex flex-col lg:flex-row gap-8 lg:gap-16">
+    <!-- Product Detail Section (Compact) -->
+    <section class="py-8 bg-white" th:if="${product != null}">
+        <div class="max-w-[1280px] mx-auto px-6">
+            <div class="flex flex-col lg:flex-row gap-8 lg:gap-10">
                 
                 <!-- 1. LEFT: Thumbnails (Vertical) -->
                 <div class="hidden lg:flex flex-col gap-4 w-20 flex-shrink-0" id="product-thumbnails-container">
@@ -32,9 +32,9 @@
                     </div>
                 </div>
 
-                <!-- 3. RIGHT: Product Info Area -->
-                <div class="w-full lg:w-[450px] flex-shrink-0">
-                    <div class="space-y-6">
+                <!-- 3. RIGHT: Product Info Area (Reduced Width) -->
+                <div class="w-full lg:w-[400px] flex-shrink-0">
+                    <div class="space-y-5">
                         <!-- Breadcrumbs -->
                         <nav class="text-[10px] font-bold tracking-[0.15em] uppercase text-neutral-400 flex items-center space-x-2">
                             <a th:href="@{/}" class="hover:text-primary transition-colors">Home</a>
@@ -43,66 +43,38 @@
                         </nav>
                         
                         <div class="flex justify-between items-start gap-4">
-                            <h1 class="text-2xl md:text-3xl font-light leading-tight text-neutral-800" th:text="${product.name}">Product Name</h1>
-                            <button class="p-2 border border-outline/10 text-neutral-400 hover:text-primary transition-all">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                            <h1 class="text-xl md:text-2xl font-light leading-tight text-neutral-800" th:text="${product.name}">Product Name</h1>
+                            <button class="p-1.5 border border-outline/10 text-neutral-400 hover:text-primary transition-all">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
                             </button>
                         </div>
 
-                        <!-- SKU & Ratings -->
                         <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] font-medium font-sans">
-                            <span class="text-neutral-400 uppercase tracking-widest">SKU: <span class="text-neutral-600" th:text="${'sz' + product.productId + '00' + product.productId}">sz25042554846</span></span>
-                            <div class="flex items-center gap-2">
-                                <div class="flex text-secondary star-rating">
-                                    <th:block th:each="i : ${#numbers.sequence(1, 5)}">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                    </th:block>
-                                </div>
-                                <span class="text-secondary">(1000+ Reviews)</span>
+                            <span class="text-neutral-400 uppercase tracking-widest">SKU: <span class="text-neutral-600" th:text="${product.productId}">sz25042554846</span></span>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="py-3 border-y border-outline/5">
+                            <div class="flex items-center gap-3">
+                                <span class="text-[10px] font-bold uppercase text-neutral-400">Giá từ</span>
+                                <span class="text-2xl font-bold text-primary" th:text="${#numbers.formatDecimal(product.minPrice != null ? product.minPrice : 0, 0, 'POINT', 0, 'COMMA') + ' ₫'}">20.900 ₫</span>
                             </div>
                         </div>
 
-                        <!-- Price & Discounts -->
-                        <div class="py-4 border-y border-outline/5 space-y-3">
-                            <div class="flex items-center gap-4">
-                                <span class="text-[12px] font-bold uppercase text-neutral-400">From</span>
-                                <span class="text-3xl font-bold text-primary" th:text="${#numbers.formatDecimal(product.minPrice != null ? product.minPrice : 0, 0, 'POINT', 0, 'COMMA') + ' ₫'}">20.900 ₫</span>
-                                <span class="bg-red-50 text-red-500 text-[10px] font-bold px-2 py-0.5 rounded">-75%</span>
-                                <span class="text-neutral-300 line-through text-sm">95.000 ₫</span>
-                            </div>
-                            <div class="flex flex-wrap gap-2 text-[10px] uppercase font-bold tracking-wider">
-                                <span class="border border-red-200 text-red-400 px-3 py-1">75% OFF: No Min. Buy</span>
-                                <span class="border border-red-200 text-red-400 px-3 py-1">65% OFF For orders 260.400đ+</span>
-                            </div>
-                        </div>
 
-                        <div class="bg-amber-50/50 p-2 flex items-center justify-between text-[11px] font-sans border border-amber-100">
-                             <div class="flex items-center gap-2 text-amber-700">
-                                 <span class="bg-amber-500 text-white font-bold p-1 italic px-2">#6 Bestseller</span>
-                                 <span>in Women T-Shirts</span>
-                             </div>
-                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                        </div>
-
-                        <div class="bg-green-50 text-green-700 p-3 text-[11px] font-sans flex items-center gap-3 border border-green-100 italic">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                            Special Free Shipping Deal
-                        </div>
-
-                        <!-- Colors Selection (As Thumbnails) -->
-                        <div class="space-y-4 pt-4" th:if="${product.variants != null && !product.variants.isEmpty()}">
+                        <!-- Colors Selection (Compact) -->
+                        <div class="space-y-3 pt-3" th:if="${product.variants != null && !product.variants.isEmpty()}">
                             <div class="flex justify-between text-[11px] font-bold uppercase tracking-widest">
                                 <span>Color: <span class="text-neutral-400" id="selected-color-name">Loading...</span></span>
-                                <a href="#" class="text-blue-500">Large Image</a>
                             </div>
                             <!-- Unique Colors will be rendered by JS for more control -->
-                            <div class="flex flex-wrap gap-3" id="color-selector-container">
+                            <div class="flex flex-wrap gap-2" id="color-selector-container">
                                 <!-- JS will populate this -->
                             </div>
                         </div>
 
-                        <!-- Size Guide & Selector -->
-                        <div class="space-y-4 pt-4" th:if="${product.variants != null && !product.variants.isEmpty()}">
+                        <!-- Size Guide & Selector (Compact) -->
+                        <div class="space-y-3 pt-3" th:if="${product.variants != null && !product.variants.isEmpty()}">
                             <div class="flex justify-between text-[11px] font-bold uppercase tracking-widest">
                                 <span>Select Size</span>
                                 <a href="#" class="text-neutral-400 border-b border-neutral-200">Size Guide</a>
@@ -112,14 +84,14 @@
                             </div>
                         </div>
 
-                        <!-- Add to Cart (Add variant storage) -->
-                        <div class="pt-8 flex gap-4">
+                        <!-- Add to Cart (Compact Height) -->
+                        <div class="pt-6 flex gap-3">
                             <input type="hidden" id="selected-variant-id" value="">
-                            <button id="add-to-cart-btn" class="flex-1 bg-neutral-900 text-white py-6 text-[11px] font-bold tracking-[0.3em] uppercase hover:bg-black transition-all no-radius shadow-xl active:scale-[0.98] disabled:bg-neutral-300 disabled:cursor-not-allowed">
+                            <button id="add-to-cart-btn" class="flex-1 bg-neutral-900 text-white py-4 text-[10px] font-bold tracking-[0.3em] uppercase hover:bg-black transition-all no-radius shadow-lg active:scale-[0.98] disabled:bg-neutral-300 disabled:cursor-not-allowed">
                                 ADD TO CART
                             </button>
-                            <button id="add-to-wishlist-btn" th:data-id="${product.productId}" class="w-16 h-16 border border-outline/20 flex items-center justify-center hover:bg-neutral-50 transition-all no-radius group/wishlist">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="wishlist-icon transition-all duration-300"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                            <button id="add-to-wishlist-btn" th:data-id="${product.productId}" class="w-12 h-12 border border-outline/20 flex items-center justify-center hover:bg-neutral-50 transition-all no-radius group/wishlist">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="wishlist-icon transition-all duration-300"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
                             </button>
                         </div>
                     </div>
@@ -128,9 +100,9 @@
         </div>
     </section>
 
-    <!-- Details Section Updates -->
-    <section class="bg-surface-low border-y border-outline/10 py-24 mt-16" th:if="${product != null}">
-        <div class="max-w-[1440px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+    <!-- Details Section (Compact) -->
+    <section class="bg-surface-low border-y border-outline/10 py-12 mt-12" th:if="${product != null}">
+        <div class="max-w-[1280px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
                 <h4 class="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 text-neutral-400 italic">Description</h4>
                 <p class="text-[11px] font-sans text-neutral-600 leading-relaxed" th:text="${product.description}">Detail text...</p>
@@ -186,11 +158,23 @@
         </div>
     </section>
     
-    <!-- Empty state if no product -->
-    <section class="py-48 text-center" th:if="${product == null}">
-        <h2 class="text-4xl font-light mb-8">Product Not Found</h2>
-        <a th:href="@{/category}" class="text-[11px] font-bold uppercase tracking-widest border-b border-primary pb-1">Return to Collection</a>
-    </section>
+    <!-- Image Lightbox Modal (Premium Glassmorphism) -->
+    <div id="image-lightbox" class="fixed inset-0 z-[100] hidden flex flex-col items-center justify-center p-4 transition-all duration-500 opacity-0 bg-black/80 backdrop-blur-md cursor-zoom-out" onclick="closeLightbox(event)">
+        <!-- Image Container -->
+        <div class="relative max-w-full max-h-full flex items-center justify-center" onclick="event.stopPropagation()">
+            <img id="lightbox-img" src="" alt="Full size view" 
+                 class="max-w-[95vw] max-h-[90vh] object-contain shadow-2xl transition-transform duration-500 scale-95">
+            
+            <!-- Close Button -->
+            <button onclick="closeLightbox(event)" 
+                    class="absolute -top-12 right-0 text-white/70 hover:text-white transition-colors p-2 group">
+                <div class="flex items-center gap-2">
+                    <span class="text-[9px] font-black uppercase tracking-[0.3em] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Close ESC</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </div>
+            </button>
+        </div>
+    </div>
 </div>
 
 </body>

@@ -84,6 +84,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // 3. Áp dụng mã giảm giá (Nếu có)
+        Coupon appliedCoupon = null;
         if (dto.getCouponCode() != null && !dto.getCouponCode().trim().isEmpty()) {
             Coupon coupon = couponRepository.findByCodeAndActiveTrue(dto.getCouponCode().trim())
                     .orElseThrow(() -> new RuntimeException("Mã giảm giá không tồn tại hoặc đã bị khóa!"));
@@ -113,9 +114,11 @@ public class OrderServiceImpl implements OrderService {
                         throw new RuntimeException("Mã giảm giá này đã được sử dụng!");
                     }
                 });
+
+            appliedCoupon = coupon;
         }
 
-        // 4. Khởi tạo & Lưu Object Order chính (không còn status ở Order)
+        // 4. Khởi tạo & Lưu Object Order chính
         Order order = new Order();
         order.setOrderDate(new Date());
         order.setTotalAmount(totalAmount);
@@ -123,6 +126,7 @@ public class OrderServiceImpl implements OrderService {
         order.setPaymentMethod(dto.getPaymentMethod());
         order.setType(OrderType.ONLINE);
         order.setUser(user);
+        order.setCoupon(appliedCoupon); // Gán mã coupon để lưu reference
         order = orderRepository.save(order);
 
         // 5. Khởi tạo OrderItem (mỗi item có status riêng) và Trừ Kho
@@ -201,14 +205,7 @@ public class OrderServiceImpl implements OrderService {
                     List<OrderItemPreviewDTO> itemPreviews = order.getOrderItems().stream()
                             .map(item -> OrderItemPreviewDTO.builder()
                                     .productName(item.getProductName())
-                                    .productImage(
-                                            item.getProductVariant() != null && 
-                                            item.getProductVariant().getProduct() != null && 
-                                            item.getProductVariant().getProduct().getImages() != null && 
-                                            !item.getProductVariant().getProduct().getImages().isEmpty() 
-                                                ? item.getProductVariant().getProduct().getImages().get(0).getUrl() 
-                                                : null
-                                    )
+                                    .productImage(getProductImageUrl(item.getProductVariant()))
                                     .quantity(item.getQuantity())
                                     .build())
                             .collect(Collectors.toList());
@@ -238,14 +235,7 @@ public class OrderServiceImpl implements OrderService {
                 .orderDate(item.getOrder().getOrderDate())
                 .paymentMethod(item.getOrder().getPaymentMethod())
                 .productName(item.getProductName())
-                .productImage(
-                        item.getProductVariant() != null && 
-                        item.getProductVariant().getProduct() != null && 
-                        item.getProductVariant().getProduct().getImages() != null && 
-                        !item.getProductVariant().getProduct().getImages().isEmpty() 
-                            ? item.getProductVariant().getProduct().getImages().get(0).getUrl() 
-                            : null
-                )
+                .productImage(getProductImageUrl(item.getProductVariant()))
                 .size(item.getProductVariant() != null ? item.getProductVariant().getSize() : null)
                 .color(item.getProductVariant() != null ? item.getProductVariant().getColor() : null)
                 .quantity(item.getQuantity())
@@ -281,14 +271,7 @@ public class OrderServiceImpl implements OrderService {
                             .orderItemId(item.getId())
                             .productId(item.getProductVariant() != null ? item.getProductVariant().getProduct().getId() : null)
                             .productName(item.getProductName())
-                            .productImage(
-                                    item.getProductVariant() != null && 
-                                    item.getProductVariant().getProduct() != null && 
-                                    item.getProductVariant().getProduct().getImages() != null && 
-                                    !item.getProductVariant().getProduct().getImages().isEmpty() 
-                                        ? item.getProductVariant().getProduct().getImages().get(0).getUrl() 
-                                        : null
-                            )
+                            .productImage(getProductImageUrl(item.getProductVariant()))
                             .size(item.getProductVariant() != null ? item.getProductVariant().getSize() : null)
                             .color(item.getProductVariant() != null ? item.getProductVariant().getColor() : null)
                             .quantity(item.getQuantity())
@@ -301,14 +284,49 @@ public class OrderServiceImpl implements OrderService {
                 })
                 .toList();
 
+        double subtotal = 0.0;
+        for (OrderDetailResponseDTO.OrderItemDTO item : itemDTOs) {
+            subtotal += item.getPrice() * item.getQuantity();
+        }
+
         return OrderDetailResponseDTO.builder()
                 .orderId(order.getId())
                 .orderDate(order.getOrderDate())
                 .totalAmount(order.getTotalAmount())
                 .paymentMethod(order.getPaymentMethod())
                 .shippingAddress(order.getShippingAddress())
+                .subtotalAmount(subtotal)
+                .discountAmount(subtotal - order.getTotalAmount())
+                .couponCode(order.getCoupon() != null ? order.getCoupon().getCode() : null)
+                .discountValue(order.getCoupon() != null ? order.getCoupon().getDiscountValue() : null)
+                .discountType(order.getCoupon() != null ? order.getCoupon().getDiscountType() : null)
                 .items(itemDTOs)
                 .build();
+    }
+
+    /**
+     * Helper to get the correct product image URL (Absolute path)
+     */
+    private String getProductImageUrl(ProductVariant variant) {
+        if (variant == null || variant.getProduct() == null || variant.getProduct().getImages() == null || variant.getProduct().getImages().isEmpty()) {
+            return null;
+        }
+
+        // Ưu tiên lấy hình ảnh khớp màu sắc với Variant
+        String targetUrl = variant.getProduct().getImages().stream()
+                .filter(img -> img.getColor() != null && img.getColor().equalsIgnoreCase(variant.getColor()))
+                .map(org.example.fashionstoresystem.entity.jpa.ProductImage::getUrl)
+                .findFirst()
+                .orElse(variant.getProduct().getImages().get(0).getUrl());
+
+        if (targetUrl == null) return null;
+
+        // Đảm bảo đường dẫn tuyệt đối (bắt đầu bằng /)
+        if (!targetUrl.startsWith("/") && !targetUrl.startsWith("http")) {
+            targetUrl = "/" + targetUrl;
+        }
+
+        return targetUrl;
     }
 
     // HỦY ĐƠN HÀNG

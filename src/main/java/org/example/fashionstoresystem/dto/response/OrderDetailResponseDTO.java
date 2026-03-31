@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.fashionstoresystem.entity.enums.DiscountType;
 import org.example.fashionstoresystem.entity.enums.OrderStatus;
 import org.example.fashionstoresystem.entity.enums.PaymentMethod;
 import org.example.fashionstoresystem.entity.enums.RefundStatus;
@@ -21,6 +22,11 @@ public class OrderDetailResponseDTO {
     private Double totalAmount;
     private PaymentMethod paymentMethod;
     private String shippingAddress;
+    private Double subtotalAmount;
+    private String couponCode;
+    private Double discountAmount;
+    private Double discountValue;
+    private DiscountType discountType;
     private List<OrderItemDTO> items;
 
     @Data
