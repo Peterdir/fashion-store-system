@@ -133,10 +133,11 @@ public class OrderServiceImpl implements OrderService {
             ProductVariant variant = item.getProductVariant();
 
             OrderItem orderItem = OrderItem.builder()
-                    .order(order)
                     .productVariant(variant)
                     .quantity((long) item.getQuantity())
+                    .price(variant.getPrice())
                     .productName(variant.getProduct().getName())
+                    .order(order)
                     .status(initialStatus)
                     .build();
             orderItemRepository.save(orderItem);
@@ -216,6 +217,7 @@ public class OrderServiceImpl implements OrderService {
         return items.map(item -> OrderItemSummaryDTO.builder()
                 .orderItemId(item.getId())
                 .orderId(item.getOrder().getId())
+                .productId(item.getProductVariant() != null ? item.getProductVariant().getProduct().getId() : null)
                 .orderDate(item.getOrder().getOrderDate())
                 .paymentMethod(item.getOrder().getPaymentMethod())
                 .productName(item.getProductName())
@@ -230,8 +232,9 @@ public class OrderServiceImpl implements OrderService {
                 .size(item.getProductVariant() != null ? item.getProductVariant().getSize() : null)
                 .color(item.getProductVariant() != null ? item.getProductVariant().getColor() : null)
                 .quantity(item.getQuantity())
-                .price(item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0)
-                .itemTotalAmount(item.getQuantity() * (item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0))
+                .price(item.getPrice() != null ? item.getPrice() : (item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0))
+                .itemTotalAmount(item.getQuantity() * (item.getPrice() != null ? item.getPrice() : (item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0)))
+                .orderTotalAmount(item.getOrder().getTotalAmount())
                 .status(item.getStatus())
                 .refundStatus(item.getRefundStatus())
                 .cancellationReason(item.getCancellationReason())
@@ -259,11 +262,20 @@ public class OrderServiceImpl implements OrderService {
 
                     return OrderDetailResponseDTO.OrderItemDTO.builder()
                             .orderItemId(item.getId())
+                            .productId(item.getProductVariant() != null ? item.getProductVariant().getProduct().getId() : null)
                             .productName(item.getProductName())
+                            .productImage(
+                                    item.getProductVariant() != null && 
+                                    item.getProductVariant().getProduct() != null && 
+                                    item.getProductVariant().getProduct().getImages() != null && 
+                                    !item.getProductVariant().getProduct().getImages().isEmpty() 
+                                        ? item.getProductVariant().getProduct().getImages().get(0).getUrl() 
+                                        : null
+                            )
                             .size(item.getProductVariant() != null ? item.getProductVariant().getSize() : null)
                             .color(item.getProductVariant() != null ? item.getProductVariant().getColor() : null)
                             .quantity(item.getQuantity())
-                            .price(item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0)
+                            .price(item.getPrice() != null ? item.getPrice() : (item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0))
                             .status(item.getStatus())
                             .refundStatus(item.getRefundStatus())
                             .cancellationReason(item.getCancellationReason())

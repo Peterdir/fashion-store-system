@@ -122,7 +122,7 @@ const AdminOrders = (() => {
         $('orders-pagination').classList.add('hidden');
 
         try {
-            const res = await fetch(`${API.LIST}?${params.toString()}`);
+            const res = await fetch(`${API.LIST}?${params.toString()}&_t=${new Date().getTime()}`);
             if (res.status === 401 || res.status === 403) {
                 window.location.href = '/admin/login';
                 return;
@@ -255,7 +255,7 @@ const AdminOrders = (() => {
         document.body.style.overflow = 'hidden';
 
         try {
-            const res = await fetch(API.DETAIL(orderId));
+            const res = await fetch(`${API.DETAIL(orderId)}?_t=${new Date().getTime()}`);
             if (res.status === 401 || res.status === 403) {
                 window.location.href = '/admin/login';
                 return;
@@ -415,6 +415,13 @@ const AdminOrders = (() => {
 
         // Load initial data
         fetchOrders(0);
+
+        // Check for orderId in URL to open detail modal automatically (from Returns page)
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoOrderId = urlParams.get('orderId');
+        if (autoOrderId) {
+            setTimeout(() => openDetail(autoOrderId), 500);
+        }
     }
 
     // Auto-init

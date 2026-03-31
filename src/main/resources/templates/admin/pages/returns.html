@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/admin-layout}">
+<head>
+    <title>Quản Lý Hoàn Trả</title>
+</head>
+<body>
+
+    <div layout:fragment="content">
+
+        <!-- Page Header -->
+        <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-xl font-black tracking-tight text-primary uppercase">Yêu Cầu Hoàn Trả</h1>
+                <p class="text-[11px] text-neutral-400 font-medium mt-1">Xem xét và xử lý các yêu cầu trả hàng từ khách hàng</p>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white border border-neutral-100 p-4 mb-5 flex flex-wrap items-end gap-3">
+            <!-- Filter Status -->
+            <div class="space-y-1">
+                <label class="text-[9px] font-black uppercase tracking-[0.15em] text-neutral-400">Trạng Thái</label>
+                <select id="filter-status" class="px-3 py-2 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary min-w-[160px]">
+                    <option value="">Tất cả</option>
+                    <option value="PENDING">Chờ duyệt</option>
+                    <option value="APPROVED">Đã chấp nhận</option>
+                    <option value="REJECTED">Đã từ chối</option>
+                    <option value="COMPLETED">Đã hoàn tất</option>
+                </select>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex gap-2">
+                <button id="btn-reset-filter" class="bg-neutral-100 text-neutral-500 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-200 transition-colors">
+                    Xóa bộ lọc
+                </button>
+            </div>
+        </div>
+
+        <!-- Returns Table -->
+        <div class="bg-white border border-neutral-100 overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-neutral-50/80 border-b border-neutral-100">
+                            <th class="px-5 py-4 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Mã yêu cầu</th>
+                            <th class="px-5 py-4 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Khách hàng</th>
+                            <th class="px-5 py-4 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Đơn hàng</th>
+                            <th class="px-5 py-4 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Lý do</th>
+                            <th class="px-5 py-4 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Ngày gửi</th>
+                            <th class="px-5 py-4 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Trạng thái</th>
+                            <th class="px-5 py-4 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="returns-table-body" class="divide-y divide-neutral-50">
+                        <!-- JS renders rows here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="returns-empty" class="hidden py-16 text-center">
+                <span class="material-symbols-outlined text-5xl text-neutral-200 mb-3">assignment_return</span>
+                <p class="text-[12px] font-bold text-neutral-400">Không tìm thấy yêu cầu hoàn trả nào</p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="returns-loading" class="py-16 text-center">
+                <span class="material-symbols-outlined text-3xl text-neutral-300 animate-spin">sync</span>
+                <p class="text-[11px] font-medium text-neutral-400 mt-2">Đang tải dữ liệu...</p>
+            </div>
+
+            <!-- Pagination -->
+            <div id="returns-pagination" class="hidden px-5 py-3 border-t border-neutral-100 flex items-center justify-between text-[11px]">
+                <span class="text-neutral-400 font-medium" id="pagination-info"></span>
+                <div class="flex items-center gap-1" id="pagination-buttons"></div>
+            </div>
+        </div>
+
+        <!-- RETURN DETAIL MODAL -->
+        <div id="return-detail-modal" class="fixed inset-0 z-50 hidden">
+            <!-- Overlay -->
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="AdminReturns.closeModal()"></div>
+            <!-- Modal Content -->
+            <div class="absolute right-0 top-0 h-full w-full max-w-2xl bg-white shadow-2xl overflow-y-auto transform transition-transform duration-300">
+                <!-- Modal Header -->
+                <div class="sticky top-0 z-10 bg-white border-b border-neutral-100 px-6 py-4 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-sm font-black uppercase tracking-[0.1em]" id="modal-request-id"></h2>
+                        <p class="text-[10px] text-neutral-400 font-medium mt-0.5" id="modal-request-date"></p>
+                    </div>
+                    <button onclick="AdminReturns.closeModal()" class="p-1.5 hover:bg-neutral-100 rounded transition-colors">
+                        <span class="material-symbols-outlined text-neutral-400">close</span>
+                    </button>
+                </div>
+
+                <!-- Modal Loading -->
+                <div id="modal-loading-state" class="py-20 text-center">
+                    <span class="material-symbols-outlined text-3xl text-neutral-300 animate-spin">sync</span>
+                </div>
+
+                <!-- Modal Body -->
+                <div id="modal-content" class="hidden">
+                    <!-- Customer & Order Info -->
+                    <div class="px-6 py-5 border-b border-neutral-100 bg-neutral-50/30">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="space-y-3">
+                                <p class="text-[10px] font-black uppercase tracking-widest text-neutral-400">Thông tin khách hàng</p>
+                                <div>
+                                    <p class="text-sm font-black text-black" id="modal-customer-name"></p>
+                                    <p class="text-[11px] text-neutral-500 font-bold" id="modal-customer-email"></p>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <p class="text-[10px] font-black uppercase tracking-widest text-neutral-400">Đơn hàng gốc</p>
+                                <div>
+                                    <p class="text-sm font-black text-primary" id="modal-order-id"></p>
+                                    <a href="#" id="view-order-link" class="text-[9px] font-black text-blue-600 uppercase hover:underline">Xem chi tiết đơn</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Return Reason -->
+                    <div class="px-6 py-5 border-b border-neutral-100">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-3">Lý do hoàn trả</p>
+                        <div class="bg-amber-50 border border-amber-100 p-4">
+                            <p class="text-[12px] font-black text-amber-900 uppercase mb-1" id="modal-reason"></p>
+                            <p class="text-[11px] text-amber-700 font-medium leading-relaxed" id="modal-description"></p>
+                        </div>
+                    </div>
+
+                    <!-- Evidence Images -->
+                    <div class="px-6 py-5 border-b border-neutral-100">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-4">Hình ảnh hiện trạng (Minh chứng)</p>
+                        <div id="modal-evidence-images" class="grid grid-cols-3 gap-3">
+                            <!-- JS renders images here -->
+                        </div>
+                        <div id="no-images-state" class="hidden py-4 text-center border border-dashed border-neutral-200">
+                            <p class="text-[11px] font-bold text-neutral-400 uppercase tracking-widest">Không có hình ảnh minh chứng</p>
+                        </div>
+                    </div>
+
+                    <!-- Processing Result (If already processed) -->
+                    <div id="rejection-result" class="hidden px-6 py-5 border-b border-neutral-100 bg-rose-50/50">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-rose-500 mb-2">Lý do từ chối trước đó</p>
+                        <p class="text-[11px] text-rose-700 font-medium" id="modal-rejection-reason"></p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div id="modal-actions" class="px-6 py-8 space-y-4">
+                        <button onclick="AdminReturns.approveRequest()" class="w-full bg-black text-white py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-neutral-800 transition-all shadow-lg active:scale-[0.98]">
+                            Chấp nhận hoàn trả
+                        </button>
+                        <button onclick="AdminReturns.showRejectionInput()" class="w-full border border-rose-200 text-rose-600 py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-rose-50 transition-all active:scale-[0.98]">
+                            Từ chối yêu cầu
+                        </button>
+                    </div>
+
+                    <!-- Rejection Input Area (Hidden initially) -->
+                    <div id="rejection-input-area" class="hidden px-6 py-8 border-t border-neutral-100 bg-neutral-50 animate-fade-in">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-neutral-500 mb-3">Lý do từ chối đơn</p>
+                        <textarea id="rejection-reason-input" class="w-full border border-neutral-200 p-4 text-[11px] font-medium outline-none focus:border-primary h-24 mb-4" placeholder="Nhập lý do chi tiết để thông báo cho khách hàng..."></textarea>
+                        <div class="flex gap-2">
+                            <button onclick="AdminReturns.confirmReject()" class="flex-1 bg-rose-600 text-white py-3 text-[10px] font-black uppercase tracking-widest hover:bg-rose-700 transition-colors">
+                                Xác nhận từ chối
+                            </button>
+                            <button onclick="AdminReturns.hideRejectionInput()" class="px-6 border border-neutral-200 text-neutral-500 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-white transition-colors">
+                                Hủy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script th:src="@{/admin/js/returns.js}"></script>
+    </div>
+</body>
+</html>

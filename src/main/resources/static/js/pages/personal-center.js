@@ -21,9 +21,9 @@ const PersonalCenter = {
 
                 // Initialize Orders Module
                 console.log('Checking OrderModule initialization conditions...');
-                if (window.OrderModule && this.originalProfile && this.originalProfile.userId) {
-                    console.log('Initializing OrderModule with ID:', this.originalProfile.userId);
-                    window.OrderModule.init(this.originalProfile.userId);
+                if (window.OrderModule && this.originalProfile) {
+                    console.log('Initializing OrderModule');
+                    window.OrderModule.init();
                     
                     const urlParams = new URLSearchParams(window.location.search);
                     const currentTab = urlParams.get('tab');
@@ -34,8 +34,7 @@ const PersonalCenter = {
                 } else {
                     console.warn('OrderModule skipped. Condition failed:', {
                         moduleFound: !!window.OrderModule,
-                        profileFound: !!this.originalProfile,
-                        userId: this.originalProfile ? this.originalProfile.userId : 'N/A'
+                        profileFound: !!this.originalProfile
                     });
                 }
             }).catch(err => {

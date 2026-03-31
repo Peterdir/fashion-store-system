@@ -44,7 +44,7 @@ public class AdminController {
 
     @GetMapping("/returns")
     public String showReturns() {
-        return "admin/pages/dashboard"; // TODO: tạo returns.html riêng
+        return "admin/pages/returns";
     }
 
     @GetMapping("/reports")

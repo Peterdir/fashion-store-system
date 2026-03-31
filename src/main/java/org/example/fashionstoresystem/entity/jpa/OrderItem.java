@@ -25,6 +25,9 @@ public class OrderItem {
     @Column(nullable = false)
     private Long quantity;
 
+    @Column(nullable = false)
+    private Double price;
+
     @Column
     private String productName;
 

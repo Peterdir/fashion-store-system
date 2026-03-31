@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.repository;
 
+import org.example.fashionstoresystem.entity.enums.ReturnStatus;
 import org.example.fashionstoresystem.entity.jpa.ReturnRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,7 @@ import java.util.List;
 public interface ReturnRequestRepository extends JpaRepository<ReturnRequest, Long> {
     // Lấy danh sách Yêu cầu hoàn trả theo Trạng thái Ví dụ "CHỜ DUYỆT"
     // Ưu tiên xếp người gửi lâu nhất (RequestDate tăng dần) lên đầu trang để xử lý trước!
-    Page<ReturnRequest> findByStatusOrderByRequestDateAsc(String status, Pageable pageable);
+    Page<ReturnRequest> findByStatusOrderByRequestDateAsc(ReturnStatus status, Pageable pageable);
 
     @Query("SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END FROM OrderItem i " +
             "WHERE i.id IN :itemIds AND i.returnRequest IS NOT NULL")

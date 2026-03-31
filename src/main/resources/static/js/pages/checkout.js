@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            const response = await fetch(`/api/cart?userId=${user.userId}`);
+            const response = await fetch(`/api/cart`);
             let allItems = [];
             
             if (response.ok) {
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const currentTotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
         try {
-            const response = await fetch(`/api/coupons/apply?userId=${user.userId}&currentTotal=${currentTotal}`, {
+            const response = await fetch(`/api/coupons/apply?currentTotal=${currentTotal}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ couponCode: code })
@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!couponSelectionList) return;
         
         try {
-            const response = await fetch(`/api/coupons?userId=${user.userId}`);
+            const response = await fetch(`/api/coupons`);
             if (response.ok) {
                 const coupons = await response.json();
                 renderCouponList(coupons);
@@ -445,7 +445,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Kiểm tra và đồng bộ hóa cartItemId (KHÔNG dùng CartUtils.addToCart để tránh cộng dồn)
             for (let i = 0; i < cartItems.length; i++) {
                 if (!cartItems[i].cartItemId) {
-                    const syncRes = await fetch(`/api/cart?userId=${user.userId}`, {
+                    const syncRes = await fetch(`/api/cart`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -467,7 +467,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             const orderData = {
-                userId: user.userId,
                 cartItemIds: cartItemIds,
                 shippingAddress: `${fullName} | ${phone} | ${address}`,
                 paymentMethod: selectedMethod,

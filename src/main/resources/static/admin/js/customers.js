@@ -80,7 +80,7 @@ const AdminCustomers = (() => {
         $('customers-pagination').classList.add('hidden');
 
         try {
-            const res = await fetch(`${API.LIST}?${params.toString()}`);
+            const res = await fetch(`${API.LIST}?${params.toString()}&_t=${new Date().getTime()}`);
             if (res.status === 401 || res.status === 403) {
                 window.location.href = '/admin/login';
                 return;
@@ -178,7 +178,7 @@ const AdminCustomers = (() => {
         document.body.style.overflow = 'hidden';
 
         try {
-            const res = await fetch(API.DETAIL(id));
+            const res = await fetch(`${API.DETAIL(id)}?_t=${new Date().getTime()}`);
             if (res.status === 401 || res.status === 403) {
                 window.location.href = '/admin/login';
                 return;

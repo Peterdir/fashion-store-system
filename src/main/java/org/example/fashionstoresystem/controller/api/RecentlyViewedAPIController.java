@@ -2,6 +2,7 @@ package org.example.fashionstoresystem.controller.api;
 
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.service.recently_viewed.RecentlyViewedService;
+import org.example.fashionstoresystem.util.SecurityUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,14 +17,15 @@ public class RecentlyViewedAPIController {
 
     @DeleteMapping
     public ResponseEntity<Void> deleteItems(
-            @RequestParam Long userId,
             @RequestParam List<Long> productIds) {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
         recentlyViewedService.deleteItems(userId, productIds);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/clear")
-    public ResponseEntity<Void> clearHistory(@RequestParam Long userId) {
+    public ResponseEntity<Void> clearHistory() {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
         recentlyViewedService.clearHistory(userId);
         return ResponseEntity.ok().build();
     }

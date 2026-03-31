@@ -126,7 +126,7 @@ Object.assign(PersonalCenter, {
         if (wishlistEmptyState) wishlistEmptyState.classList.add('hidden');
 
         try {
-            const response = await fetch(`/api/wishlists?userId=${user.userId}`);
+            const response = await fetch(`/api/wishlists`);
             if (response.ok) {
                 const items = await response.json();
                 this.renderWishlist(items);

@@ -10,7 +10,7 @@
 | 👕 Quản Lý Sản Phẩm | ✅ `AdminProductController` | ✅ `admin/pages/products.html` | ✅ **Xong** |
 | 👥 Quản Lý Khách Hàng | ✅ `AdminUserController` | ✅ `admin/pages/customers.html` | ✅ **Xong** |
 | 🎟️ Quản Lý Mã Giảm Giá | ✅ `AdminCouponController` | ❌ Chưa có giao diện | **🔴 Thiếu** |
-| 🔄 Yêu Cầu Hoàn Trả | ✅ `AdminReturnRequestController` | ❌ Chưa có giao diện | **🔴 Thiếu** |
+| 🔄 Yêu Cầu Hoàn Trả | ✅ `AdminReturnRequestController` | ✅ `admin/pages/returns.html` | ✅ **Xong** |
 | 📈 Báo Cáo Doanh Thu | ✅ `ReportController` | ❌ Chưa có giao diện | **🔴 Thiếu** |
 | 🏪 Bán Hàng Trực Tiếp | ✅ `OfflineSaleController` | ❌ Chưa có giao diện | **🔴 Thiếu** |
 

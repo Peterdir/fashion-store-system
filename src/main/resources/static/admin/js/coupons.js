@@ -192,6 +192,10 @@ const AdminCoupons = (() => {
     async function openEdit(id) {
         try {
             const res = await fetch(API.DETAIL(id));
+            if (res.status === 401 || res.status === 403) {
+                window.location.href = '/admin/login';
+                return;
+            }
             if (!res.ok) throw new Error('Lỗi khi tải chi tiết mã giảm giá');
             const c = await res.json();
 
@@ -302,6 +306,10 @@ const AdminCoupons = (() => {
     async function toggleStatus(id) {
         try {
             const res = await fetch(API.TOGGLE(id), { method: 'PATCH' });
+            if (res.status === 401 || res.status === 403) {
+                window.location.href = '/admin/login';
+                return;
+            }
             if (!res.ok) throw new Error('Cập nhật trạng thái thất bại');
             
             showToast('Cập nhật trạng thái thành công!');

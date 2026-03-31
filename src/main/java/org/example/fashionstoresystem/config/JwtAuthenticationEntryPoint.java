@@ -29,13 +29,13 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             return;
         }
 
-        // Trả về 401 Unauthorized thay vì 403 Forbidden khi chưa đăng nhập cho các API request
+        // Trả về 401 Unauthorized cho các API request
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
         MessageResponseDTO errorResponse = MessageResponseDTO.builder()
-                .message("Bạn chưa đăng nhập hoặc phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!")
+                .message("Phiên đăng nhập đã hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại!")
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();

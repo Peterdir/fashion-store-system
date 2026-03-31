@@ -19,7 +19,7 @@ const WishlistUtils = (() => {
         }
 
         try {
-            const response = await fetch(`/api/wishlists?userId=${user.userId}`);
+            const response = await fetch(`/api/wishlists`);
             if (response.ok) {
                 const items = await response.json();
                 const count = items.length;
@@ -48,7 +48,7 @@ const WishlistUtils = (() => {
         }
 
         try {
-            const response = await fetch(`/api/wishlists/toggle?userId=${user.userId}&productId=${productId}`, {
+            const response = await fetch(`/api/wishlists/toggle?productId=${productId}`, {
                 method: 'POST'
             });
 
@@ -77,7 +77,7 @@ const WishlistUtils = (() => {
         if (!user) return false;
 
         try {
-            const response = await fetch(`/api/wishlists?userId=${user.userId}`);
+            const response = await fetch(`/api/wishlists`);
             if (response.ok) {
                 const items = await response.json();
                 return items.some(item => item.productId.toString() === productId.toString());

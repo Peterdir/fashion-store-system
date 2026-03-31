@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof AuthUtils !== 'undefined' && AuthUtils.isAuthenticated()) {
             try {
                 const user = AuthUtils.getUser();
-                const response = await fetch(`/api/wishlists?userId=${user.userId}`);
+                const response = await fetch(`/api/wishlists`);
                 if (response.ok) {
                     const wishItems = await response.json();
                     // Lưu cả productId và variantId tiềm năng để so khớp tốt nhất

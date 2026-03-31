@@ -29,7 +29,9 @@ public class OrderDetailResponseDTO {
     @Builder
     public static class OrderItemDTO {
         private Long orderItemId;
+        private Long productId;
         private String productName;
+        private String productImage;
         private String size;
         private String color;
         private Long quantity;

@@ -17,7 +17,18 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        // Trả về 403 Forbidden khi đã đăng nhập nhưng không đủ quyền hạn
+        // Nếu là request từ trình duyệt lấy giao diện HTML, chuyển hướng về trang đăng nhập
+        String acceptHeader = request.getHeader("Accept");
+        if (acceptHeader != null && acceptHeader.contains("text/html")) {
+            if (request.getRequestURI().startsWith("/admin")) {
+                response.sendRedirect("/admin/login?error=access_denied");
+            } else {
+                response.sendRedirect("/login?error=access_denied");
+            }
+            return;
+        }
+
+        // Trả về 403 Forbidden cho các API request
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");

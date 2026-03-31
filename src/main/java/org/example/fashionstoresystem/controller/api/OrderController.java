@@ -10,6 +10,7 @@ import org.example.fashionstoresystem.dto.response.OrderSummaryResponseDTO;
 import org.example.fashionstoresystem.dto.response.PlaceOrderResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderItemSummaryDTO;
 import org.example.fashionstoresystem.service.order.OrderService;
+import org.example.fashionstoresystem.util.SecurityUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,8 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<PlaceOrderResponseDTO> placeOrder(
             @Valid @RequestBody PlaceOrderRequestDTO dto) {
+        // Luôn ghi đè userId từ session để đảm bảo bảo mật
+        dto.setUserId(SecurityUtils.getAuthenticatedUserId());
         PlaceOrderResponseDTO response = orderService.placeOrder(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -37,9 +40,9 @@ public class OrderController {
     // LẤY DANH SÁCH ĐƠN HÀNG (DẠNG GỘP ORDER) - DÙNG CHO TAB ALL
     @GetMapping
     public ResponseEntity<Page<OrderSummaryResponseDTO>> getMyOrders(
-            @RequestParam Long userId,
             @RequestParam(required = false) List<OrderStatus> statuses,
             Pageable pageable) {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
         Page<OrderSummaryResponseDTO> response = orderService.getMyOrders(userId, statuses, pageable);
         return ResponseEntity.ok(response);
     }
@@ -47,9 +50,9 @@ public class OrderController {
     // LẤY DANH SÁCH SẢN PHẨM TRONG ĐƠN (ORDER ITEM) - DÙNG CHO CÁC TAB TRẠNG THÁI
     @GetMapping("/items")
     public ResponseEntity<Page<OrderItemSummaryDTO>> getMyOrderItems(
-            @RequestParam Long userId,
             @RequestParam(required = false) List<OrderStatus> statuses,
             Pageable pageable) {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
         Page<OrderItemSummaryDTO> response = orderService.getMyOrderItems(userId, statuses, pageable);
         return ResponseEntity.ok(response);
     }
@@ -57,8 +60,8 @@ public class OrderController {
     // XEM CHI TIẾT ĐƠN HÀNG
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderDetailResponseDTO> getMyOrderDetail(
-            @RequestParam Long userId,
             @PathVariable Long orderId) {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
         OrderDetailResponseDTO response = orderService.getMyOrderDetail(userId, orderId);
         return ResponseEntity.ok(response);
     }
@@ -66,9 +69,9 @@ public class OrderController {
     // HỦY ĐƠN HÀNG
     @PostMapping("/{orderId}/cancel")
     public ResponseEntity<MessageResponseDTO> cancelOrder(
-            @RequestParam Long userId,
             @PathVariable Long orderId,
             @Valid @RequestBody CancelOrderRequestDTO dto) {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
         MessageResponseDTO response = orderService.cancelOrder(userId, orderId, dto);
         return ResponseEntity.ok(response);
     }

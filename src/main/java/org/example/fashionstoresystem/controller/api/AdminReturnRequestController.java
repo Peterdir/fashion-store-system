@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.ProcessReturnRequestDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.dto.response.ReturnRequestResponseDTO;
+import org.example.fashionstoresystem.entity.enums.ReturnStatus;
 import org.example.fashionstoresystem.service.return_request.ReturnRequestService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +22,10 @@ public class AdminReturnRequestController {
 
     // LẤY TẤT CẢ YÊU CẦU
     @GetMapping
-    public ResponseEntity<Page<ReturnRequestResponseDTO>> getAllReturnRequests(Pageable pageable) {
-        return ResponseEntity.ok(returnRequestService.getAllReturnRequests(pageable));
+    public ResponseEntity<Page<ReturnRequestResponseDTO>> getAllReturnRequests(
+            @RequestParam(required = false) ReturnStatus status,
+            Pageable pageable) {
+        return ResponseEntity.ok(returnRequestService.getAllReturnRequests(status, pageable));
     }
 
     // XEM CHI TIẾT

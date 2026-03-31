@@ -83,6 +83,10 @@ const AdminProducts = (() => {
         try {
             // Thêm timestamp để ép trình duyệt tải dữ liệu thực tế từ DB, bỏ qua cache
             const res = await fetch(`${API.LIST}?${params.toString()}&_t=${new Date().getTime()}`);
+            if (res.status === 401 || res.status === 403) {
+                window.location.href = '/admin/login';
+                return;
+            }
             if (!res.ok) throw new Error('Lỗi khi tải danh sách sản phẩm');
             const data = await res.json();
 
@@ -266,6 +270,10 @@ const AdminProducts = (() => {
 
         try {
             const res = await fetch(API.DETAIL(productId));
+            if (res.status === 401 || res.status === 403) {
+                window.location.href = '/admin/login';
+                return;
+            }
             if (!res.ok) throw new Error('Không thể tải thông tin sản phẩm');
             const product = await res.json();
 

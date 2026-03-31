@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -45,13 +46,12 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
     public List<OrderItem> validateReturnEligibility(Long orderId, List<Long> itemIds) {
         Order order = getOrderForReturn(orderId);
 
-        // Kiểm tra từng OrderItem có trạng thái DELIVERED không (thay vì check Order.status)
         List<OrderItem> selectedItems = order.getOrderItems().stream()
                 .filter(item -> itemIds.contains(item.getId()))
                 .toList();
 
         for (OrderItem item : selectedItems) {
-            if (item.getStatus() != OrderStatus.DELIVERED) {
+            if (item.getStatus() != OrderStatus.DELIVERED && item.getStatus() != OrderStatus.COMPLETED) {
                 throw new RuntimeException("Sản phẩm '" + item.getProductName()
                         + "' chưa được giao thành công, không thể hoàn trả!");
             }
@@ -73,18 +73,27 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
         ReturnRequest returnRequest = new ReturnRequest();
         returnRequest.setOrder(order);
         returnRequest.setUser(order.getUser());
-        returnRequest.setReturnItems(returnItems);
+        returnRequest.setReturnItems(new ArrayList<>(returnItems));
         returnRequest.setStatus(ReturnStatus.PENDING);
         returnRequest.setReason(dto.getReason());
         returnRequest.setDescription(dto.getDescription());
         returnRequest.setRequestDate(new Date());
+        returnRequest.setImageUrls(dto.getImageUrls());
+
+        // Mark items as PENDING refund and link to request
+        for (OrderItem item : returnItems) {
+            item.setRefundStatus(RefundStatus.PENDING);
+            item.setReturnRequest(returnRequest);
+        }
 
         return returnRepository.save(returnRequest);
     }
 
-    // ADMIN API
     @Override
-    public Page<ReturnRequestResponseDTO> getAllReturnRequests(Pageable pageable) {
+    public Page<ReturnRequestResponseDTO> getAllReturnRequests(ReturnStatus status, Pageable pageable) {
+        if (status != null) {
+            return returnRepository.findByStatusOrderByRequestDateAsc(status, pageable).map(this::mapToDTO);
+        }
         return returnRepository.findAll(pageable).map(this::mapToDTO);
     }
 
@@ -107,10 +116,15 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
 
         rr.setStatus(dto.getNewStatus());
         rr.setProcessedAt(new Date());
-        
+
         if (dto.getNewStatus() == ReturnStatus.REJECTED) {
             rr.setRejectionReason(dto.getRejectionReason());
+            // Reset items status back to NONE if rejected
+            for (OrderItem item : rr.getReturnItems()) {
+                item.setRefundStatus(RefundStatus.NONE);
+            }
         } else if (dto.getNewStatus() == ReturnStatus.APPROVED) {
+            // Items are already PENDING refund from submission, but let's be explicit
             for (OrderItem item : rr.getReturnItems()) {
                 item.setRefundStatus(RefundStatus.PENDING);
             }
@@ -132,7 +146,7 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
                 .status(rr.getStatus())
                 .reason(rr.getReason())
                 .description(rr.getDescription())
-                .imageUrls(java.util.Collections.emptyList())
+                .imageUrls(rr.getImageUrls())
                 .requestDate(rr.getRequestDate())
                 .rejectionReason(rr.getRejectionReason())
                 .build();

@@ -111,7 +111,7 @@ Object.assign(PersonalCenter, {
         const productIds = Array.from(this.selectedRecentlyViewedIds).join(',');
         
         try {
-            const response = await fetch(`/api/recently-viewed?userId=${user.userId}&productIds=${productIds}`, {
+            const response = await fetch(`/api/recently-viewed?productIds=${productIds}`, {
                 method: 'DELETE'
             });
 

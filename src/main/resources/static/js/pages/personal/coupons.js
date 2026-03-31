@@ -84,7 +84,7 @@ const CouponModule = {
         const user = AuthUtils.getUser();
         
         try {
-            const response = await fetch(`/api/coupons?userId=${user.userId}`);
+            const response = await fetch(`/api/coupons`);
             if (response.ok) {
                 this.coupons = await response.json();
                 this.renderExclusiveOffers();
@@ -227,7 +227,7 @@ const CouponModule = {
         const user = AuthUtils.getUser();
 
         try {
-            const response = await fetch(`/api/coupons/collect?userId=${user.userId}`, {
+            const response = await fetch(`/api/coupons/collect`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ couponId: couponId })

@@ -116,30 +116,6 @@
         // Lấy ID từ Thymeleaf Controller truyền xuống (UserViewController)
         const currentOrderId = /*[[${orderId}]]*/ 0;
 
-        /** Utility: Trích xuất Session/LocalStorage ID **/
-        async function getSafeUserId() {
-            try {
-                const userObj = localStorage.getItem('user');
-                if (userObj) {
-                    const parsed = JSON.parse(userObj);
-                    if (parsed.userId || parsed.id) return parsed.userId || parsed.id;
-                }
-            } catch (e) { console.error('Lỗi phân giải User:', e); }
-
-            try {
-                // Thử liên hệ trực tiếp server bằng Cookie/Session
-                const res = await fetch('/api/users/me');
-                if (res.ok) {
-                    const profile = await res.json();
-                    if (profile && profile.userId) {
-                        return profile.userId;
-                    }
-                }
-            } catch (e) { console.error('Lỗi xác thực ngầm:', e); }
-
-            return null; // fallback
-        }
-
         const formatVND = (value) => new Intl.NumberFormat('vi-VN').format(value) + ' ₫';
 
         const parseStatusName = (statusEnum) => {
@@ -275,14 +251,33 @@
                 }
 
                 const trackingHtml = generateTrackingTimelineHTML(item.status, orderDate);
+                const fallbackImg = 'https://vietcetera.com/uploads/images/15-apr-2021/screen-shot-2021-04-15-at-13-21-47-1618467727402.png';
+                const imgUrl = item.productImage || fallbackImg;
+                const strProductId = item.productId ? 'PROD-' + String(item.productId).padStart(6, '0') : 'N/A';
+
+                // Nút hoàn trả (chỉ hiện khi đã giao hoặc hoàn thành và chưa hoàn tiền)
+                let returnBtn = '';
+                if ((item.status === 'DELIVERED' || item.status === 'COMPLETED') && !item.refundStatus) {
+                    returnBtn = `
+                        <button onclick="requestReturn(${item.orderItemId}, '${item.productName.replace(/'/g, "\\'")}')" class="mt-2 text-[9px] font-black uppercase text-red-500 border border-red-200 px-4 py-1.5 rounded hover:bg-red-50 transition-colors">
+                            Yêu cầu trả hàng
+                        </button>
+                    `;
+                }
 
                 return `
                 <div class="p-6 flex flex-col border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                     
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <!-- Product Image -->
+                        <div class="w-16 h-20 flex-shrink-0 border border-gray-100 overflow-hidden rounded bg-gray-50">
+                            <img src="${imgUrl}" alt="${item.productName}" class="w-full h-full object-cover" onerror="this.src='${fallbackImg}'">
+                        </div>
+
                         <div class="flex-1 w-full">
                             <div class="flex flex-wrap items-center gap-3 mb-2">
                                 <h4 class="text-sm font-black text-gray-900 uppercase">${item.productName || 'Không xác định'}</h4>
+                                <span class="text-[9px] font-bold text-gray-400 font-mono">ID: ${strProductId}</span>
                                 <span class="px-3 py-1 text-[9px] font-black tracking-widest uppercase rounded-full border ${statusTheme.color}">${statusTheme.label}</span>
                             </div>
                             
@@ -299,6 +294,7 @@
                             <p class="text-xs text-gray-400 uppercase font-black tracking-widest mb-1">Thành tiền</p>
                             <p class="text-lg font-black text-black">${formatVND(item.price * item.quantity)}</p>
                             ${refundBadge}
+                            ${returnBtn}
                         </div>
                     </div>
                     
@@ -309,20 +305,40 @@
             }).join('');
         };
 
-
-        async function bootstrapOrderDetail() {
-            const uid = await getSafeUserId();
-            if (!uid) {
-                document.getElementById('loading').classList.add('hidden');
-                const errDiv = document.getElementById('error');
-                errDiv.classList.remove('hidden');
-                document.getElementById('error-msg').textContent = 'Xác thực tài khoản thất bại! Vui lòng làm mới trang (F5) hoặc đăng nhập lại.';
-                return;
-            }
+        async function requestReturn(orderItemId, productName) {
+            const reason = prompt(`Vui lòng nhập lý do trả hàng cho sản phẩm "${productName}":`);
+            if (!reason) return;
 
             try {
-                // Fetch API REST của hệ thống GetOrder
-                const response = await fetch(`/api/orders/${currentOrderId}?userId=${uid}`);
+                const response = await fetch('/api/return-requests', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        orderItemId: orderItemId,
+                        reason: reason
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Yêu cầu trả hàng đã được gửi thành công.');
+                    bootstrapOrderDetail(); // Reload data
+                } else {
+                    const err = await response.json();
+                    alert('Lỗi: ' + (err.message || 'Không thể gửi yêu cầu.'));
+                }
+            } catch (error) {
+                console.error('Error submitting return request:', error);
+                alert('Đã xảy ra lỗi khi kết nối với máy chủ.');
+            }
+        }
+
+
+        async function bootstrapOrderDetail() {
+            try {
+                // Fetch API REST của hệ thống GetOrder - Không còn truyền userId từ client để bảo mật
+                const response = await fetch(`/api/orders/${currentOrderId}`);
                 if (response.status === 404 || response.status === 403 || response.status === 500) {
                      throw new Error('Dữ liệu không tồn tại hoặc bạn không có quyền sở hữu hóa đơn này.');
                 }

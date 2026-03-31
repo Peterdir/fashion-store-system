@@ -6,6 +6,7 @@ import org.example.fashionstoresystem.dto.request.SubmitReturnRequestDTO;
 import org.example.fashionstoresystem.dto.response.ReturnRequestResponseDTO;
 import org.example.fashionstoresystem.entity.jpa.ReturnRequest;
 import org.example.fashionstoresystem.service.return_request.ReturnRequestService;
+import org.example.fashionstoresystem.util.SecurityUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +21,8 @@ public class ReturnRequestController {
 
     // LẤY DS YÊU CẦU TRẢ HÀNG
     @GetMapping
-    public ResponseEntity<List<ReturnRequestResponseDTO>> getReturnRequestsByCustomer(
-            @RequestParam Long userId) {
+    public ResponseEntity<List<ReturnRequestResponseDTO>> getReturnRequestsByCustomer() {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
         return ResponseEntity.ok(
                 returnRequestService.getReturnRequestsByCustomer(userId));
     }

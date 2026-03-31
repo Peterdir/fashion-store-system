@@ -8,6 +8,7 @@ import org.example.fashionstoresystem.dto.response.ApplyCouponResponseDTO;
 import org.example.fashionstoresystem.dto.response.CouponResponseDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.service.coupon.CouponService;
+import org.example.fashionstoresystem.util.SecurityUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,25 +24,25 @@ public class CouponController {
 
     // XEM DANH SÁCH MÃ
     @GetMapping
-    public ResponseEntity<List<CouponResponseDTO>> getAvailableCoupons(
-            @RequestParam Long userId) {
+    public ResponseEntity<List<CouponResponseDTO>> getAvailableCoupons() {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
         return ResponseEntity.ok(couponService.getAvailableCoupons(userId));
     }
 
     // THU THẬP MÃ GIẢM GIÁ
     @PostMapping("/collect")
     public ResponseEntity<MessageResponseDTO> collectCoupon(
-            @RequestParam Long userId,
             @Valid @RequestBody CollectCouponRequestDTO dto) {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
         return ResponseEntity.ok(couponService.collectCoupon(userId, dto));
     }
 
     // ÁP DỤNG MÃ CHO ĐƠN HÀNG
     @PostMapping("/apply")
     public ResponseEntity<ApplyCouponResponseDTO> applyCoupon(
-            @RequestParam Long userId,
             @RequestParam Double currentTotal,
             @Valid @RequestBody ApplyCouponRequestDTO dto) {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(couponService.applyCoupon(userId, dto, currentTotal));
     }

@@ -17,6 +17,7 @@ import java.util.Date;
 public class OrderItemSummaryDTO {
     private Long orderItemId;
     private Long orderId; // Để link bấm về Chi tiết Hóa đơn gốc
+    private Long productId;
     private Date orderDate; // Ngày đặt hàng
     private PaymentMethod paymentMethod; // Hình thức thanh toán
     private String productName;
@@ -26,6 +27,7 @@ public class OrderItemSummaryDTO {
     private Long quantity;
     private Double price;
     private Double itemTotalAmount; // quantity * price
+    private Double orderTotalAmount;
     private OrderStatus status; // Trạng thái tiến độ duy nhất của Item này
     private RefundStatus refundStatus;
     private String cancellationReason;

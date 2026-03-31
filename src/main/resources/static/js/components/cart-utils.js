@@ -22,7 +22,7 @@ class CartUtils {
         if (window.AuthUtils && AuthUtils.isAuthenticated()) {
             const user = AuthUtils.getUser();
             try {
-                const response = await fetch(`/api/cart?userId=${user.userId}`, {
+                const response = await fetch(`/api/cart`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
