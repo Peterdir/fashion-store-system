@@ -26,8 +26,11 @@ const OrderModule = {
         'processing': 'PAID,PROCESSING',
         'shipped': 'SHIPPING',
         'review': 'DELIVERED,COMPLETED',
-        'return': 'CANCELLED,PAYMENT_FAILED,PAYMENT_EXPIRED'
+        'return': 'CANCELLED,PAYMENT_FAILED,PAYMENT_EXPIRED',
+        'deleted': null
     },
+
+    terminalStatuses: ['COMPLETED', 'CANCELLED', 'PAYMENT_FAILED', 'PAYMENT_EXPIRED'],
 
     /**
      * Setup UI listeners for order-specific interactions
@@ -72,15 +75,13 @@ const OrderModule = {
 
         try {
             const backendStatus = this.statusMapping[status] || null;
-            let url = `/api/orders?page=${page}&size=10`;
+            const isDeletedTab = status === 'deleted';
+            let url = `/api/orders?page=${page}&size=10&hidden=${isDeletedTab}`;
             let isItemCard = false;
 
-            if (status !== 'all' && status !== 'unpaid') {
-                url = `/api/orders/items?page=${page}&size=10`;
+            if (status !== 'all' && status !== 'unpaid' && status !== 'deleted') {
+                url = `/api/orders/items?page=${page}&size=10&hidden=${isDeletedTab}`;
                 isItemCard = true;
-            } else {
-                url = `/api/orders?page=${page}&size=10`;
-                isItemCard = false;
             }
 
             if (backendStatus) {
@@ -338,13 +339,33 @@ const OrderModule = {
 
                 <!-- Footer -->
                 <div class="border-t border-black/5 flex divide-x divide-black/5">
-                    <a href="/personal/order/${item.orderId}?fromStatus=${this.currentStatus}" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase hover:bg-neutral-50 transition-colors">Chi tiết đơn hàng</a>
+                    <a href="/personal/order/${item.orderId}?fromStatus=${this.currentStatus}" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase hover:bg-neutral-50 transition-colors">Chi tiết</a>
                     ${payBtn}
                     ${cancelBtn}
-                    ${returnBtn ? returnBtn : (cancelBtn || payBtn ? '' : `<button class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 hover:text-black transition-colors" onclick="window.location.href='/category'">Mua lại</button>`)}
+                    ${this.renderItemArchiveAction(item.orderId, statusEnum)}
+                    ${!returnBtn && !cancelBtn && !payBtn && !this.renderItemArchiveAction(item.orderId, statusEnum) ? `<button class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 hover:text-black transition-colors" onclick="window.location.href='/category'">Mua lại</button>` : (returnBtn || '')}
                 </div>
             </div>
         `;
+    },
+
+    renderItemArchiveAction(orderId, status) {
+        if (this.currentStatus === 'deleted') {
+            return `
+                <button onclick="OrderModule.restoreOrder(${orderId})" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-black hover:bg-neutral-50 transition-colors">
+                    Khôi phục
+                </button>
+            `;
+        }
+
+        if (this.terminalStatuses.includes(status)) {
+            return `
+                <button onclick="OrderModule.archiveOrder(${orderId})" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-black hover:bg-neutral-50 transition-colors">
+                    Lưu trữ
+                </button>
+            `;
+        }
+        return '';
     },
 
     /**
@@ -689,13 +710,41 @@ const OrderModule = {
                     <div class="text-right shrink-0 border-l border-black/5 pl-6">
                         <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5 leading-none">TỔNG CỘNG</p>
                         <p class="text-base font-black text-black tracking-tighter mb-2.5">${total}đ</p>
-                        <a href="/personal/order/${order.orderId}?fromStatus=${this.currentStatus}" class="inline-block bg-black text-white px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-primary transition-all">
-                            XEM CHI TIẾT
-                        </a>
+                        <div class="flex flex-col gap-2">
+                            <a href="/personal/order/${order.orderId}?fromStatus=${this.currentStatus}" class="inline-block bg-black text-white px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-neutral-800 transition-all text-center">
+                                XEM CHI TIẾT
+                            </a>
+                            ${this.renderArchiveAction(order.orderId, order.statusSummary)}
+                        </div>
                     </div>
                 </div>
             </div>
         `;
+    },
+
+    renderArchiveAction(orderId, statusSummary) {
+        // If it's a summary card, check if ALL items are in terminal statuses
+        if (statusSummary) {
+            const statuses = Object.keys(statusSummary);
+            const isAllTerminal = statuses.every(s => this.terminalStatuses.includes(s));
+            
+            if (this.currentStatus === 'deleted') {
+                return `
+                    <button onclick="OrderModule.restoreOrder(${orderId})" class="inline-block border border-black text-black px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-neutral-100 transition-all">
+                        KHÔI PHỤC
+                    </button>
+                `;
+            }
+
+            if (isAllTerminal) {
+                return `
+                    <button onclick="OrderModule.archiveOrder(${orderId})" class="inline-block border border-black text-black px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-neutral-100 transition-all">
+                        LƯU TRỮ
+                    </button>
+                `;
+            }
+        }
+        return '';
     },
 
     /**
@@ -865,6 +914,33 @@ const OrderModule = {
             modal.classList.add('hidden');
             this.loadOrders(this.currentStatus); // Reload anyway to refresh status
         }, 500);
+    },
+
+    async archiveOrder(orderId) {
+        if (!confirm('Bạn có chắc chắn muốn ẩn đơn hàng này khỏi danh sách?')) return;
+        try {
+            const response = await fetch(`/api/orders/${orderId}/hide`, { method: 'POST' });
+            if (!response.ok) throw new Error('Failed to archive order');
+
+            // Success: Reload
+            this.loadOrders(this.currentStatus);
+        } catch (error) {
+            console.error('Error archiving order:', error);
+            alert('Có lỗi xảy ra khi lưu trữ đơn hàng: ' + error.message);
+        }
+    },
+
+    async restoreOrder(orderId) {
+        try {
+            const response = await fetch(`/api/orders/${orderId}/restore`, { method: 'POST' });
+            if (!response.ok) throw new Error('Failed to restore order');
+
+            // Success: Reload
+            this.loadOrders(this.currentStatus);
+        } catch (error) {
+            console.error('Error restoring order:', error);
+            alert('Có lỗi xảy ra khi khôi phục đơn hàng: ' + error.message);
+        }
     }
 };
 

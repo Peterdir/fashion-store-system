@@ -226,12 +226,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<OrderSummaryResponseDTO> getMyOrders(Long userId, List<OrderStatus> statuses, Pageable pageable) {
+    public Page<OrderSummaryResponseDTO> getMyOrders(Long userId, List<OrderStatus> statuses, boolean hidden, Pageable pageable) {
         Page<Order> orders;
         if (statuses == null || statuses.isEmpty()) {
-            orders = orderRepository.findAllMyOrders(userId, pageable);
+            orders = orderRepository.findAllMyOrders(userId, hidden, pageable);
         } else {
-            orders = orderRepository.searchMyOrdersByStatuses(userId, statuses, pageable);
+            orders = orderRepository.searchMyOrdersByStatuses(userId, statuses, hidden, pageable);
         }
 
         return orders
@@ -266,8 +266,8 @@ public class OrderServiceImpl implements OrderService {
     // THEO DÕI TRẠNG THÁI ĐƠN HÀNG - Xem danh sách Từng món (OrderItem)
     @Override
     @Transactional(readOnly = true)
-    public Page<OrderItemSummaryDTO> getMyOrderItems(Long userId, List<OrderStatus> statuses, Pageable pageable) {
-        Page<OrderItem> items = orderItemRepository.findByOrderUserIdAndStatusInOrderByOrderOrderDateDesc(userId, statuses, pageable);
+    public Page<OrderItemSummaryDTO> getMyOrderItems(Long userId, List<OrderStatus> statuses, boolean hidden, Pageable pageable) {
+        Page<OrderItem> items = orderItemRepository.findByOrderUserIdAndStatusInAndOrderHiddenByUserOrderByOrderOrderDateDesc(userId, statuses, hidden, pageable);
 
         return items.map(item -> OrderItemSummaryDTO.builder()
                 .orderItemId(item.getId())
@@ -438,5 +438,23 @@ public class OrderServiceImpl implements OrderService {
         return MessageResponseDTO.builder()
                 .message(message)
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void hideOrder(Long userId, Long orderId) {
+        Order order = orderRepository.findByIdAndUserId(orderId, userId)
+                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại!"));
+        order.setHiddenByUser(true);
+        orderRepository.save(order);
+    }
+
+    @Override
+    @Transactional
+    public void restoreOrder(Long userId, Long orderId) {
+        Order order = orderRepository.findByIdAndUserId(orderId, userId)
+                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại!"));
+        order.setHiddenByUser(false);
+        orderRepository.save(order);
     }
 }

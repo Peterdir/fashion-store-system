@@ -41,9 +41,10 @@ public class OrderController {
     @GetMapping
     public ResponseEntity<Page<OrderSummaryResponseDTO>> getMyOrders(
             @RequestParam(required = false) List<OrderStatus> statuses,
+            @RequestParam(defaultValue = "false") boolean hidden,
             Pageable pageable) {
         Long userId = SecurityUtils.getAuthenticatedUserId();
-        Page<OrderSummaryResponseDTO> response = orderService.getMyOrders(userId, statuses, pageable);
+        Page<OrderSummaryResponseDTO> response = orderService.getMyOrders(userId, statuses, hidden, pageable);
         return ResponseEntity.ok(response);
     }
 
@@ -51,9 +52,10 @@ public class OrderController {
     @GetMapping("/items")
     public ResponseEntity<Page<OrderItemSummaryDTO>> getMyOrderItems(
             @RequestParam(required = false) List<OrderStatus> statuses,
+            @RequestParam(defaultValue = "false") boolean hidden,
             Pageable pageable) {
         Long userId = SecurityUtils.getAuthenticatedUserId();
-        Page<OrderItemSummaryDTO> response = orderService.getMyOrderItems(userId, statuses, pageable);
+        Page<OrderItemSummaryDTO> response = orderService.getMyOrderItems(userId, statuses, hidden, pageable);
         return ResponseEntity.ok(response);
     }
 
@@ -82,5 +84,21 @@ public class OrderController {
         Long userId = SecurityUtils.getAuthenticatedUserId();
         String paymentUrl = orderService.retryPayment(userId, orderId);
         return ResponseEntity.ok(new MessageResponseDTO(paymentUrl));
+    }
+
+    // ẨN ĐƠN HÀNG (LƯU TRỮ)
+    @PostMapping("/{orderId}/hide")
+    public ResponseEntity<MessageResponseDTO> hideOrder(@PathVariable Long orderId) {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
+        orderService.hideOrder(userId, orderId);
+        return ResponseEntity.ok(new MessageResponseDTO("Đã lưu trữ đơn hàng thành công!"));
+    }
+
+    // KHÔI PHỤC ĐƠN HÀNG
+    @PostMapping("/{orderId}/restore")
+    public ResponseEntity<MessageResponseDTO> restoreOrder(@PathVariable Long orderId) {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
+        orderService.restoreOrder(userId, orderId);
+        return ResponseEntity.ok(new MessageResponseDTO("Đã khôi phục đơn hàng thành công!"));
     }
 }
