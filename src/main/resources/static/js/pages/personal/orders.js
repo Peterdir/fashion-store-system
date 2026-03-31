@@ -75,9 +75,12 @@ const OrderModule = {
             let url = `/api/orders?page=${page}&size=10`;
             let isItemCard = false;
 
-            if (status !== 'all') {
+            if (status !== 'all' && status !== 'unpaid') {
                 url = `/api/orders/items?page=${page}&size=10`;
                 isItemCard = true;
+            } else {
+                url = `/api/orders?page=${page}&size=10`;
+                isItemCard = false;
             }
 
             if (backendStatus) {
@@ -310,7 +313,7 @@ const OrderModule = {
                 <!-- Main Content -->
                 <div class="flex items-center p-5 gap-5">
                     <div class="w-16 h-20 shrink-0 shadow-sm border border-black/5">
-                        <img src="${imgUrl}" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" onerror="this.src='${fallbackImg}'">
+                        <img src="${imgUrl}" class="w-full h-full object-cover transition-all duration-500" onerror="this.src='${fallbackImg}'">
                     </div>
                     
                     <div class="flex-1 min-w-0">
@@ -335,7 +338,7 @@ const OrderModule = {
 
                 <!-- Footer -->
                 <div class="border-t border-black/5 flex divide-x divide-black/5">
-                    <a href="/personal/order/${item.orderId}" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase hover:bg-neutral-50 transition-colors">Chi tiết đơn hàng</a>
+                    <a href="/personal/order/${item.orderId}?fromStatus=${this.currentStatus}" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase hover:bg-neutral-50 transition-colors">Chi tiết đơn hàng</a>
                     ${payBtn}
                     ${cancelBtn}
                     ${returnBtn ? returnBtn : (cancelBtn || payBtn ? '' : `<button class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 hover:text-black transition-colors" onclick="window.location.href='/category'">Mua lại</button>`)}
@@ -686,7 +689,7 @@ const OrderModule = {
                     <div class="text-right shrink-0 border-l border-black/5 pl-6">
                         <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5 leading-none">TỔNG CỘNG</p>
                         <p class="text-base font-black text-black tracking-tighter mb-2.5">${total}đ</p>
-                        <a href="/personal/order/${order.orderId}" class="inline-block bg-black text-white px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-primary transition-all">
+                        <a href="/personal/order/${order.orderId}?fromStatus=${this.currentStatus}" class="inline-block bg-black text-white px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-primary transition-all">
                             XEM CHI TIẾT
                         </a>
                     </div>

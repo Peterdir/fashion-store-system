@@ -160,6 +160,16 @@
         
         // Initialize the manager
         document.addEventListener('DOMContentLoaded', () => {
+            // Xử lý nút Back động
+            const params = new URLSearchParams(window.location.search);
+            const fromStatus = params.get('fromStatus');
+            if (fromStatus) {
+                const backLinks = document.querySelectorAll('a[href*="/personal-center?tab=orders"]');
+                backLinks.forEach(link => {
+                    link.href = `/personal-center?tab=orders&status=${fromStatus}`;
+                });
+            }
+
             window.orderDetailManager.init(currentOrderId);
         });
     </script>
