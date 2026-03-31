@@ -127,12 +127,15 @@ public class OrderServiceImpl implements OrderService {
         order.setType(OrderType.ONLINE);
         order.setUser(user);
         order.setCoupon(appliedCoupon); // Gán mã coupon để lưu reference
-        order = orderRepository.save(order);
-
-        // 5. Khởi tạo OrderItem (mỗi item có status riêng) và Trừ Kho
+        
         OrderStatus initialStatus = (dto.getPaymentMethod() == PaymentMethod.COD) 
                 ? OrderStatus.PENDING_CONFIRMATION 
                 : OrderStatus.PENDING_PAYMENT;
+        order.setStatus(initialStatus);
+        
+        order = orderRepository.save(order);
+
+        // 5. Khởi tạo OrderItem (mỗi item có status riêng) và Trừ Kho
 
         for (CartItem item : cartItems) {
             ProductVariant variant = item.getProductVariant();
@@ -173,12 +176,50 @@ public class OrderServiceImpl implements OrderService {
         return PlaceOrderResponseDTO.builder()
                 .orderId(order.getId())
                 .totalAmount(order.getTotalAmount())
-                .status(initialStatus)
-                .paymentUrl(paymentUrl)
+                .status(order.getStatus())
+                .paymentUrl(paymentUrl) // Vẫn giữ để tương thích nếu FE muốn redirect ngay
                 .message(order.getPaymentMethod() == PaymentMethod.MOMO 
-                    ? "Đang chuyển hướng sang trang thanh toán MoMo..." 
+                    ? "Đơn hàng đã được khởi tạo. Vui lòng thanh toán trong vòng 10 phút." 
                     : "Đặt hàng thành công! Đơn hàng của bạn đang chờ xác nhận.")
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public String retryPayment(Long userId, Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại!"));
+        
+        // Bảo mật: Kiểm tra đơn hàng có thuộc về User này không
+        if (!order.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Bạn không có quyền thanh toán đơn hàng này!");
+        }
+        
+        // Kiểm tra xem đơn hàng còn trong trạng thái PENDING_PAYMENT không
+        if (order.getStatus() != OrderStatus.PENDING_PAYMENT) {
+            throw new RuntimeException("Đơn hàng này không ở trạng thái chờ thanh toán!");
+        }
+        
+        // Kiểm tra hết hạn (10 phút)
+        long diff = new Date().getTime() - order.getOrderDate().getTime();
+        if (diff > 10 * 60 * 1000) {
+            throw new RuntimeException("Yêu cầu thanh toán đã hết hạn (quá 10 phút)!");
+        }
+        
+        return momoService.createPaymentUrl(order.getId(), order.getTotalAmount());
+    }
+
+    @Override
+    @Transactional
+    public void revertInventory(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại!"));
+        
+        for (OrderItem item : order.getOrderItems()) {
+            ProductVariant variant = item.getProductVariant();
+            variant.setStockQuantity(variant.getStockQuantity() + item.getQuantity().intValue());
+            productVariantRepository.save(variant);
+        }
     }
 
     // THEO DÕI TRẠNG THÁI ĐƠN HÀNG - Xem danh sách
@@ -340,6 +381,7 @@ public class OrderServiceImpl implements OrderService {
 
         Set<OrderStatus> cancellableStatuses = Set.of(
                 OrderStatus.PENDING_PAYMENT,
+                OrderStatus.PENDING_CONFIRMATION,
                 OrderStatus.PAID,
                 OrderStatus.PROCESSING);
 

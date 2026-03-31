@@ -394,6 +394,46 @@ const AdminOrders = (() => {
         }
     }
 
+    // ===== UPDATE WHOLE ORDER STATUS (NEW) =====
+    async function updateWholeOrderStatus() {
+        const orderIdText = $('modal-order-id').textContent;
+        const match = orderIdText.match(/#ORD-(\d+)/);
+        if (!match) return;
+        const orderId = parseInt(match[1]);
+
+        const select = $('modal-global-status');
+        const newStatus = select.value;
+        if (!newStatus) {
+            showToast('Vui lòng chọn trạng thái mới', 'warning');
+            return;
+        }
+
+        if (!confirm(`Xác nhận cập nhật TOÀN BỘ đơn hàng sang trạng thái: ${STATUS_LABELS[newStatus]}?`)) return;
+
+        try {
+            const res = await fetch(`${API.UPDATE_STATUS(orderId)}?status=${newStatus}`, {
+                method: 'PATCH',
+            });
+            if (res.status === 401 || res.status === 403) {
+                window.location.href = '/admin/login';
+                return;
+            }
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.message || 'Cập nhật toàn bộ đơn hàng thất bại');
+            }
+
+            showToast('Cập nhật toàn bộ đơn hàng thành công!');
+            
+            // Reload modal & table
+            await openDetail(orderId);
+            fetchOrders(currentPage);
+            select.value = ''; // Reset select
+        } catch (err) {
+            showToast(err.message, 'error');
+        }
+    }
+
     // ===== INIT =====
     function init() {
         // Filter inputs (Automatic filtering)
@@ -432,5 +472,5 @@ const AdminOrders = (() => {
     }
 
     // Public API
-    return { openDetail, closeModal, updateItemStatus };
+    return { openDetail, closeModal, updateItemStatus, updateWholeOrderStatus };
 })();

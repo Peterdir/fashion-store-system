@@ -494,8 +494,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     CartUtils.updateCartIconBadge();
                 }
 
-                if (selectedMethod === 'MOMO' && result.paymentUrl) {
-                    window.location.href = result.paymentUrl;
+                if (selectedMethod === 'MOMO') {
+                    // Chuyển hướng sang trang tóm tắt thanh toán để xem countdown và chi tiết
+                    window.location.href = `/checkout/payment-summary?orderId=${result.orderId}`;
                 } else {
                     if (window.Toast) Toast.success('Đặt hàng thành công!');
                     setTimeout(() => {

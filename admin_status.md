@@ -9,7 +9,7 @@
 | 📦 Quản Lý Đơn Hàng | ✅ `AdminOrderController` | ✅ `admin/pages/orders.html` | ✅ **Xong** |
 | 👕 Quản Lý Sản Phẩm | ✅ `AdminProductController` | ✅ `admin/pages/products.html` | ✅ **Xong** |
 | 👥 Quản Lý Khách Hàng | ✅ `AdminUserController` | ✅ `admin/pages/customers.html` | ✅ **Xong** |
-| 🎟️ Quản Lý Mã Giảm Giá | ✅ `AdminCouponController` | ❌ Chưa có giao diện | **🔴 Thiếu** |
+| 🎟️ Quản Lý Mã Giảm Giá | ✅ `AdminCouponController` | ✅ `admin/pages/coupons.html` | ✅ **Xong** |
 | 🔄 Yêu Cầu Hoàn Trả | ✅ `AdminReturnRequestController` | ✅ `admin/pages/returns.html` | ✅ **Xong** |
 | 📈 Báo Cáo Doanh Thu | ✅ `ReportController` | ❌ Chưa có giao diện | **🔴 Thiếu** |
 | 🏪 Bán Hàng Trực Tiếp | ✅ `OfflineSaleController` | ❌ Chưa có giao diện | **🔴 Thiếu** |
@@ -107,10 +107,14 @@
 
 **Dữ liệu coupon:** `code`, `discountValue`, `discountType` (PERCENTAGE/FIXED), `startDate`, `expiryDate`, `minOrderAmount`
 
-**Giao diện cần có:**
-- Bảng danh sách mã giảm giá
-- Form tạo/sửa mã
-- Toggle bật/tắt mã
+**Giao diện:** ✅ [coupons.html](file:///d:/Subject/CongNghePhanMemHDT/FinalProject/fashion-store-system/src/main/resources/templates/admin/pages/coupons.html) + [coupons.js](file:///d:/Subject/CongNghePhanMemHDT/FinalProject/fashion-store-system/src/main/resources/static/admin/js/coupons.js)
+
+**Tính năng đã có:**
+- ✅ Danh sách mã giảm giá, phân trang.
+- ✅ Tìm kiếm theo mã CODE (Live Search 300ms debounce).
+- ✅ Thêm/Sửa mã giảm giá (Modal Slide-over).
+- ✅ Bật/Tắt trạng thái mã ngay lập tức.
+- ✅ Validation form (Ngày bắt đầu/kết thúc, giá trị giảm, đơn tối thiểu).
 
 ---
 

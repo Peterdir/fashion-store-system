@@ -3,6 +3,7 @@ package org.example.fashionstoresystem.entity.jpa;
 import jakarta.persistence.*;
 import lombok.*;
 
+import org.example.fashionstoresystem.entity.enums.OrderStatus;
 import org.example.fashionstoresystem.entity.enums.OrderType;
 import org.example.fashionstoresystem.entity.enums.PaymentMethod;
 
@@ -40,6 +41,10 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

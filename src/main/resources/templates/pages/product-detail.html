@@ -39,18 +39,18 @@
                         <nav class="text-[10px] font-bold tracking-[0.15em] uppercase text-neutral-400 flex items-center space-x-2">
                             <a th:href="@{/}" class="hover:text-primary transition-colors">Home</a>
                             <span class="text-neutral-300">/</span>
-                            <a th:href="@{/category}" class="hover:text-primary transition-colors" th:text="${product.category != null ? product.category : 'Shop'}">Category</a>
+                            <a th:href="@{/category(keyword=${product.categoryName})}" class="hover:text-primary transition-colors" th:text="${product.categoryName != null ? product.categoryName : 'Shop'}">Category</a>
                         </nav>
                         
                         <div class="flex justify-between items-start gap-4">
                             <h1 class="text-xl md:text-2xl font-light leading-tight text-neutral-800" th:text="${product.name}">Product Name</h1>
-                            <button class="p-1.5 border border-outline/10 text-neutral-400 hover:text-primary transition-all">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                            </button>
                         </div>
 
                         <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] font-medium font-sans">
-                            <span class="text-neutral-400 uppercase tracking-widest">SKU: <span class="text-neutral-600" th:text="${product.productId}">sz25042554846</span></span>
+                            <span class="text-neutral-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                Mã sản phẩm (SKU): <span id="variant-sku-display" class="text-neutral-900 font-black" th:text="${'HY-P' + product.productId}">HY-P25</span>
+                                <span class="material-symbols-outlined text-[12px] cursor-help text-neutral-300" title="Mã số định danh duy nhất cho từng mẫu mã và kích thước của sản phẩm này.">info</span>
+                            </span>
                         </div>
 
                         <!-- Price -->
@@ -59,6 +59,14 @@
                                 <span class="text-[10px] font-bold uppercase text-neutral-400">Giá từ</span>
                                 <span class="text-2xl font-bold text-primary" th:text="${#numbers.formatDecimal(product.minPrice != null ? product.minPrice : 0, 0, 'POINT', 0, 'COMMA') + ' ₫'}">20.900 ₫</span>
                             </div>
+                        </div>
+
+                        <!-- Description (Moved up for better visibility) -->
+                        <div class="py-2">
+                            <h4 class="text-[9px] font-black tracking-[0.3em] uppercase mb-3 text-neutral-400 italic">Mô tả sản phẩm</h4>
+                            <p class="text-xs font-medium text-neutral-600 leading-relaxed max-h-[100px] overflow-y-auto pr-2 custom-scrollbar" th:text="${product.description}">
+                                Thông tin chi tiết về sản phẩm đang được cập nhật...
+                            </p>
                         </div>
 
 
@@ -104,8 +112,11 @@
     <section class="bg-surface-low border-y border-outline/10 py-12 mt-12" th:if="${product != null}">
         <div class="max-w-[1280px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
-                <h4 class="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 text-neutral-400 italic">Description</h4>
-                <p class="text-[11px] font-sans text-neutral-600 leading-relaxed" th:text="${product.description}">Detail text...</p>
+                <h4 class="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 text-neutral-400 italic">Dịch vụ</h4>
+                <p class="text-[11px] font-sans text-neutral-600 leading-relaxed">
+                    Hỗ trợ chỉnh sửa kích cỡ miễn phí tại cửa hàng.<br>
+                    Đổi trả trong vòng 7 ngày nếu có lỗi từ nhà sản xuất.
+                </p>
             </div>
             <div>
                 <h4 class="text-[10px] font-bold tracking-[0.3em] uppercase mb-6 text-neutral-400 italic">Stock Info</h4>

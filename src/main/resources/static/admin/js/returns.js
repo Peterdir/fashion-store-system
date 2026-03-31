@@ -136,25 +136,28 @@ const AdminReturns = {
         const info = document.getElementById('pagination-info');
         const buttons = document.getElementById('pagination-buttons');
         
-        info.innerHTML = `Hiển thị <b>${data.size * data.number + 1} - ${Math.min(data.size * (data.number + 1), data.totalElements)}</b> trên tổng số <b>${data.totalElements}</b>`;
+        // Cập nhật lấy từ data.page do chế độ via-dto trong application.properties
+        const page = data.page || data;
+        
+        info.innerHTML = `Hiển thị <b>${page.size * page.number + 1} - ${Math.min(page.size * (page.number + 1), page.totalElements)}</b> trên tổng số <b>${page.totalElements}</b>`;
         
         let html = '';
         // Prev
-        html += `<button onclick="AdminReturns.changePage(${data.number - 1})" ${data.first ? 'disabled' : ''} class="p-1.5 border border-neutral-200 disabled:opacity-30 hover:bg-neutral-50 transition-colors"><span class="material-symbols-outlined text-[18px]">chevron_left</span></button>`;
+        html += `<button onclick="AdminReturns.changePage(${page.number - 1})" ${page.number === 0 ? 'disabled' : ''} class="p-1.5 border border-neutral-200 disabled:opacity-30 hover:bg-neutral-50 transition-colors"><span class="material-symbols-outlined text-[18px]">chevron_left</span></button>`;
         
         // Pages
-        for (let i = 0; i < data.totalPages; i++) {
-            if (i === data.number) {
+        for (let i = 0; i < page.totalPages; i++) {
+            if (i === page.number) {
                 html += `<button class="w-8 h-8 bg-black text-white text-[10px] font-black">${i + 1}</button>`;
-            } else if (i < 3 || i > data.totalPages - 4 || (i > data.number - 2 && i < data.number + 2)) {
+            } else if (i < 3 || i > page.totalPages - 4 || (i > page.number - 2 && i < page.number + 2)) {
                 html += `<button onclick="AdminReturns.changePage(${i})" class="w-8 h-8 border border-neutral-200 text-[10px] font-bold hover:bg-neutral-50">${i + 1}</button>`;
-            } else if (i === 3 || i === data.totalPages - 4) {
+            } else if (i === 3 || i === page.totalPages - 4) {
                 html += `<span class="px-1 text-neutral-300">...</span>`;
             }
         }
 
         // Next
-        html += `<button onclick="AdminReturns.changePage(${data.number + 1})" ${data.last ? 'disabled' : ''} class="p-1.5 border border-neutral-200 disabled:opacity-30 hover:bg-neutral-50 transition-colors"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>`;
+        html += `<button onclick="AdminReturns.changePage(${page.number + 1})" ${page.number >= page.totalPages - 1 ? 'disabled' : ''} class="p-1.5 border border-neutral-200 disabled:opacity-30 hover:bg-neutral-50 transition-colors"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>`;
         
         buttons.innerHTML = html;
     },
@@ -221,6 +224,36 @@ const AdminReturns = {
                 document.getElementById('modal-rejection-reason').textContent = req.rejectionReason;
             } else {
                 rejectionView.classList.add('hidden');
+            }
+
+            // Return Items
+            const itemsContainer = document.getElementById('modal-return-items');
+            if (req.items && req.items.length > 0) {
+                itemsContainer.innerHTML = req.items.map(item => `
+                    <tr class="hover:bg-neutral-50/30 transition-colors">
+                        <td class="px-3 py-3">
+                            <div class="flex items-center gap-3">
+                                <img src="${item.productImage || '/images/placeholders/product.png'}" 
+                                     class="w-8 h-10 object-cover border border-neutral-100 flex-shrink-0"
+                                     onerror="this.src='/images/placeholders/product.png'">
+                                <div class="flex flex-col min-w-0">
+                                    <span class="text-[11px] font-black text-black uppercase truncate max-w-[200px]" title="${item.productName}">${item.productName}</span>
+                                    <span class="text-[9px] font-bold text-neutral-400 uppercase tracking-tighter">
+                                        Màu: ${item.color || 'N/A'} | Size: ${item.size || 'N/A'}
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-3 py-3 text-center">
+                            <span class="text-[11px] font-black text-black">x${item.quantity}</span>
+                        </td>
+                        <td class="px-3 py-3 text-right">
+                            <span class="text-[11px] font-black text-primary">${new Intl.NumberFormat('vi-VN').format(item.price)}đ</span>
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                itemsContainer.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-[10px] text-neutral-400 uppercase font-bold italic">Không tìm thấy thông tin sản phẩm</td></tr>`;
             }
 
             // Actions visibility based on status

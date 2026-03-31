@@ -235,6 +235,7 @@ const OrderModule = {
         const fallbackImg = 'https://vietcetera.com/uploads/images/15-apr-2021/screen-shot-2021-04-15-at-13-21-47-1618467727402.png';
         const imgUrl = item.productImage || fallbackImg;
         const strProductId = item.productId ? 'PROD-' + String(item.productId).padStart(6, '0') : 'N/A';
+        const strOrderIdFull = item.orderId ? 'ORD-' + String(item.orderId).padStart(6, '0') : 'N/A';
         const finalOrderTotal = new Intl.NumberFormat('vi-VN').format(item.orderTotalAmount);
 
         // Refund Status Badge
@@ -264,6 +265,28 @@ const OrderModule = {
                 </button>
             `;
         }
+        
+        // Cancellation Button Logic (MỚI)
+        const cancellableStates = ['PENDING_PAYMENT', 'PENDING_CONFIRMATION', 'PAID', 'PROCESSING'];
+        let cancelBtn = '';
+        if (cancellableStates.includes(statusEnum)) {
+            cancelBtn = `
+                <button onclick="OrderModule.openCancelModal(${item.orderId}, '${strOrderIdFull}')" 
+                        class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-red-500 hover:bg-rose-50 transition-colors flex items-center justify-center gap-1">
+                    <span class="material-symbols-outlined text-[13px]">cancel</span> Hủy đơn
+                </button>
+            `;
+        }
+        // Nút Thanh toán lại (MỚI)
+        let payBtn = '';
+        if (statusEnum === 'PENDING_PAYMENT') {
+            payBtn = `
+                <a href="/checkout/payment-summary?orderId=${item.orderId}" 
+                   class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase bg-black text-white hover:bg-primary transition-all flex items-center justify-center gap-1">
+                    <span class="material-symbols-outlined text-[13px]">payments</span> Thanh toán ngay
+                </a>
+            `;
+        }
 
         return `
             <div class="border border-black flex flex-col group hover:shadow-[3px_3px_0_0_#000] transition-all duration-300 relative overflow-hidden bg-white">
@@ -272,7 +295,7 @@ const OrderModule = {
                 <div class="border-b border-black p-3.5 flex justify-between items-center bg-gray-50/40">
                     <div class="flex items-center gap-3">
                         <div class="bg-black text-white px-2.5 py-0.5 text-[9px] font-black uppercase tracking-widest truncate">
-                            ${strProductId}
+                            ${strOrderIdFull}
                         </div>
                         <span class="text-[10px] font-bold text-gray-400 font-mono flex items-center gap-1">
                             <span class="material-symbols-outlined text-[13px]">calendar_today</span> ${date}
@@ -291,7 +314,10 @@ const OrderModule = {
                     </div>
                     
                     <div class="flex-1 min-w-0">
-                        <h4 class="text-xs font-black text-black uppercase tracking-tight truncate mb-1">${item.productName}</h4>
+                        <div class="flex items-center gap-2 mb-1">
+                            <h4 class="text-xs font-black text-black uppercase tracking-tight truncate">${item.productName}</h4>
+                            <span class="text-[8px] font-bold text-gray-300 uppercase tracking-tighter">[${strProductId}]</span>
+                        </div>
                         <div class="flex gap-2 mt-1 text-[9px] font-black uppercase tracking-widest text-gray-400">
                             <span>${item.color || 'FREE'}</span>
                             <span class="text-black/10">•</span>
@@ -310,7 +336,9 @@ const OrderModule = {
                 <!-- Footer -->
                 <div class="border-t border-black/5 flex divide-x divide-black/5">
                     <a href="/personal/order/${item.orderId}" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase hover:bg-neutral-50 transition-colors">Chi tiết đơn hàng</a>
-                    ${returnBtn ? returnBtn : `<button class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 hover:text-black transition-colors" onclick="window.location.href='/category'">Mua lại sản phẩm</button>`}
+                    ${payBtn}
+                    ${cancelBtn}
+                    ${returnBtn ? returnBtn : (cancelBtn || payBtn ? '' : `<button class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 hover:text-black transition-colors" onclick="window.location.href='/category'">Mua lại</button>`)}
                 </div>
             </div>
         `;
@@ -531,6 +559,8 @@ const OrderModule = {
             if (response.ok) {
                 this.closeReturnModal();
                 this.showReturnSuccess();
+                // Reload list to update Return buttons
+                this.loadOrders(this.currentStatus);
             } else {
                 const err = await response.json();
                 alert('Lỗi: ' + (err.message || 'Không thể gửi yêu cầu.'));
@@ -545,6 +575,31 @@ const OrderModule = {
     },
 
     /**
+     * Determine the single dominant status for an order based on item progress.
+     * Hides "passed" statuses by picking the one furthest in the workflow.
+     */
+    getDominantStatus(statusSummary) {
+        if (!statusSummary || Object.keys(statusSummary).length === 0) return 'PENDING_CONFIRMATION';
+
+        const statuses = Object.keys(statusSummary);
+        if (statuses.length === 1) return statuses[0];
+
+        // Priority list: Higher index = More progressed/Important
+        const PRIORITY = [
+            'PENDING_PAYMENT', 'PENDING_CONFIRMATION', 
+            'PAID', 'PROCESSING', 'SHIPPING', 
+            'DELIVERED', 'COMPLETED',
+            'PAYMENT_FAILED', 'PAYMENT_EXPIRED', 'CANCELLED'
+        ];
+
+        // Sort by priority and pick the highest one that isn't a "failure" unless all are failures
+        const sorted = statuses.sort((a, b) => PRIORITY.indexOf(b) - PRIORITY.indexOf(a));
+        
+        // If there's any active progress (SHIPPING, PROCESSING, etc.), use it over PENDING
+        return sorted[0];
+    },
+
+    /**
      * Create HTML for individual (Whole) order card (Compact)
      */
     renderOrderCard(order) {
@@ -552,19 +607,41 @@ const OrderModule = {
         const total = new Intl.NumberFormat('vi-VN').format(order.totalAmount);
         const fallbackImg = 'https://vietcetera.com/uploads/images/15-apr-2021/screen-shot-2021-04-15-at-13-21-47-1618467727402.png';
 
-        const strOrderId = 'ORD-' + String(order.orderId).padStart(6, '0');
+        const strOrderIdFull = 'ORD-' + String(order.orderId).padStart(6, '0');
 
-        // Status display
-        let statusHtml = '';
-        if (order.statusSummary) {
-            statusHtml = Object.entries(order.statusSummary).map(([status, count]) => {
-                const label = this.getStatusLabel(status);
-                let colorClass = 'bg-gray-50 text-gray-500 border-gray-200';
-                if (status === 'DELIVERED' || status === 'COMPLETED') colorClass = 'bg-emerald-50 text-emerald-600 border-emerald-100';
-                if (status === 'SHIPPING') colorClass = 'bg-blue-50 text-blue-600 border-blue-100';
-                if (status.includes('PENDING')) colorClass = 'bg-amber-50 text-amber-600 border-amber-100';
-                return `<span class="${colorClass} px-1.5 py-0.5 text-[7px] font-black uppercase tracking-wider border rounded-sm">${label} (${count})</span>`;
-            }).join(' ');
+        // Status display - Now using Dominant Status to avoid "passed" statuses showing up
+        const dominantStatus = this.getDominantStatus(order.statusSummary);
+        const label = this.getStatusLabel(dominantStatus);
+
+        let colorClass = 'bg-gray-50 text-gray-500 border-gray-200';
+        if (dominantStatus === 'DELIVERED' || dominantStatus === 'COMPLETED') colorClass = 'bg-emerald-50 text-emerald-600 border-emerald-100';
+        if (dominantStatus === 'SHIPPING') colorClass = 'bg-blue-50 text-blue-600 border-blue-100';
+        if (dominantStatus.includes('PENDING')) colorClass = 'bg-amber-50 text-amber-600 border-amber-100';
+        if (['CANCELLED', 'PAYMENT_FAILED', 'PAYMENT_EXPIRED'].includes(dominantStatus)) colorClass = 'bg-red-50 text-red-600 border-red-100';
+
+        const statusHtml = `<span class="${colorClass} px-1.5 py-0.5 text-[7px] font-black uppercase tracking-wider border rounded-sm">${label}</span>`;
+
+        // Cancellation Button Logic
+        const cancellableStates = ['PENDING_PAYMENT', 'PENDING_CONFIRMATION', 'PAID', 'PROCESSING'];
+        let cancelBtnHtml = '';
+        if (cancellableStates.includes(dominantStatus)) {
+            cancelBtnHtml = `
+                <button onclick="OrderModule.openCancelModal(${order.orderId}, '${strOrderIdFull}')" 
+                        class="text-[9px] font-black text-red-500 hover:text-red-700 transition-colors uppercase tracking-widest flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">cancel</span> Hủy đơn
+                </button>
+            `;
+        }
+
+        // Nút Thanh toán (Cho Order Card)
+        let payBtnHtml = '';
+        if (dominantStatus === 'PENDING_PAYMENT') {
+            payBtnHtml = `
+                <a href="/checkout/payment-summary?orderId=${order.orderId}" 
+                        class="text-[9px] font-black text-primary hover:text-primary/80 transition-colors uppercase tracking-widest flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">payments</span> Thanh toán ngay
+                </a>
+            `;
         }
 
         // Mini Gallery (Moderately Sized)
@@ -595,11 +672,13 @@ const OrderModule = {
                     <!-- Info -->
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-3 mb-1.5">
-                            <span class="text-[10px] font-black tracking-widest text-black">${strOrderId}</span>
+                            <span class="text-[10px] font-black tracking-widest text-black">${strOrderIdFull}</span>
                             <span class="text-[9px] font-bold text-gray-400 font-mono">${date}</span>
                         </div>
-                        <div class="flex flex-wrap gap-1.5">
+                        <div class="flex items-center gap-4">
                             ${statusHtml}
+                            ${payBtnHtml}
+                            ${cancelBtnHtml}
                         </div>
                     </div>
 
@@ -633,6 +712,156 @@ const OrderModule = {
             'PAYMENT_EXPIRED': 'Giao dịch hết hạn'
         };
         return labels[status] || status;
+    },
+
+    /**
+     * Open Cancel Order Modal
+     */
+    openCancelModal(orderId, displayId) {
+        this.selectedOrderIdForCancel = orderId;
+        const displaySpan = document.getElementById('cancel-order-display-id');
+        if (displaySpan) displaySpan.textContent = `#${displayId}`;
+
+        // Reset form
+        const reasonSelect = document.getElementById('cancel-reason');
+        const descriptionText = document.getElementById('cancel-description');
+        if (reasonSelect) reasonSelect.value = '';
+        if (descriptionText) descriptionText.value = '';
+
+        const modal = document.getElementById('cancel-order-modal');
+        const backdrop = modal.querySelector('.bg-backdrop-cancel');
+        const content = modal.querySelector('.bg-modal-cancel');
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            backdrop.classList.add('opacity-100');
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    },
+
+    /**
+     * Close Cancel Order Modal
+     */
+    closeCancelModal() {
+        const modal = document.getElementById('cancel-order-modal');
+        const backdrop = modal.querySelector('.bg-backdrop-cancel');
+        const content = modal.querySelector('.bg-modal-cancel');
+
+        backdrop.classList.remove('opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        content.classList.remove('scale-100', 'opacity-100');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    },
+
+    /**
+     * Submit Cancel Order API
+     */
+    async submitCancelOrder() {
+        const orderId = this.selectedOrderIdForCancel;
+        const reason = document.getElementById('cancel-reason').value;
+        const note = document.getElementById('cancel-description').value;
+
+        if (!reason) {
+            alert('Vui lòng chọn lý do hủy đơn.');
+            return;
+        }
+
+        const fullReason = note ? `${reason}: ${note}` : reason;
+
+        try {
+            const response = await fetch(`/api/orders/${orderId}/cancel`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cancellationReason: fullReason })
+            });
+
+            if (response.ok) {
+                this.closeCancelModal();
+                this.showCancelSuccess();
+            } else {
+                const err = await response.json();
+                this.closeCancelModal();
+                this.showCancelFailed(err.message || 'Không thể hủy đơn hàng lúc này.');
+            }
+        } catch (error) {
+            console.error('Cancel order error:', error);
+            alert('Lỗi kết nối server.');
+        }
+    },
+
+    /**
+     * Show Cancel Success Modal
+     */
+    showCancelSuccess() {
+        const modal = document.getElementById('cancel-success-modal');
+        const backdrop = modal.querySelector('.bg-backdrop-cancel-success');
+        const content = modal.querySelector('.bg-modal-cancel-success');
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            backdrop.classList.add('opacity-100');
+            content.classList.remove('scale-90', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    },
+
+    /**
+     * Close Cancel Success Modal
+     */
+    closeCancelSuccess() {
+        const modal = document.getElementById('cancel-success-modal');
+        const backdrop = modal.querySelector('.bg-backdrop-cancel-success');
+        const content = modal.querySelector('.bg-modal-cancel-success');
+
+        backdrop.classList.remove('opacity-100');
+        content.classList.add('scale-90', 'opacity-0');
+        content.classList.remove('scale-100', 'opacity-100');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            this.loadOrders(this.currentStatus);
+        }, 500);
+    },
+
+    /**
+     * Show Cancel Failed Modal
+     */
+    showCancelFailed(message) {
+        const modal = document.getElementById('cancel-failed-modal');
+        const backdrop = modal.querySelector('.bg-backdrop-cancel-failed');
+        const content = modal.querySelector('.bg-modal-cancel-failed');
+        const messagePara = document.getElementById('cancel-failed-message');
+
+        if (messagePara) messagePara.textContent = message;
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            backdrop.classList.add('opacity-100');
+            content.classList.remove('scale-90', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    },
+
+    /**
+     * Close Cancel Failed Modal
+     */
+    closeCancelFailed() {
+        const modal = document.getElementById('cancel-failed-modal');
+        const backdrop = modal.querySelector('.bg-backdrop-cancel-failed');
+        const content = modal.querySelector('.bg-modal-cancel-failed');
+
+        backdrop.classList.remove('opacity-100');
+        content.classList.add('scale-90', 'opacity-0');
+        content.classList.remove('scale-100', 'opacity-100');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            this.loadOrders(this.currentStatus); // Reload anyway to refresh status
+        }, 500);
     }
 };
 

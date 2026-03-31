@@ -25,4 +25,5 @@ public class ReturnRequestResponseDTO {
     private Date requestDate;
     private String rejectionReason;
     private String paymentMethod;
+    private List<ReturnItemDTO> items;
 }

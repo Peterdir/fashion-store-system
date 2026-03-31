@@ -16,12 +16,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Lấy các sản phẩm có trạng thái còn bán
     List<Product> findByStatus(ProductStatus status);
 
-    // Tìm sản phẩm chứa keyword trong tên hoặc tên danh mục
-    @Query("SELECT p FROM Product p LEFT JOIN p.category c WHERE " +
-           "(LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-           "OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+    // Tìm sản phẩm theo từ khóa và lọc giá (minPrice, maxPrice)
+    @Query("SELECT DISTINCT p FROM Product p " +
+           "LEFT JOIN p.category c " +
+           "LEFT JOIN p.variants v " +
+           "WHERE (:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+           "AND (:minPrice IS NULL OR v.price >= :minPrice) " +
+           "AND (:maxPrice IS NULL OR v.price <= :maxPrice) " +
            "AND p.status = 'ACTIVE'")
-    Page<Product> findByNameOrCategoryContaining(@Param("keyword") String keyword, Pageable pageable);
+    Page<Product> findFiltered(@Param("keyword") String keyword, @Param("minPrice") Double minPrice, @Param("maxPrice") Double maxPrice, Pageable pageable);
 
     // Tìm sản phẩm theo danh sách category IDs (bao gồm danh mục cha + con)
     @Query("SELECT p FROM Product p WHERE p.category.id IN :categoryIds AND p.status = 'ACTIVE'")

@@ -863,8 +863,106 @@
                         </div>
                     </div>
 
+                    <!-- Cancel Order Modal (MỚI) -->
+                    <div id="cancel-order-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4">
+                        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 bg-backdrop-cancel" onclick="OrderModule.closeCancelModal()"></div>
+                        <div class="relative bg-white w-full max-w-[450px] shadow-2xl border border-black transform scale-95 opacity-0 transition-all duration-300 bg-modal-cancel overflow-hidden">
+                            <!-- Modal Header -->
+                            <div class="border-b border-black p-5 flex justify-between items-center bg-gray-50">
+                                <h3 class="text-xs font-black uppercase tracking-[0.2em]">Xác nhận hủy đơn hàng</h3>
+                                <button onclick="OrderModule.closeCancelModal()" class="material-symbols-outlined text-xl hover:rotate-90 transition-transform">close</button>
+                            </div>
+
+                            <div class="p-6 space-y-5">
+                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-relaxed">
+                                    Bạn có chắc chắn muốn hủy đơn hàng <span id="cancel-order-display-id" class="text-black font-black">#ORD-000000</span> không? Hành động này không thể hoàn tác.
+                                </p>
+
+                                <div class="space-y-2">
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Lý do hủy đơn <span class="text-red-500">*</span></label>
+                                    <div class="relative">
+                                        <select id="cancel-reason" class="w-full bg-white border border-black px-4 py-3 text-[11px] font-bold tracking-widest uppercase focus:ring-0 outline-none appearance-none cursor-pointer">
+                                            <option value="" disabled selected>Chọn lý do hủy</option>
+                                            <option value="Đổi ý / Không còn nhu cầu">Đổi ý / Không còn nhu cầu</option>
+                                            <option value="Cập nhật địa chỉ / SĐT nhận hàng">Cập nhật địa chỉ / SĐT nhận hàng</option>
+                                            <option value="Muốn thay đổi sản phẩm trong đơn">Muốn thay đổi sản phẩm trong đơn</option>
+                                            <option value="Tìm thấy giá rẻ hơn ở nơi khác">Tìm thấy giá rẻ hơn ở nơi khác</option>
+                                            <option value="Phí vận chuyển quá cao">Phí vận chuyển quá cao</option>
+                                            <option value="Thời gian giao hàng quá lâu">Thời gian giao hàng quá lâu</option>
+                                            <option value="Khác">Lý do khác</option>
+                                        </select>
+                                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-sm">expand_more</span>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-2" id="cancel-custom-reason-container">
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Ghi chú thêm</label>
+                                    <textarea id="cancel-description" rows="3" 
+                                              class="w-full bg-white border border-black p-4 text-[11px] font-bold tracking-widest uppercase focus:ring-0 outline-none resize-none placeholder:text-gray-200"
+                                              placeholder="Nhập lý do chi tiết nếu chọn 'Khác'..."></textarea>
+                                </div>
+
+                                <div class="flex gap-4 pt-2">
+                                    <button onclick="OrderModule.closeCancelModal()" 
+                                            class="flex-1 border border-black px-6 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all">
+                                        Đóng
+                                    </button>
+                                    <button onclick="OrderModule.submitCancelOrder()" 
+                                            class="flex-1 bg-red-600 text-white px-6 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-red-700 transition-all shadow-xl active:scale-95">
+                                        Xác nhận hủy
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cancel Success Modal (MỚI) -->
+                    <div id="cancel-success-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6">
+                        <div class="absolute inset-0 bg-white/60 backdrop-blur-md opacity-0 transition-opacity duration-700 bg-backdrop-cancel-success"></div>
+                        <div class="relative bg-white w-full max-w-[360px] p-12 shadow-[0_40px_80px_rgba(0,0,0,0.2)] border border-black text-center transform scale-90 opacity-0 transition-all duration-500 bg-modal-cancel-success">
+                            <div class="success-checkmark mb-16">
+                                <div class="check-icon">
+                                    <span class="icon-line line-tip"></span>
+                                    <span class="icon-line line-long"></span>
+                                    <div class="icon-circle"></div>
+                                    <div class="icon-fix"></div>
+                                </div>
+                            </div>
+                            <h3 class="text-xs font-black uppercase tracking-[0.3em] mb-4 text-black text-red-600">Đã hủy đơn hàng</h3>
+                            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.15em] leading-loose mb-10">Đơn hàng của bạn đã được hủy thành công. Nếu đã thanh toán, chúng tôi sẽ xử lý hoàn tiền trong thời gian sớm nhất.</p>
+                            
+                            <button onclick="OrderModule.closeCancelSuccess()" 
+                                    class="w-full border border-black bg-black text-white px-8 py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all">
+                                Đóng
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cancel Failed Modal (MỚI) -->
+                    <div id="cancel-failed-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6">
+                        <div class="absolute inset-0 bg-white/60 backdrop-blur-md opacity-0 transition-opacity duration-700 bg-backdrop-cancel-failed"></div>
+                        <div class="relative bg-white w-full max-w-[360px] p-12 shadow-[0_40px_80px_rgba(0,0,0,0.2)] border border-black text-center transform scale-90 opacity-0 transition-all duration-500 bg-modal-cancel-failed">
+                            <div class="error-xmark mb-16">
+                                <div class="x-icon">
+                                    <span class="icon-line line-left"></span>
+                                    <span class="icon-line line-right"></span>
+                                    <div class="icon-circle"></div>
+                                </div>
+                            </div>
+                            <h3 class="text-xs font-black uppercase tracking-[0.3em] mb-4 text-black text-amber-600">Không thể hủy đơn</h3>
+                            <p id="cancel-failed-message" class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.15em] leading-loose mb-10">Đơn hàng của bạn đã chuyển sang trạng thái xử lý/vận chuyển và không thể tự hủy lúc này.</p>
+                            
+                            <button onclick="OrderModule.closeCancelFailed()" 
+                                    class="w-full border border-black bg-black text-white px-8 py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all">
+                                Đã hiểu
+                            </button>
+                        </div>
+                    </div>
+
                     <style>
-                        .success-checkmark { width: 80px; height: 100px; margin: 0 auto; position: relative; }
+                        .success-checkmark, .error-xmark { width: 80px; height: 100px; margin: 0 auto; position: relative; }
+                        
+                        /* Success Checkmark Style */
                         .check-icon { width: 80px; height: 80px; position: relative; border-radius: 50%; box-sizing: content-box; border: 4px solid #58b76c; }
                         .check-icon::before { top: 3px; left: -2px; width: 30px; transform-origin: 100% 50%; border-radius: 100px 0 0 100px; }
                         .check-icon::after { top: 0; left: 30px; width: 60px; transform-origin: 0 50%; border-radius: 0 100px 100px 0; animation: rotate-circle 4.25s ease-in; }
@@ -874,9 +972,20 @@
                         .icon-line.line-long { top: 38px; right: 8px; width: 47px; transform: rotate(-45deg); animation: icon-line-long 0.75s; }
                         .icon-circle { top: -4px; left: -4px; z-index: 10; width: 80px; height: 80px; border-radius: 50%; position: absolute; box-sizing: content-box; border: 4px solid rgba(88, 183, 108, .5); }
                         .icon-fix { top: 8px; width: 5px; left: 28px; z-index: 1; height: 85px; position: absolute; transform: rotate(-45deg); background-color: #FFFFFF; }
+                        
+                        /* Error X-Mark Style */
+                        .x-icon { width: 80px; height: 80px; position: relative; border-radius: 50%; box-sizing: content-box; border: 4px solid #f27474; }
+                        .x-icon .icon-line { background-color: #f27474; top: 37px; width: 47px; }
+                        .x-icon .icon-line.line-left { left: 17px; transform: rotate(45deg); animation: icon-line-left 0.75s; }
+                        .x-icon .icon-line.line-right { right: 17px; transform: rotate(-45deg); animation: icon-line-right 0.75s; }
+                        .error-xmark .icon-circle { border: 4px solid rgba(242, 116, 116, .5); }
+
                         @keyframes rotate-circle { 0% { transform: rotate(-45deg); } 5% { transform: rotate(-45deg); } 12% { transform: rotate(-405deg); } 100% { transform: rotate(-405deg); } }
                         @keyframes icon-line-tip { 0% { width: 0; left: 1px; top: 19px; } 54% { width: 0; left: 1px; top: 19px; } 70% { width: 50px; left: -8px; top: 37px; } 84% { width: 17px; left: 21px; top: 48px; } 100% { width: 25px; left: 14px; top: 46px; } }
                         @keyframes icon-line-long { 0% { width: 0; right: 46px; top: 54px; } 65% { width: 0; right: 46px; top: 54px; } 84% { width: 55px; right: 0px; top: 35px; } 100% { width: 47px; right: 8px; top: 38px; } }
+                        @keyframes icon-line-left { 0% { width: 0; left: 40px; top: 37px; } 100% { width: 47px; left: 17px; top: 37px; } }
+                        @keyframes icon-line-right { 0% { width: 0; right: 40px; top: 37px; } 100% { width: 47px; right: 17px; top: 37px; } }
+
                         .bg-backdrop.show { opacity: 1; }
                         .bg-modal.show { opacity: 1; transform: scale(1); }
                     </style>

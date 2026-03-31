@@ -22,10 +22,12 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<Page<ProductSummaryResponseDTO>> getProducts(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
             Pageable pageable
     ) {
 
-        Page<ProductSummaryResponseDTO> response = productService.getProducts(keyword, pageable);
+        Page<ProductSummaryResponseDTO> response = productService.getProducts(keyword, minPrice, maxPrice, pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

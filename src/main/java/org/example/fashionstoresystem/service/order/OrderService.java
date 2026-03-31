@@ -28,4 +28,10 @@ public interface OrderService {
 
     // Hủy đơn hàng
     MessageResponseDTO cancelOrder(Long userId, Long orderId, CancelOrderRequestDTO dto);
+
+    // Thanh toán lại cho đơn MOMO
+    String retryPayment(Long userId, Long orderId);
+
+    // Hoàn kho (dùng cho cleanup task)
+    void revertInventory(Long orderId);
 }

@@ -18,6 +18,12 @@ public class CheckoutPageController {
         return "pages/checkout";
     }
 
+    @GetMapping("/checkout/payment-summary")
+    public String paymentSummary(@RequestParam("orderId") Long orderId, Model model) {
+        model.addAttribute("orderId", orderId);
+        return "pages/payment-summary";
+    }
+
     @GetMapping("/mock/momo-payment")
     public String mockMomoPayment(@RequestParam("orderId") String orderId, 
                                   @RequestParam("amount") String amount, 

@@ -157,12 +157,21 @@ function updateFinalVariant() {
     const variant = productVariants.find(v => v.color === currentSelectedColor && v.size === currentSelectedSize);
     
     if (variant) {
+        // Update Price
         const priceElements = document.querySelectorAll('.text-primary.font-bold, .text-3xl.font-bold.text-primary, .text-2xl.font-bold.text-primary');
         priceElements.forEach(el => el.innerText = new Intl.NumberFormat('vi-VN').format(variant.price) + ' ₫');
 
+        // Update Stock
         const stockDisplay = document.getElementById('stock-display');
         if (stockDisplay) stockDisplay.innerText = `${variant.stockQuantity} items available`;
         
+        // Update SKU dynamically
+        const skuDisplay = document.getElementById('variant-sku-display');
+        if (skuDisplay) {
+            // Note: if you have a productId in context, use it. For now using variantId.
+            skuDisplay.innerText = `HY-V${variant.variantId}`;
+        }
+
         const variantInput = document.getElementById('selected-variant-id');
         if (variantInput) variantInput.value = variant.variantId;
         

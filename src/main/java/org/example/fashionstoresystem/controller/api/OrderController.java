@@ -75,4 +75,12 @@ public class OrderController {
         MessageResponseDTO response = orderService.cancelOrder(userId, orderId, dto);
         return ResponseEntity.ok(response);
     }
+
+    // THANH TOÁN LẠI (Cho đơn hàng MoMo chưa quá hạn)
+    @PostMapping("/{orderId}/retry-payment")
+    public ResponseEntity<MessageResponseDTO> retryPayment(@PathVariable Long orderId) {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
+        String paymentUrl = orderService.retryPayment(userId, orderId);
+        return ResponseEntity.ok(new MessageResponseDTO(paymentUrl));
+    }
 }

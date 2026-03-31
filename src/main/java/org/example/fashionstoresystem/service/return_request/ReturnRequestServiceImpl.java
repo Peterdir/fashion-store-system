@@ -4,12 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.SubmitReturnRequestDTO;
 import org.example.fashionstoresystem.dto.request.ProcessReturnRequestDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
+import org.example.fashionstoresystem.dto.response.ReturnItemDTO;
 import org.example.fashionstoresystem.dto.response.ReturnRequestResponseDTO;
 import org.example.fashionstoresystem.entity.enums.OrderStatus;
 import org.example.fashionstoresystem.entity.enums.RefundStatus;
 import org.example.fashionstoresystem.entity.enums.ReturnStatus;
 import org.example.fashionstoresystem.entity.jpa.Order;
 import org.example.fashionstoresystem.entity.jpa.OrderItem;
+import org.example.fashionstoresystem.entity.jpa.ProductImage;
+import org.example.fashionstoresystem.entity.jpa.ProductVariant;
 import org.example.fashionstoresystem.entity.jpa.ReturnRequest;
 import org.example.fashionstoresystem.repository.OrderRepository;
 import org.example.fashionstoresystem.repository.ReturnRequestRepository;
@@ -165,6 +168,36 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
                 .requestDate(rr.getRequestDate())
                 .rejectionReason(rr.getRejectionReason())
                 .paymentMethod(rr.getOrder().getPaymentMethod().name())
+                .items(rr.getReturnItems().stream()
+                        .map(item -> ReturnItemDTO.builder()
+                                .productName(item.getProductName())
+                                .productImage(getProductImageUrl(item.getProductVariant()))
+                                .size(item.getProductVariant() != null ? item.getProductVariant().getSize() : null)
+                                .color(item.getProductVariant() != null ? item.getProductVariant().getColor() : null)
+                                .quantity(item.getQuantity())
+                                .price(item.getPrice())
+                                .build())
+                        .toList())
                 .build();
+    }
+
+    private String getProductImageUrl(ProductVariant variant) {
+        if (variant == null || variant.getProduct() == null || variant.getProduct().getImages() == null || variant.getProduct().getImages().isEmpty()) {
+            return null;
+        }
+
+        String targetUrl = variant.getProduct().getImages().stream()
+                .filter(img -> img.getColor() != null && img.getColor().equalsIgnoreCase(variant.getColor()))
+                .map(ProductImage::getUrl)
+                .findFirst()
+                .orElse(variant.getProduct().getImages().get(0).getUrl());
+
+        if (targetUrl == null) return null;
+
+        if (!targetUrl.startsWith("/") && !targetUrl.startsWith("http")) {
+            targetUrl = "/" + targetUrl;
+        }
+
+        return targetUrl;
     }
 }

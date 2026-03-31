@@ -42,4 +42,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT DISTINCT o FROM Order o LEFT JOIN o.orderItems oi WHERE o.user.id = :userId ORDER BY o.orderDate DESC")
     Page<Order> findAllMyOrders(@Param("userId") Long userId, Pageable pageable);
+
+    // Tìm đơn hàng quá hạn thanh toán
+    List<Order> findByStatusAndOrderDateBefore(OrderStatus status, Date expireTime);
 }

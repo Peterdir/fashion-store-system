@@ -45,15 +45,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductSummaryResponseDTO> getProducts(String keyword, Pageable pageable) {
-        Page<Product> productsPage;
-        
-        // Nếu keyword trống thì lấy tất cả, ngược lại thì tìm kiếm thông minh theo Tên hoặc Category
-        if (keyword == null || keyword.trim().isEmpty()) {
-            productsPage = productRepository.findAll(pageable);
-        } else {
-            productsPage = productRepository.findByNameOrCategoryContaining(keyword.trim(), pageable);
-        }
+    public Page<ProductSummaryResponseDTO> getProducts(String keyword, Double minPrice, Double maxPrice, Pageable pageable) {
+        // Sử dụng phương thức tìm kiếm linh hoạt với Keyword và Lọc giá
+        Page<Product> productsPage = productRepository.findFiltered(
+                (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null,
+                minPrice,
+                maxPrice,
+                pageable
+        );
 
         // Map Entity sang DTO
         return productsPage.map(product -> ProductSummaryResponseDTO.builder()

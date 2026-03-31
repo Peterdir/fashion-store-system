@@ -20,9 +20,28 @@
                         <span class="text-primary" th:text="${keyword}">Current Category</span>
                     </th:block>
                 </nav>
-                <div class="flex space-x-12 mt-4 md:mt-0">
-                    <button class="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-primary pb-1">Filter (0)</button>
-                    <button class="text-[11px] font-bold tracking-[0.2em] uppercase border-b border-primary pb-1">Sort By</button>
+                <div class="flex flex-wrap items-center gap-6 mt-4 md:mt-0">
+                    <!-- Sort Selection -->
+                    <div class="relative group">
+                        <select id="sort-selector" onchange="categoryManager.applyFilters()"
+                                class="appearance-none bg-transparent text-[11px] font-bold tracking-[0.2em] uppercase border-b border-primary pb-1 pr-6 cursor-pointer focus:outline-none">
+                            <option value="">Sort By</option>
+                            <option value="id,desc" th:selected="${#strings.equals(param.sort, 'id,desc')}">Newest</option>
+                            <option value="variants.price,asc" th:selected="${#strings.equals(param.sort, 'variants.price,asc')}">Price: Low to High</option>
+                            <option value="variants.price,desc" th:selected="${#strings.equals(param.sort, 'variants.price,desc')}">Price: High to Low</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-0 top-0 text-sm pointer-events-none">expand_more</span>
+                    </div>
+
+                    <!-- Price Filter Toggle (Simple logic for now: inputs) -->
+                    <div class="flex items-center gap-3">
+                        <input type="number" id="min-price" th:value="${minPrice}" placeholder="Min đ" 
+                               class="w-20 bg-neutral-50 border-b border-neutral-200 py-1 text-[10px] font-bold text-center focus:border-primary outline-none">
+                        <span class="text-[10px] text-neutral-300">—</span>
+                        <input type="number" id="max-price" th:value="${maxPrice}" placeholder="Max đ" 
+                               class="w-20 bg-neutral-50 border-b border-neutral-200 py-1 text-[10px] font-bold text-center focus:border-primary outline-none">
+                        <button onclick="categoryManager.applyFilters()" class="bg-black text-white px-3 py-1 text-[9px] font-bold uppercase tracking-widest hover:bg-neutral-800 transition-all">Go</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -67,7 +86,7 @@
 
                 <!-- Pagination -->
                 <div th:if="${products.totalPages > 1}" class="mt-24 flex items-center justify-center space-x-8">
-                    <a th:href="@{/category(page=${products.number - 1}, keyword=${keyword})}" 
+                    <a th:href="@{/category(page=${products.number - 1}, keyword=${keyword}, sort=${param.sort}, minPrice=${minPrice}, maxPrice=${maxPrice})}" 
                        th:if="${products.hasPrevious()}"
                        class="text-[10px] uppercase font-bold tracking-[0.2em] hover:text-primary transition-colors">Previous</a>
                     
@@ -75,11 +94,11 @@
                         <span th:each="i : ${#numbers.sequence(0, products.totalPages - 1)}"
                               th:class="${i == products.number ? 'text-primary' : 'text-neutral-300'}"
                               class="text-[10px] font-bold">
-                            <a th:href="@{/category(page=${i}, keyword=${keyword})}" th:text="${i + 1}">1</a>
+                            <a th:href="@{/category(page=${i}, keyword=${keyword}, sort=${param.sort}, minPrice=${minPrice}, maxPrice=${maxPrice})}" th:text="${i + 1}">1</a>
                         </span>
                     </div>
 
-                    <a th:href="@{/category(page=${products.number + 1}, keyword=${keyword})}" 
+                    <a th:href="@{/category(page=${products.number + 1}, keyword=${keyword}, sort=${param.sort}, minPrice=${minPrice}, maxPrice=${maxPrice})}" 
                        th:if="${products.hasNext()}"
                        class="text-[10px] uppercase font-bold tracking-[0.2em] hover:text-primary transition-colors">Next</a>
                 </div>
@@ -88,6 +107,40 @@
         </div>
     </section>
 </div>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        class CategoryManager {
+            constructor() {
+                this.keyword = /*[[${keyword}]]*/ null;
+            }
+
+            applyFilters() {
+                const sort = document.getElementById('sort-selector').value;
+                const minPrice = document.getElementById('min-price').value;
+                const maxPrice = document.getElementById('max-price').value;
+                
+                let url = new URL(window.location.href);
+                url.searchParams.delete('page'); 
+                
+                if (this.keyword) url.searchParams.set('keyword', this.keyword);
+                else url.searchParams.delete('keyword');
+                
+                if (sort) url.searchParams.set('sort', sort);
+                else url.searchParams.delete('sort');
+                
+                if (minPrice) url.searchParams.set('minPrice', minPrice);
+                else url.searchParams.delete('minPrice');
+                
+                if (maxPrice) url.searchParams.set('maxPrice', maxPrice);
+                else url.searchParams.delete('maxPrice');
+                
+                window.location.href = url.pathname + url.search;
+            }
+        }
+        window.categoryManager = new CategoryManager();
+    </script>
+</th:block>
 
 </body>
 </html>

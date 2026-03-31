@@ -29,11 +29,15 @@ public class ProductViewController {
     @GetMapping("/category")
     public String category(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
             @PageableDefault(size = 12) Pageable pageable,
             Model model) {
-        Page<ProductSummaryResponseDTO> products = productService.getProducts(keyword, pageable);
+        Page<ProductSummaryResponseDTO> products = productService.getProducts(keyword, minPrice, maxPrice, pageable);
         model.addAttribute("products", products);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("minPrice", minPrice);
+        model.addAttribute("maxPrice", maxPrice);
         return "pages/category";
     }
 

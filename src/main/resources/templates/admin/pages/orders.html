@@ -146,6 +146,30 @@
                         </div>
                     </div>
 
+                    <!-- Cập nhật trạng thái toàn bộ đơn hàng (MỚI) -->
+                    <div class="px-6 py-4 border-b border-neutral-100 bg-neutral-50/50">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-[0.15em] text-primary">Cập nhật nhanh cả đơn</p>
+                                <p class="text-[9px] text-neutral-400 font-medium">Thay đổi trạng thái cho tất cả sản phẩm</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <select id="modal-global-status" class="px-3 py-2 text-[10px] font-bold border border-neutral-200 bg-white outline-none focus:border-primary min-w-[150px]">
+                                    <option value="">Chọn trạng thái...</option>
+                                    <option value="PROCESSING">Đang xử lý</option>
+                                    <option value="SHIPPING">Đang giao hàng</option>
+                                    <option value="DELIVERED">Đã giao hàng</option>
+                                    <option value="COMPLETED">Hoàn thành</option>
+                                    <option value="CANCELLED">Hủy đơn hàng</option>
+                                </select>
+                                <button onclick="AdminOrders.updateWholeOrderStatus()" 
+                                        class="bg-primary text-white px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-neutral-800 transition-colors">
+                                    Cập nhật
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Order Items -->
                     <div class="px-6 py-5">
                         <p class="text-[10px] font-black uppercase tracking-[0.15em] text-neutral-500 mb-3">Sản phẩm trong đơn</p>
