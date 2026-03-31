@@ -110,23 +110,38 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
         ReturnRequest rr = returnRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Yêu cầu hoàn trả không tồn tại!"));
 
-        if (rr.getStatus() != ReturnStatus.PENDING) {
-            throw new RuntimeException("Chỉ có thể xử lý yêu cầu đang ở trạng thái Chờ duyệt!");
+        ReturnStatus currentStatus = rr.getStatus();
+        ReturnStatus nextStatus = dto.getNewStatus();
+
+        // Validation for workflow transitions
+        if (currentStatus == ReturnStatus.PENDING) {
+            if (nextStatus != ReturnStatus.APPROVED && nextStatus != ReturnStatus.REJECTED) {
+                throw new RuntimeException("Chỉ có thể Duyệt hoặc Từ chối yêu cầu đang chờ!");
+            }
+        } else if (currentStatus == ReturnStatus.APPROVED) {
+            if (nextStatus != ReturnStatus.COMPLETED) {
+                throw new RuntimeException("Chủ có thể Hoàn tất yêu cầu đã được duyệt!");
+            }
+        } else {
+            throw new RuntimeException("Yêu cầu đã kết thúc, không thể xử lý thêm!");
         }
 
-        rr.setStatus(dto.getNewStatus());
+        rr.setStatus(nextStatus);
         rr.setProcessedAt(new Date());
 
-        if (dto.getNewStatus() == ReturnStatus.REJECTED) {
+        if (nextStatus == ReturnStatus.REJECTED) {
             rr.setRejectionReason(dto.getRejectionReason());
             // Reset items status back to NONE if rejected
             for (OrderItem item : rr.getReturnItems()) {
                 item.setRefundStatus(RefundStatus.NONE);
             }
-        } else if (dto.getNewStatus() == ReturnStatus.APPROVED) {
-            // Items are already PENDING refund from submission, but let's be explicit
+        } else if (nextStatus == ReturnStatus.APPROVED) {
             for (OrderItem item : rr.getReturnItems()) {
                 item.setRefundStatus(RefundStatus.PENDING);
+            }
+        } else if (nextStatus == ReturnStatus.COMPLETED) {
+            for (OrderItem item : rr.getReturnItems()) {
+                item.setRefundStatus(RefundStatus.COMPLETED);
             }
         }
 
@@ -149,6 +164,7 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
                 .imageUrls(rr.getImageUrls())
                 .requestDate(rr.getRequestDate())
                 .rejectionReason(rr.getRejectionReason())
+                .paymentMethod(rr.getOrder().getPaymentMethod().name())
                 .build();
     }
 }

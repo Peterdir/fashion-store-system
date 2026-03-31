@@ -13,8 +13,6 @@ import org.example.fashionstoresystem.entity.enums.ReturnStatus;
 @AllArgsConstructor
 @Builder
 public class ProcessReturnRequestDTO {
-    @NotNull(message = "ID yêu cầu hoàn trả không được để trống")
-    private Long requestId;
 
     @NotNull(message = "Trạng thái mới không được để trống")
     private ReturnStatus newStatus;

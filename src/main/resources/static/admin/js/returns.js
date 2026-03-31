@@ -195,6 +195,7 @@ const AdminReturns = {
             document.getElementById('view-order-link').href = `/admin/orders?orderId=${req.orderId}`;
             document.getElementById('modal-reason').textContent = req.reason;
             document.getElementById('modal-description').textContent = req.description || '(Không có mô tả chi tiết)';
+            document.getElementById('modal-payment-method').textContent = this.getPaymentLabel(req.paymentMethod);
 
             // Images
             const imagesContainer = document.getElementById('modal-evidence-images');
@@ -222,13 +223,8 @@ const AdminReturns = {
                 rejectionView.classList.add('hidden');
             }
 
-            // Actions visibility
-            const actions = document.getElementById('modal-actions');
-            if (req.status === 'PENDING') {
-                actions.classList.remove('hidden');
-            } else {
-                actions.classList.add('hidden');
-            }
+            // Actions visibility based on status
+            this.renderModalActions(req);
 
             this.modalLoading.classList.add('hidden');
             this.modalContent.classList.remove('hidden');
@@ -237,6 +233,52 @@ const AdminReturns = {
             this.showToast('Không thể tải chi tiết yêu cầu', 'error');
             this.closeModal();
         }
+    },
+
+    getPaymentLabel(method) {
+        const labels = {
+            'COD': 'Tiền mặt (COD)',
+            'VNPAY': 'VNPay',
+            'MOMO': 'MoMo',
+            'BANK_TRANSFER': 'Chuyển khoản'
+        };
+        return labels[method] || method;
+    },
+
+    renderModalActions(req) {
+        const actions = document.getElementById('modal-actions');
+        actions.innerHTML = '';
+        actions.classList.add('hidden');
+
+        if (req.status === 'PENDING') {
+            actions.classList.remove('hidden');
+            actions.innerHTML = `
+                <button onclick="AdminReturns.approveRequest()" class="w-full bg-black text-white py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-neutral-800 transition-all shadow-lg active:scale-[0.98]">
+                    Chấp nhận hoàn trả
+                </button>
+                <button onclick="AdminReturns.showRejectionInput()" class="w-full border border-rose-200 text-rose-600 py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-rose-50 transition-all active:scale-[0.98]">
+                    Từ chối yêu cầu
+                </button>
+            `;
+        } else if (req.status === 'APPROVED') {
+            actions.classList.remove('hidden');
+            const isCOD = req.paymentMethod === 'COD';
+            actions.innerHTML = `
+                <div class="bg-blue-50 border border-blue-100 p-4 mb-4">
+                    <p class="text-[10px] font-bold text-blue-700 uppercase tracking-widest leading-relaxed">
+                        Yêu cầu đã được DUYỆT. Vui lòng ${isCOD ? 'hoàn tiền mặt hoặc chuyển khoản cho khách' : 'thực hiện hoàn tiền trên cổng thanh toán'} sau đó nhấn xác nhận bên dưới.
+                    </p>
+                </div>
+                <button onclick="AdminReturns.completeRefund()" class="w-full bg-blue-600 text-white py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-blue-700 transition-all shadow-lg active:scale-[0.98]">
+                    Xác nhận đã hoàn tiền (${req.paymentMethod})
+                </button>
+            `;
+        }
+    },
+
+    async completeRefund() {
+        if (!confirm('Xác nhận bạn đã thực hiện hoàn tiền cho khách hàng? Trạng thái sẽ chuyển sang HOÀN TẤT.')) return;
+        this.processRequest('COMPLETED');
     },
 
     closeModal() {
