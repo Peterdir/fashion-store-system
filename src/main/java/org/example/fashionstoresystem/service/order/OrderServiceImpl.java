@@ -9,6 +9,7 @@ import org.example.fashionstoresystem.dto.response.OrderDetailResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderSummaryResponseDTO;
 import org.example.fashionstoresystem.dto.response.PlaceOrderResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderItemSummaryDTO;
+import org.example.fashionstoresystem.dto.response.OrderItemPreviewDTO;
 import org.example.fashionstoresystem.entity.enums.DiscountType;
 import org.example.fashionstoresystem.entity.enums.OrderStatus;
 import org.example.fashionstoresystem.entity.enums.OrderType;
@@ -197,6 +198,21 @@ public class OrderServiceImpl implements OrderService {
                                     LinkedHashMap::new,
                                     Collectors.summingInt(i -> 1)));
 
+                    List<OrderItemPreviewDTO> itemPreviews = order.getOrderItems().stream()
+                            .map(item -> OrderItemPreviewDTO.builder()
+                                    .productName(item.getProductName())
+                                    .productImage(
+                                            item.getProductVariant() != null && 
+                                            item.getProductVariant().getProduct() != null && 
+                                            item.getProductVariant().getProduct().getImages() != null && 
+                                            !item.getProductVariant().getProduct().getImages().isEmpty() 
+                                                ? item.getProductVariant().getProduct().getImages().get(0).getUrl() 
+                                                : null
+                                    )
+                                    .quantity(item.getQuantity())
+                                    .build())
+                            .collect(Collectors.toList());
+
                     return OrderSummaryResponseDTO.builder()
                             .orderId(order.getId())
                             .orderDate(order.getOrderDate())
@@ -204,6 +220,7 @@ public class OrderServiceImpl implements OrderService {
                             .paymentMethod(order.getPaymentMethod())
                             .itemCount(order.getOrderItems().size())
                             .statusSummary(statusSummary)
+                            .items(itemPreviews)
                             .build();
                 });
     }

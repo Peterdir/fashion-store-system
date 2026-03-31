@@ -527,49 +527,96 @@ const OrderModule = {
     renderOrderCard(order) {
         const date = new Date(order.orderDate).toLocaleDateString('vi-VN');
         const total = new Intl.NumberFormat('vi-VN').format(order.totalAmount);
+        const fallbackImg = 'https://vietcetera.com/uploads/images/15-apr-2021/screen-shot-2021-04-15-at-13-21-47-1618467727402.png';
 
         // Status display
         let statusHtml = '';
         if (order.statusSummary) {
             statusHtml = Object.entries(order.statusSummary).map(([status, count]) => {
                 const label = this.getStatusLabel(status);
-                return `<span class="bg-gray-50 px-2 py-1 rounded-sm text-[8px] font-black uppercase tracking-wider border border-gray-200">${label} (${count})</span>`;
+                let colorClass = 'bg-gray-50 text-gray-500 border-gray-200';
+                if (status === 'DELIVERED' || status === 'COMPLETED') colorClass = 'bg-emerald-50 text-emerald-600 border-emerald-100';
+                if (status === 'SHIPPING') colorClass = 'bg-blue-50 text-blue-600 border-blue-100';
+                if (status.includes('PENDING')) colorClass = 'bg-amber-50 text-amber-600 border-amber-100';
+
+                return `<span class="${colorClass} px-2 py-1 text-[8px] font-black uppercase tracking-wider border rounded-sm">${label} (${count})</span>`;
             }).join(' ');
+        }
+
+        // Items Preview Gallery
+        let itemsHtml = '';
+        if (order.items && order.items.length > 0) {
+            const displayItems = order.items.slice(0, 4);
+            const remaining = order.items.length - 4;
+
+            itemsHtml = `
+                <div class="mt-4 flex items-center gap-3 overflow-hidden">
+                    <div class="flex -space-x-2 overflow-hidden items-center group/gallery">
+                        ${displayItems.map(item => `
+                            <div class="relative w-12 h-14 border border-white rounded-sm overflow-hidden flex-shrink-0 shadow-sm transition-transform duration-300 hover:z-10 hover:scale-110">
+                                <img src="${item.productImage || fallbackImg}" alt="${item.productName}" class="w-full h-full object-cover" onerror="this.src='${fallbackImg}'">
+                                <div class="absolute bottom-0 right-0 bg-black/80 text-white text-[7px] font-black px-1 min-w-[12px] text-center">x${item.quantity}</div>
+                            </div>
+                        `).join('')}
+                        ${remaining > 0 ? `
+                            <div class="relative w-12 h-14 bg-neutral-100 border border-white rounded-sm flex items-center justify-center flex-shrink-0 shadow-sm z-0">
+                                <span class="text-[9px] font-black text-neutral-500">+${remaining}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="flex-1 ml-2">
+                        <p class="text-[10px] font-black text-black uppercase tracking-wide truncate max-w-[200px]">
+                            ${order.items[0].productName}
+                            ${order.items.length > 1 ? `<span class="lowercase text-gray-400 font-bold ml-1">...và ${order.items.length - 1} sản phẩm khác</span>` : ''}
+                        </p>
+                        <p class="text-[8px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Tổng cộng ${order.itemCount} sản phẩm</p>
+                    </div>
+                </div>
+            `;
         }
 
         const strOrderId = 'ORD-' + String(order.orderId).padStart(6, '0');
 
         return `
-            <div class="bg-white p-4 shadow-sm border border-black hover:shadow-[3px_3px_0_0_#000] transition-all group mb-4">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4 pb-3 border-b border-outline/10">
-                    <div class="space-y-1">
-                        <div class="flex items-center gap-2">
-                            <span class="bg-black text-white px-2 py-1 text-[9px] font-black tracking-widest uppercase truncate max-w-[120px]">${strOrderId}</span>
-                            <span class="text-[10px] font-bold text-gray-400 font-mono flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">calendar_today</span> ${date}</span>
-                        </div>
+            <div class="bg-white p-5 border border-black hover:shadow-[5px_5px_0_0_#000] transition-all duration-300 group mb-6">
+                <!-- Header -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-black/5">
+                    <div class="flex items-center gap-3">
+                        <span class="bg-black text-white px-2.5 py-1 text-[10px] font-black tracking-widest uppercase truncate shadow-sm group-hover:bg-primary transition-colors">${strOrderId}</span>
+                        <span class="text-[10px] font-bold text-gray-400 font-mono flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">calendar_today</span> ${date}</span>
                     </div>
-                    <div class="flex flex-wrap items-center gap-1">
+                    <div class="flex flex-wrap items-center gap-1.5">
                         ${statusHtml}
                     </div>
                 </div>
 
-                <div class="flex items-end justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">P.THỨC:</span>
-                        <span class="text-[10px] font-black uppercase tracking-widest text-black">${order.paymentMethod || 'COD'}</span>
+                <!-- Products Preview -->
+                ${itemsHtml}
+
+                <!-- Footer / Totals -->
+                <div class="mt-6 pt-4 border-t border-dashed border-neutral-200 flex flex-wrap items-end justify-between gap-4">
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Phương thức:</span>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-black bg-neutral-50 px-2 py-0.5 border border-neutral-100">${order.paymentMethod || 'COD'}</span>
+                        </div>
+                        <a href="/personal/order/${order.orderId}" class="inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-black group-hover:text-primary transition-colors">
+                            CHI TIẾT ĐƠN HÀNG <span class="material-symbols-outlined text-[14px] transition-transform group-hover:translate-x-1">arrow_forward</span>
+                        </a>
                     </div>
                     <div class="text-right">
-                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">TỔNG THANH TOÁN</p>
-                        <p class="text-base font-black text-black">${total}đ</p>
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">TỔNG THANH TOÁN</p>
+                        <p class="text-xl font-black text-black tracking-tighter">${total}<span class="text-xs ml-0.5 uppercase">đ</span></p>
                     </div>
                 </div>
 
-                <div class="mt-4 flex justify-end gap-2">
-                    <button onclick="window.location.href='/personal/order/${order.orderId}'" class="border border-black bg-white text-black px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all">Chi tiết</button>
-                    ${order.paymentMethod === 'MOMO' && order.statusSummary && order.statusSummary['PENDING_PAYMENT'] ?
-                `<button class="bg-primary text-white px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:opacity-90 transition-all">Thu ngân</button>` : ''
-            }
-                </div>
+                <!-- Contextual Actions (only for Pending payment) -->
+                ${order.paymentMethod === 'MOMO' && order.statusSummary && order.statusSummary['PENDING_PAYMENT'] ? `
+                    <div class="mt-4 flex justify-end">
+                        <button class="bg-primary text-white w-full md:w-auto px-10 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-lg active:scale-95">Thanh toán ngay</button>
+                    </div>
+                ` : ''}
             </div>
         `;
     },
