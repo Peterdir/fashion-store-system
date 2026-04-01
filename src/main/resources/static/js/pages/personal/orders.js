@@ -202,12 +202,24 @@ const OrderModule = {
         if (loadingArea) loadingArea.classList.remove('hidden');
         if (contentArea) {
             contentArea.classList.add('hidden');
+            // Khôi phục padding mặc định nếu không phải tab review
+            if (status !== 'reviewed') {
+                contentArea.classList.remove('p-6');
+                contentArea.classList.add('p-20');
+                contentArea.classList.replace('justify-start', 'justify-center');
+            }
         }
 
         try {
             const backendStatus = this.statusMapping[status] || null;
             let url = `/api/orders?page=${page}&size=10`;
             let isItemCard = false;
+
+            if (status === 'reviewed') {
+                this.currentStatus = 'reviewed';
+                await this.loadReviewHistory(page, true);
+                return;
+            }
 
             if (status !== 'all' && status !== 'unpaid') {
                 url = `/api/orders/items?page=${page}&size=10`;
@@ -216,8 +228,6 @@ const OrderModule = {
                 // Thêm tham số reviewed dựa trên tab
                 if (status === 'review') {
                     url += `&reviewed=false`;
-                } else if (status === 'reviewed') {
-                    url += `&reviewed=true`;
                 }
             }
 
@@ -1268,28 +1278,59 @@ const OrderModule = {
     /**
      * Review History Logic
      */
-    async loadReviewHistory(page = 0) {
-        const container = document.getElementById('review-history-container');
+    async loadReviewHistory(page = 0, explicitlyOrderTab = false) {
+        const orderContentArea = document.getElementById('order-tab-content-area');
+        const reviewHistoryContainer = document.getElementById('review-history-container');
+        const loadingArea = document.getElementById('order-loading');
+        
+        // Xác định container dựa trên ngữ cảnh gọi hoặc trạng thái hiện tại
+        const isOrderTabContext = explicitlyOrderTab || 
+                                 this.currentStatus === 'reviewed' || 
+                                 (orderContentArea && !orderContentArea.closest('.hidden'));
+        
+        const container = isOrderTabContext ? orderContentArea : reviewHistoryContainer;
+        
         if (!container) return;
+
+        // Bật loading nếu đang ở trong tab Orders
+        if (isOrderTabContext && loadingArea) {
+            loadingArea.classList.remove('hidden');
+            container.classList.add('hidden');
+        }
 
         try {
             const response = await fetch(`/api/reviews/my?page=${page}&size=5&sort=createdAt,desc`);
             if (response.ok) {
                 const data = await response.json();
-                this.renderReviewHistory(data.content);
-                this.renderReviewHistoryPagination(data);
+                this.renderReviewHistory(data.content, container);
+                this.renderReviewHistoryPagination(data, isOrderTabContext);
             }
         } catch (error) {
             console.error('Error loading review history:', error);
             container.innerHTML = '<p class="text-center py-10 uppercase text-[10px] font-bold text-red-500">Không thể tải lịch sử đánh giá.</p>';
+        } finally {
+            // Luôn đảm bảo tắt loading nếu đang ở tab Orders
+            if (isOrderTabContext && loadingArea) {
+                loadingArea.classList.add('hidden');
+                container.classList.remove('hidden');
+            }
         }
     },
+    
+    renderReviewHistory(reviews, targetContainer = null) {
+        const container = targetContainer || document.getElementById('review-history-container');
+        if (!container) return;
 
-    renderReviewHistory(reviews) {
-        const container = document.getElementById('review-history-container');
+        // Tối ưu hóa padding nếu đang ở trong tab Orders để "trải dài" hơn
+        if (container.id === 'order-tab-content-area') {
+            container.classList.remove('p-20');
+            container.classList.add('p-6', 'w-full');
+            container.classList.replace('justify-center', 'justify-start');
+        }
+
         if (!reviews || reviews.length === 0) {
             container.innerHTML = `
-                <div class="flex flex-col items-center justify-center py-20 opacity-30">
+                <div class="flex flex-col items-center justify-center py-20 opacity-30 w-full">
                     <span class="material-symbols-outlined text-6xl mb-4">history_edu</span>
                     <p class="text-[10px] font-black uppercase tracking-widest">Bạn chưa có đánh giá nào.</p>
                 </div>
@@ -1297,62 +1338,109 @@ const OrderModule = {
             return;
         }
 
-        container.innerHTML = reviews.map(review => `
-            <div class="bg-neutral-50 border border-black/5 p-6 hover:border-black transition-all group">
-                <div class="flex gap-6">
-                    <!-- Product Info -->
-                    <a href="/product-detail/${review.productId}" class="w-20 h-24 shrink-0 bg-white border border-black/10 overflow-hidden group/img">
-                        <img src="${review.productImage || '/images/placeholder.jpg'}" class="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-500">
-                    </a>
+        container.innerHTML = `
+            <div class="w-full space-y-6">
+                ${reviews.map(review => {
+                    const orderDate = review.orderDate ? new Date(review.orderDate).toLocaleString('vi-VN') : 'N/A';
+                    const reviewDate = new Date(review.createdAt).toLocaleDateString('vi-VN');
+                    const formattedPrice = review.price ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(review.price) : 'N/A';
                     
-                    <div class="flex-1 space-y-4">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <a href="/product-detail/${review.productId}" class="group/name">
-                                    <h4 class="text-xs font-black uppercase tracking-tight text-black mb-1 group-hover/name:text-accent transition-colors">${review.productName}</h4>
+                    return `
+                    <div class="bg-neutral-50/50 border border-black/5 p-4 md:p-6 hover:border-black transition-all group w-full relative overflow-hidden">
+                        <!-- Status Badge -->
+                        <div class="absolute top-0 right-0">
+                            <div class="bg-emerald-500 text-white px-4 py-1 text-[8px] font-black uppercase tracking-[0.2em] flex items-center gap-1 shadow-sm">
+                                <span class="material-symbols-outlined text-[10px]">check_circle</span>
+                                Đã Đánh Giá
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-4">
+                            <!-- Product & Order Header -->
+                            <div class="flex gap-4 items-start pb-3 border-b border-black/5">
+                                <a href="/product-detail/${review.productId}" class="w-16 h-20 shrink-0 bg-white border border-black/5 overflow-hidden shadow-sm">
+                                    <img src="${review.productImage || '/images/placeholder.jpg'}" class="w-full h-full object-cover">
                                 </a>
-                                <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Ngày đánh giá: ${new Date(review.createdAt).toLocaleDateString('vi-VN')}</p>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <a href="/product-detail/${review.productId}" class="hover:text-primary transition-colors">
+                                            <h4 class="text-[11px] font-black uppercase tracking-widest text-black/80 truncate pr-20">${review.productName}</h4>
+                                        </a>
+                                    </div>
+                                    <div class="flex flex-wrap items-center gap-4 text-[9px] font-bold text-black/40 uppercase tracking-widest">
+                                        <div class="flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-sm">calendar_today</span>
+                                            Ngày đặt: ${orderDate}
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-sm">payments</span>
+                                            Giá: <span class="text-secondary font-black">${formattedPrice}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flex text-secondary gap-0.5">
-                                ${Array(5).fill(0).map((_, i) => `
-                                    <span class="material-symbols-outlined text-lg" 
-                                          style="${i < review.rating ? "font-variation-settings: 'FILL' 1" : ""}">
-                                        ${i < review.rating ? 'star' : 'star_outline'}
-                                    </span>
-                                `).join('')}
+
+                            <!-- THE REVIEW CONTENT (CENTERPIECE) -->
+                            <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+                                <!-- Star Rating -->
+                                <div class="flex flex-col gap-1 shrink-0 md:border-r md:border-black/5 md:pr-6">
+                                    <span class="text-[8px] font-black uppercase tracking-[0.3em] text-black/30">Điểm Đánh Giá</span>
+                                    <div class="flex text-amber-500 gap-0.5">
+                                        ${Array(5).fill(0).map((_, i) => `
+                                            <span class="material-symbols-outlined text-lg" 
+                                                  style="${i < review.rating ? "font-variation-settings: 'FILL' 1" : ""}">
+                                                ${i < review.rating ? 'star' : 'star_outline'}
+                                            </span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+
+                                <!-- Comment Text Area -->
+                                <div class="flex-1 w-full bg-white/60 p-4 border border-black/5 rounded-sm relative group-hover:bg-white transition-colors duration-500">
+                                    <span class="material-symbols-outlined absolute -top-3 -left-1 text-black/5 text-4xl">format_quote</span>
+                                    <p class="text-[11px] font-bold text-black leading-relaxed italic relative z-10 pl-1">
+                                        "${review.comment || 'Không có bình luận.'}"
+                                    </p>
+                                    <div class="mt-2 flex items-center justify-between">
+                                        <span class="text-[8px] font-black uppercase tracking-widest text-black/20 italic">
+                                            Ngày đánh giá: ${reviewDate}
+                                        </span>
+                                        <a href="/product-detail/${review.productId}" class="text-[9px] font-black uppercase tracking-[0.2em] text-primary hover:text-black transition-colors flex items-center gap-1">
+                                            Buy Again <span class="material-symbols-outlined text-sm">refresh</span>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="bg-white p-4 border border-black/5 relative">
-                            <span class="material-symbols-outlined absolute -top-3 -left-1 text-gray-100 text-3xl -z-10">format_quote</span>
-                            <p class="text-[11px] font-bold text-black leading-relaxed uppercase tracking-wide">
-                                ${review.comment || 'Không có bình luận.'}
-                            </p>
-                        </div>
-
-                        <div class="flex justify-end">
-                            <a href="/product-detail/${review.productId}" class="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors flex items-center gap-1">
-                                Xem sản phẩm <span class="material-symbols-outlined text-sm">arrow_right_alt</span>
-                            </a>
                         </div>
                     </div>
-                </div>
+                    `;
+                }).join('')}
             </div>
-        `).join('');
+        `;
     },
 
-    renderReviewHistoryPagination(data) {
-        const container = document.getElementById('review-history-pagination');
+    renderReviewHistoryPagination(data, isOrderTab = false) {
+        let container = document.getElementById('review-history-pagination');
+        
+        if (isOrderTab) {
+            container = document.getElementById('order-tab-pagination');
+            if (container) container.classList.remove('hidden');
+        }
+
         if (!container || data.totalPages <= 1) {
-            container.innerHTML = '';
+            if (container) container.innerHTML = '';
             return;
         }
 
         let html = '';
-        for (let i = 0; i < data.totalPages; i++) {
+        const currentPage = data.number;
+        const totalPages = data.totalPages;
+
+        for (let i = 0; i < totalPages; i++) {
+            const onclickHandler = isOrderTab ? `OrderModule.loadOrders('reviewed', ${i})` : `OrderModule.loadReviewHistory(${i})`;
             html += `
-                <button onclick="OrderModule.loadReviewHistory(${i})" 
-                        class="w-8 h-8 flex items-center justify-center text-[10px] font-black border ${i === data.number ? 'bg-black text-white border-black' : 'border-gray-200 hover:border-black'} transition-all">
+                <button onclick="${onclickHandler}" 
+                        class="w-8 h-8 flex items-center justify-center text-[10px] font-black border ${i === currentPage ? 'bg-black text-white border-black' : 'border-gray-200 hover:border-black'} transition-all">
                     ${i + 1}
                 </button>
             `;

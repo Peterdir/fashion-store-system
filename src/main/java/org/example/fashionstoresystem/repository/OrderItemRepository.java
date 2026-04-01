@@ -8,9 +8,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
+
+    // Tìm đơn hàng thành công gần nhất của 1 người dùng cho 1 sản phẩm cụ thể (Fallback cho Review)
+    Optional<OrderItem> findFirstByOrderUserIdAndProductVariantProductIdOrderByOrderOrderDateDesc(Long userId, Long productId);
 
     // Lấy tất cả OrderItem của 1 đơn hàng
     List<OrderItem> findByOrderId(Long orderId);

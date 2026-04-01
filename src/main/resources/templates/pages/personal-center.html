@@ -84,13 +84,13 @@
                                         <span class="material-symbols-outlined text-base">rate_review</span>
                                         Review Orders
                                     </button>
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="reviewed">
+                                        <span class="material-symbols-outlined text-base">history_edu</span>
+                                        Review History
+                                    </button>
                                     <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="return">
                                         <span class="material-symbols-outlined text-base">assignment_return</span>
                                         Return Orders
-                                    </button>
-                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="review-history">
-                                        <span class="material-symbols-outlined text-base">history_edu</span>
-                                        Review History
                                     </button>
                                 </div>
                             </div>
@@ -1062,6 +1062,9 @@
                         .bg-backdrop.show { opacity: 1; }
                         .bg-modal.show { opacity: 1; transform: scale(1); }
                     </style>
+                </div> <!-- Close grid -->
+            </div> <!-- Close max-width -->
+        </div> <!-- Close content fragment -->
 
     <th:block layout:fragment="script">
         <script th:src="@{/js/pages/personal-center.js}"></script>

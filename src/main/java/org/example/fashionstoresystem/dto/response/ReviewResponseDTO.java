@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.Date;
 
 @Data
 @Builder
@@ -20,5 +21,7 @@ public class ReviewResponseDTO {
     private String customerName;
     private Integer rating;
     private String comment;
+    private Double price;
+    private Date orderDate;
     private Instant createdAt;
 }

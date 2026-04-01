@@ -5,6 +5,7 @@ import org.example.fashionstoresystem.dto.request.SubmitReviewRequestDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.dto.response.ReviewResponseDTO;
 import org.example.fashionstoresystem.entity.enums.OrderStatus;
+import org.example.fashionstoresystem.entity.jpa.OrderItem;
 import org.example.fashionstoresystem.entity.jpa.Product;
 import org.example.fashionstoresystem.entity.jpa.Review;
 import org.example.fashionstoresystem.entity.jpa.User;
@@ -103,7 +104,7 @@ public class ReviewServiceImpl implements ReviewService {
             imageUrl = review.getProduct().getImages().get(0).getUrl();
         }
 
-        return ReviewResponseDTO.builder()
+        ReviewResponseDTO.ReviewResponseDTOBuilder builder = ReviewResponseDTO.builder()
                 .reviewId(review.getId())
                 .productId(review.getProduct().getId())
                 .productName(review.getProduct().getName())
@@ -112,8 +113,26 @@ public class ReviewServiceImpl implements ReviewService {
                 .customerName(review.getUser().getFullName())
                 .rating(review.getRating())
                 .comment(review.getComment())
-                .createdAt(review.getCreatedAt())
-                .build();
+                .createdAt(review.getCreatedAt());
+
+        // Bổ sung thông tin đơn hàng (Sử dụng cơ chế Fallback nếu thiếu liên kết trực tiếp)
+        OrderItem orderItem = review.getOrderItem();
+        if (orderItem == null) {
+            orderItem = orderItemRepository
+                    .findFirstByOrderUserIdAndProductVariantProductIdOrderByOrderOrderDateDesc(
+                            review.getUser().getId(), 
+                            review.getProduct().getId()
+                    ).orElse(null);
+        }
+
+        if (orderItem != null) {
+            builder.price(orderItem.getPrice());
+            if (orderItem.getOrder() != null) {
+                builder.orderDate(orderItem.getOrder().getOrderDate());
+            }
+        }
+
+        return builder.build();
     }
 
     private String formatImageUrl(String url) {
