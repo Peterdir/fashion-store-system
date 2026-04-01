@@ -31,6 +31,23 @@
     <div class="space-y-1.5">
         <h4 class="text-[10px] font-bold tracking-[0.1em] text-neutral-400 uppercase" th:text="${product.category}">CATEGORY</h4>
         <h3 class="text-sm font-medium tracking-tight h-5 overflow-hidden" th:text="${product.name}">Product Name</h3>
+        
+        <!-- Rating -->
+        <div class="flex items-center gap-2" th:if="${product.reviewCount != null && product.reviewCount > 0}">
+            <div class="relative inline-flex text-yellow-400/20 material-symbols-outlined select-none text-[12px] leading-none">
+                <div class="flex gap-0">
+                    <span class="w-[12px] text-center">star</span><span class="w-[12px] text-center">star</span><span class="w-[12px] text-center">star</span><span class="w-[12px] text-center">star</span><span class="w-[12px] text-center">star</span>
+                </div>
+                <div class="absolute top-0 left-0 overflow-hidden text-yellow-400 whitespace-nowrap" 
+                     th:style="|width: ${product.averageRating * 20}%|">
+                    <div class="flex gap-0">
+                        <span class="w-[12px] text-center">star</span><span class="w-[12px] text-center">star</span><span class="w-[12px] text-center">star</span><span class="w-[12px] text-center">star</span><span class="w-[12px] text-center">star</span>
+                    </div>
+                </div>
+            </div>
+            <span class="text-[9px] font-bold text-neutral-400" th:text="${'(' + product.reviewCount + ')'}">(10)</span>
+        </div>
+
         <div class="flex items-center space-x-3 pt-1">
             <span class="text-secondary font-bold text-sm" 
                   th:text="${#numbers.formatCurrency(product.price)}">$0.00</span>

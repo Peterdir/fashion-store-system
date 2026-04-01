@@ -20,4 +20,6 @@ public class ProductSummaryResponseDTO {
     private String primaryImageUrl;
     private String hoverImageUrl;
     private Double minPrice;
+    private Double averageRating;
+    private Long reviewCount;
 }

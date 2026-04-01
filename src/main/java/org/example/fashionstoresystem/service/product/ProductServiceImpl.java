@@ -184,6 +184,8 @@ public class ProductServiceImpl implements ProductService {
                 .category(getCategoryName(p))
                 .primaryImageUrl(formatImageUrl(p.getImages().isEmpty() ? "/images/placeholder.png" : p.getImages().get(0).getUrl()))
                 .hoverImageUrl(formatImageUrl(p.getImages().size() > 1 ? p.getImages().get(1).getUrl() : (p.getImages().isEmpty() ? "/images/placeholder.png" : p.getImages().get(0).getUrl())))
+                .averageRating(reviewRepository.getAverageRatingByProductId(p.getId()) != null ? reviewRepository.getAverageRatingByProductId(p.getId()) : 0.0)
+                .reviewCount(reviewRepository.countByProductId(p.getId()))
                 .build();
     }
 

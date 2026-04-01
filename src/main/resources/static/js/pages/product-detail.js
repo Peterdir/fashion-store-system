@@ -73,6 +73,10 @@ function selectColor(color, element) {
         } else {
             updateFinalVariant();
         }
+    } else {
+        // Clear selection if no sizes are available for this color
+        currentSelectedSize = null;
+        updateFinalVariant();
     }
 }
 
@@ -163,12 +167,15 @@ function updateFinalVariant() {
 
         // Update Stock
         const stockDisplay = document.getElementById('stock-display');
-        if (stockDisplay) stockDisplay.innerText = `${variant.stockQuantity} items available`;
+        if (stockDisplay) {
+            stockDisplay.innerText = `${variant.stockQuantity} sản phẩm có sẵn`;
+            stockDisplay.classList.remove('text-neutral-400');
+            stockDisplay.classList.add('text-primary');
+        }
         
         // Update SKU dynamically
         const skuDisplay = document.getElementById('variant-sku-display');
         if (skuDisplay) {
-            // Note: if you have a productId in context, use it. For now using variantId.
             skuDisplay.innerText = `HY-V${variant.variantId}`;
         }
 
@@ -176,7 +183,19 @@ function updateFinalVariant() {
         if (variantInput) variantInput.value = variant.variantId;
         
         const addToCartBtn = document.getElementById('add-to-cart-btn');
-        if (addToCartBtn) addToCartBtn.disabled = variant.stockQuantity <= 0;
+        if (addToCartBtn) {
+            addToCartBtn.disabled = variant.stockQuantity <= 0;
+            if (variant.stockQuantity <= 0) {
+                if (stockDisplay) stockDisplay.innerText = 'Tạm hết hàng';
+            }
+        }
+    } else {
+        const stockDisplay = document.getElementById('stock-display');
+        if (stockDisplay) {
+            stockDisplay.innerText = 'Vui lòng chọn Màu & Size';
+            stockDisplay.classList.add('text-neutral-400');
+            stockDisplay.classList.remove('text-primary');
+        }
     }
 }
 
