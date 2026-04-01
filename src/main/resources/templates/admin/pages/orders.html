@@ -27,10 +27,10 @@
                     <option value="PENDING_CONFIRMATION">Chờ xác nhận</option>
                     <option value="PENDING_PAYMENT">Chờ thanh toán</option>
                     <option value="PAID">Đã thanh toán</option>
-                    <option value="PROCESSING">Đang xử lý</option>
+                    <option value="PROCESSING">Đang chuẩn bị</option>
                     <option value="SHIPPING">Đang giao</option>
                     <option value="DELIVERED">Đã giao</option>
-                    <option value="COMPLETED">Hoàn thành</option>
+                    <option value="COMPLETED">Hoàn tất</option>
                     <option value="CANCELLED">Đã hủy</option>
                 </select>
             </div>
@@ -156,11 +156,11 @@
                             <div class="flex items-center gap-2">
                                 <select id="modal-global-status" class="px-3 py-2 text-[10px] font-bold border border-neutral-200 bg-white outline-none focus:border-primary min-w-[150px]">
                                     <option value="">Chọn trạng thái...</option>
-                                    <option value="PROCESSING">Đang xử lý</option>
-                                    <option value="SHIPPING">Đang giao hàng</option>
-                                    <option value="DELIVERED">Đã giao hàng</option>
-                                    <option value="COMPLETED">Hoàn thành</option>
-                                    <option value="CANCELLED">Hủy đơn hàng</option>
+                                    <option value="PROCESSING">Đang chuẩn bị</option>
+                                    <option value="SHIPPING">Đang giao</option>
+                                    <option value="DELIVERED">Đã giao</option>
+                                    <option value="COMPLETED">Hoàn tất</option>
+                                    <option value="CANCELLED">Đã hủy</option>
                                 </select>
                                 <button onclick="AdminOrders.updateWholeOrderStatus()" 
                                         class="bg-primary text-white px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-neutral-800 transition-colors">
