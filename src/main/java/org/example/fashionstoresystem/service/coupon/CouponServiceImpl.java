@@ -35,19 +35,23 @@ public class CouponServiceImpl implements CouponService {
     // Xem danh sách mã giảm giá đang có
     @Override
     public List<CouponResponseDTO> getAvailableCoupons(Long userId) {
-        List<Coupon> activeCoupons = couponRepository.findByActiveTrue();
+        List<Coupon> allActiveCoupons = couponRepository.findByActiveTrue();
 
-        return activeCoupons.stream()
-                .map(coupon -> CouponResponseDTO.builder()
-                        .couponId(coupon.getId())
-                        .code(coupon.getCode())
-                        .discountValue(coupon.getDiscountValue())
-                        .discountType(coupon.getDiscountType())
-                        .startDate(coupon.getStartDate())
-                        .expiryDate(coupon.getExpiryDate())
-                        .minOrderAmount(coupon.getMinOrderAmount())
-                        .collected(userCouponRepository.existsByUserIdAndCouponId(userId, coupon.getId()))
-                        .build())
+        return allActiveCoupons.stream()
+                .map(coupon -> {
+                    var userCouponOpt = userCouponRepository.findByUserIdAndCouponId(userId, coupon.getId());
+                    return CouponResponseDTO.builder()
+                            .couponId(coupon.getId())
+                            .code(coupon.getCode())
+                            .discountValue(coupon.getDiscountValue())
+                            .discountType(coupon.getDiscountType())
+                            .startDate(coupon.getStartDate())
+                            .expiryDate(coupon.getExpiryDate())
+                            .minOrderAmount(coupon.getMinOrderAmount())
+                            .collected(userCouponOpt.isPresent())
+                            .used(userCouponOpt.map(UserCoupon::isUsed).orElse(false))
+                            .build();
+                })
                 .toList();
     }
 
@@ -129,8 +133,8 @@ public class CouponServiceImpl implements CouponService {
 
     // ADMIN API
     @Override
-    public Page<CouponResponseDTO> getAllCoupons(Pageable pageable) {
-        return couponRepository.findAll(pageable).map(this::mapToDTO);
+    public Page<CouponResponseDTO> getAllCoupons(String keyword, Pageable pageable) {
+        return couponRepository.findAllForAdmin(keyword, pageable).map(this::mapToDTO);
     }
 
     @Override
@@ -155,7 +159,7 @@ public class CouponServiceImpl implements CouponService {
                 .expiryDate(dto.getExpiryDate())
                 .minOrderAmount(dto.getMinOrderAmount())
                 .usageLimit(dto.getUsageLimit())
-                .active(true)
+                .active(dto.isActive())
                 .build();
         
         return mapToDTO(couponRepository.save(coupon));
@@ -207,7 +211,9 @@ public class CouponServiceImpl implements CouponService {
                 .startDate(coupon.getStartDate())
                 .expiryDate(coupon.getExpiryDate())
                 .minOrderAmount(coupon.getMinOrderAmount())
-                .collected(false) // Assuming collected isn't relevant for Admin view or handle appropriately
+                .usageLimit(coupon.getUsageLimit())
+                .active(coupon.isActive())
+                .collected(false)
                 .build();
     }
 }

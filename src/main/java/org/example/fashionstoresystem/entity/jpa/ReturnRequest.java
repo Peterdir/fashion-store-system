@@ -59,4 +59,9 @@ public class ReturnRequest {
     @Builder.Default
     @OneToMany(mappedBy = "returnRequest", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<OrderItem> returnItems = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "return_request_images", joinColumns = @JoinColumn(name = "return_request_id"))
+    @Column(name = "image_url", columnDefinition = "TEXT")
+    private List<String> imageUrls = new ArrayList<>();
 }

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>Sign In</title>
+</head>
+<body>
+    <main layout:fragment="content" class="flex-grow flex flex-col items-center justify-center py-12 px-4 bg-background">
+        <!-- Welcome Header -->
+        <div class="mb-10 w-full max-w-md text-center space-y-1">
+            <p class="text-[10px] font-black tracking-[0.4em] uppercase text-primary/40">H&Y Premium Store</p>
+            <h2 class="text-xs font-medium tracking-tight text-on-surface-variant/60 italic">"Style is a way to say who you are without having to speak."</h2>
+        </div>
+
+        <!-- Login Card -->
+        <div class="w-full max-w-md bg-surface-container-lowest p-10 md:p-12 no-radius shadow-[0_20px_60px_rgba(0,0,0,0.05)] border border-outline/5">
+            <div class="mb-12 text-center">
+                <h1 class="text-3xl font-black tracking-tighter text-on-surface mb-3 uppercase">Sign In</h1>
+                <p class="text-xs font-medium tracking-tight text-on-surface-variant italic">Enter your details to access your account.</p>
+            </div>
+
+            <form id="loginForm" class="space-y-8">
+                <!-- Email/Phone Input -->
+                <div class="space-y-2">
+                    <label class="block text-[9px] font-black uppercase tracking-[0.15em] text-on-surface-variant">Email Address</label>
+                    <input type="email" id="email" 
+                           class="w-full px-5 py-4 bg-surface-container-highest border-none no-radius focus:ring-1 focus:ring-primary focus:bg-white transition-all duration-300 text-[11px] font-medium placeholder:text-outline/50 placeholder:italic" 
+                           placeholder="your@email.com" required>
+                </div>
+
+                <!-- Password Input -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="block text-[9px] font-black uppercase tracking-[0.15em] text-on-surface-variant">Password</label>
+                        <a th:href="@{/forgot-password}" class="text-[9px] font-black uppercase tracking-[0.15em] text-secondary hover:text-primary transition-colors underline underline-offset-4 decoration-secondary/30">Forgot Password?</a>
+                    </div>
+                    <div class="relative group">
+                        <input type="password" id="password" 
+                               class="w-full px-5 py-4 bg-surface-container-highest border-none no-radius focus:ring-1 focus:ring-primary focus:bg-white transition-all duration-300 text-[11px] font-medium placeholder:text-outline/50 placeholder:italic" 
+                               placeholder="Enter your password" required>
+                        <button type="button" id="togglePassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-lg">visibility</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Remember Me -->
+                <div class="flex items-center gap-2 group cursor-pointer">
+                    <input type="checkbox" id="rememberMe" class="w-3.5 h-3.5 border-outline/20 rounded-none bg-surface-container-highest text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer">
+                    <label for="rememberMe" class="text-[9px] font-black uppercase tracking-[0.1em] text-on-surface-variant/60 group-hover:text-primary transition-colors cursor-pointer select-none">Remember Me</label>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" 
+                        class="w-full bg-primary hover:bg-zinc-800 text-white font-black py-5 no-radius transition-all duration-500 active:scale-[0.98] shadow-2xl shadow-black/10 uppercase tracking-[0.25em] text-[10px] mt-4">
+                    Sign In
+                </button>
+            </form>
+
+            <!-- Sign Up Prompt -->
+            <div class="text-center pt-8 border-t border-outline/5">
+                <p class="text-[11px] font-medium tracking-tight text-on-surface-variant">
+                    Don't have an account? 
+                    <a th:href="@{/register}" class="text-primary font-black uppercase tracking-widest ml-2 hover:underline underline-offset-4">Sign Up</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Secondary Aesthetic Image -->
+        <div class="mt-20 hidden md:block group cursor-crosshair">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvS8EA0MQ5GJ6q8pLFpSt4aMUiRhALkNycLGrCVoZdequPlaj8TNn-u8Bxs8y4LecFwKgF5igNj6Xd49tbfugf-NBcv_WOjB6wOG19ulGZw0N_UWTjXrtvCV7tqQh2Q7nLZS-cZSTrJkvFPnepdYTrJgOB4yR7SnPf34UTbKaLaCONPzeFJ7ubTFcj2W5FAzRwuDyC01fOxrzovdJm-PaDJuOUUH1txXdjYTr471pod13A2opaCGPvKkoNn_HYoigRBB9oWHCIbQ" 
+                 alt="Sign In Inspiration" 
+                 class="w-80 h-40 object-cover opacity-10 grayscale group-hover:opacity-30 group-hover:grayscale-0 transition-all duration-1000 ease-in-out">
+        </div>
+    </main>
+
+    <th:block layout:fragment="scripts">
+        <script th:src="@{/js/pages/login.js}"></script>
+    </th:block>
+</body>
+</html>

@@ -26,145 +26,65 @@ graph TD
     Controller -- Render --> Thymeleaf
     Client -- Gọi AJAX --> API
     API -- Trả về JSON --> Client
-    Client -- Cận nhật giao diện --> JS
+    Client -- Cập nhật giao diện --> JS
 ```
 
-## 2. Cấu trúc Thư mục Đề xuất
+## 2. Cấu trúc Thư mục Hiện tại
 
 ```text
 src/main/resources/
 ├── static/
-│   ├── css/
-│   │   ├── input.css        # Nguồn Tailwind
-│   │   └── main.css         # Kết quả sau khi build
 │   ├── js/
-│   │   ├── utils/
-│   │   │   ├── api.js       # Wrapper cho Fetch API
-│   │   │   └── auth.js      # Lưu trữ JWT (localStorage)
-│   │   ├── pages/
+│   │   ├── pages/           # JS dành riêng cho từng trang
 │   │   │   ├── login.js
-│   │   │   ├── register.js
-│   │   │   └── cart.js
-│   │   └── common.js        # Các tương tác toàn cục
-│   └── images/
+│   │   │   └── register.js
+│   │   └── common.js        # Logic toàn cục (giỏ hàng, auth check)
+│   └── images/              # Logo, banners, placeholder products
 └── templates/
-    ├── layout/
-    │   └── base.html        # Template chính
+    ├── layouts/
+    │   └── layout.html      # Layout chính (chứa Tailwind config & Google Fonts)
     ├── fragments/
-    │   ├── header.html
-    │   ├── footer.html
-    │   └── common-head.html
-    ├── customer/            # Trang phía khách hàng
-    │   ├── auth/
-    │   │   ├── login.html
-    │   │   └── register.html
-    │   ├── product/
-    │   │   ├── list.html
-    │   │   └── detail.html
-    │   └── cart.html
-    └── admin/               # Trang quản trị (mở rộng sau)
-        └── dashboard.html
+    │   ├── header.html      # Header 2 tầng (Brand & Nav)
+    │   └── footer.html      # Footer thông tin & social
+    └── pages/               # Các trang nội dung cụ thể
+        ├── login.html       # Sign In
+        ├── register.html    # Sign Up (khớp RegisterRequestDTO)
+        ├── index.html       # Trang chủ
+        ├── category.html    # Danh sách sản phẩm
+        └── product-detail.html # Chi tiết sản phẩm
 ```
 
 ## 3. Bản đồ Ánh xạ: View vs API
 
-| Trang / Tính năng | URL View (View Controller) | API Backend (REST) |
-| :--- | :--- | :--- |
-| Trang Đăng nhập | `/login` | `POST /api/auth/login` |
-| Trang Đăng ký | `/register` | `POST /api/auth/register` |
-| Danh sách Sản phẩm | `/products` | `GET /api/products` |
-| Chi tiết Sản phẩm | `/products/{id}` | `GET /api/products/{id}` |
-| Giỏ hàng | `/cart` | `GET /api/cart?userId=...` |
+| Trang / Tính năng | URL View | API Backend (REST) | Mô tả |
+| :--- | :--- | :--- | :--- |
+| Trang Chủ | `/` | N/A | Landing page |
+| Đăng nhập | `/login` | `POST /api/auth/login` | Xác thực JWT |
+| Đăng ký | `/register` | `POST /api/auth/register` | Tạo tài khoản mới |
+| Danh sách SP | `/category` | `GET /api/products` | Lọc và phân trang |
+| Chi tiết SP | `/product-detail/{id}` | `GET /api/products/{id}` | Thông tin chi tiết biến thể |
 
-## 4. Ví dụ Luồng: Đăng nhập
+## 4. Thiết kế & Thẩm mỹ (Digital Curator)
 
-### A. View Controller (`ViewController.java`)
-```java
-@Controller
-public class ViewController {
-    @GetMapping("/login")
-    public String loginPage() {
-        return "customer/auth/login";
-    }
-}
-```
+Hệ thống sử dụng phong cách **Brutalist Minimalism**:
+- **Border Radius**: Cố định `0px` cho toàn bộ element (nút, input, card).
+- **Màu sắc**: Bảng màu Monochrome (Đen/Trắng/Xám) kết hợp sắc cam `secondary` làm điểm nhấn.
+- **Typography**: Sử dụng font `Inter` hoặc `Outfit` mang lại cảm giác hiện đại, cao cấp.
+- **Icons**: Sử dụng `Google Material Symbols Outlined`.
 
-### B. Thymeleaf Template (`login.html`)
-```html
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Đăng nhập</title>
-</head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-    <form id="loginForm" class="p-8 bg-white rounded shadow-md w-96">
-        <h2 class="text-2xl font-bold mb-4">Đăng nhập</h2>
-        <input type="email" id="email" placeholder="Email" required class="w-full mb-2 p-2 border">
-        <input type="password" id="password" placeholder="Mật khẩu" required class="w-full mb-4 p-2 border">
-        <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded">Đăng nhập</button>
-        <div id="errorMessage" class="text-red-500 mt-2 hidden"></div>
-    </form>
-    
-    <!-- JS dành riêng cho trang này -->
-    <script th:src="@{/js/utils/api.js}"></script>
-    <script th:src="@{/js/pages/login.js}"></script>
-</body>
-</html>
-```
+## 5. Xử lý Lỗi & Bảo mật
 
-### C. JavaScript - Ví dụ `api.js`
-```javascript
-const api = {
-    async post(url, body) {
-        const token = localStorage.getItem('token');
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                ...(token && { 'Authorization': `Bearer ${token}` })
-            },
-            body: JSON.stringify(body)
-        });
-        if (!response.ok) throw new Error(await response.text());
-        return response.json();
-    }
-};
-```
+Hệ thống đã cấu hình các Handler tùy chỉnh để trả về mã lỗi chuẩn REST:
+- **401 Unauthorized**: Xử lý bởi `JwtAuthenticationEntryPoint` khi người dùng chưa đăng nhập hoặc token hết hạn.
+- **403 Forbidden**: Xử lý bởi `CustomAccessDeniedHandler` khi người dùng đã đăng nhập nhưng không đủ quyền truy cập (ví dụ: Customer vào trang Admin).
 
-### D. JavaScript - Ví dụ `login.js`
-```javascript
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+## 6. Các Best Practices (Quy tắc Tốt nhất)
 
-    try {
-        const response = await api.post('/api/auth/login', { email, password });
-        if (response.accessToken) {
-            localStorage.setItem('token', response.accessToken);
-            window.location.href = '/products';
-        }
-    } catch (err) {
-        const msgDiv = document.getElementById('errorMessage');
-        msgDiv.textContent = err.message;
-        msgDiv.classList.remove('hidden');
-    }
-});
-```
-
-## 5. Bảo vệ Trang (Guard Page Flow)
-
-Để bảo vệ các trang yêu cầu đăng nhập (ví dụ: Giỏ hàng, Hồ sơ), hãy thêm script kiểm tra token trong `<head>`:
-
-```javascript
-// common.js
-function checkAuth() {
-    const token = localStorage.getItem('token');
-    if (!token && window.location.pathname !== '/login') {
-        window.location.href = '/login';
-    }
-}
-```
+1.  **Layout**: Sử dụng `layout:decorate` và `layout:fragment` (Thymeleaf Layout Dialect) để tái sử dụng mã nguồn.
+2.  **Logic JS**: Tách biệt logic xử lý form vào các file JS riêng trong `static/js/pages/`.
+3.  **Tailwind CDN/Build**: Hiện tại sử dụng Play CDN cho phát triển nhanh. Khi triển khai production, cần chuyển sang build CSS để tối ưu hóa hiệu suất.
+4.  **Header gọn nhẹ**: Header được thiết kế 2 tầng nhưng tối ưu chiều cao (`48px` cho tầng trên, `32px` cho tầng dưới) để ưu tiên không gian cho nội dung chính.
+`
 
 ## 6. Các Best Practices (Quy tắc Tốt nhất)
 

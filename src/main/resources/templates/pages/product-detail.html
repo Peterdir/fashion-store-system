@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title th:text="${product != null ? product.name + ' - Digital Curator' : 'Product Detail - Digital Curator'}">Product Detail</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <!-- Product Detail Section (Compact) -->
+    <section class="py-8 bg-white" th:if="${product != null}">
+        <div class="max-w-[1280px] mx-auto px-6">
+            <div class="flex flex-col lg:flex-row gap-8 lg:gap-10">
+                
+                <!-- 1. LEFT: Thumbnails (Vertical) -->
+                <div class="hidden lg:flex flex-col gap-4 w-20 flex-shrink-0" id="product-thumbnails-container">
+                    <!-- JS will populate this based on selected color -->
+                </div>
+
+                <!-- 2. CENTER: Main Image Display -->
+                <div class="flex-1 flex justify-center lg:justify-start">
+                    <div class="bg-surface-low aspect-[3/4] overflow-hidden relative group w-full max-w-[550px] shadow-sm">
+                        <img id="main-product-image" 
+                             th:src="${product.mainImage}" 
+                             th:alt="${product.name}" 
+                             class="w-full h-full object-cover transition-all duration-700">
+                        
+                        <!-- Mobile Thumbnails (Horizontal) -->
+                        <div class="flex lg:hidden absolute bottom-4 left-4 right-4 gap-2 overflow-x-auto pb-2 scrollbar-hide" id="mobile-thumbnails-container">
+                             <!-- JS will populate this -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. RIGHT: Product Info Area (Reduced Width) -->
+                <div class="w-full lg:w-[400px] flex-shrink-0">
+                    <div class="space-y-5">
+                        <!-- Breadcrumbs -->
+                        <nav class="text-[10px] font-bold tracking-[0.15em] uppercase text-neutral-400 flex items-center space-x-2">
+                            <a th:href="@{/}" class="hover:text-primary transition-colors">Home</a>
+                            <span class="text-neutral-300">/</span>
+                            <a th:href="@{/category(keyword=${product.categoryName})}" class="hover:text-primary transition-colors" th:text="${product.categoryName != null ? product.categoryName : 'Shop'}">Category</a>
+                        </nav>
+                        
+                        <div class="flex flex-col gap-2">
+                            <h1 class="text-xl md:text-2xl font-light leading-tight text-neutral-800" th:text="${product.name}">Product Name</h1>
+                            
+                            <!-- Rating Summary -->
+                            <div class="flex items-center gap-3">
+                                <div class="relative inline-flex text-yellow-400/20 material-symbols-outlined select-none text-sm leading-none">
+                                    <div class="flex gap-0">
+                                        <span class="w-[14px] text-center">star</span><span class="w-[14px] text-center">star</span><span class="w-[14px] text-center">star</span><span class="w-[14px] text-center">star</span><span class="w-[14px] text-center">star</span>
+                                    </div>
+                                    <div class="absolute top-0 left-0 overflow-hidden text-yellow-400 whitespace-nowrap transition-all duration-700" 
+                                         th:style="|width: ${product.averageRating * 20}%|">
+                                        <div class="flex gap-0">
+                                            <span class="w-[14px] text-center">star</span><span class="w-[14px] text-center">star</span><span class="w-[14px] text-center">star</span><span class="w-[14px] text-center">star</span><span class="w-[14px] text-center">star</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest" 
+                                      th:if="${product.reviewCount > 0}"
+                                      th:text="${#numbers.formatDecimal(product.averageRating, 1, 1) + ' (' + product.reviewCount + ' đánh giá)'}">
+                                    4.5 (10 reviews)
+                                </span>
+                                <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest italic" 
+                                      th:if="${product.reviewCount == 0}">
+                                    Chưa có đánh giá
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] font-medium font-sans">
+                            <span class="text-neutral-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                Mã sản phẩm (SKU): <span id="variant-sku-display" class="text-neutral-900 font-black" th:text="${'HY-P' + product.productId}">HY-P25</span>
+                                <span class="material-symbols-outlined text-[12px] cursor-help text-neutral-300" title="Mã số định danh duy nhất cho từng mẫu mã và kích thước của sản phẩm này.">info</span>
+                            </span>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="py-3 border-y border-outline/5">
+                            <div class="flex items-center gap-3">
+                                <span class="text-[10px] font-bold uppercase text-neutral-400">Giá từ</span>
+                                <span class="text-2xl font-bold text-primary" th:text="${#numbers.formatDecimal(product.minPrice != null ? product.minPrice : 0, 0, 'POINT', 0, 'COMMA') + ' ₫'}">20.900 ₫</span>
+                            </div>
+                        </div>
+
+                        <!-- Description (Moved up for better visibility) -->
+                        <div class="py-2">
+                            <h4 class="text-[9px] font-black tracking-[0.3em] uppercase mb-3 text-neutral-400 italic">Mô tả sản phẩm</h4>
+                            <p class="text-xs font-medium text-neutral-600 leading-relaxed max-h-[100px] overflow-y-auto pr-2 custom-scrollbar" th:text="${product.description}">
+                                Thông tin chi tiết về sản phẩm đang được cập nhật...
+                            </p>
+                        </div>
+
+
+                        <!-- Colors Selection (Compact) -->
+                        <div class="space-y-3 pt-3" th:if="${product.variants != null && !product.variants.isEmpty()}">
+                            <div class="flex justify-between text-[11px] font-bold uppercase tracking-widest">
+                                <span>Màu sắc: <span class="text-neutral-400" id="selected-color-name">Đang tải...</span></span>
+                            </div>
+                            <!-- Unique Colors will be rendered by JS for more control -->
+                            <div class="flex flex-wrap gap-2" id="color-selector-container">
+                                <!-- JS will populate this -->
+                            </div>
+                        </div>
+
+                        <!-- Size Guide & Selector (Compact) -->
+                        <div class="space-y-3 pt-3" th:if="${product.variants != null && !product.variants.isEmpty()}">
+                            <div class="flex justify-between text-[11px] font-bold uppercase tracking-widest">
+                                <span>Chọn kích cỡ</span>
+                                <a href="#" class="text-neutral-400 border-b border-neutral-200">Hướng dẫn chọn size</a>
+                            </div>
+                            <div class="flex flex-wrap gap-2" id="size-selector-container">
+                                <!-- JS will populate this -->
+                            </div>
+                            <div class="flex justify-between items-center text-[10px] uppercase tracking-widest mt-2 overflow-hidden px-1">
+                                <span class="text-neutral-400 font-bold">Tình trạng:</span>
+                                <span id="stock-display" class="font-black text-primary animate-in fade-in slide-in-from-right-4 duration-500">Chọn Màu & Size</span>
+                            </div>
+                        </div>
+
+                        <!-- Add to Cart (Compact Height) -->
+                        <div class="pt-6 flex gap-3">
+                            <input type="hidden" id="selected-variant-id" value="">
+                            <button id="add-to-cart-btn" class="flex-1 bg-neutral-900 text-white py-4 text-[10px] font-bold tracking-[0.3em] uppercase hover:bg-black transition-all no-radius shadow-lg active:scale-[0.98] disabled:bg-neutral-300 disabled:cursor-not-allowed">
+                                THÊM VÀO GIỎ HÀNG
+                            </button>
+                            <button id="add-to-wishlist-btn" th:data-id="${product.productId}" class="w-12 h-12 border border-outline/20 flex items-center justify-center hover:bg-neutral-50 transition-all no-radius group/wishlist">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="wishlist-icon transition-all duration-300"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Reviews Section -->
+    <section class="py-20 bg-white border-b border-outline/5" th:if="${product != null}">
+        <div class="max-w-[1280px] mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                <div class="space-y-4">
+                    <h2 class="text-3xl md:text-5xl font-light leading-tight text-neutral-900 border-b-2 border-primary/10 pb-4 inline-block">Đánh giá từ khách hàng</h2>
+                </div>
+                <div class="flex items-center gap-4 py-2 px-6 bg-surface-low border border-outline/10 text-neutral-500" th:if="${product.reviewCount > 0}">
+                    <div class="flex items-center gap-2">
+                        <div class="relative inline-flex text-yellow-400/20 material-symbols-outlined select-none text-lg leading-none">
+                            <div class="flex gap-0">
+                                <span class="w-[18px] text-center">star</span><span class="w-[18px] text-center">star</span><span class="w-[18px] text-center">star</span><span class="w-[18px] text-center">star</span><span class="w-[18px] text-center">star</span>
+                            </div>
+                            <div class="absolute top-0 left-0 overflow-hidden text-yellow-400 whitespace-nowrap" 
+                                 th:style="|width: ${product.averageRating * 20}%|">
+                                <div class="flex gap-0">
+                                    <span class="w-[18px] text-center">star</span><span class="w-[18px] text-center">star</span><span class="w-[18px] text-center">star</span><span class="w-[18px] text-center">star</span><span class="w-[18px] text-center">star</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="text-xl font-bold text-neutral-900" th:text="${#numbers.formatDecimal(product.averageRating, 1, 1)}">4.5</span>
+                    </div>
+                    <div class="h-4 w-[1px] bg-outline/20"></div>
+                    <span class="text-[11px] font-bold uppercase tracking-widest" th:text="${product.reviewCount + ' đánh giá'}">10 đánh giá</span>
+                </div>
+            </div>
+
+            <div th:if="${product.reviews != null && !product.reviews.isEmpty()}" class="space-y-0 divide-y divide-outline/10">
+                <div th:each="review : ${product.reviews}" class="py-8 first:pt-0 last:pb-0">
+                    <div class="flex gap-4">
+                        <!-- Avatar -->
+                        <div class="w-8 h-8 rounded-full bg-neutral-100 text-neutral-400 flex flex-shrink-0 items-center justify-center font-bold text-[10px] uppercase border border-outline/5" 
+                             th:text="${review.reviewerName != null && !review.reviewerName.isEmpty() ? #strings.substring(review.reviewerName, 0, 1) : '?'}">A</div>
+                        
+                        <div class="flex-1 space-y-2">
+                            <!-- Header: Name & Stars -->
+                            <div>
+                                <h4 class="text-[12px] font-bold text-neutral-900 leading-none" th:text="${review.reviewerName}">Reviewer Name</h4>
+                                <div class="flex items-center gap-0.5 text-yellow-400 mt-1.5 focus:outline-none">
+                                    <span th:each="i : ${#numbers.sequence(1, 5)}" 
+                                          class="material-symbols-outlined text-[12px]"
+                                          th:style="|font-variation-settings: 'FILL' ${i <= review.rating ? 1 : 0}|"
+                                          th:text="${i <= review.rating ? 'star' : 'star'}">star</span>
+                                </div>
+                            </div>
+
+                            <!-- Variation & Date (Shopee Style) -->
+                            <div class="flex flex-wrap items-center gap-3 text-[11px] text-neutral-400">
+                                <span>Phân loại hàng: <span th:text="${review.color + ', ' + review.size}">Black, M</span></span>
+                                <span class="w-[1px] h-3 bg-outline/20"></span>
+                                <span th:if="${review.createdAt != null}" th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy')}">01/01/2024</span>
+                            </div>
+
+                            <!-- Comment -->
+                            <p class="text-[14px] text-neutral-700 leading-relaxed pt-1" th:text="${review.comment}">
+                                Chất lượng sản phẩm rất tuyệt vời, vải mềm mịn và form dáng chuẩn như hình. Rất đáng tiền!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${product.reviews == null || product.reviews.isEmpty()}" class="py-20 text-center border border-dashed border-outline/20 bg-surface-low/20">
+                <div class="mb-6 opacity-20">
+                    <span class="material-symbols-outlined text-6xl">chat_bubble</span>
+                </div>
+                <h3 class="text-sm font-bold uppercase tracking-[0.3em] text-neutral-400 mb-2">Chưa có đánh giá</h3>
+                <p class="text-xs text-neutral-300">Hãy là người đầu tiên sở hữu và chia sẻ trải nghiệm về sản phẩm này.</p>
+            </div>
+        </div>
+    </section>
+
+    <th:block layout:fragment="script">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            window.productVariants = /*[[${product.variants}]]*/ [];
+            window.productImages = /*[[${product.images}]]*/ [];
+            window.mainProductImage = /*[[${product.mainImage}]]*/ '/images/placeholder.png';
+            /*]]>*/
+        </script>
+        <script th:src="@{/js/pages/product-detail.js}"></script>
+    </th:block>
+
+    <!-- Related Products -->
+    <section class="editorial-spacing bg-white" th:if="${relatedProducts != null && !relatedProducts.isEmpty()}">
+        <div class="max-w-[1440px] mx-auto px-6">
+            <h3 class="text-xs tracking-[0.4em] font-bold mb-16 text-neutral-400 uppercase text-center">Sản phẩm liên quan</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div th:each="rp : ${relatedProducts}" class="group cursor-pointer">
+                    <a th:href="@{'/product-detail/' + ${rp.productId}}" class="block">
+                        <div class="bg-surface-low aspect-[3/4] overflow-hidden mb-6 relative">
+                            <img th:src="${rp.primaryImageUrl}" th:alt="${rp.name}" 
+                                 class="w-full h-full object-cover transition-all duration-1000 group-hover:scale-105">
+                            <img th:src="${rp.hoverImageUrl}" th:alt="${rp.name}" 
+                                 class="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                        </div>
+                        <h4 class="text-[10px] font-bold uppercase tracking-[0.2em] mb-2 group-hover:text-secondary transition-colors" th:text="${rp.name}">Product Name</h4>
+                        <p class="text-[11px] font-medium text-neutral-400" 
+                           th:text="${#numbers.formatDecimal(rp.minPrice != null ? rp.minPrice : 0, 0, 'POINT', 0, 'COMMA') + ' ₫'}">0 ₫</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Image Lightbox Modal (Premium Glassmorphism) -->
+    <div id="image-lightbox" class="fixed inset-0 z-[100] hidden flex flex-col items-center justify-center p-4 transition-all duration-500 opacity-0 bg-black/80 backdrop-blur-md cursor-zoom-out" onclick="closeLightbox(event)">
+        <!-- Image Container -->
+        <div class="relative max-w-full max-h-full flex items-center justify-center" onclick="event.stopPropagation()">
+            <img id="lightbox-img" src="" alt="Xem ảnh đầy đủ" 
+                 class="max-w-[95vw] max-h-[90vh] object-contain shadow-2xl transition-transform duration-500 scale-95">
+            
+            <!-- Close Button -->
+            <button onclick="closeLightbox(event)" 
+                    class="absolute -top-12 right-0 text-white/70 hover:text-white transition-colors p-2 group">
+                <div class="flex items-center gap-2">
+                    <span class="text-[9px] font-black uppercase tracking-[0.3em] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Đóng ESC</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </div>
+            </button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

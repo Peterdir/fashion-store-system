@@ -10,19 +10,24 @@ import org.example.fashionstoresystem.dto.response.CustomerSummaryResponseDTO;
 import org.example.fashionstoresystem.dto.response.CustomerDetailResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderSummaryResponseDTO;
 import org.example.fashionstoresystem.entity.enums.Role;
+import org.example.fashionstoresystem.entity.enums.UserStatus;
 import org.example.fashionstoresystem.entity.jpa.OrderItem;
 import org.example.fashionstoresystem.entity.jpa.User;
 import org.example.fashionstoresystem.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.example.fashionstoresystem.service.email_log.EmailService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +35,9 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
-    // QUẢN LÝ THÔNG TIN CÁ NHÂN
+    // --- QUẢN LÝ THÔNG TIN CÁ NHÂN ---
 
     @Override
     public ProfileResponseDTO getProfile(Long userId) {
@@ -43,6 +49,7 @@ public class UserServiceImpl implements UserService {
                 .phone(user.getPhone())
                 .email(user.getEmail())
                 .address(user.getAddress())
+                .emailVerified(user.isEmailVerified())
                 .role(user.getRole())
                 .build();
     }
@@ -52,7 +59,7 @@ public class UserServiceImpl implements UserService {
     public ProfileResponseDTO updateProfile(Long userId, UpdateProfileRequestDTO dto) {
         User user = findUserById(userId);
 
-        // Dữ liệu không hợp lệ - Kiểm tra trùng lặp phone với user khác
+        // --- Cập nhật Phone ---
         if (dto.getPhone() != null && !dto.getPhone().isBlank()) {
             if (userRepository.existsByPhoneAndIdNot(dto.getPhone(), userId)) {
                 throw new RuntimeException("Số điện thoại đã được sử dụng bởi tài khoản khác!");
@@ -60,10 +67,34 @@ public class UserServiceImpl implements UserService {
             user.setPhone(dto.getPhone());
         }
 
-        if (dto.getFullName() != null && !dto.getFullName().isBlank()) {
-            user.setFullName(dto.getFullName());
+        // --- Quy trình Thay đổi Email (Xác thực trước - Đổi sau) ---
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+            if (!dto.getEmail().equalsIgnoreCase(user.getEmail())) {
+                
+                // Kiểm tra xem email mới có bị trùng với người khác không
+                if (userRepository.existsByEmailAndIdNot(dto.getEmail(), userId)) {
+                    throw new RuntimeException("Email đã được sử dụng bởi tài khoản khác!");
+                }
+
+                // Lưu email mới vào pendingEmail và bắt đầu quy trình xác thực
+                user.setPendingEmail(dto.getEmail());
+                
+                String token = createVerificationToken(user);
+                try {
+                    // Gửi mail xác thực đến EMAIL MỚI
+                    emailService.sendVerificationEmail(user.getPendingEmail(), token);
+                } catch (Exception e) {
+                    System.err.println("Lỗi khi gửi mail xác thực cho email mới: " + e.getMessage());
+                }
+            }
         }
 
+        // --- Cập nhật FullName ---
+        if (dto.getFullName() != null && !dto.getFullName().isBlank()) {
+            user.setFullName(capitalizeName(dto.getFullName()));
+        }
+
+        // --- Cập nhật Address ---
         if (dto.getAddress() != null) {
             user.setAddress(dto.getAddress());
         }
@@ -74,25 +105,25 @@ public class UserServiceImpl implements UserService {
                 .userId(user.getId())
                 .fullName(user.getFullName())
                 .phone(user.getPhone())
-                .email(user.getEmail())
+                .email(user.getEmail()) // Vẫn trả về email cũ cho đến khi xác thực xong
                 .address(user.getAddress())
+                .pendingEmail(user.getPendingEmail())
+                .emailVerified(user.isEmailVerified())
                 .role(user.getRole())
                 .build();
     }
 
-    // ĐỔI MẬT KHẨU
+    // --- ĐỔI MẬT KHẨU ---
 
     @Override
     @Transactional
     public MessageResponseDTO changePassword(Long userId, ChangePasswordRequestDTO dto) {
         User user = findUserById(userId);
 
-        // Mật khẩu hiện tại không đúng
         if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
             throw new RuntimeException("Mật khẩu hiện tại không đúng!");
         }
 
-        // Mật khẩu mới không hợp lệ
         if (dto.getNewPassword().length() < 6) {
             throw new RuntimeException("Mật khẩu mới phải có ít nhất 6 ký tự!");
         }
@@ -101,7 +132,6 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Mật khẩu xác nhận không khớp!");
         }
 
-        // Cập nhật mật khẩu mới
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
 
@@ -110,7 +140,78 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    // CUSTOMER MANAGEMENT (ADMIN)
+    // --- XÓA TÀI KHOẢN ---
+
+    @Override
+    @Transactional
+    public MessageResponseDTO deleteAccount(Long userId) {
+        User user = findUserById(userId);
+        user.setStatus(UserStatus.BLOCKED);
+        userRepository.save(user);
+
+        return MessageResponseDTO.builder()
+                .message("Tài khoản đã được xóa (khóa) thành công!")
+                .build();
+    }
+
+    // --- XÁC THỰC EMAIL ---
+
+    @Override
+    @Transactional
+    public MessageResponseDTO resendVerification(Long userId) {
+        User user = findUserById(userId);
+        
+        // Xác định email gửi đến (ưu tiên pendingEmail nếu đang đổi mail)
+        String targetEmail = (user.getPendingEmail() != null) ? user.getPendingEmail() : user.getEmail();
+        
+        if (user.getPendingEmail() == null && user.isEmailVerified()) {
+            throw new RuntimeException("Tài khoản đã được xác thực trước đó!");
+        }
+
+        String token = createVerificationToken(user);
+        userRepository.save(user);
+        
+        try {
+            emailService.sendVerificationEmail(targetEmail, token);
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi khi gửi lại email xác thực: " + e.getMessage());
+        }
+
+        return MessageResponseDTO.builder()
+                .message("Email xác thực đã được gửi lại thành công đến " + targetEmail)
+                .build();
+    }
+
+    // --- PRIVATE HELPERS ---
+
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại!"));
+    }
+
+    private String createVerificationToken(User user) {
+        String token = UUID.randomUUID().toString();
+        user.setVerificationToken(token);
+        user.setVerificationTokenExpiryDate(Instant.now().plus(24, ChronoUnit.HOURS));
+        return token;
+    }
+
+    private String capitalizeName(String name) {
+        if (name == null || name.isBlank())
+            return "";
+        String[] words = name.toLowerCase().split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                sb.append(Character.toUpperCase(word.charAt(0)))
+                        .append(word.substring(1).toLowerCase())
+                        .append(" ");
+            }
+        }
+        return sb.toString().trim();
+    }
+
+    // --- QUẢN LÝ KHÁCH HÀNG (ADMIN) ---
 
     @Override
     public Page<CustomerSummaryResponseDTO> getAllCustomers(String keyword, Pageable pageable) {
@@ -182,12 +283,5 @@ public class UserServiceImpl implements UserService {
         return MessageResponseDTO.builder()
                 .message("Cập nhật trạng thái khách hàng thành công!")
                 .build();
-    }
-
-    // PRIVATE HELPERS
-
-    private User findUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại!"));
     }
 }

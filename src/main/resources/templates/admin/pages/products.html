@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/admin-layout}">
+<head>
+    <title>Quản Lý Sản Phẩm</title>
+</head>
+<body>
+
+    <div layout:fragment="content">
+
+        <!-- Page Header -->
+        <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-xl font-black tracking-tight text-primary uppercase">Sản Phẩm</h1>
+                <p class="text-[11px] text-neutral-400 font-medium mt-1">Quản lý danh mục sản phẩm của cửa hàng</p>
+            </div>
+            <button id="btn-add-product" class="bg-primary text-white px-5 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-800 transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]">add</span> Thêm Sản Phẩm
+            </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white border border-neutral-100 p-4 mb-5 flex flex-wrap items-end gap-3">
+            <!-- Search -->
+            <div class="space-y-1 flex-1 min-w-[200px]">
+                <label class="text-[9px] font-black uppercase tracking-[0.15em] text-neutral-400">Tìm kiếm</label>
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-neutral-300">search</span>
+                    <input type="text" id="filter-keyword" placeholder="Tên sản phẩm..."
+                           class="w-full pl-9 pr-3 py-2 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary">
+                </div>
+            </div>
+            <!-- Filter Status -->
+            <div class="space-y-1">
+                <label class="text-[9px] font-black uppercase tracking-[0.15em] text-neutral-400">Trạng Thái</label>
+                <select id="filter-status" class="px-3 py-2 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary min-w-[140px]">
+                    <option value="">Tất cả</option>
+                    <option value="ACTIVE">Đang bán</option>
+                    <option value="INACTIVE">Tạm ẩn</option>
+                    <option value="OUT_OF_STOCK">Hết hàng</option>
+                    <option value="DISCONTINUED">Ngừng kinh doanh</option>
+                </select>
+            </div>
+            <!-- Actions -->
+            <div class="flex gap-2">
+                <button id="btn-reset-filter" class="bg-neutral-100 text-neutral-500 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-200 transition-colors">
+                    Xóa bộ lọc
+                </button>
+            </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="bg-white border border-neutral-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-neutral-50/80 border-b border-neutral-100">
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Sản phẩm</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Danh mục</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-right">Giá</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Tồn kho</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Biến thể</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Trạng thái</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body" class="divide-y divide-neutral-50">
+                        <!-- JS renders rows here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="products-empty" class="hidden py-16 text-center">
+                <span class="material-symbols-outlined text-5xl text-neutral-200 mb-3">inventory_2</span>
+                <p class="text-[12px] font-bold text-neutral-400">Không tìm thấy sản phẩm nào</p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="products-loading" class="py-16 text-center">
+                <span class="material-symbols-outlined text-3xl text-neutral-300 animate-spin">sync</span>
+                <p class="text-[11px] font-medium text-neutral-400 mt-2">Đang tải dữ liệu...</p>
+            </div>
+
+            <!-- Pagination -->
+            <div id="products-pagination" class="hidden px-5 py-3 border-t border-neutral-100 flex items-center justify-between text-[11px]">
+                <span class="text-neutral-400 font-medium" id="pagination-info"></span>
+                <div class="flex items-center gap-1" id="pagination-buttons"></div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ADD / EDIT PRODUCT MODAL (Slide-over panel) -->
+        <!-- ============================================ -->
+        <div id="product-modal" class="fixed inset-0 z-50 hidden">
+            <!-- Overlay -->
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="AdminProducts.closeModal()"></div>
+            <!-- Modal Content -->
+            <div class="absolute right-0 top-0 h-full w-full max-w-3xl bg-white shadow-2xl overflow-y-auto transform transition-transform duration-300">
+                <!-- Modal Header -->
+                <div class="sticky top-0 z-10 bg-white border-b border-neutral-100 px-6 py-4 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-sm font-black uppercase tracking-[0.1em]" id="modal-title">Thêm Sản Phẩm Mới</h2>
+                        <p class="text-[10px] text-neutral-400 font-medium mt-0.5" id="modal-subtitle">Điền thông tin sản phẩm bên dưới</p>
+                    </div>
+                    <button onclick="AdminProducts.closeModal()" class="p-1.5 hover:bg-neutral-100 rounded transition-colors">
+                        <span class="material-symbols-outlined text-neutral-400">close</span>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <form id="product-form" class="p-6 space-y-6">
+                    <input type="hidden" id="form-product-id">
+
+                    <!-- Thông tin cơ bản -->
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.15em] text-neutral-500 mb-3 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[14px] text-accent">info</span> Thông tin cơ bản
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="sm:col-span-2 space-y-1">
+                                <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Tên sản phẩm <span class="text-red-500">*</span></label>
+                                <input type="text" id="form-name" required maxlength="255" placeholder="Ví dụ: Áo Polo Cotton Premium"
+                                       class="w-full px-3 py-2.5 text-[12px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Danh mục <span class="text-red-500">*</span></label>
+                                <input type="text" id="form-category" required maxlength="100" placeholder="Ví dụ: Áo Polo"
+                                       class="w-full px-3 py-2.5 text-[12px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Giá (₫) <span class="text-red-500">*</span></label>
+                                <input type="number" id="form-price" required min="1" step="any" placeholder="599000"
+                                       class="w-full px-3 py-2.5 text-[12px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors">
+                            </div>
+                            <!-- Status (only for edit mode) -->
+                            <div class="sm:col-span-2 space-y-1" id="form-status-group" style="display:none;">
+                                <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Trạng thái</label>
+                                <select id="form-status" class="w-full px-3 py-2.5 text-[12px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors">
+                                    <option value="ACTIVE">Đang bán</option>
+                                    <option value="INACTIVE">Tạm ẩn</option>
+                                    <option value="OUT_OF_STOCK">Hết hàng</option>
+                                    <option value="DISCONTINUED">Ngừng kinh doanh</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-2 space-y-1">
+                                <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Mô tả</label>
+                                <textarea id="form-description" rows="3" maxlength="2000" placeholder="Mô tả chi tiết sản phẩm..."
+                                          class="w-full px-3 py-2.5 text-[12px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors resize-none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hình ảnh -->
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.15em] text-neutral-500 mb-3 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[14px] text-accent">image</span> Hình ảnh sản phẩm
+                            <span class="text-neutral-300 font-medium normal-case tracking-normal">(1–10 URL)</span>
+                        </p>
+                        <div id="image-urls-container" class="space-y-2">
+                            <!-- Image URL inputs rendered by JS -->
+                        </div>
+                        <button type="button" id="btn-add-image" class="mt-2 text-[10px] font-bold text-accent hover:text-primary transition-colors flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">add_circle</span> Thêm ảnh
+                        </button>
+                    </div>
+
+                    <!-- Biến thể (Variants) -->
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.15em] text-neutral-500 mb-3 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[14px] text-accent">style</span> Biến thể sản phẩm
+                            <span class="text-neutral-300 font-medium normal-case tracking-normal">(Size × Màu × Tồn kho)</span>
+                        </p>
+                        <div id="variants-container" class="space-y-2">
+                            <!-- Variant rows rendered by JS -->
+                        </div>
+                        <button type="button" id="btn-add-variant" class="mt-2 text-[10px] font-bold text-accent hover:text-primary transition-colors flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">add_circle</span> Thêm biến thể
+                        </button>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex items-center justify-end gap-3 pt-4 border-t border-neutral-100">
+                        <button type="button" onclick="AdminProducts.closeModal()" class="px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-neutral-500 hover:bg-neutral-100 transition-colors">
+                            Hủy
+                        </button>
+                        <button type="submit" id="btn-submit" class="bg-primary text-white px-6 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-800 transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[14px]">save</span> Lưu Sản Phẩm
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- DELETE CONFIRM MODAL -->
+        <div id="delete-modal" class="fixed inset-0 z-[60] hidden">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="AdminProducts.closeDeleteModal()"></div>
+            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white shadow-2xl p-6">
+                <div class="text-center">
+                    <div class="w-14 h-14 mx-auto mb-4 bg-red-50 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-3xl text-red-500">delete_forever</span>
+                    </div>
+                    <h3 class="text-sm font-black uppercase tracking-wide mb-1">Xóa sản phẩm?</h3>
+                    <p class="text-[11px] font-medium text-neutral-400 mb-1" id="delete-product-name"></p>
+                    <p class="text-[10px] text-red-400 font-medium">Hành động này không thể hoàn tác.</p>
+                </div>
+                <div class="flex items-center justify-center gap-3 mt-6">
+                    <button onclick="AdminProducts.closeDeleteModal()" class="px-5 py-2 text-[10px] font-black uppercase tracking-widest text-neutral-500 hover:bg-neutral-100 transition-colors">
+                        Hủy
+                    </button>
+                    <button id="btn-confirm-delete" class="bg-red-600 text-white px-5 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-colors flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[14px]">delete</span> Xác nhận xóa
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div id="admin-toast" class="fixed bottom-6 right-6 z-[100] space-y-2"></div>
+
+        <script th:src="@{/admin/js/products.js}"></script>
+    </div>
+</body>
+</html>

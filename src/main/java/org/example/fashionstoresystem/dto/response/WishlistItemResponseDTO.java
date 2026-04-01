@@ -15,4 +15,6 @@ public class WishlistItemResponseDTO {
     private String productName;
     private Double productPrice;
     private String primaryImageUrl;
+    private String categoryName;
+    private Boolean inStock;
 }

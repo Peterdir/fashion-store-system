@@ -1,6 +1,7 @@
 package org.example.fashionstoresystem.entity.enums;
 
 public enum OrderStatus {
+    PENDING_CONFIRMATION,
     PENDING_PAYMENT,
     PAID,
     PROCESSING,

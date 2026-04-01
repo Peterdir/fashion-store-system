@@ -37,6 +37,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT DISTINCT o FROM Order o LEFT JOIN o.orderItems oi WHERE (?1 IS NULL OR oi.status = ?1) AND (CAST(?2 AS date) IS NULL OR o.orderDate >= ?2) AND (CAST(?3 AS date) IS NULL OR o.orderDate <= ?3)")
     Page<Order> searchOrders(OrderStatus status, Date startDate, Date endDate, Pageable pageable);
 
-    @Query("SELECT DISTINCT o FROM Order o LEFT JOIN o.orderItems oi WHERE o.user.id = ?1 AND (?2 IS NULL OR oi.status = ?2)")
-    Page<Order> searchMyOrders(Long userId, OrderStatus status, Pageable pageable);
+    @Query("SELECT DISTINCT o FROM Order o LEFT JOIN o.orderItems oi WHERE o.user.id = :userId AND oi.status IN :statuses ORDER BY o.orderDate DESC")
+    Page<Order> searchMyOrdersByStatuses(@Param("userId") Long userId, @Param("statuses") List<OrderStatus> statuses, Pageable pageable);
+
+    @Query("SELECT DISTINCT o FROM Order o LEFT JOIN o.orderItems oi WHERE o.user.id = :userId ORDER BY o.orderDate DESC")
+    Page<Order> findAllMyOrders(@Param("userId") Long userId, Pageable pageable);
+
+    // Tìm đơn hàng quá hạn thanh toán
+    List<Order> findByStatusAndOrderDateBefore(OrderStatus status, Date expireTime);
 }

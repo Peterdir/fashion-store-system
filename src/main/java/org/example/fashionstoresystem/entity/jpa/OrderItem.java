@@ -25,11 +25,14 @@ public class OrderItem {
     @Column(nullable = false)
     private Long quantity;
 
+    @Column(nullable = false)
+    private Double price;
+
     @Column
     private String productName;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     @Builder.Default
     private OrderStatus status = OrderStatus.PENDING_PAYMENT;
 
@@ -51,6 +54,10 @@ public class OrderItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "variant_id")
     private ProductVariant productVariant;
+
+    @Builder.Default
+    @Column(name = "is_reviewed", nullable = false)
+    private boolean isReviewed = false;
 
     @Builder.Default
     @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)

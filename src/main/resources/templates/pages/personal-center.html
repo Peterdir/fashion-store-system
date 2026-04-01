@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>Personal Center - H&Y</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Hero/Breadcrumb Section -->
+        <div class="bg-surface-low border-b border-outline/5 py-4">
+            <div class="max-w-[1440px] mx-auto px-6 lg:px-12">
+                <div class="flex items-center gap-2 text-[10px] font-bold tracking-widest text-on-surface-variant/60">
+                    <a th:href="@{/}" class="hover:text-primary transition-colors">Home</a>
+                    <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+                    <span class="text-primary font-bold">Personal Center</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-[1440px] mx-auto px-6 lg:px-12 py-12">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                
+                <!-- Left Sidebar Navigation -->
+                <aside class="lg:col-span-3 space-y-8">
+                    <div class="bg-white p-6 shadow-sm border border-outline/5">
+                        <button class="tab-link w-full text-left text-xs font-black tracking-[0.2em] mb-8 pb-4 border-b border-outline/10 text-on-surface-variant hover:text-secondary transition-colors" 
+                                data-tab="dashboard">
+                            Personal Center
+                        </button>
+                        
+                        <nav class="space-y-1">
+                            <!-- My Account -->
+                            <div id="my-account-group" class="group">
+                                <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left toggle-menu-btn"
+                                        data-target="my-account-sub">
+                                    My Account
+                                    <span id="my-account-arrow" class="material-symbols-outlined text-sm transition-transform">expand_more</span>
+                                </button>
+                                <div id="my-account-sub" class="pl-4 space-y-2 py-2 hidden">
+                                    <button class="tab-link block w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="profile">My Profile</button>
+                                    <button class="tab-link block w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="address">Address Book</button>
+                                    <button class="tab-link block w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="manage">Manage My Account</button>
+                                </div>
+                            </div>
+                            
+                            <!-- My Assets -->
+                            <div id="my-assets-group" class="group">
+                                <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left toggle-menu-btn"
+                                        data-target="my-assets-sub">
+                                    My Assets
+                                    <span id="my-assets-arrow" class="material-symbols-outlined text-sm transition-transform">expand_more</span>
+                                </button>
+                                <div id="my-assets-sub" class="pl-4 space-y-2 py-2 hidden">
+                                    <button class="tab-link block w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="coupons">My Coupons</button>
+                                </div>
+                            </div>
+                            
+                            <!-- My Orders -->
+                            <div id="my-orders-group" class="group">
+                                <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left toggle-menu-btn"
+                                        data-target="my-orders-sub">
+                                    My Orders
+                                    <span id="my-orders-arrow" class="material-symbols-outlined text-sm transition-transform">expand_more</span>
+                                </button>
+                                <div id="my-orders-sub" class="pl-4 space-y-2 py-2 hidden">
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="all">
+                                        <span class="material-symbols-outlined text-base">inventory</span>
+                                        All Orders
+                                    </button>
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="unpaid">
+                                        <span class="material-symbols-outlined text-base">account_balance_wallet</span>
+                                        Unpaid Orders
+                                    </button>
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="processing">
+                                        <span class="material-symbols-outlined text-base">package_2</span>
+                                        Processing Orders
+                                    </button>
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="shipped">
+                                        <span class="material-symbols-outlined text-base">local_shipping</span>
+                                        Shipped Orders
+                                    </button>
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="review">
+                                        <span class="material-symbols-outlined text-base">rate_review</span>
+                                        Review Orders
+                                    </button>
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="reviewed">
+                                        <span class="material-symbols-outlined text-base">history_edu</span>
+                                        Review History
+                                    </button>
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="return">
+                                        <span class="material-symbols-outlined text-base">assignment_return</span>
+                                        Return Orders
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Other static links -->
+                             <!-- My Favorites -->
+                             <div id="my-favorites-group" class="group">
+                                 <button class="w-full flex items-center justify-between py-3 text-[11px] font-black uppercase tracking-[0.15em] hover:text-secondary transition-colors text-left toggle-menu-btn"
+                                         data-target="my-favorites-sub" data-arrow="my-favorites-arrow">
+                                     My Favorites
+                                     <span id="my-favorites-arrow" class="material-symbols-outlined text-sm transition-transform">expand_more</span>
+                                 </button>
+                                 <div id="my-favorites-sub" class="pl-4 space-y-2 py-2 hidden">
+                                     <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="favorites">
+                                         <span class="material-symbols-outlined text-base">favorite</span>
+                                         Wish List
+                                     </button>
+                                     <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="recently-viewed">
+                                         <span class="material-symbols-outlined text-base">schedule</span>
+                                         Recently Viewed
+                                     </button>
+                                 </div>
+                             </div>
+                            
+                            <div class="h-px bg-outline/10 my-4"></div>
+                            
+                            <!-- Sign Out -->
+                              <a th:href="@{/logout}" class="flex items-center gap-2 py-3 text-[11px] font-bold tracking-[0.15em] text-red-500 hover:text-red-700 transition-colors">
+                                  <span class="material-symbols-outlined text-lg">logout</span>
+                                  Sign Out
+                              </a>
+                        </nav>
+                    </div>
+                </aside>
+
+                <!-- Main Content Area -->
+                <div class="lg:col-span-9 space-y-6">
+                    <!-- Tab: Dashboard Overview -->
+                    <div id="tab-dashboard" class="tab-content space-y-6 animate-in fade-in duration-500">
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                            
+                            <!-- Left Column: Primary Cards -->
+                            <div class="md:col-span-8 space-y-6">
+                                
+                                <!-- Profile & Assets Card -->
+                                <div class="bg-white p-8 shadow-sm border border-outline/5 transition-all hover:shadow-md">
+                                    <div class="flex items-start justify-between mb-10">
+                                        <div class="flex items-center gap-6">
+                                            <div>
+                                                <h2 id="pc-dashboard-name-container" class="text-xl font-bold tracking-tight flex items-center gap-2 select-none normal-case">
+                                                    <span class="text-on-surface-variant/40 font-medium">Hi,</span>
+                                                    <span id="pc-dashboard-name" class="text-on-surface">Guest User</span>
+                                                    <span class="inline-flex items-center justify-center bg-primary/5 text-primary text-[10px] font-black px-2 py-0.5 rounded-full border border-primary/10 ml-1">
+                                                        <span class="material-symbols-outlined text-[12px] mr-1">verified</span> Member
+                                                    </span>
+                                                </h2>
+                                            </div>
+                                        </div>
+                                        <button class="tab-link text-[11px] font-bold text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors" data-tab="profile">
+                                            My Profile <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Asset Counts -->
+                                    <div class="grid grid-cols-4 gap-8">
+                                        <div class="text-center group cursor-pointer tab-link" data-tab="coupons">
+                                            <p class="text-[18px] font-black tracking-tighter text-black mb-1">***</p>
+                                            <p class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Coupons</p>
+                                        </div>
+                                        <div class="text-center group cursor-pointer tab-link" data-tab="wishlist">
+                                            <p class="text-[18px] font-black tracking-tighter text-black mb-1 group-hover:text-secondary transition-colors">***</p>
+                                            <p class="text-[11px] font-medium text-on-surface-variant group-hover:text-secondary transition-colors">Wishlist</p>
+                                        </div>
+                                        <div class="text-center group cursor-pointer tab-link" data-tab="address">
+                                            <div class="w-full flex justify-center mb-1">
+                                                <span class="material-symbols-outlined text-2xl text-on-surface-variant/40 group-hover:text-primary transition-colors">location_on</span>
+                                            </div>
+                                            <p class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Addresses</p>
+                                            <p id="pc-dashboard-address" class="text-[9px] text-on-surface-variant/40 mt-1 line-clamp-1 truncate px-2">No address set</p>
+                                        </div>
+                                        <div class="text-center group cursor-pointer tab-link" data-tab="profile">
+                                            <div class="w-full flex justify-center mb-1">
+                                                <span class="material-symbols-outlined text-2xl text-on-surface-variant/40 group-hover:text-primary transition-colors">settings</span>
+                                            </div>
+                                            <p class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Settings</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Asset visibility toggle -->
+                                    <div class="mt-4 flex justify-end">
+                                        <span class="material-symbols-outlined text-on-surface-variant/20 cursor-pointer hover:text-primary">visibility_off</span>
+                                    </div>
+                                </div>
+
+                                <!-- My Orders Card -->
+                                <div class="bg-white p-8 shadow-sm border border-outline/5 transition-all hover:shadow-md">
+                                    <div class="flex items-center justify-between mb-10">
+                                        <h3 class="text-sm font-black tracking-widest uppercase">My Orders</h3>
+                                        <button class="tab-link text-[11px] font-bold text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors" data-tab="orders">
+                                            View All <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-5 gap-2 text-center mb-12">
+                                        <div class="group cursor-pointer tab-link" data-tab="orders">
+                                            <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-2">account_balance_wallet</span>
+                                            <span class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Unpaid</span>
+                                        </div>
+                                        <div class="group cursor-pointer tab-link" data-tab="orders">
+                                            <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-2">package_2</span>
+                                            <span class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Processing</span>
+                                        </div>
+                                        <div class="group cursor-pointer tab-link" data-tab="orders">
+                                            <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-2">local_shipping</span>
+                                            <span class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Shipped</span>
+                                        </div>
+                                        <div class="group cursor-pointer tab-link" data-tab="orders">
+                                            <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-2">rate_review</span>
+                                            <span class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Review</span>
+                                        </div>
+                                        <div class="group cursor-pointer tab-link" data-tab="orders">
+                                            <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-2">assignment_return</span>
+                                            <span class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Returns</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Empty State Illustration -->
+                                    <div class="py-12 flex flex-col items-center justify-center opacity-40">
+                                        <div class="mb-4">
+                                            <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M50 20C40 20 35 30 35 30H65C65 30 60 20 50 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                                <path d="M30 40H70V80H30V40Z" stroke="currentColor" stroke-width="2"/>
+                                                <circle cx="50" cy="55" r="5" stroke="currentColor" stroke-width="2"/>
+                                                <path d="M40 70H60" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                                <path d="M80 60 L85 55 M85 65 L80 60" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                                <path d="M15 45 L20 40 M20 50 L15 45" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                            </svg>
+                                        </div>
+                                        <p class="text-[11px] font-medium uppercase tracking-[0.2em]">It is empty here :-(</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Secondary Cards -->
+                            <div class="md:col-span-4 space-y-6">
+                                <!-- Wishlist Card -->
+                                <div class="bg-white p-8 shadow-sm border border-outline/5 transition-all hover:shadow-md h-[220px]">
+                                    <div class="flex items-center justify-between mb-8">
+                                        <h3 class="text-sm font-black tracking-widest uppercase">Wishlist</h3>
+                                        <button class="tab-link text-[11px] font-bold text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors" data-tab="wishlist">
+                                            More <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+                                        </button>
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <div class="w-16 h-20 bg-surface-low/50 rounded overflow-hidden flex items-center justify-center opacity-30 border-2 border-dashed border-outline/10">
+                                            <span class="material-symbols-outlined text-xl">favorite</span>
+                                        </div>
+                                        <div class="w-16 h-20 bg-surface-low/50 rounded overflow-hidden flex items-center justify-center opacity-30 border-2 border-dashed border-outline/10">
+                                            <span class="material-symbols-outlined text-xl">favorite</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Activity Rows -->
+                                <div class="space-y-4">
+                                    <div class="bg-white px-8 py-5 shadow-sm border border-outline/5 flex items-center justify-between group hover:border-secondary transition-colors cursor-pointer tab-link" data-tab="recently-viewed">
+                                        <span class="text-sm font-black tracking-widest uppercase">Recently Viewed</span>
+                                        <span class="text-[10px] font-black uppercase text-on-surface-variant group-hover:text-secondary">View All <span class="material-symbols-outlined text-[14px] align-middle ml-1">chevron_right</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: My Coupons -->
+                    <div id="tab-coupons" class="tab-content hidden space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div class="text-center py-4">
+                            <h2 class="text-2xl font-black tracking-widest uppercase text-primary">MY COUPONS</h2>
+                        </div>
+                        
+                        <!-- Coupon Tabs -->
+                        <div id="coupon-tabs-container" class="flex items-center justify-center gap-12 border-b border-outline/10 pb-px">
+                            <button class="coupon-subtab relative py-4 text-[11px] font-black uppercase tracking-widest text-primary border-b-2 border-primary" data-status="unused">Unused Coupons</button>
+                            <button class="coupon-subtab py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors" data-status="used">Used</button>
+                            <button class="coupon-subtab py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors" data-status="expired">Expired Coupons</button>
+                        </div>
+                        
+                        <!-- Filter Pills -->
+                        <div id="coupon-filters-container" class="flex flex-wrap items-center gap-3">
+                            <button class="coupon-filter-pill px-5 py-1.5 rounded-full border border-primary bg-primary text-white text-[9px] font-black uppercase tracking-widest" data-filter="all">All</button>
+                            <button class="coupon-filter-pill px-5 py-1.5 rounded-full border border-outline/10 bg-surface-low text-on-surface-variant text-[9px] font-bold uppercase tracking-widest hover:border-secondary transition-colors" data-filter="expiring">Expiring Soon</button>
+                            <button class="coupon-filter-pill px-5 py-1.5 rounded-full border border-outline/10 bg-surface-low text-on-surface-variant text-[9px] font-bold uppercase tracking-widest hover:border-secondary transition-colors" data-filter="new">New</button>
+                        </div>
+                        
+                        <!-- Exclusive Offers Section -->
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-2 text-amber-500">
+                                <span class="material-symbols-outlined text-lg">star</span>
+                                <h3 class="text-[10px] font-black uppercase tracking-widest">Ưu đãi dành riêng cho bạn</h3>
+                            </div>
+                            
+                            <div id="exclusive-offers-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- JS Populated -->
+                            </div>
+                        </div>
+
+                        <!-- Standard Coupons Section -->
+                        <div class="space-y-6">
+                            <h3 class="text-[11px] font-black uppercase tracking-[0.2em] border-l-4 border-secondary pl-3">Kho Voucher Của Tôi</h3>
+                            <div id="my-coupons-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- JS Populated -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Tab: My Profile -->
+                    <div id="tab-profile" class="tab-content hidden space-y-6">
+                        <div class="bg-white p-10 shadow-sm border border-outline/5 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            <h2 class="text-xl font-black tracking-tighter uppercase mb-10 pb-6 border-b border-outline/10">Personal Information</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                <div class="space-y-6">
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold tracking-wide text-on-surface-variant/60">Full Name</label>
+                                        <input id="pc-profile-name-input" type="text" 
+                                               class="w-full bg-surface-low border border-outline/10 px-4 py-3 text-sm font-bold tracking-tight focus:border-secondary focus:ring-0 outline-none transition-all"
+                                               placeholder="Enter your full name">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold tracking-wide text-on-surface-variant/60">Email Address</label>
+                                        <p id="pc-profile-email" class="text-sm font-bold opacity-60">Not Set</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-6">
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold tracking-wide text-on-surface-variant/60">Phone Number</label>
+                                        <p id="pc-profile-phone" class="text-sm font-bold opacity-60">Not Set</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="pc-save-btn-container" class="mt-12 hidden">
+                                <button id="pc-save-profile-btn" 
+                                        class="bg-secondary text-white px-12 py-3 text-[11px] font-bold tracking-[0.1em] hover:opacity-90 transition-all shadow-lg hover:shadow-xl active:scale-95 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[16px]">save</span> Save changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Address Book -->
+                    <div id="tab-address" class="tab-content hidden space-y-6">
+                        <div class="bg-white p-10 shadow-sm border border-outline/5 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            <div class="flex items-center justify-between mb-10 pb-6 border-b border-outline/10">
+                                <h2 class="text-xl font-black tracking-tighter uppercase">Address Book</h2>
+                            </div>
+                            <div class="space-y-6">
+                                <div class="p-8 border border-outline/10 bg-surface-low/30 relative group transition-all hover:border-secondary/30">
+                                    <span class="absolute top-0 right-0 bg-primary text-white text-[8px] font-black px-4 py-1.5 tracking-widest">Default Shipping Address</span>
+                                    <div class="space-y-4 pt-4">
+                                        <div class="flex items-start gap-4">
+                                            <span class="material-symbols-outlined text-on-surface-variant/40 mt-1">location_on</span>
+                                            <div class="flex-1 space-y-2">
+                                                <label class="text-[10px] font-bold tracking-wide text-on-surface-variant/60">Detailed Shipping Address</label>
+                                                <textarea id="pc-address-input" rows="3" 
+                                                          class="w-full bg-transparent border border-outline/10 p-3 text-sm font-bold tracking-tight text-on-surface-variant focus:ring-1 focus:ring-secondary focus:border-secondary transition-all resize-none placeholder:text-on-surface-variant/20 mb-2"
+                                                          placeholder="Enter your shipping address..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="pc-save-address-container" class="hidden">
+                                    <button id="pc-save-address-btn" 
+                                            class="bg-secondary text-white px-10 py-3 text-[11px] font-bold tracking-[0.1em] hover:opacity-90 transition-all shadow-lg hover:shadow-xl active:scale-95 flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-[16px]">save</span> Save address
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Payment Options -->
+                    <div id="tab-payment" class="tab-content hidden space-y-6">
+                        <div class="bg-white p-10 shadow-sm border border-outline/5 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            <h2 class="text-xl font-black tracking-tighter uppercase mb-10 pb-6 border-b border-outline/10">Payment Methods</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <button class="p-8 border-2 border-dashed border-outline/20 hover:border-secondary/30 hover:bg-secondary/5 transition-all flex flex-col items-center justify-center gap-4 group aspect-video">
+                                    <span class="material-symbols-outlined text-4xl text-outline/40 group-hover:text-secondary transition-all">add_circle</span>
+                                    <span class="text-[11px] font-bold tracking-[0.1em] text-on-surface-variant/40 group-hover:text-secondary">Add new method</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Manage My Account -->
+                    <div id="tab-manage" class="tab-content hidden space-y-6">
+                        <div class="bg-white p-10 shadow-sm border border-outline/5 animate-in fade-in slide-in-from-bottom-2 duration-500 text-center">
+                            <h2 class="text-2xl font-black tracking-tighter uppercase mb-12">MANAGE MY ACCOUNT</h2>
+                            
+                            <div class="space-y-4 max-w-[600px] mx-auto text-left">
+                                <!-- Change Email Section -->
+                                <div class="p-8 bg-surface-low/30 border border-outline/5 flex items-start justify-between">
+                                    <div class="space-y-2 flex-grow pr-4">
+                                        <div class="flex items-center gap-2">
+                                            <h3 class="text-[11px] font-black tracking-widest uppercase">Email Address</h3>
+                                            <!-- Verified Badge -->
+                                            <span id="pc-email-verified-badge" class="hidden flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[9px] font-black tracking-tighter border border-emerald-100">
+                                                <span class="material-symbols-outlined text-[12px]">verified</span>
+                                                Verified
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-3">
+                                            <p id="pc-manage-email" class="text-sm font-bold text-on-surface-variant/60">Not Set</p>
+                                            <button id="pc-resend-verify-btn" class="hidden text-[11px] font-bold tracking-tight text-primary hover:text-black underline transition-colors">
+                                                Verify now
+                                            </button>
+                                        </div>
+
+                                        <p id="pc-email-pending-note" class="hidden text-[10px] font-medium text-blue-500 italic mt-1">
+                                            * A verification link has been sent to your new email. Verified to complete the change.
+                                        </p>
+
+                                        <div id="pc-email-edit-container" class="hidden mt-4 pt-4 border-t border-outline/5">
+                                            <input type="email" id="pc-new-email-input" class="w-full bg-white border border-outline/20 px-4 py-2 text-sm focus:border-secondary transition-colors outline-none" placeholder="Enter new email">
+                                            <p class="text-[9px] text-on-surface-variant/40 mt-1 italic">Note: You must verify the new email before the change takes effect.</p>
+                                            <div class="flex gap-2 mt-3">
+                                                <button id="pc-save-email-btn" class="bg-secondary text-white px-4 py-1.5 text-[11px] font-bold tracking-tight hover:bg-black transition-all">Save email</button>
+                                                <button id="pc-cancel-email-btn" class="bg-outline/20 text-on-surface-variant px-4 py-1.5 text-[11px] font-bold tracking-tight hover:bg-outline/40 transition-all">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button id="pc-change-email-toggle" class="flex-shrink-0 border border-primary px-8 py-2.5 text-[11px] font-bold tracking-tight hover:bg-primary hover:text-white transition-all">Change</button>
+                                </div>
+
+                                <!-- Change Password Section (New) -->
+                                <div class="p-8 bg-surface-low/30 border border-outline/5">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div class="space-y-2">
+                                            <h3 class="text-[11px] font-black uppercase tracking-widest">Security Password</h3>
+                                            <p class="text-[10px] font-bold text-on-surface-variant/60">Update your account password</p>
+                                        </div>
+                                        <button id="pc-change-password-toggle" class="border border-primary px-8 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Update</button>
+                                    </div>
+                                    
+                                    <div id="pc-password-edit-container" class="hidden space-y-4 mt-6 pt-6 border-t border-outline/10">
+                                        <div class="space-y-1">
+                                            <label class="text-[10px] font-bold tracking-wide text-on-surface-variant/40">Current Password</label>
+                                            <div class="relative">
+                                                <input type="password" id="pc-current-password" class="w-full bg-white border border-outline/20 px-4 py-2.5 pr-10 text-sm focus:border-secondary transition-colors outline-none shadow-sm">
+                                                <button type="button" class="password-toggle absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-secondary transition-colors">
+                                                    <span class="material-symbols-outlined text-sm">visibility</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div class="space-y-1">
+                                                <label class="text-[10px] font-bold tracking-wide text-on-surface-variant/40">New Password</label>
+                                                <div class="relative">
+                                                    <input type="password" id="pc-new-password" class="w-full bg-white border border-outline/20 px-4 py-2.5 pr-10 text-sm focus:border-secondary transition-colors outline-none shadow-sm">
+                                                    <button type="button" class="password-toggle absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-secondary transition-colors">
+                                                        <span class="material-symbols-outlined text-sm">visibility</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="space-y-1">
+                                                <label class="text-[10px] font-bold tracking-wide text-on-surface-variant/40">Confirm New</label>
+                                                <div class="relative">
+                                                    <input type="password" id="pc-confirm-password" class="w-full bg-white border border-outline/20 px-4 py-2.5 pr-10 text-sm focus:border-secondary transition-colors outline-none shadow-sm">
+                                                    <button type="button" class="password-toggle absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-secondary transition-colors">
+                                                        <span class="material-symbols-outlined text-sm">visibility</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-2 pt-2">
+                                            <button id="pc-save-password-btn" class="bg-secondary text-white px-8 py-3 text-[11px] font-bold tracking-tight hover:bg-black transition-all shadow-lg flex items-center gap-2">
+                                                <span>Save new password</span>
+                                            </button>
+                                            <button id="pc-cancel-password-btn" class="bg-outline/10 text-on-surface-variant px-8 py-3 text-[11px] font-bold tracking-tight hover:bg-outline/20 transition-all">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <!-- Delete Account Section -->
+                                <div id="pc-delete-account-btn" class="p-8 bg-red-50/30 border border-red-100 flex items-center justify-between group cursor-pointer hover:bg-red-50 transition-colors">
+                                    <div class="space-y-2">
+                                        <h3 class="text-[11px] font-black tracking-widest uppercase text-red-600">Delete Account</h3>
+                                        <p class="text-[10px] font-bold text-red-400 tracking-wide">Account will not be recoverable</p>
+                                    </div>
+                                    <span class="material-symbols-outlined text-red-300 group-hover:text-red-600 transition-all group-hover:translate-x-1">chevron_right</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                    <!-- Tab: My Orders (Detailed) -->
+                    <div id="tab-orders" class="tab-content hidden space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <!-- Top Header -->
+                        <div class="relative flex items-center justify-center py-6">
+                            <h2 class="text-3xl font-black tracking-tighter uppercase">My Orders</h2>
+                        </div>
+
+                        <!-- Orders Sub-navigation -->
+                        <div class="bg-white border-b border-outline/10 px-2 flex items-center justify-between relative h-16">
+                            <!-- Scroll Left -->
+                            <button id="order-tab-scroll-left" class="hidden absolute left-0 p-3 bg-white/95 backdrop-blur z-20 hover:text-secondary transition-all shadow-sm">
+                                <span class="material-symbols-outlined text-lg">chevron_left</span>
+                            </button>
+
+                            <div class="flex-1 overflow-hidden relative h-full flex items-center">
+                                <div id="order-subtabs-container" class="flex items-center gap-10 overflow-x-auto no-scrollbar scroll-smooth px-8 h-full">
+                                    <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-primary border-b-2 border-primary whitespace-nowrap" data-status="all">Tất cả</button>
+                                    <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="unpaid">Chờ thanh toán</button>
+                                    <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="processing">Đang chuẩn bị</button>
+                                    <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="shipped">Đang giao</button>
+                                    <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="review">Đã giao & Đánh giá</button>
+                                    <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="reviewed">Lịch sử Review</button>
+                                    <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="return">Trả hàng/Hủy</button>
+                                </div>
+                            </div>
+
+                            <!-- Scroll Right -->
+                            <!-- Increased right to avoid search button conflict -->
+                            <button id="order-tab-scroll-right" class="absolute right-14 p-3 bg-white/95 backdrop-blur z-20 hover:text-secondary transition-all shadow-sm">
+                                <span class="material-symbols-outlined text-lg">chevron_right</span>
+                            </button>
+
+                            <!-- Search Control -->
+                            <div class="flex items-center pl-4 bg-white z-30">
+                                <input id="order-search-input" type="text" 
+                                       class="w-0 overflow-hidden opacity-0 bg-surface-low border border-outline/10 px-0 py-2 text-[11px] font-bold tracking-tight placeholder:text-on-surface-variant/20 focus:outline-none transition-all duration-300"
+                                       placeholder="Tìm kiếm theo mã, tên...">
+                                <button id="order-search-btn" class="p-4 hover:text-primary transition-colors">
+                                    <span class="material-symbols-outlined text-xl">search</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Simulated Loading Area -->
+                        <div id="order-loading" class="hidden flex items-center justify-center min-h-[400px]">
+                            <div class="flex gap-2">
+                                <div id="order-dot-1" class="w-2.5 h-2.5 bg-black rounded-full animate-bounce [animation-delay:-0.3s] transition-all duration-300"></div>
+                                <div id="order-dot-2" class="w-2.5 h-2.5 bg-black rounded-full animate-bounce [animation-delay:-0.15s] transition-all duration-300"></div>
+                                <div id="order-dot-3" class="w-2.5 h-2.5 bg-black rounded-full animate-bounce transition-all duration-300"></div>
+                            </div>
+                        </div>
+
+                        <!-- Order Content (with animation trigger) -->
+                        <div id="order-tab-content-area" class="bg-white p-20 shadow-sm border border-outline/5 flex flex-col items-center justify-center min-h-[400px] animate-in fade-in duration-300">
+                            <div class="mb-6 opacity-20 scale-150">
+                                <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M30 20H70V80H30V20Z" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M40 35H60" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M40 45H60" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M40 55H50" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    <circle cx="65" cy="70" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M65 65V70L68 73" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <p class="text-[11px] font-bold text-on-surface-variant/40 tracking-wide text-center">It is empty here :-(</p>
+                        </div>
+
+
+                    </div>
+
+                    <!-- Tab: My Favorites (Detailed) -->
+                    <div id="tab-favorites" class="tab-content hidden space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                    <!-- Top Header -->
+                                    <div class="flex flex-col items-center justify-center py-8">
+                                        <h2 class="text-3xl font-black tracking-tighter uppercase">My Wishlist</h2>
+                                        <div class="h-1 w-12 bg-secondary mt-2"></div>
+                                    </div>
+
+                                    <!-- Minimalist Filter Bar -->
+                                    <div class="bg-surface-low/50 p-4 flex items-center justify-center gap-4">
+                                        <!-- Category Dropdown -->
+                                        <div class="relative group">
+                                            <button class="bg-white border border-outline/10 px-4 py-2 flex items-center gap-4 text-[11px] font-bold tracking-tight hover:border-primary transition-all">
+                                                <span id="wishlist-category-label">Category</span>
+                                                <span class="material-symbols-outlined text-sm">expand_more</span>
+                                            </button>
+                                            <!-- Dropdown Content -->
+                                            <div class="absolute left-0 top-full w-48 pt-2 z-50 hidden group-hover:block animate-in fade-in slide-in-from-top-2 duration-200">
+                                                <div class="bg-white shadow-xl border border-outline/5 p-2 space-y-1">
+                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold tracking-tight hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
+                                                            data-filter-type="category" data-filter-value="all">
+                                                        <span class="w-2.5 h-2.5 rounded-full border-2 border-outline/20 group-hover/opt:border-secondary transition-colors"></span>
+                                                        All Categories
+                                                    </button>
+                                                    <th:block th:each="cat : ${wishlistCategories}">
+                                                        <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold tracking-tight hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
+                                                                data-filter-type="category" th:data-filter-value="${cat}">
+                                                            <span class="w-2.5 h-2.5 rounded-full border-2 border-outline/20 group-hover/opt:border-secondary transition-colors"></span>
+                                                            <span th:text="${cat}">Category Name</span>
+                                                        </button>
+                                                    </th:block>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Status Dropdown -->
+                                        <div class="relative group">
+                                            <button class="bg-white border border-outline/10 px-4 py-2 flex items-center gap-4 text-[11px] font-bold tracking-tight hover:border-primary transition-all">
+                                                <span id="wishlist-status-label">Status</span>
+                                                <span class="material-symbols-outlined text-sm">expand_more</span>
+                                            </button>
+                                            <!-- Dropdown Content -->
+                                            <div class="absolute left-0 top-full w-48 pt-2 z-50 hidden group-hover:block animate-in fade-in slide-in-from-top-2 duration-200">
+                                                <div class="bg-white shadow-xl border border-outline/5 p-2 space-y-1">
+                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold tracking-tight hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
+                                                            data-filter-type="status" data-filter-value="all">
+                                                        <span class="w-3 h-3 rounded-full border-2 border-outline/20 group-hover/opt:border-secondary transition-colors"></span>
+                                                        All Status
+                                                    </button>
+                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold tracking-tight hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
+                                                            data-filter-type="status" data-filter-value="in-stock">
+                                                        <span class="w-3 h-3 rounded-full border-2 border-outline/20 group-hover/opt:border-secondary transition-colors"></span>
+                                                        In Stock
+                                                    </button>
+                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold tracking-tight hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
+                                                            data-filter-type="status" data-filter-value="out-of-stock">
+                                                        <span class="w-3 h-3 rounded-full border-2 border-outline/20 group-hover/opt:border-secondary transition-colors"></span>
+                                                        Out of Stock
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Wishlist Loading Area -->
+                                    <div id="wishlist-loading" class="hidden flex items-center justify-center min-h-[400px]">
+                                        <div class="flex gap-2">
+                                            <div id="wishlist-dot-1" class="w-2.5 h-2.5 bg-black rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                            <div id="wishlist-dot-2" class="w-2.5 h-2.5 bg-black rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                            <div id="wishlist-dot-3" class="w-2.5 h-2.5 bg-black rounded-full animate-bounce"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Empty State Illustration -->
+                                    <div id="wishlist-empty-state" class="bg-white p-20 shadow-sm border border-outline/5 flex flex-col items-center justify-center min-h-[400px] hidden">
+                                        <div class="mb-6 opacity-20 scale-150">
+                                            <span class="material-symbols-outlined text-6xl text-secondary">favorite</span>
+                                        </div>
+                                        <p class="text-[11px] font-bold text-on-surface-variant/40 tracking-wide text-center">It is empty here :-(</p>
+                                    </div>
+
+                                    <!-- Wishlist Content Area -->
+                                    <div id="wishlist-content-area" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-in fade-in duration-500">
+                                        <!-- JS will populate this dynamically -->
+                                    </div>
+                                </div>
+
+                                <!-- Tab: Review History -->
+                                <div id="tab-review-history" class="tab-content hidden space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                    <div class="flex flex-col items-center justify-center py-8">
+                                        <h2 class="text-3xl font-black tracking-tighter uppercase">Review History</h2>
+                                        <div class="h-1 w-12 bg-secondary mt-2"></div>
+                                        <p class="text-[10px] font-bold text-gray-400 tracking-wide mt-4">Tất cả đánh giá của bạn về sản phẩm H&Y</p>
+                                    </div>
+                                    <div id="review-history-container" class="space-y-6 min-h-[400px]">
+                                        <div class="flex items-center justify-center py-20">
+                                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+                                        </div>
+                                    </div>
+                                    <div id="review-history-pagination" class="flex justify-center gap-2 pt-8"></div>
+                                </div>
+
+                                <!-- Tab: Recently Viewed -->
+                                <div id="tab-recently-viewed" class="tab-content hidden space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                    <!-- Top Header -->
+                                    <div class="flex flex-col items-center justify-center py-8">
+                                        <h2 class="text-3xl font-black tracking-tighter uppercase">Recently Viewed</h2>
+                                        <div class="h-1 w-12 bg-secondary mt-2"></div>
+                                    </div>
+
+                                    <!-- Action Bar (Improved) -->
+                                    <div th:if="${!#lists.isEmpty(recentlyViewed)}" class="flex items-center justify-between px-4 py-2 bg-surface-low/50 sticky top-0 z-20">
+                                        <div id="selection-controls" class="hidden flex items-center gap-4 animate-in fade-in slide-in-from-left-4">
+                                            <label class="flex items-center gap-2 cursor-pointer group">
+                                                <input type="checkbox" id="select-all-recently-viewed" onchange="PersonalCenter.toggleSelectAllRecentlyViewed(this.checked)" class="w-4 h-4 rounded border-outline/20 text-secondary focus:ring-secondary">
+                                                <span class="text-[11px] font-bold tracking-tight group-hover:text-primary transition-colors">Select all</span>
+                                            </label>
+                                            <button id="delete-selected-btn" onclick="PersonalCenter.deleteSelectedRecentlyViewed()" 
+                                                    class="bg-red-500 text-white px-4 py-1.5 text-[11px] font-bold tracking-tight hover:bg-red-600 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                                Delete selected (0)
+                                            </button>
+                                        </div>
+                                        <button id="toggle-select-mode-btn" onclick="PersonalCenter.toggleRecentlyViewedSelectionMode()" 
+                                                class="ml-auto text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-[18px]" id="select-btn-icon">rule</span>
+                                            <span id="select-btn-text">Select</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Empty State Illustration (Matches Provided Design) -->
+                                    <div th:if="${#lists.isEmpty(recentlyViewed)}" class="py-24 flex flex-col items-center justify-center min-h-[450px]">
+                                        <!-- Illustration Icon -->
+                                        <div class="mb-8 opacity-20 relative">
+                                            <span class="material-symbols-outlined text-[80px] font-light">history_edu</span>
+                                            <div class="absolute -bottom-2 -right-2 bg-white rounded-full p-1">
+                                                <span class="material-symbols-outlined text-2xl font-light">schedule</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Message -->
+                                        <p class="text-sm font-medium text-on-surface-variant/40 mb-10 tracking-wide text-center">
+                                            You have not viewed anything.
+                                        </p>
+                                        
+                                        <!-- Action Button -->
+                                        <a href="/category" 
+                                           class="inline-flex items-center justify-center bg-black text-white px-12 py-4 text-[13px] font-bold tracking-[0.1em] hover:bg-neutral-800 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95">
+                                            Go Shopping
+                                        </a>
+                                    </div>
+
+                                    <!-- Product Grid -->
+                                    <div th:if="${!#lists.isEmpty(recentlyViewed)}" id="recently-viewed-grid" class="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10">
+                                        <div th:each="item : ${recentlyViewed}" class="recently-viewed-item group cursor-pointer relative" th:data-product-id="${item.id}">
+                                            
+                                            <!-- Checkbox Overlay -->
+                                            <div class="selection-overlay absolute top-2 left-2 z-10 opacity-0 pointer-events-none transition-all duration-300">
+                                                <input type="checkbox" class="item-checkbox w-5 h-5 border-2 border-white/50 bg-black/20 text-secondary focus:ring-secondary cursor-pointer" 
+                                                       th:onchange="'PersonalCenter.onRecentlyViewedSelectionChange(' + ${item.id} + ')'" onclick="event.stopPropagation()">
+                                            </div>
+
+                                            <!-- Image Section -->
+                                            <div class="relative aspect-[3/4] overflow-hidden bg-surface-low mb-3" onclick="if(PersonalCenter.recentlyViewedSelectionMode) { this.parentElement.querySelector('.item-checkbox').click(); } else { window.location.href='/product/' + this.parentElement.dataset.productId; }">
+                                                <img th:src="${item.imageUrl}" th:alt="${item.productName}" 
+                                                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                                                
+                                                <!-- Brand Label -->
+                                                <span class="absolute top-4 left-4 text-sm font-medium text-on-surface/40" th:text="${item.brandName}">Dazy</span>
+
+                                                <!-- Discount Badge -->
+                                                <div class="absolute bottom-4 left-4 bg-red-50 text-red-500 px-1.5 py-0.5 text-[10px] font-black">
+                                                    -<span th:text="${item.discountPercent}">0</span>%
+                                                </div>
+                                            </div>
+
+                                            <!-- Info Section -->
+                                            <div class="space-y-1">
+                                                <h3 class="text-[11px] font-medium text-on-surface line-clamp-1 group-hover:text-secondary transition-colors" th:text="${item.productName}">Product Name</h3>
+                                                
+                                                <div class="flex items-end justify-between">
+                                                    <div>
+                                                        <div class="flex items-center gap-2">
+                                                            <span class="text-sm font-black text-secondary" th:text="${#numbers.formatDecimal(item.productPrice, 0, 'COMMA', 0, 'POINT') + 'đ'}">107.100đ</span>
+                                                        </div>
+                                                        <p class="text-[10px] text-on-surface-variant/40">Estimated</p>
+                                                    </div>
+                                                    
+                                                    <!-- Add to Cart Icon -->
+                                                    <button th:data-id="${item.id}"
+                                                            th:data-name="${item.productName}"
+                                                            th:data-price="${item.productPrice}"
+                                                            th:data-image="${item.imageUrl}"
+                                                            onclick="CartUtils.addToCart({ id: this.dataset.id, productId: this.dataset.id, name: this.dataset.name, price: parseFloat(this.dataset.price), image: this.dataset.image, color: 'N/A', size: 'N/A', quantity: 1 }); event.preventDefault();"
+                                                            class="w-8 h-8 rounded-full border border-outline/10 flex items-center justify-center hover:bg-secondary hover:text-white transition-all">
+                                                        <span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Return Request Modal -->
+                    <div id="return-request-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4">
+                        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 bg-backdrop-return" onclick="OrderModule.closeReturnModal()"></div>
+                        <div class="relative bg-white w-full max-w-[500px] max-h-[90vh] flex flex-col shadow-2xl border border-black transform scale-95 opacity-0 transition-all duration-300 bg-modal-return overflow-hidden">
+                            <!-- Modal Header -->
+                            <div class="border-b border-black p-5 flex justify-between items-center bg-gray-50 flex-shrink-0">
+                                <h3 class="text-xs font-black uppercase tracking-[0.2em]">Yêu cầu Trả hàng / Hoàn tiền</h3>
+                                <button onclick="OrderModule.closeReturnModal()" class="material-symbols-outlined text-xl hover:rotate-90 transition-transform">close</button>
+                            </div>
+
+                            <form id="return-request-form" class="p-6 space-y-5 overflow-y-auto flex-1 custom-scrollbar">
+                                <input type="hidden" id="return-order-id">
+                                <input type="hidden" id="return-order-item-id">
+
+                                <!-- Product Preview -->
+                                <div class="flex gap-4 p-3 bg-gray-50 border border-dashed border-gray-200">
+                                    <div class="w-12 h-16 flex-shrink-0 border border-gray-200 bg-white">
+                                        <img id="return-product-img" src="" alt="" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h4 id="return-product-name" class="text-[11px] font-bold truncate mb-1 text-black">Product Name</h4>
+                                        <div class="flex gap-2 text-[10px] font-medium text-gray-400 tracking-wide">
+                                            <span id="return-product-color">Màu: N/A</span>
+                                            <span id="return-product-size">Size: N/A</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Reason Selection -->
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-bold tracking-wide text-gray-400">Lý do trả hàng <span class="text-red-500">*</span></label>
+                                    <div class="relative">
+                                        <select id="return-reason" required class="w-full bg-white border border-black px-4 py-3 text-[11px] font-bold tracking-tight focus:ring-0 outline-none appearance-none cursor-pointer">
+                                            <option value="" disabled selected>Chọn lý do</option>
+                                            <option value="Sản phẩm lỗi/hỏng">Sản phẩm lỗi/hỏng</option>
+                                            <option value="Không đúng mô tả">Sản phẩm không đúng mô tả</option>
+                                            <option value="Giao sai sản phẩm">Giao sai sản phẩm</option>
+                                            <option value="Đổi ý/Không còn nhu cầu">Đổi ý / Không còn nhu cầu</option>
+                                            <option value="Vấn đề kích cỡ (Quá to/nhỏ)">Vấn đề kích cỡ (Quá to/nhỏ)</option>
+                                            <option value="Chất lượng không đạt kỳ vọng">Chất lượng không đạt kỳ vọng</option>
+                                            <option value="Khác">Lý do khác</option>
+                                        </select>
+                                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-sm">expand_more</span>
+                                    </div>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-bold tracking-wide text-gray-400">Mô tả chi tiết</label>
+                                    <textarea id="return-description" rows="4" 
+                                              class="w-full bg-white border border-black p-4 text-[11px] font-bold tracking-tight focus:ring-0 outline-none resize-none placeholder:text-gray-200"
+                                              placeholder="Vui lòng cung cấp thêm thông tin..."></textarea>
+                                    <p class="text-[9px] font-bold text-gray-400 text-right tracking-tight">Tối đa 1000 ký tự</p>
+                                </div>
+
+                                <!-- Multiple Images Selection -->
+                                <div class="space-y-3">
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Hình ảnh minh chứng (Tối đa 5)</label>
+                                    
+                                    <input type="file" id="return-image-input" multiple accept="image/*" class="hidden" onchange="OrderModule.handleReturnImageSelect(event)">
+                                    
+                                    <div class="flex flex-wrap gap-3">
+                                        <!-- Preview Container -->
+                                        <div id="return-image-previews" class="contents">
+                                            <!-- Dynamically populated by JS -->
+                                        </div>
+
+                                        <!-- Add Button -->
+                                        <button type="button" id="add-return-image-btn" onclick="document.getElementById('return-image-input').click()" 
+                                                class="w-[70px] h-[70px] border border-dashed border-black/20 flex flex-col items-center justify-center gap-1 hover:border-black hover:bg-gray-50 transition-all text-gray-300 hover:text-black group">
+                                            <span class="material-symbols-outlined text-xl">add_a_photo</span>
+                                            <span class="text-[7px] font-black uppercase tracking-tighter">Thêm ảnh</span>
+                                        </button>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-[8px] text-gray-400 uppercase font-bold tracking-widest">Định dạng: JPG, PNG • Tối đa 2MB/ảnh</p>
+                                        <p id="return-image-counter" class="text-[8px] text-black font-black uppercase tracking-widest">0/5 Ảnh</p>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex gap-4 pt-2 pb-2">
+                                    <button type="button" onclick="OrderModule.closeReturnModal()" 
+                                            class="flex-1 border border-black px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-black hover:text-white transition-all">
+                                        Hủy
+                                    </button>
+                                    <button type="submit" 
+                                            class="flex-1 bg-black text-white px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-gray-800 transition-all shadow-xl active:scale-95">
+                                        Xác nhận trả hàng
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Modals Section -->
+                    <div id="pc-password-success-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6 pointer-events-none">
+                        <div class="absolute inset-0 bg-white/40 backdrop-blur-md opacity-0 transition-opacity duration-700 bg-backdrop"></div>
+                        <div class="relative bg-white w-full max-w-[320px] p-10 shadow-[0_30px_70px_rgba(0,0,0,0.15)] border border-outline/5 text-center transform scale-90 opacity-0 transition-all duration-500 bg-modal">
+                            <div class="success-checkmark mb-8">
+                                <div class="check-icon">
+                                    <span class="icon-line line-tip"></span>
+                                    <span class="icon-line line-long"></span>
+                                    <div class="icon-circle"></div>
+                                    <div class="icon-fix"></div>
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-black uppercase tracking-tighter mb-2">Password Updated</h3>
+                            <p class="text-[11px] font-bold text-on-surface-variant/60 tracking-tight">Your account is now more secure</p>
+                        </div>
+                    </div>
+
+                    <div id="return-success-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6">
+                        <div class="absolute inset-0 bg-white/60 backdrop-blur-md opacity-0 transition-opacity duration-700 bg-backdrop-success"></div>
+                        <div class="relative bg-white w-full max-w-[360px] p-12 shadow-[0_40px_80px_rgba(0,0,0,0.2)] border border-black text-center transform scale-90 opacity-0 transition-all duration-500 bg-modal-success">
+                            <div class="success-checkmark mb-16">
+                                <div class="check-icon">
+                                    <span class="icon-line line-tip"></span>
+                                    <span class="icon-line line-long"></span>
+                                    <div class="icon-circle"></div>
+                                    <div class="icon-fix"></div>
+                                </div>
+                            </div>
+                            <h3 class="text-sm font-black uppercase tracking-widest mb-6 text-black">Yêu cầu đã gửi thành công</h3>
+                            <p class="text-[10px] font-bold text-gray-500 tracking-wide leading-loose mb-10">Chúng tôi sẽ xem xét nội dung và phản hồi cho bạn trong vòng 24 - 48 giờ làm việc qua email hoặc thông báo này.</p>
+                            <button onclick="OrderModule.closeReturnSuccess()" class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all shadow-lg active:scale-95">Đóng</button>
+                        </div>
+                    </div>
+
+                    <div id="cancel-order-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4">
+                        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 bg-backdrop-cancel" onclick="OrderModule.closeCancelModal()"></div>
+                        <div class="relative bg-white w-full max-w-[450px] shadow-2xl border border-black transform scale-95 opacity-0 transition-all duration-300 bg-modal-cancel overflow-hidden">
+                            <div class="border-b border-black p-5 flex justify-between items-center bg-gray-50">
+                                <h3 class="text-xs font-black uppercase tracking-[0.2em]">Xác nhận hủy đơn hàng</h3>
+                                <button onclick="OrderModule.closeCancelModal()" class="material-symbols-outlined text-xl hover:rotate-90 transition-transform">close</button>
+                            </div>
+                            <div class="p-6 space-y-5">
+                                <p class="text-[11px] font-bold text-gray-500 tracking-tight leading-relaxed">Bạn có chắc chắn muốn hủy đơn hàng <span id="cancel-order-display-id" class="text-black font-black">#ORD-000000</span> không? Hành động này không thể hoàn tác.</p>
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-bold tracking-wide text-gray-400">Lý do hủy đơn <span class="text-red-500">*</span></label>
+                                    <div class="relative">
+                                        <select id="cancel-reason" class="w-full bg-white border border-black px-4 py-3 text-[11px] font-bold tracking-tight focus:ring-0 outline-none appearance-none cursor-pointer">
+                                            <option value="" disabled selected>Chọn lý do hủy</option>
+                                            <option value="Đổi ý / Không còn nhu cầu">Đổi ý / Không còn nhu cầu</option>
+                                            <option value="Cập nhật địa chỉ / SĐT nhận hàng">Cập nhật địa chỉ / SĐT nhận hàng</option>
+                                            <option value="Muốn thay đổi sản phẩm trong đơn">Muốn thay đổi sản phẩm trong đơn</option>
+                                            <option value="Tìm thấy giá rẻ hơn ở nơi khác">Tìm thấy giá rẻ hơn ở nơi khác</option>
+                                            <option value="Phí vận chuyển quá cao">Phí vận chuyển quá cao</option>
+                                            <option value="Thời gian giao hàng quá lâu">Thời gian giao hàng quá lâu</option>
+                                            <option value="Khác">Lý do khác</option>
+                                        </select>
+                                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-sm">expand_more</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-2" id="cancel-custom-reason-container">
+                                    <label class="text-[10px] font-bold tracking-wide text-gray-400">Ghi chú thêm</label>
+                                    <textarea id="cancel-description" rows="3" class="w-full bg-white border border-black p-4 text-[11px] font-bold tracking-tight focus:ring-0 outline-none resize-none placeholder:text-gray-200" placeholder="Nhập lý do chi tiết nếu chọn 'Khác'..."></textarea>
+                                </div>
+                                <div class="flex gap-4 pt-2">
+                                    <button onclick="OrderModule.closeCancelModal()" class="flex-1 border border-black px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-black hover:text-white transition-all">Đóng</button>
+                                    <button onclick="OrderModule.submitCancelOrder()" class="flex-1 bg-red-600 text-white px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-red-700 transition-all shadow-xl active:scale-95">Xác nhận hủy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="repurchase-order-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4">
+                        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 bg-backdrop-repurchase" onclick="OrderModule.closeRepurchaseModal()"></div>
+                        <div class="relative bg-white w-full max-w-[400px] shadow-2xl border border-black transform scale-95 opacity-0 transition-all duration-300 bg-modal-repurchase overflow-hidden">
+                            <div class="p-8 text-center space-y-6">
+                                <div class="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto border border-black"><span class="material-symbols-outlined text-2xl">refresh</span></div>
+                                <div class="space-y-2">
+                                    <h3 class="text-xs font-black uppercase tracking-[0.2em]">Mua lại đơn hàng?</h3>
+                                    <p class="text-[10px] font-bold text-gray-400 tracking-wide leading-loose px-4">Bạn có muốn thêm tất cả sản phẩm trong đơn hàng này vào giỏ hàng để mua lại không?</p>
+                                </div>
+                                <div class="flex gap-3 pt-4">
+                                    <button onclick="OrderModule.closeRepurchaseModal()" class="flex-1 border border-black px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-50 transition-all">Hủy</button>
+                                    <button onclick="OrderModule.submitRepurchaseOrder()" class="flex-1 bg-black text-white px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-800 transition-all shadow-lg active:scale-95">Mua lại</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="cancel-success-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6">
+                        <div class="absolute inset-0 bg-white/60 backdrop-blur-md opacity-0 transition-opacity duration-700 bg-backdrop-cancel-success"></div>
+                        <div class="relative bg-white w-full max-w-[360px] p-12 shadow-[0_40px_80px_rgba(0,0,0,0.2)] border border-black text-center transform scale-90 opacity-0 transition-all duration-500 bg-modal-cancel-success">
+                            <div class="success-checkmark mb-16">
+                                <div class="check-icon">
+                                    <span class="icon-line line-tip"></span>
+                                    <span class="icon-line line-long"></span>
+                                    <div class="icon-circle"></div>
+                                    <div class="icon-fix"></div>
+                                </div>
+                            </div>
+                            <h3 class="text-sm font-black uppercase tracking-tight mb-4 text-red-600">Đã hủy đơn hàng</h3>
+                            <p class="text-[10px] font-bold text-gray-500 tracking-tight leading-loose mb-10">Đơn hàng của bạn đã được hủy thành công. Nếu đã thanh toán, chúng tôi sẽ xử lý hoàn tiền trong thời gian sớm nhất.</p>
+                            <button onclick="OrderModule.closeCancelSuccess()" class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all">Đóng</button>
+                        </div>
+                    </div>
+
+                    <div id="cancel-failed-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6">
+                        <div class="absolute inset-0 bg-white/60 backdrop-blur-md opacity-0 transition-opacity duration-700 bg-backdrop-cancel-failed"></div>
+                        <div class="relative bg-white w-full max-w-[360px] p-12 shadow-[0_40px_80px_rgba(0,0,0,0.2)] border border-black text-center transform scale-90 opacity-0 transition-all duration-500 bg-modal-cancel-failed">
+                            <div class="error-xmark mb-16">
+                                <div class="x-icon"><span class="icon-line line-left"></span><span class="icon-line line-right"></span><div class="icon-circle"></div></div>
+                            </div>
+                            <h3 class="text-sm font-black uppercase tracking-tight mb-4 text-amber-600">Không thể hủy đơn</h3>
+                            <p id="cancel-failed-message" class="text-[10px] font-bold text-gray-500 tracking-tight leading-loose mb-10">Đơn hàng của bạn đã chuyển sang trạng thái xử lý/vận chuyển và không thể tự hủy lúc này.</p>
+                            <button onclick="OrderModule.closeCancelFailed()" class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all">Đã hiểu</button>
+                        </div>
+                    </div>
+
+                    <div id="review-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4">
+                        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 bg-backdrop-review" onclick="OrderModule.closeReviewModal()"></div>
+                        <div class="relative bg-white w-full max-w-[500px] shadow-2xl border border-black transform scale-95 opacity-0 transition-all duration-300 bg-modal-review overflow-hidden">
+                            <div class="border-b border-black p-5 flex justify-between items-center bg-gray-50 text-black">
+                                <h2 class="text-xs font-black uppercase tracking-[0.2em]">Đánh giá sản phẩm</h2>
+                                <button onclick="OrderModule.closeReviewModal()" class="material-symbols-outlined text-xl hover:rotate-90 transition-transform">close</button>
+                            </div>
+                            <div class="p-6 space-y-6">
+                                <div class="flex items-center gap-4 bg-neutral-50 p-4 border border-black/5">
+                                    <div class="w-16 h-20 shrink-0 border border-black/10 bg-white"><img id="review-product-img" src="" class="w-full h-full object-cover"></div>
+                                    <div class="flex-1 min-w-0">
+                                        <h4 id="review-product-name" class="text-[11px] font-bold tracking-tight truncate text-black">Product Name</h4>
+                                        <p id="review-product-info" class="text-[10px] font-medium text-gray-400 tracking-wide mt-1">Màu: Black • Size: L</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-3 text-center">
+                                    <label class="text-[10px] font-bold tracking-wide text-gray-400 block">Chất lượng sản phẩm</label>
+                                    <div class="flex items-center justify-center gap-2" id="star-rating-container">
+                                        <span class="star-btn material-symbols-outlined text-3xl cursor-pointer transition-all hover:scale-125 text-gray-200" data-rating="1">star</span>
+                                        <span class="star-btn material-symbols-outlined text-3xl cursor-pointer transition-all hover:scale-125 text-gray-200" data-rating="2">star</span>
+                                        <span class="star-btn material-symbols-outlined text-3xl cursor-pointer transition-all hover:scale-125 text-gray-200" data-rating="3">star</span>
+                                        <span class="star-btn material-symbols-outlined text-3xl cursor-pointer transition-all hover:scale-125 text-gray-200" data-rating="4">star</span>
+                                        <span class="star-btn material-symbols-outlined text-3xl cursor-pointer transition-all hover:scale-125 text-gray-200" data-rating="5">star</span>
+                                    </div>
+                                    <div id="review-rating-error" class="hidden text-red-500 text-[10px] font-bold tracking-tight animate-bounce">Vui lòng chọn số sao đánh giá!</div>
+                                    <p id="rating-text" class="text-[11px] font-bold tracking-tight text-secondary min-h-[15px]"></p>
+                                    <input type="hidden" id="review-rating-value" value="0">
+                                    <input type="hidden" id="review-product-id" value="">
+                                    <input type="hidden" id="review-order-item-id" value="">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-bold tracking-wide text-gray-400">Chia sẻ cảm nhận của bạn</label>
+                                    <textarea id="review-comment" rows="4" class="w-full bg-white border border-black p-4 text-[11px] font-bold tracking-tight focus:ring-0 outline-none resize-none placeholder:text-gray-200 text-black" placeholder="Bạn thấy sản phẩm như thế nào? Hãy chia sẻ cùng H&Y nhé..."></textarea>
+                                </div>
+                                <div class="flex gap-4 pt-2">
+                                    <button onclick="OrderModule.closeReviewModal()" class="flex-1 border border-black px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-50 transition-all text-black">Trở lại</button>
+                                    <button onclick="OrderModule.submitReview()" class="flex-1 bg-black text-white px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-800 transition-all shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">Gửi đánh giá</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="review-success-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6">
+                        <div class="absolute inset-0 bg-white/60 backdrop-blur-md opacity-0 transition-opacity duration-700 bg-backdrop-review-success"></div>
+                        <div class="relative bg-white w-full max-w-[360px] p-12 shadow-[0_40px_80px_rgba(0,0,0,0.2)] border border-black text-center transform scale-90 opacity-0 transition-all duration-500 bg-modal-review-success">
+                            <div class="success-checkmark mb-16">
+                                <div class="check-icon">
+                                    <span class="icon-line line-tip"></span>
+                                    <span class="icon-line line-long"></span>
+                                    <div class="icon-circle"></div>
+                                    <div class="icon-fix"></div>
+                                </div>
+                            </div>
+                            <h3 class="text-sm font-black uppercase tracking-tight mb-4 text-secondary">Đã gửi đánh giá</h3>
+                            <p class="text-[10px] font-bold text-gray-400 tracking-tight leading-loose mb-10">H&Y xin chân thành cảm ơn feedback của bạn. Mong rằng bạn sẽ có những trải nghiệm tuyệt vời cùng sản phẩm!</p>
+                            <button onclick="OrderModule.closeReviewSuccess()" class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all">Đóng</button>
+                        </div>
+                    </div>
+
+                    <style>
+                        .success-checkmark, .error-xmark { width: 80px; height: 100px; margin: 0 auto; position: relative; }
+                        .check-icon { width: 80px; height: 80px; position: relative; border-radius: 50%; box-sizing: content-box; border: 4px solid #58b76c; }
+                        .check-icon::before { top: 3px; left: -2px; width: 30px; transform-origin: 100% 50%; border-radius: 100px 0 0 100px; }
+                        .check-icon::after { top: 0; left: 30px; width: 60px; transform-origin: 0 50%; border-radius: 0 100px 100px 0; animation: rotate-circle 4.25s ease-in; }
+                        .check-icon::before, .check-icon::after { content: ''; height: 100px; position: absolute; background: #FFFFFF; transform: rotate(-45deg); }
+                        .icon-line { height: 5px; background-color: #58b76c; display: block; border-radius: 2px; position: absolute; z-index: 10; }
+                        .icon-line.line-tip { top: 46px; left: 14px; width: 25px; transform: rotate(45deg); animation: icon-line-tip 0.75s; }
+                        .icon-line.line-long { top: 38px; right: 8px; width: 47px; transform: rotate(-45deg); animation: icon-line-long 0.75s; }
+                        .icon-circle { top: -4px; left: -4px; z-index: 10; width: 80px; height: 80px; border-radius: 50%; position: absolute; box-sizing: content-box; border: 4px solid rgba(88, 183, 108, .5); }
+                        .icon-fix { top: 8px; width: 5px; left: 28px; z-index: 1; height: 85px; position: absolute; transform: rotate(-45deg); background-color: #FFFFFF; }
+                        .x-icon { width: 80px; height: 80px; position: relative; border-radius: 50%; box-sizing: content-box; border: 4px solid #f27474; }
+                        .x-icon .icon-line { background-color: #f27474; top: 37px; width: 47px; }
+                        .x-icon .icon-line.line-left { left: 17px; transform: rotate(45deg); animation: icon-line-left 0.75s; }
+                        .x-icon .icon-line.line-right { right: 17px; transform: rotate(-45deg); animation: icon-line-right 0.75s; }
+                        .error-xmark .icon-circle { border: 4px solid rgba(242, 116, 116, .5); }
+                        @keyframes rotate-circle { 0% { transform: rotate(-45deg); } 5% { transform: rotate(-45deg); } 12% { transform: rotate(-405deg); } 100% { transform: rotate(-405deg); } }
+                        @keyframes icon-line-tip { 0% { width: 0; left: 1px; top: 19px; } 54% { width: 0; left: 1px; top: 19px; } 70% { width: 50px; left: -8px; top: 37px; } 84% { width: 17px; left: 21px; top: 48px; } 100% { width: 25px; left: 14px; top: 46px; } }
+                        @keyframes icon-line-long { 0% { width: 0; right: 46px; top: 54px; } 65% { width: 0; right: 46px; top: 54px; } 84% { width: 55px; right: 0px; top: 35px; } 100% { width: 47px; right: 8px; top: 38px; } }
+                        @keyframes icon-line-left { 0% { width: 0; left: 40px; top: 37px; } 100% { width: 47px; left: 17px; top: 37px; } }
+                        @keyframes icon-line-right { 0% { width: 0; right: 40px; top: 37px; } 100% { width: 47px; right: 17px; top: 37px; } }
+                        .bg-backdrop.show { opacity: 1; }
+                        .bg-modal.show { opacity: 1; transform: scale(1); }
+                    </style>
+                </div> <!-- Close grid -->
+            </div> <!-- Close max-width -->
+        </div> <!-- Close content fragment -->
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/pages/personal-center.js}"></script>
+        <script th:src="@{/js/pages/personal/profile.js}"></script>
+        <script th:src="@{/js/pages/personal/orders.js}"></script>
+        <script th:src="@{/js/pages/personal/wishlist.js}"></script>
+        <script th:src="@{/js/pages/personal/recently-viewed.js}"></script>
+        <script th:src="@{/js/pages/personal/manage.js}"></script>
+        <script src="/js/pages/personal/coupons.js"></script>
+    </th:block>
+</body>
+</html>

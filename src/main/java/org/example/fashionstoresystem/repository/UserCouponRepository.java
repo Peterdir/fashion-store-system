@@ -15,6 +15,8 @@ public interface UserCouponRepository extends JpaRepository<UserCoupon, Long> {
     // Check xem khách đã nhặt mã này vào ví chưa (ngăn thu thập 1 mã 2 lần)
     boolean existsByUserIdAndCouponId(Long userId, Long couponId);
     
+    Optional<UserCoupon> findByUserIdAndCouponId(Long userId, Long couponId);
+
     // Rút thẻ giảm giá ra để đánh dấu thành "Đã sử dụng" khi chốt đơn
     Optional<UserCoupon> findByUserIdAndCouponCode(Long userId, String code);
 }
