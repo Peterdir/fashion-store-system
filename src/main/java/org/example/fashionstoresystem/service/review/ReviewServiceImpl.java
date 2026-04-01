@@ -74,6 +74,16 @@ public class ReviewServiceImpl implements ReviewService {
                 orderItemRepository.save(item);
                 review.setOrderItem(item);
             });
+        } else {
+            // Fallback: Tìm OrderItem chưa đánh giá gần nhất của user cho sản phẩm này
+            orderItemRepository
+                    .findFirstByOrderUserIdAndProductVariantProductIdAndIsReviewedFalseOrderByOrderOrderDateDesc(
+                            userId, dto.getProductId()
+                    ).ifPresent(item -> {
+                        item.setReviewed(true);
+                        orderItemRepository.save(item);
+                        review.setOrderItem(item);
+                    });
         }
 
         reviewRepository.save(review);
@@ -84,16 +94,19 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ReviewResponseDTO> getReviewsByProduct(Long productId, Pageable pageable) {
         return reviewRepository.findByProductId(productId, pageable).map(this::mapToDTO);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ReviewResponseDTO> getReviewsByUser(Long userId, Pageable pageable) {
         return reviewRepository.findByUserId(userId, pageable).map(this::mapToDTO);
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Page<ReviewResponseDTO> getAllReviews(Pageable pageable) {
         return reviewRepository.findAll(pageable).map(this::mapToDTO);
     }

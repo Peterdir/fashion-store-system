@@ -16,6 +16,9 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     // Tìm đơn hàng thành công gần nhất của 1 người dùng cho 1 sản phẩm cụ thể (Fallback cho Review)
     Optional<OrderItem> findFirstByOrderUserIdAndProductVariantProductIdOrderByOrderOrderDateDesc(Long userId, Long productId);
 
+    // Tìm OrderItem chưa đánh giá gần nhất của 1 người dùng cho 1 sản phẩm cụ thể
+    Optional<OrderItem> findFirstByOrderUserIdAndProductVariantProductIdAndIsReviewedFalseOrderByOrderOrderDateDesc(Long userId, Long productId);
+
     // Lấy tất cả OrderItem của 1 đơn hàng
     List<OrderItem> findByOrderId(Long orderId);
 

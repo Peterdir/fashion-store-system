@@ -1,5 +1,6 @@
 package org.example.fashionstoresystem.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,5 +32,6 @@ public class OrderItemSummaryDTO {
     private OrderStatus status; // Trạng thái tiến độ duy nhất của Item này
     private RefundStatus refundStatus;
     private String cancellationReason;
+    @JsonProperty("isReviewed")
     private boolean isReviewed;
 }

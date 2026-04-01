@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.example.fashionstoresystem.repository.ProductCleanupRepository;
+import org.example.fashionstoresystem.repository.ReviewRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductCleanupRepository cleanupRepository;
+    private final ReviewRepository reviewRepository;
 
     // Helper: Lấy tên danh mục an toàn (null-safe)
     private String getCategoryName(Product product) {
@@ -89,9 +91,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductDetailResponseDTO getProductDetail(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại hoặc đã bị ngừng kinh doanh!"));
+
+        Double avgRating = reviewRepository.getAverageRatingByProductId(productId);
+        long reviewCount = reviewRepository.countByProductId(productId);
 
         // Map chi tiết Entity (gồm cả các list phụ) sang DTO
         return ProductDetailResponseDTO.builder()
@@ -103,6 +109,8 @@ public class ProductServiceImpl implements ProductService {
                 .categoryName(getCategoryName(product))
                 .description(product.getDescription())
                 .status(product.getStatus())
+                .averageRating(avgRating != null ? avgRating : 0.0)
+                .reviewCount(reviewCount)
                 .mainImage(formatImageUrl(product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl()))
                 .hoverImage(formatImageUrl(product.getImages().size() > 1 ? product.getImages().get(1).getUrl() : (product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl())))
                 .images(product.getImages().stream()
@@ -127,6 +135,9 @@ public class ProductServiceImpl implements ProductService {
                                 .rating(r.getRating())
                                 .comment(r.getComment())
                                 .reviewerName(r.getUser() != null ? r.getUser().getFullName() : "Anonymous")
+                                .size(r.getOrderItem() != null && r.getOrderItem().getProductVariant() != null ? r.getOrderItem().getProductVariant().getSize() : "N/A")
+                                .color(r.getOrderItem() != null && r.getOrderItem().getProductVariant() != null ? r.getOrderItem().getProductVariant().getColor() : "N/A")
+                                .createdAt(r.getCreatedAt())
                                 .build())
                         .collect(Collectors.toList()))
                 .build();
