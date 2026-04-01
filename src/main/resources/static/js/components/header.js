@@ -7,8 +7,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuTitle = document.getElementById('mega-menu-title');
     const headerElement = document.querySelector('header');
     let closeTimer;
+    let openTimer;
     const productCache = {};
     const subcategoryCache = {};
+
+    // ==================== SMART STICKY HEADER ====================
+    let lastScrollY = window.scrollY;
+    const hideThreshold = 100; // Only hide after scrolling down 100px
+    const scrollTolerance = 10; // Scroll difference before triggering
+
+    window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
+        
+        // Don't do anything if near the very top
+        if (currentScrollY < hideThreshold) {
+            if (headerElement) headerElement.style.transform = 'translateY(0)';
+            return;
+        }
+
+        const diff = currentScrollY - lastScrollY;
+        
+        // If scrolling down significantly -> Hide
+        if (diff > scrollTolerance && currentScrollY > hideThreshold) {
+            if (headerElement) headerElement.style.transform = 'translateY(-100%)';
+            // Also close menu if hiding
+            closeMenu();
+        } 
+        // If scrolling up significantly -> Show
+        else if (diff < -scrollTolerance) {
+            if (headerElement) headerElement.style.transform = 'translateY(0)';
+        }
+
+        lastScrollY = currentScrollY;
+    }, { passive: true });
 
     // ==================== SCROLL LOGIC ====================
     const updateArrows = () => {
@@ -187,36 +218,53 @@ document.addEventListener('DOMContentLoaded', () => {
     // Top Nav Triggers
     document.querySelectorAll('.mega-trigger').forEach(link => {
         link.addEventListener('mouseenter', () => {
+            if (closeTimer) clearTimeout(closeTimer);
+            if (openTimer) clearTimeout(openTimer);
+
             const id = link.getAttribute('data-id');
             const name = link.getAttribute('data-name') || link.textContent.trim();
-            
-            openMenu();
-            
-            if (name !== 'Categories') {
-                // Đồng bộ sidebar active state
-                document.querySelectorAll('.mega-menu-item').forEach(btn => {
-                    const btnName = btn.getAttribute('data-name');
-                    if (btnName === name) {
-                        btn.classList.add('active', 'bg-white', 'border-l-4', 'border-secondary');
-                    } else {
-                        btn.classList.remove('active', 'bg-white', 'border-l-4', 'border-secondary');
-                    }
-                });
+
+            openTimer = setTimeout(() => {
+                openMenu();
                 
-                fetchCategoryData(id, name);
-            }
+                if (name !== 'Categories') {
+                    // Đồng bộ sidebar active state
+                    document.querySelectorAll('.mega-menu-item').forEach(btn => {
+                        const btnName = btn.getAttribute('data-name');
+                        if (btnName === name) {
+                            btn.classList.add('active', 'bg-white', 'border-l-4', 'border-secondary');
+                        } else {
+                            btn.classList.remove('active', 'bg-white', 'border-l-4', 'border-secondary');
+                        }
+                    });
+                    
+                    fetchCategoryData(id, name);
+                }
+            }, 0); // instant response
+        });
+
+        link.addEventListener('mouseleave', () => {
+            if (openTimer) clearTimeout(openTimer);
         });
     });
 
     // Sidebar items
     document.querySelectorAll('.mega-menu-item').forEach(item => {
         item.addEventListener('mouseenter', () => {
-            document.querySelectorAll('.mega-menu-item').forEach(i => i.classList.remove('active', 'bg-white', 'border-l-4', 'border-secondary'));
-            item.classList.add('active', 'bg-white', 'border-l-4', 'border-secondary');
+            if (openTimer) clearTimeout(openTimer);
             
-            const id = item.getAttribute('data-id');
-            const name = item.getAttribute('data-name');
-            fetchCategoryData(id, name);
+            openTimer = setTimeout(() => {
+                document.querySelectorAll('.mega-menu-item').forEach(i => i.classList.remove('active', 'bg-white', 'border-l-4', 'border-secondary'));
+                item.classList.add('active', 'bg-white', 'border-l-4', 'border-secondary');
+                
+                const id = item.getAttribute('data-id');
+                const name = item.getAttribute('data-name');
+                fetchCategoryData(id, name);
+            }, 0); // instant sidebar switching
+        });
+        
+        item.addEventListener('mouseleave', () => {
+            if (openTimer) clearTimeout(openTimer);
         });
     });
 
@@ -226,6 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const openMenu = () => {
         if (closeTimer) clearTimeout(closeTimer);
+        if (openTimer) clearTimeout(openTimer);
         if (megaMenu) {
             megaMenu.classList.remove('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
         }
@@ -236,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (megaMenu) {
                 megaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2', 'pointer-events-none');
             }
-        }, 100); // Small delay for better UX
+        }, 0); // Instant close
     };
 
     // Global Header leave -> Close all
@@ -246,7 +295,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Hover Nav Bar triggers or keep open
     if (navBottomBar) {
-        navBottomBar.addEventListener('mouseenter', openMenu);
         navBottomBar.addEventListener('mouseleave', (e) => {
             // Only close if NOT moving into the Mega Menu
             if (megaMenu && !megaMenu.contains(e.relatedTarget)) {

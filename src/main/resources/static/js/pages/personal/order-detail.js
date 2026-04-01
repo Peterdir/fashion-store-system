@@ -202,10 +202,10 @@ class OrderDetailManager {
     generateTrackingTimelineHTML(status, orderDate) {
         if (!status || !orderDate) return '';
         const flowSteps = [
-            { key: 'PENDING', label: 'Xác nhận', icon: 'receipt_long' },
+            { key: 'PENDING', label: 'Chờ xác nhận', icon: 'receipt_long' },
             { key: 'PAID', label: 'Thanh toán', icon: 'payments' },
-            { key: 'PROCESSING', label: 'Xuất kho', icon: 'inventory_2' },
-            { key: 'SHIPPING', label: 'Vận chuyển', icon: 'local_shipping' },
+            { key: 'PROCESSING', label: 'Chuẩn bị hàng', icon: 'inventory_2' },
+            { key: 'SHIPPING', label: 'Đang giao', icon: 'local_shipping' },
             { key: 'DELIVERED', label: 'Hoàn tất', icon: 'check_circle' }
         ];
 
@@ -308,9 +308,9 @@ class OrderDetailManager {
             'PENDING_PAYMENT': { label: 'Chờ thanh toán', color: 'bg-orange-50 text-orange-700 border-orange-100' },
             'PAID': { label: 'Đã thanh toán', color: 'bg-green-50 text-green-700 border-green-100' },
             'PROCESSING': { label: 'Đang chuẩn bị', color: 'bg-blue-50 text-blue-700 border-blue-100' },
-            'SHIPPING': { label: 'Đang vận chuyển', color: 'bg-indigo-50 text-indigo-700 border-indigo-100' },
-            'DELIVERED': { label: 'Đã giao hàng', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
-            'COMPLETED': { label: 'Hoàn thành', color: 'bg-gray-50 text-gray-700 border-gray-100' },
+            'SHIPPING': { label: 'Đang giao', color: 'bg-indigo-50 text-indigo-700 border-indigo-100' },
+            'DELIVERED': { label: 'Đã giao', color: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
+            'COMPLETED': { label: 'Hoàn tất', color: 'bg-gray-50 text-gray-700 border-gray-100' },
             'CANCELLED': { label: 'Đã hủy', color: 'bg-red-50 text-red-700 border-red-100' },
             'PAYMENT_FAILED': { label: 'Thanh toán lỗi', color: 'bg-red-50 text-red-700 border-red-100' }
         };

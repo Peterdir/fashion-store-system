@@ -31,4 +31,5 @@ public class OrderItemSummaryDTO {
     private OrderStatus status; // Trạng thái tiến độ duy nhất của Item này
     private RefundStatus refundStatus;
     private String cancellationReason;
+    private boolean isReviewed;
 }

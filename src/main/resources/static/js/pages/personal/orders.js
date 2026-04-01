@@ -15,6 +15,7 @@ const OrderModule = {
         console.log('--- OrderModule Initializing ---');
         this.setupListeners();
         this.setupReturnFormListener();
+        this.setupSearchAndScrollListeners();
     },
 
     /**
@@ -57,6 +58,137 @@ const OrderModule = {
                 this.loadOrders(status);
             });
         });
+
+        // Review History tab listener
+        const reviewHistoryLink = document.querySelector('.tab-link[data-tab="review-history"]');
+        if (reviewHistoryLink) {
+            reviewHistoryLink.addEventListener('click', () => {
+                this.loadReviewHistory();
+            });
+        }
+
+        this.setupStarListeners();
+    },
+
+    /**
+     * Search and Scroll Listeners
+     */
+    setupSearchAndScrollListeners() {
+        const searchBtn = document.getElementById('order-search-btn');
+        const searchInput = document.getElementById('order-search-input');
+        const scrollLeft = document.getElementById('order-tab-scroll-left');
+        const scrollRight = document.getElementById('order-tab-scroll-right');
+        const container = document.getElementById('order-subtabs-container');
+
+        if (searchBtn && searchInput) {
+            searchBtn.addEventListener('click', () => this.toggleSearch());
+            searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
+        }
+
+        if (scrollLeft && scrollRight && container) {
+            scrollLeft.addEventListener('click', () => this.scrollTabs('left'));
+            scrollRight.addEventListener('click', () => this.scrollTabs('right'));
+
+            // Show/hide arrows based on scroll position
+            container.addEventListener('scroll', () => {
+                scrollLeft.classList.toggle('hidden', container.scrollLeft <= 5);
+                scrollRight.classList.toggle('hidden', 
+                    container.scrollLeft + container.clientWidth >= container.scrollWidth - 5);
+            });
+
+            // Initial check
+            setTimeout(() => {
+                scrollRight.classList.toggle('hidden', 
+                    container.scrollLeft + container.clientWidth >= container.scrollWidth - 5);
+            }, 500);
+        }
+    },
+
+    toggleSearch() {
+        const input = document.getElementById('order-search-input');
+        const isHidden = input.classList.contains('w-0');
+        
+        if (isHidden) {
+            input.classList.remove('w-0', 'opacity-0', 'px-0');
+            input.classList.add('w-48', 'md:w-72', 'opacity-100', 'px-3');
+            input.focus();
+        } else {
+            input.classList.add('w-0', 'opacity-0', 'px-0');
+            input.classList.remove('w-48', 'md:w-72', 'opacity-100', 'px-3');
+            if (input.value) {
+                input.value = '';
+                this.handleSearch('');
+            }
+        }
+    },
+
+    handleSearch(keyword) {
+        if (!this.allCurrentOrdersData) return;
+        
+        const term = keyword.toLowerCase().trim();
+        if (!term) {
+            this.renderOrders(this.allCurrentOrdersData, this.isItemCard);
+            return;
+        }
+
+        const filtered = this.allCurrentOrdersData.content.filter(item => {
+            // Check order ID
+            const orderIdMatch = (item.id || item.orderId || '').toString().toLowerCase().includes(term);
+            // Check code
+            const codeMatch = (item.code || '').toLowerCase().includes(term);
+            // Check product name (if item card)
+            const productNameMatch = (item.productName || '').toLowerCase().includes(term);
+            // Check all items in order (if order card)
+            let itemsMatch = false;
+            if (item.items) {
+                itemsMatch = item.items.some(i => (i.productName || '').toLowerCase().includes(term));
+            }
+
+            return orderIdMatch || codeMatch || productNameMatch || itemsMatch;
+        });
+
+        // Create a fake page data for rendering
+        const filteredData = {
+            ...this.allCurrentOrdersData,
+            content: filtered,
+            totalElements: filtered.length,
+            numberOfElements: filtered.length,
+            // Keep original pagination but it might be confusing, usually search resets view
+        };
+
+        this.renderOrders(filteredData, this.isItemCard);
+    },
+
+    scrollTabs(direction) {
+        const container = document.getElementById('order-subtabs-container');
+        if (!container) return;
+        
+        // Use a slightly larger scroll amount for better UX
+        const scrollAmount = 300;
+        const targetScroll = container.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount);
+        
+        container.scrollTo({
+            left: targetScroll,
+            behavior: 'smooth'
+        });
+    },
+
+    setupStarListeners() {
+        const stars = document.querySelectorAll('.star-btn');
+        stars.forEach(star => {
+            star.addEventListener('mouseover', () => {
+                const rating = parseInt(star.getAttribute('data-rating'));
+                this.highlightStars(rating);
+            });
+            star.addEventListener('mouseleave', () => {
+                const currentRating = parseInt(document.getElementById('review-rating-value').value);
+                this.highlightStars(currentRating);
+            });
+            star.addEventListener('click', () => {
+                const rating = parseInt(star.getAttribute('data-rating'));
+                this.selectRating(rating);
+            });
+        });
     },
 
     /**
@@ -92,6 +224,10 @@ const OrderModule = {
             if (!response.ok) throw new Error('Failed to fetch orders');
 
             const data = await response.json();
+            
+            // Store for client-side searching
+            this.allCurrentOrdersData = data;
+            this.isItemCard = isItemCard;
 
             // Render the data with the correct card format
             this.renderOrders(data, isItemCard);
@@ -215,24 +351,28 @@ const OrderModule = {
 
         switch (statusEnum) {
             case 'PENDING_PAYMENT':
+                statusString = 'Chờ thanh toán';
+                statusColor = 'text-yellow-700 bg-yellow-50 border-yellow-200'; break;
             case 'PENDING_CONFIRMATION':
-                statusString = 'Đang chờ';
+                statusString = 'Chờ xác nhận';
                 statusColor = 'text-yellow-700 bg-yellow-50 border-yellow-200'; break;
             case 'PAID':
             case 'PROCESSING':
-                statusString = 'Đang xử lý';
+                statusString = 'Đang chuẩn bị';
                 statusColor = 'text-blue-700 bg-blue-50 border-blue-200'; break;
             case 'SHIPPING':
                 statusString = 'Đang giao';
                 statusColor = 'text-indigo-700 bg-indigo-50 border-indigo-200'; break;
             case 'DELIVERED':
+                statusString = 'Đã giao';
+                statusColor = 'text-emerald-700 bg-emerald-50 border-emerald-200'; break;
             case 'COMPLETED':
                 statusString = 'Hoàn tất';
                 statusColor = 'text-green-700 bg-green-50 border-green-200'; break;
             case 'CANCELLED':
             case 'PAYMENT_FAILED':
             case 'PAYMENT_EXPIRED':
-                statusString = 'Hủy/Lỗi';
+                statusString = 'Đã hủy / Lỗi';
                 statusColor = 'text-red-700 bg-red-50 border-red-200'; break;
         }
 
@@ -342,30 +482,56 @@ const OrderModule = {
                     <a href="/personal/order/${item.orderId}?fromStatus=${this.currentStatus}" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase hover:bg-neutral-50 transition-colors">Chi tiết</a>
                     ${payBtn}
                     ${cancelBtn}
-                    ${this.renderItemArchiveAction(item.orderId, statusEnum)}
-                    ${!returnBtn && !cancelBtn && !payBtn && !this.renderItemArchiveAction(item.orderId, statusEnum) ? `<button class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 hover:text-black transition-colors" onclick="window.location.href='/category'">Mua lại</button>` : (returnBtn || '')}
+                    ${this.renderItemArchiveAction(item, statusEnum)}
+                    ${!returnBtn && !cancelBtn && !payBtn && !this.renderItemArchiveAction(item, statusEnum) ? `<button class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 hover:text-black transition-colors" onclick="window.location.href='/category'">Mua lại</button>` : (returnBtn || '')}
                 </div>
             </div>
         `;
     },
-
-    renderItemArchiveAction(orderId, status) {
+    renderItemArchiveAction(item, status) {
+        const orderId = item.orderId;
         if (this.currentStatus === 'deleted') {
             return `
-                <button onclick="OrderModule.restoreOrder(${orderId})" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-black hover:bg-neutral-50 transition-colors">
+                <button onclick="OrderModule.restoreOrder(${orderId})" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-black hover:bg-neutral-50 transition-colors font-black">
                     Khôi phục
                 </button>
             `;
         }
 
+        let buttons = '';
+        if (status === 'PAYMENT_EXPIRED' || status === 'CANCELLED' || status === 'PAYMENT_FAILED') {
+            buttons += `
+                <button onclick="OrderModule.repurchaseOrder(${orderId})" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-secondary hover:bg-neutral-50 transition-colors flex items-center justify-center gap-1">
+                    <span class="material-symbols-outlined text-[13px]">refresh</span> Mua lại
+                </button>
+            `;
+        }
+
+        if (status === 'DELIVERED' || status === 'COMPLETED') {
+            if (item.isReviewed) {
+                buttons += `
+                    <button class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 cursor-default flex items-center justify-center gap-1">
+                        <span class="material-symbols-outlined text-[13px]">verified</span> Đã đánh giá
+                    </button>
+                `;
+            } else {
+                buttons += `
+                    <button onclick="OrderModule.openReviewModal(${item.productId}, ${item.orderItemId}, '${item.productName.replace(/'/g, "\\'")}', '${item.productImage}', '${item.color}', '${item.size}')" 
+                            class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-amber-600 hover:bg-neutral-50 transition-colors flex items-center justify-center gap-1">
+                        <span class="material-symbols-outlined text-[13px]">rate_review</span> Đánh giá
+                    </button>
+                `;
+            }
+        }
+
         if (this.terminalStatuses.includes(status)) {
-            return `
+            buttons += `
                 <button onclick="OrderModule.archiveOrder(${orderId})" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-black hover:bg-neutral-50 transition-colors">
                     Lưu trữ
                 </button>
             `;
         }
-        return '';
+        return buttons;
     },
 
     /**
@@ -721,30 +887,36 @@ const OrderModule = {
             </div>
         `;
     },
-
     renderArchiveAction(orderId, statusSummary) {
-        // If it's a summary card, check if ALL items are in terminal statuses
-        if (statusSummary) {
-            const statuses = Object.keys(statusSummary);
-            const isAllTerminal = statuses.every(s => this.terminalStatuses.includes(s));
-            
-            if (this.currentStatus === 'deleted') {
-                return `
-                    <button onclick="OrderModule.restoreOrder(${orderId})" class="inline-block border border-black text-black px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-neutral-100 transition-all">
-                        KHÔI PHỤC
-                    </button>
-                `;
-            }
+        if (!statusSummary) return '';
+        const statuses = Object.keys(statusSummary);
+        const isAllTerminal = statuses.every(s => this.terminalStatuses.includes(s));
 
-            if (isAllTerminal) {
-                return `
-                    <button onclick="OrderModule.archiveOrder(${orderId})" class="inline-block border border-black text-black px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-neutral-100 transition-all">
-                        LƯU TRỮ
-                    </button>
-                `;
-            }
+        if (this.currentStatus === 'deleted') {
+            return `
+                <button onclick="OrderModule.restoreOrder(${orderId})" class="inline-block border border-black text-black px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-neutral-100 transition-all">
+                    KHÔI PHỤC
+                </button>
+            `;
         }
-        return '';
+
+        let buttons = '';
+        if (statuses.includes('PAYMENT_EXPIRED') || statuses.includes('CANCELLED') || statuses.includes('PAYMENT_FAILED')) {
+            buttons += `
+                <button onclick="OrderModule.repurchaseOrder(${orderId})" class="inline-block border border-secondary text-secondary px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-secondary hover:text-white transition-all">
+                    MUA LẠI
+                </button>
+            `;
+        }
+
+        if (isAllTerminal) {
+            buttons += `
+                <button onclick="OrderModule.archiveOrder(${orderId})" class="inline-block border border-black text-black px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-neutral-100 transition-all">
+                    LƯU TRỮ
+                </button>
+            `;
+        }
+        return buttons;
     },
 
     /**
@@ -755,13 +927,13 @@ const OrderModule = {
             'PENDING_CONFIRMATION': 'Chờ xác nhận',
             'PENDING_PAYMENT': 'Chờ thanh toán',
             'PAID': 'Đã thanh toán',
-            'PROCESSING': 'Đang xử lý',
-            'SHIPPING': 'Đang giao hàng',
+            'PROCESSING': 'Đang chuẩn bị',
+            'SHIPPING': 'Đang giao',
             'DELIVERED': 'Đã giao',
-            'COMPLETED': 'Hoàn thành',
+            'COMPLETED': 'Hoàn tất',
             'CANCELLED': 'Đã hủy',
             'PAYMENT_FAILED': 'Thanh toán lỗi',
-            'PAYMENT_EXPIRED': 'Giao dịch hết hạn'
+            'PAYMENT_EXPIRED': 'Hết hạn'
         };
         return labels[status] || status;
     },
@@ -807,6 +979,175 @@ const OrderModule = {
         setTimeout(() => {
             modal.classList.add('hidden');
         }, 300);
+    },
+
+    /**
+     * Repurchase an order (opens confirmation modal)
+     */
+    async repurchaseOrder(orderId) {
+        this.openRepurchaseModal(orderId);
+    },
+
+    openRepurchaseModal(orderId) {
+        this.selectedOrderIdForRepurchase = orderId;
+        const modal = document.getElementById('repurchase-order-modal');
+        const backdrop = modal.querySelector('.bg-backdrop-repurchase');
+        const content = modal.querySelector('.bg-modal-repurchase');
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            backdrop.classList.add('opacity-100');
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    },
+
+    closeRepurchaseModal() {
+        const modal = document.getElementById('repurchase-order-modal');
+        const backdrop = modal.querySelector('.bg-backdrop-repurchase');
+        const content = modal.querySelector('.bg-modal-repurchase');
+
+        backdrop.classList.remove('opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        content.classList.remove('scale-100', 'opacity-100');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    },
+
+    async submitRepurchaseOrder() {
+        const orderId = this.selectedOrderIdForRepurchase;
+        if (!orderId) return;
+
+        try {
+            const response = await fetch(`/api/orders/${orderId}/repurchase`, {
+                method: 'POST'
+            });
+
+            this.closeRepurchaseModal();
+
+            if (response.ok) {
+                alert('Đã thêm các sản phẩm vào giỏ hàng thành công!');
+                window.location.href = '/cart';
+            } else {
+                const err = await response.json();
+                alert('Lỗi: ' + (err.message || 'Không thể mua lại đơn hàng.'));
+            }
+        } catch (error) {
+            console.error('Repurchase error:', error);
+            this.closeRepurchaseModal();
+            alert('Đã xảy ra lỗi khi kết nối với máy chủ.');
+        }
+    },
+
+    /**
+     * Product Review Modal Management
+     */
+    openReviewModal(productId, orderItemId, productName, productImg, color, size) {
+        // Set info
+        document.getElementById('review-product-id').value = productId;
+        document.getElementById('review-product-img').src = productImg;
+        document.getElementById('review-product-name').textContent = productName;
+        document.getElementById('review-product-info').textContent = `Màu: ${color} • Size: ${size}`;
+        
+        // Reset modal
+        this.selectRating(0);
+        document.getElementById('review-comment').value = '';
+        
+        // Hide error message if any
+        const errorMsg = document.getElementById('review-rating-error');
+        if (errorMsg) errorMsg.classList.add('hidden');
+
+        const modal = document.getElementById('review-modal');
+        const backdrop = modal.querySelector('.bg-backdrop-review');
+        const content = modal.querySelector('.bg-modal-review');
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            backdrop.classList.add('opacity-100');
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    },
+
+    closeReviewModal() {
+        const modal = document.getElementById('review-modal');
+        const backdrop = modal.querySelector('.bg-backdrop-review');
+        const content = modal.querySelector('.bg-modal-review');
+
+        backdrop.classList.remove('opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        content.classList.remove('scale-100', 'opacity-100');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    },
+
+    highlightStars(rating) {
+        const stars = document.querySelectorAll('.star-btn');
+        stars.forEach(star => {
+            const starRating = parseInt(star.getAttribute('data-rating'));
+            if (starRating <= rating) {
+                star.classList.replace('text-gray-200', 'text-amber-400');
+                star.style.fontVariationSettings = "'FILL' 1";
+            } else {
+                star.classList.replace('text-amber-400', 'text-gray-200');
+                star.style.fontVariationSettings = "'FILL' 0";
+            }
+        });
+    },
+
+    selectRating(rating) {
+        document.getElementById('review-rating-value').value = rating;
+        this.highlightStars(rating);
+        
+        // Hide error message when rating is selected
+        const errorMsg = document.getElementById('review-rating-error');
+        if (errorMsg && rating > 0) errorMsg.classList.add('hidden');
+
+        const texts = {
+            0: '',
+            1: 'Tệ',
+            2: 'Không hài lòng',
+            3: 'Bình thường',
+            4: 'Hài lòng',
+            5: 'Tuyệt vời'
+        };
+        document.getElementById('rating-text').textContent = texts[rating];
+    },
+
+    async submitReview() {
+        const productId = document.getElementById('review-product-id').value;
+        const rating = parseInt(document.getElementById('review-rating-value').value);
+        const comment = document.getElementById('review-comment').value;
+
+        if (rating === 0) {
+            const errorMsg = document.getElementById('review-rating-error');
+            if (errorMsg) errorMsg.classList.remove('hidden');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/reviews', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, rating, comment })
+            });
+
+            if (response.ok) {
+                this.closeReviewModal();
+                this.showReviewSuccess();
+                this.loadOrders(this.currentStatus);
+            } else {
+                const err = await response.json();
+                alert('Lỗi: ' + (err.message || 'Không thể gửi đánh giá.'));
+            }
+        } catch (error) {
+            console.error('Submit review error:', error);
+            alert('Lỗi kết nối server.');
+        }
     },
 
     /**
@@ -916,12 +1257,59 @@ const OrderModule = {
         }, 500);
     },
 
+    /**
+     * Open Archive Confirmation Modal
+     */
+    openArchiveModal(orderId) {
+        this.selectedOrderIdForArchive = orderId;
+        const modal = document.getElementById('archive-order-modal');
+        const backdrop = modal.querySelector('.bg-backdrop-archive');
+        const content = modal.querySelector('.bg-modal-archive');
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            backdrop.classList.add('opacity-100');
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    },
+
+    /**
+     * Close Archive Confirmation Modal
+     */
+    closeArchiveModal() {
+        const modal = document.getElementById('archive-order-modal');
+        const backdrop = modal.querySelector('.bg-backdrop-archive');
+        const content = modal.querySelector('.bg-modal-archive');
+
+        backdrop.classList.remove('opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        content.classList.remove('scale-100', 'opacity-100');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    },
+
+    /**
+     * Legacy entry point for Archive, now opens modal
+     */
     async archiveOrder(orderId) {
-        if (!confirm('Bạn có chắc chắn muốn ẩn đơn hàng này khỏi danh sách?')) return;
+        this.openArchiveModal(orderId);
+    },
+
+    /**
+     * Actual API call for archiving
+     */
+    async submitArchiveOrder() {
+        const orderId = this.selectedOrderIdForArchive;
+        if (!orderId) return;
+
         try {
             const response = await fetch(`/api/orders/${orderId}/hide`, { method: 'POST' });
             if (!response.ok) throw new Error('Failed to archive order');
 
+            this.closeArchiveModal();
             // Success: Reload
             this.loadOrders(this.currentStatus);
         } catch (error) {
@@ -941,6 +1329,130 @@ const OrderModule = {
             console.error('Error restoring order:', error);
             alert('Có lỗi xảy ra khi khôi phục đơn hàng: ' + error.message);
         }
+    },
+
+    showReviewSuccess() {
+        const modal = document.getElementById('review-success-modal');
+        const backdrop = modal.querySelector('.bg-backdrop-review-success');
+        const content = modal.querySelector('.bg-modal-review-success');
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            backdrop.classList.add('opacity-100');
+            content.classList.remove('scale-90', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    },
+
+    closeReviewSuccess() {
+        const modal = document.getElementById('review-success-modal');
+        const backdrop = modal.querySelector('.bg-backdrop-review-success');
+        const content = modal.querySelector('.bg-modal-review-success');
+
+        backdrop.classList.remove('opacity-100');
+        content.classList.add('scale-90', 'opacity-0');
+        content.classList.remove('scale-100', 'opacity-100');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            // If we are currently on the review orders tab, reload it
+            if (this.currentStatus === 'review') {
+                this.loadOrders('review');
+            }
+        }, 500);
+    },
+
+    /**
+     * Review History Logic
+     */
+    async loadReviewHistory(page = 0) {
+        const container = document.getElementById('review-history-container');
+        if (!container) return;
+
+        try {
+            const response = await fetch(`/api/reviews/my?page=${page}&size=5&sort=createdAt,desc`);
+            if (response.ok) {
+                const data = await response.json();
+                this.renderReviewHistory(data.content);
+                this.renderReviewHistoryPagination(data);
+            }
+        } catch (error) {
+            console.error('Error loading review history:', error);
+            container.innerHTML = '<p class="text-center py-10 uppercase text-[10px] font-bold text-red-500">Không thể tải lịch sử đánh giá.</p>';
+        }
+    },
+
+    renderReviewHistory(reviews) {
+        const container = document.getElementById('review-history-container');
+        if (!reviews || reviews.length === 0) {
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-20 opacity-30">
+                    <span class="material-symbols-outlined text-6xl mb-4">history_edu</span>
+                    <p class="text-[10px] font-black uppercase tracking-widest">Bạn chưa có đánh giá nào.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = reviews.map(review => `
+            <div class="bg-neutral-50 border border-black/5 p-6 hover:border-black transition-all group">
+                <div class="flex gap-6">
+                    <!-- Product Info -->
+                    <div class="w-20 h-24 shrink-0 bg-white border border-black/10 overflow-hidden">
+                        <img src="${review.productImage || '/images/placeholder.jpg'}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    
+                    <div class="flex-1 space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="text-xs font-black uppercase tracking-tight text-black mb-1">${review.productName}</h4>
+                                <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Ngày đánh giá: ${new Date(review.createdAt).toLocaleDateString('vi-VN')}</p>
+                            </div>
+                            <div class="flex text-secondary gap-0.5">
+                                ${Array(5).fill(0).map((_, i) => `
+                                    <span class="material-symbols-outlined text-lg" 
+                                          style="${i < review.rating ? "font-variation-settings: 'FILL' 1" : ""}">
+                                        ${i < review.rating ? 'star' : 'star_outline'}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 border border-black/5 relative">
+                            <span class="material-symbols-outlined absolute -top-3 -left-1 text-gray-100 text-3xl -z-10">format_quote</span>
+                            <p class="text-[11px] font-bold text-black leading-relaxed uppercase tracking-wide">
+                                ${review.comment || 'Không có bình luận.'}
+                            </p>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <a href="/product-detail/${review.productId}" class="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors flex items-center gap-1">
+                                Xem sản phẩm <span class="material-symbols-outlined text-sm">arrow_right_alt</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    renderReviewHistoryPagination(data) {
+        const container = document.getElementById('review-history-pagination');
+        if (!container || data.totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+
+        let html = '';
+        for (let i = 0; i < data.totalPages; i++) {
+            html += `
+                <button onclick="OrderModule.loadReviewHistory(${i})" 
+                        class="w-8 h-8 flex items-center justify-center text-[10px] font-black border ${i === data.number ? 'bg-black text-white border-black' : 'border-gray-200 hover:border-black'} transition-all">
+                    ${i + 1}
+                </button>
+            `;
+        }
+        container.innerHTML = html;
     }
 };
 

@@ -201,6 +201,9 @@ const PersonalCenter = {
             if (tabId === 'coupons' && window.CouponModule) {
                 window.CouponModule.init();
             }
+            if (tabId === 'review-history' && window.OrderModule) {
+                window.OrderModule.loadReviewHistory();
+            }
             if (tabId === 'orders' && window.OrderModule) {
                 const urlParams = new URLSearchParams(window.location.search);
                 let status = urlParams.get('status') || 'all';

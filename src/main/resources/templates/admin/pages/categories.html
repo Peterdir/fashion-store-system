@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/admin-layout}">
+<head>
+    <title>Quản Lý Danh Mục</title>
+</head>
+<body>
+
+    <div layout:fragment="content">
+
+        <!-- Page Header -->
+        <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-xl font-black tracking-tight text-primary uppercase">Danh Mục</h1>
+                <p class="text-[11px] text-neutral-400 font-medium mt-1">Quản lý cấu trúc danh mục sản phẩm của cửa hàng</p>
+            </div>
+            <button id="btn-add-category" onclick="AdminCategories.openModal()" class="bg-primary text-white px-5 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-800 transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]">add</span> Thêm Danh Mục
+            </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white border border-neutral-100 p-4 mb-5 flex flex-wrap items-end gap-3">
+            <!-- Search -->
+            <div class="space-y-1 flex-1 min-w-[200px]">
+                <label class="text-[9px] font-black uppercase tracking-[0.15em] text-neutral-400">Tìm kiếm</label>
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[16px] text-neutral-300">search</span>
+                    <input type="text" id="filter-keyword" placeholder="Tên danh mục..."
+                           class="w-full pl-9 pr-3 py-2 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary">
+                </div>
+            </div>
+            <!-- Actions -->
+            <div class="flex gap-2">
+                <button id="btn-reset-filter" onclick="AdminCategories.resetFilters()" class="bg-neutral-100 text-neutral-500 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-200 transition-colors">
+                    Xóa bộ lọc
+                </button>
+            </div>
+        </div>
+
+        <!-- Categories Table -->
+        <div class="bg-white border border-neutral-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-neutral-50/80 border-b border-neutral-100">
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">ID</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Tên danh mục</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Danh mục cha</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Số mục con</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categories-table-body" class="divide-y divide-neutral-50">
+                        <!-- JS renders rows here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="categories-empty" class="hidden py-16 text-center">
+                <span class="material-symbols-outlined text-5xl text-neutral-200 mb-3">category</span>
+                <p class="text-[12px] font-bold text-neutral-400">Không tìm thấy danh mục nào</p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="categories-loading" class="py-16 text-center">
+                <span class="material-symbols-outlined text-3xl text-neutral-300 animate-spin">sync</span>
+                <p class="text-[11px] font-medium text-neutral-400 mt-2">Đang tải dữ liệu...</p>
+            </div>
+        </div>
+
+        <!-- ADD / EDIT CATEGORY MODAL -->
+        <div id="category-modal" class="fixed inset-0 z-50 hidden">
+            <!-- Overlay -->
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="AdminCategories.closeModal()"></div>
+            <!-- Modal Content -->
+            <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl overflow-y-auto transform transition-transform duration-300">
+                <!-- Modal Header -->
+                <div class="sticky top-0 z-10 bg-white border-b border-neutral-100 px-6 py-4 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-sm font-black uppercase tracking-[0.1em]" id="modal-title">Thêm Danh Mục Mới</h2>
+                        <p class="text-[10px] text-neutral-400 font-medium mt-0.5" id="modal-subtitle">Điền thông tin danh mục bên dưới</p>
+                    </div>
+                    <button onclick="AdminCategories.closeModal()" class="p-1.5 hover:bg-neutral-100 rounded transition-colors">
+                        <span class="material-symbols-outlined text-neutral-400">close</span>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <form id="category-form" class="p-6 space-y-6">
+                    <input type="hidden" id="form-category-id">
+
+                    <div class="space-y-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Tên danh mục <span class="text-red-500">*</span></label>
+                            <input type="text" id="form-name" required maxlength="255" placeholder="Ví dụ: Áo sơ mi"
+                                   class="w-full px-3 py-2.5 text-[12px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Danh mục cha</label>
+                            <select id="form-parent-id" class="w-full px-3 py-2.5 text-[12px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors">
+                                <option value="">(Không có danh mục cha)</option>
+                                <!-- JS renders options here -->
+                            </select>
+                            <p class="text-[9px] text-neutral-400 mt-1 italic">Để trống nếu đây là danh mục cấp 1</p>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex items-center justify-end gap-3 pt-4 border-t border-neutral-100">
+                        <button type="button" onclick="AdminCategories.closeModal()" class="px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-neutral-500 hover:bg-neutral-100 transition-colors">
+                            Hủy
+                        </button>
+                        <button type="submit" id="btn-submit" class="bg-primary text-white px-6 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-800 transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[14px]">save</span> Lưu Danh Mục
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- DELETE CONFIRM MODAL -->
+        <div id="delete-modal" class="fixed inset-0 z-[60] hidden">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="AdminCategories.closeDeleteModal()"></div>
+            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white shadow-2xl p-6">
+                <div class="text-center">
+                    <div class="w-14 h-14 mx-auto mb-4 bg-red-50 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-3xl text-red-500">delete_forever</span>
+                    </div>
+                    <h3 class="text-sm font-black uppercase tracking-wide mb-1">Xóa danh mục?</h3>
+                    <p class="text-[11px] font-medium text-neutral-400 mb-1" id="delete-category-name"></p>
+                    <p class="text-[10px] text-red-400 font-medium">Lưu ý: Xóa danh mục cha sẽ xóa toàn bộ danh mục con và gỡ danh mục khỏi các sản phẩm liên quan.</p>
+                </div>
+                <div class="flex items-center justify-center gap-3 mt-6">
+                    <button onclick="AdminCategories.closeDeleteModal()" class="px-5 py-2 text-[10px] font-black uppercase tracking-widest text-neutral-500 hover:bg-neutral-100 transition-colors">
+                        Hủy
+                    </button>
+                    <button id="btn-confirm-delete" class="bg-red-600 text-white px-5 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-colors flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[14px]">delete</span> Xác nhận xóa
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div id="admin-toast" class="fixed bottom-6 right-6 z-[100] space-y-2"></div>
+
+        <script th:src="@{/admin/js/categories.js}"></script>
+    </div>
+</body>
+</html>

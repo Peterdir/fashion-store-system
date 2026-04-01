@@ -2,8 +2,10 @@ package org.example.fashionstoresystem.service.order;
 
 import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.repository.UserCouponRepository;
+import org.example.fashionstoresystem.dto.request.AddToCartRequestDTO;
 import org.example.fashionstoresystem.dto.request.CancelOrderRequestDTO;
 import org.example.fashionstoresystem.dto.request.PlaceOrderRequestDTO;
+import org.example.fashionstoresystem.service.cart_item.CartService;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderDetailResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderSummaryResponseDTO;
@@ -29,7 +31,9 @@ import org.example.fashionstoresystem.repository.OrderItemRepository;
 import org.example.fashionstoresystem.repository.OrderRepository;
 import org.example.fashionstoresystem.repository.ProductVariantRepository;
 import org.example.fashionstoresystem.repository.UserRepository;
+import org.example.fashionstoresystem.repository.ReviewRepository;
 import org.example.fashionstoresystem.service.payment.MomoService;
+import org.example.fashionstoresystem.service.notification.NotificationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +60,9 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final UserCouponRepository userCouponRepository;
     private final MomoService momoService;
+    private final NotificationService notificationService;
+    private final CartService cartService;
+    private final ReviewRepository reviewRepository;
 
     // ĐẶT HÀNG
 
@@ -172,7 +179,16 @@ public class OrderServiceImpl implements OrderService {
                 });
         }
 
-        // 8. Trả về kết quả
+        // 9. Gửi thông báo
+        notificationService.createNotification(
+                user,
+                "Đặt hàng thành công",
+                "Đơn hàng #" + order.getId() + " của bạn đã được khởi tạo thành công.",
+                "SUCCESS",
+                order.getId()
+        );
+
+        // 10. Trả về kết quả
         return PlaceOrderResponseDTO.builder()
                 .orderId(order.getId())
                 .totalAmount(order.getTotalAmount())
@@ -286,6 +302,7 @@ public class OrderServiceImpl implements OrderService {
                 .status(item.getStatus())
                 .refundStatus(item.getRefundStatus())
                 .cancellationReason(item.getCancellationReason())
+                .isReviewed(item.getProductVariant() != null && reviewRepository.existsByUserIdAndProductId(userId, item.getProductVariant().getProduct().getId()))
                 .build());
     }
 
@@ -429,6 +446,16 @@ public class OrderServiceImpl implements OrderService {
         }
 
         String message = "Hủy đơn hàng thành công!";
+        
+        // Gửi thông báo hủy đơn
+        notificationService.createNotification(
+                order.getUser(),
+                "Đơn hàng đã được hủy",
+                "Đơn hàng #" + order.getId() + " đã được hủy thành công. Lý do: " + dto.getCancellationReason(),
+                "WARNING",
+                order.getId()
+        );
+
         if (hasRefund && !refundFailed) {
             message += " Yêu cầu hoàn tiền đang được xử lý.";
         } else if (refundFailed) {
@@ -456,5 +483,28 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại!"));
         order.setHiddenByUser(false);
         orderRepository.save(order);
+    }
+    
+    @Override
+    @Transactional
+    public void repurchaseOrder(Long userId, Long orderId) {
+        Order order = orderRepository.findByIdAndUserId(orderId, userId)
+                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại!"));
+
+        for (OrderItem item : order.getOrderItems()) {
+            if (item.getProductVariant() != null) {
+                AddToCartRequestDTO addDto = AddToCartRequestDTO.builder()
+                        .variantId(item.getProductVariant().getId())
+                        .quantity(item.getQuantity().intValue())
+                        .build();
+                try {
+                    // Thử thêm vào giỏ hàng, nếu hết hàng hoặc lỗi thì bỏ qua món đó
+                    cartService.addToCart(userId, addDto);
+                } catch (Exception e) {
+                    // Log cảnh báo nhưng vẫn tiếp tục với các món khác
+                    System.err.println("Không thể mua lại sản phẩm " + item.getProductName() + ": " + e.getMessage());
+                }
+            }
+        }
     }
 }

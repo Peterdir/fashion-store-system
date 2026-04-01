@@ -10,10 +10,10 @@
         <!-- Hero/Breadcrumb Section -->
         <div class="bg-surface-low border-b border-outline/5 py-4">
             <div class="max-w-[1440px] mx-auto px-6 lg:px-12">
-                <div class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60">
+                <div class="flex items-center gap-2 text-[10px] font-bold tracking-widest text-on-surface-variant/60">
                     <a th:href="@{/}" class="hover:text-primary transition-colors">Home</a>
                     <span class="material-symbols-outlined text-[12px]">chevron_right</span>
-                    <span class="text-primary">Personal Center</span>
+                    <span class="text-primary font-bold">Personal Center</span>
                 </div>
             </div>
         </div>
@@ -24,7 +24,7 @@
                 <!-- Left Sidebar Navigation -->
                 <aside class="lg:col-span-3 space-y-8">
                     <div class="bg-white p-6 shadow-sm border border-outline/5">
-                        <button class="tab-link w-full text-left text-xs font-black tracking-[0.2em] uppercase mb-8 pb-4 border-b border-outline/10 text-on-surface-variant hover:text-secondary transition-colors" 
+                        <button class="tab-link w-full text-left text-xs font-black tracking-[0.2em] mb-8 pb-4 border-b border-outline/10 text-on-surface-variant hover:text-secondary transition-colors" 
                                 data-tab="dashboard">
                             Personal Center
                         </button>
@@ -38,9 +38,9 @@
                                     <span id="my-account-arrow" class="material-symbols-outlined text-sm transition-transform">expand_more</span>
                                 </button>
                                 <div id="my-account-sub" class="pl-4 space-y-2 py-2 hidden">
-                                    <button class="tab-link block w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="profile">My Profile</button>
-                                    <button class="tab-link block w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="address">Address Book</button>
-                                    <button class="tab-link block w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="manage">Manage My Account</button>
+                                    <button class="tab-link block w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="profile">My Profile</button>
+                                    <button class="tab-link block w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="address">Address Book</button>
+                                    <button class="tab-link block w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="manage">Manage My Account</button>
                                 </div>
                             </div>
                             
@@ -52,7 +52,7 @@
                                     <span id="my-assets-arrow" class="material-symbols-outlined text-sm transition-transform">expand_more</span>
                                 </button>
                                 <div id="my-assets-sub" class="pl-4 space-y-2 py-2 hidden">
-                                    <button class="tab-link block w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="coupons">My Coupons</button>
+                                    <button class="tab-link block w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="coupons">My Coupons</button>
                                 </div>
                             </div>
                             
@@ -64,29 +64,33 @@
                                     <span id="my-orders-arrow" class="material-symbols-outlined text-sm transition-transform">expand_more</span>
                                 </button>
                                 <div id="my-orders-sub" class="pl-4 space-y-2 py-2 hidden">
-                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="all">
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="all">
                                         <span class="material-symbols-outlined text-base">inventory</span>
                                         All Orders
                                     </button>
-                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="unpaid">
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="unpaid">
                                         <span class="material-symbols-outlined text-base">account_balance_wallet</span>
                                         Unpaid Orders
                                     </button>
-                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="processing">
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="processing">
                                         <span class="material-symbols-outlined text-base">package_2</span>
                                         Processing Orders
                                     </button>
-                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="shipped">
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="shipped">
                                         <span class="material-symbols-outlined text-base">local_shipping</span>
                                         Shipped Orders
                                     </button>
-                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="review">
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="review">
                                         <span class="material-symbols-outlined text-base">rate_review</span>
                                         Review Orders
                                     </button>
-                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="return">
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="orders" data-status="return">
                                         <span class="material-symbols-outlined text-base">assignment_return</span>
                                         Return Orders
+                                    </button>
+                                    <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="review-history">
+                                        <span class="material-symbols-outlined text-base">history_edu</span>
+                                        Review History
                                     </button>
                                 </div>
                             </div>
@@ -100,11 +104,11 @@
                                      <span id="my-favorites-arrow" class="material-symbols-outlined text-sm transition-transform">expand_more</span>
                                  </button>
                                  <div id="my-favorites-sub" class="pl-4 space-y-2 py-2 hidden">
-                                     <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="favorites">
+                                     <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="favorites">
                                          <span class="material-symbols-outlined text-base">favorite</span>
                                          Wish List
                                      </button>
-                                     <button class="tab-link flex items-center gap-3 w-full text-left text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="recently-viewed">
+                                     <button class="tab-link flex items-center gap-3 w-full text-left text-[11px] font-medium tracking-wide text-on-surface-variant hover:text-secondary py-1 transition-colors" data-tab="recently-viewed">
                                          <span class="material-symbols-outlined text-base">schedule</span>
                                          Recently Viewed
                                      </button>
@@ -114,10 +118,10 @@
                             <div class="h-px bg-outline/10 my-4"></div>
                             
                             <!-- Sign Out -->
-                             <a th:href="@{/logout}" class="flex items-center gap-2 py-3 text-[11px] font-black uppercase tracking-[0.15em] text-red-500 hover:text-red-700 transition-colors">
-                                 <span class="material-symbols-outlined text-lg">logout</span>
-                                 Sign Out
-                             </a>
+                              <a th:href="@{/logout}" class="flex items-center gap-2 py-3 text-[11px] font-bold tracking-[0.15em] text-red-500 hover:text-red-700 transition-colors">
+                                  <span class="material-symbols-outlined text-lg">logout</span>
+                                  Sign Out
+                              </a>
                         </nav>
                     </div>
                 </aside>
@@ -308,27 +312,27 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                                 <div class="space-y-6">
                                     <div class="space-y-1">
-                                        <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant/60">Full Name</label>
+                                        <label class="text-[10px] font-bold tracking-wide text-on-surface-variant/60">Full Name</label>
                                         <input id="pc-profile-name-input" type="text" 
                                                class="w-full bg-surface-low border border-outline/10 px-4 py-3 text-sm font-bold tracking-tight focus:border-secondary focus:ring-0 outline-none transition-all"
                                                placeholder="Enter your full name">
                                     </div>
                                     <div class="space-y-1">
-                                        <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant/60">Email Address</label>
+                                        <label class="text-[10px] font-bold tracking-wide text-on-surface-variant/60">Email Address</label>
                                         <p id="pc-profile-email" class="text-sm font-bold opacity-60">Not Set</p>
                                     </div>
                                 </div>
                                 <div class="space-y-6">
                                     <div class="space-y-1">
-                                        <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant/60">Phone Number</label>
+                                        <label class="text-[10px] font-bold tracking-wide text-on-surface-variant/60">Phone Number</label>
                                         <p id="pc-profile-phone" class="text-sm font-bold opacity-60">Not Set</p>
                                     </div>
                                 </div>
                             </div>
                             <div id="pc-save-btn-container" class="mt-12 hidden">
                                 <button id="pc-save-profile-btn" 
-                                        class="bg-secondary text-white px-12 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-90 transition-all shadow-lg hover:shadow-xl active:scale-95 flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-[16px]">save</span> Save Changes
+                                        class="bg-secondary text-white px-12 py-3 text-[11px] font-bold tracking-[0.1em] hover:opacity-90 transition-all shadow-lg hover:shadow-xl active:scale-95 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[16px]">save</span> Save changes
                                 </button>
                             </div>
                         </div>
@@ -342,12 +346,12 @@
                             </div>
                             <div class="space-y-6">
                                 <div class="p-8 border border-outline/10 bg-surface-low/30 relative group transition-all hover:border-secondary/30">
-                                    <span class="absolute top-0 right-0 bg-primary text-white text-[8px] font-black px-4 py-1.5 uppercase tracking-widest">Default Shipping Address</span>
+                                    <span class="absolute top-0 right-0 bg-primary text-white text-[8px] font-black px-4 py-1.5 tracking-widest">Default Shipping Address</span>
                                     <div class="space-y-4 pt-4">
                                         <div class="flex items-start gap-4">
                                             <span class="material-symbols-outlined text-on-surface-variant/40 mt-1">location_on</span>
                                             <div class="flex-1 space-y-2">
-                                                <label class="text-[9px] font-black uppercase tracking-widest text-on-surface-variant/60">Detailed Shipping Address</label>
+                                                <label class="text-[10px] font-bold tracking-wide text-on-surface-variant/60">Detailed Shipping Address</label>
                                                 <textarea id="pc-address-input" rows="3" 
                                                           class="w-full bg-transparent border border-outline/10 p-3 text-sm font-bold tracking-tight text-on-surface-variant focus:ring-1 focus:ring-secondary focus:border-secondary transition-all resize-none placeholder:text-on-surface-variant/20 mb-2"
                                                           placeholder="Enter your shipping address..."></textarea>
@@ -358,8 +362,8 @@
                                 
                                 <div id="pc-save-address-container" class="hidden">
                                     <button id="pc-save-address-btn" 
-                                            class="bg-secondary text-white px-10 py-3 text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-90 transition-all shadow-lg hover:shadow-xl active:scale-95 flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-[16px]">save</span> Save Address
+                                            class="bg-secondary text-white px-10 py-3 text-[11px] font-bold tracking-[0.1em] hover:opacity-90 transition-all shadow-lg hover:shadow-xl active:scale-95 flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-[16px]">save</span> Save address
                                     </button>
                                 </div>
                             </div>
@@ -373,7 +377,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <button class="p-8 border-2 border-dashed border-outline/20 hover:border-secondary/30 hover:bg-secondary/5 transition-all flex flex-col items-center justify-center gap-4 group aspect-video">
                                     <span class="material-symbols-outlined text-4xl text-outline/40 group-hover:text-secondary transition-all">add_circle</span>
-                                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant/40 group-hover:text-secondary">Add New Method</span>
+                                    <span class="text-[11px] font-bold tracking-[0.1em] text-on-surface-variant/40 group-hover:text-secondary">Add new method</span>
                                 </button>
                             </div>
                         </div>
@@ -389,9 +393,9 @@
                                 <div class="p-8 bg-surface-low/30 border border-outline/5 flex items-start justify-between">
                                     <div class="space-y-2 flex-grow pr-4">
                                         <div class="flex items-center gap-2">
-                                            <h3 class="text-[11px] font-black uppercase tracking-widest">Email Address</h3>
+                                            <h3 class="text-[11px] font-black tracking-widest uppercase">Email Address</h3>
                                             <!-- Verified Badge -->
-                                            <span id="pc-email-verified-badge" class="hidden flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase tracking-tighter border border-emerald-100">
+                                            <span id="pc-email-verified-badge" class="hidden flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[9px] font-black tracking-tighter border border-emerald-100">
                                                 <span class="material-symbols-outlined text-[12px]">verified</span>
                                                 Verified
                                             </span>
@@ -399,8 +403,8 @@
                                         
                                         <div class="flex items-center gap-3">
                                             <p id="pc-manage-email" class="text-sm font-bold text-on-surface-variant/60">Not Set</p>
-                                            <button id="pc-resend-verify-btn" class="hidden text-[10px] font-black uppercase tracking-widest text-primary hover:text-black underline transition-colors">
-                                                Verify Now
+                                            <button id="pc-resend-verify-btn" class="hidden text-[11px] font-bold tracking-tight text-primary hover:text-black underline transition-colors">
+                                                Verify now
                                             </button>
                                         </div>
 
@@ -412,12 +416,12 @@
                                             <input type="email" id="pc-new-email-input" class="w-full bg-white border border-outline/20 px-4 py-2 text-sm focus:border-secondary transition-colors outline-none" placeholder="Enter new email">
                                             <p class="text-[9px] text-on-surface-variant/40 mt-1 italic">Note: You must verify the new email before the change takes effect.</p>
                                             <div class="flex gap-2 mt-3">
-                                                <button id="pc-save-email-btn" class="bg-secondary text-white px-4 py-1.5 text-[9px] font-black uppercase tracking-widest hover:bg-black transition-all">Save Email</button>
-                                                <button id="pc-cancel-email-btn" class="bg-outline/20 text-on-surface-variant px-4 py-1.5 text-[9px] font-black uppercase tracking-widest hover:bg-outline/40 transition-all">Cancel</button>
+                                                <button id="pc-save-email-btn" class="bg-secondary text-white px-4 py-1.5 text-[11px] font-bold tracking-tight hover:bg-black transition-all">Save email</button>
+                                                <button id="pc-cancel-email-btn" class="bg-outline/20 text-on-surface-variant px-4 py-1.5 text-[11px] font-bold tracking-tight hover:bg-outline/40 transition-all">Cancel</button>
                                             </div>
                                         </div>
                                     </div>
-                                    <button id="pc-change-email-toggle" class="flex-shrink-0 border border-primary px-8 py-2.5 text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Change</button>
+                                    <button id="pc-change-email-toggle" class="flex-shrink-0 border border-primary px-8 py-2.5 text-[11px] font-bold tracking-tight hover:bg-primary hover:text-white transition-all">Change</button>
                                 </div>
 
                                 <!-- Change Password Section (New) -->
@@ -432,7 +436,7 @@
                                     
                                     <div id="pc-password-edit-container" class="hidden space-y-4 mt-6 pt-6 border-t border-outline/10">
                                         <div class="space-y-1">
-                                            <label class="text-[9px] font-black uppercase text-on-surface-variant/40">Current Password</label>
+                                            <label class="text-[10px] font-bold tracking-wide text-on-surface-variant/40">Current Password</label>
                                             <div class="relative">
                                                 <input type="password" id="pc-current-password" class="w-full bg-white border border-outline/20 px-4 py-2.5 pr-10 text-sm focus:border-secondary transition-colors outline-none shadow-sm">
                                                 <button type="button" class="password-toggle absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-secondary transition-colors">
@@ -442,7 +446,7 @@
                                         </div>
                                         <div class="grid grid-cols-2 gap-4">
                                             <div class="space-y-1">
-                                                <label class="text-[9px] font-black uppercase text-on-surface-variant/40">New Password</label>
+                                                <label class="text-[10px] font-bold tracking-wide text-on-surface-variant/40">New Password</label>
                                                 <div class="relative">
                                                     <input type="password" id="pc-new-password" class="w-full bg-white border border-outline/20 px-4 py-2.5 pr-10 text-sm focus:border-secondary transition-colors outline-none shadow-sm">
                                                     <button type="button" class="password-toggle absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-secondary transition-colors">
@@ -451,7 +455,7 @@
                                                 </div>
                                             </div>
                                             <div class="space-y-1">
-                                                <label class="text-[9px] font-black uppercase text-on-surface-variant/40">Confirm New</label>
+                                                <label class="text-[10px] font-bold tracking-wide text-on-surface-variant/40">Confirm New</label>
                                                 <div class="relative">
                                                     <input type="password" id="pc-confirm-password" class="w-full bg-white border border-outline/20 px-4 py-2.5 pr-10 text-sm focus:border-secondary transition-colors outline-none shadow-sm">
                                                     <button type="button" class="password-toggle absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 hover:text-secondary transition-colors">
@@ -461,10 +465,10 @@
                                             </div>
                                         </div>
                                         <div class="flex gap-2 pt-2">
-                                            <button id="pc-save-password-btn" class="bg-secondary text-white px-8 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-lg flex items-center gap-2">
-                                                <span>Save New Password</span>
+                                            <button id="pc-save-password-btn" class="bg-secondary text-white px-8 py-3 text-[11px] font-bold tracking-tight hover:bg-black transition-all shadow-lg flex items-center gap-2">
+                                                <span>Save new password</span>
                                             </button>
-                                            <button id="pc-cancel-password-btn" class="bg-outline/10 text-on-surface-variant px-8 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-outline/20 transition-all">Cancel</button>
+                                            <button id="pc-cancel-password-btn" class="bg-outline/10 text-on-surface-variant px-8 py-3 text-[11px] font-bold tracking-tight hover:bg-outline/20 transition-all">Cancel</button>
                                         </div>
                                     </div>
                                 </div>
@@ -474,8 +478,8 @@
                                 <!-- Delete Account Section -->
                                 <div id="pc-delete-account-btn" class="p-8 bg-red-50/30 border border-red-100 flex items-center justify-between group cursor-pointer hover:bg-red-50 transition-colors">
                                     <div class="space-y-2">
-                                        <h3 class="text-[11px] font-black uppercase tracking-widest text-red-600">Delete Account</h3>
-                                        <p class="text-[9px] font-bold text-red-400 uppercase tracking-widest">Account will not be recoverable</p>
+                                        <h3 class="text-[11px] font-black tracking-widest uppercase text-red-600">Delete Account</h3>
+                                        <p class="text-[10px] font-bold text-red-400 tracking-wide">Account will not be recoverable</p>
                                     </div>
                                     <span class="material-symbols-outlined text-red-300 group-hover:text-red-600 transition-all group-hover:translate-x-1">chevron_right</span>
                                 </div>
@@ -494,22 +498,39 @@
                         </div>
 
                         <!-- Orders Sub-navigation -->
-                        <div class="bg-white border-b border-outline/10 px-2 flex items-center justify-between">
-                            <div id="order-subtabs-container" class="flex items-center gap-8 overflow-x-auto no-scrollbar">
-                                <button class="order-subtab py-4 text-[11px] font-black uppercase tracking-widest text-primary border-b-2 border-primary whitespace-nowrap" data-status="all">All orders</button>
-                                <button class="order-subtab py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="unpaid">Unpaid</button>
-                                <button class="order-subtab py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="processing">Processing</button>
-                                <button class="order-subtab py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="shipped">Shipped</button>
-                                <button class="order-subtab py-4 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="review">Review</button>
-                                <div class="order-subtab flex items-center gap-2 group cursor-pointer py-4" data-status="return">
-                                    <span class="text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/60 group-hover:text-primary transition-colors">Returns</span>
-                                    <span class="material-symbols-outlined text-[14px] text-on-surface-variant/40 group-hover:text-primary transition-colors">chevron_right</span>
-                                </div>
-                                <button class="order-subtab py-4 text-[11px] font-medium uppercase tracking-widest text-on-surface-variant/30 hover:text-primary transition-colors whitespace-nowrap" data-status="deleted">Deleted Orders History</button>
-                            </div>
-                            <button class="p-4 hover:text-primary transition-colors">
-                                <span class="material-symbols-outlined text-xl">search</span>
+                        <div class="bg-white border-b border-outline/10 px-2 flex items-center justify-between relative h-16">
+                            <!-- Scroll Left -->
+                            <button id="order-tab-scroll-left" class="hidden absolute left-0 p-3 bg-white/95 backdrop-blur z-20 hover:text-secondary transition-all shadow-sm">
+                                <span class="material-symbols-outlined text-lg">chevron_left</span>
                             </button>
+
+                            <div class="flex-1 overflow-hidden relative h-full flex items-center">
+                                <div id="order-subtabs-container" class="flex items-center gap-10 overflow-x-auto no-scrollbar scroll-smooth px-8 h-full">
+                                    <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-primary border-b-2 border-primary whitespace-nowrap" data-status="all">Tất cả</button>
+                                    <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="unpaid">Chờ thanh toán</button>
+                                    <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="processing">Đang chuẩn bị</button>
+                                    <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="shipped">Đang giao</button>
+                                    <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="review">Đã giao & Đánh giá</button>
+                                    <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="return">Trả hàng/Hủy</button>
+                                    <button class="order-subtab h-full flex items-center text-[11px] font-medium tracking-tight text-on-surface-variant/30 hover:text-primary transition-colors whitespace-nowrap" data-status="deleted">Đơn đã lưu trữ</button>
+                                </div>
+                            </div>
+
+                            <!-- Scroll Right -->
+                            <!-- Increased right to avoid search button conflict -->
+                            <button id="order-tab-scroll-right" class="absolute right-14 p-3 bg-white/95 backdrop-blur z-20 hover:text-secondary transition-all shadow-sm">
+                                <span class="material-symbols-outlined text-lg">chevron_right</span>
+                            </button>
+
+                            <!-- Search Control -->
+                            <div class="flex items-center pl-4 bg-white z-30">
+                                <input id="order-search-input" type="text" 
+                                       class="w-0 overflow-hidden opacity-0 bg-surface-low border border-outline/10 px-0 py-2 text-[11px] font-bold tracking-tight placeholder:text-on-surface-variant/20 focus:outline-none transition-all duration-300"
+                                       placeholder="Tìm kiếm theo mã, tên...">
+                                <button id="order-search-btn" class="p-4 hover:text-primary transition-colors">
+                                    <span class="material-symbols-outlined text-xl">search</span>
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Simulated Loading Area -->
@@ -533,7 +554,7 @@
                                     <path d="M65 65V70L68 73" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             </div>
-                            <p class="text-[11px] font-medium text-on-surface-variant/40 uppercase tracking-[0.2em]">It is empty here :-(</p>
+                            <p class="text-[11px] font-bold text-on-surface-variant/40 tracking-wide text-center">It is empty here :-(</p>
                         </div>
 
 
@@ -551,20 +572,20 @@
                                     <div class="bg-surface-low/50 p-4 flex items-center justify-center gap-4">
                                         <!-- Category Dropdown -->
                                         <div class="relative group">
-                                            <button class="bg-white border border-outline/10 px-4 py-2 flex items-center gap-4 text-[11px] font-black uppercase tracking-widest hover:border-primary transition-all">
+                                            <button class="bg-white border border-outline/10 px-4 py-2 flex items-center gap-4 text-[11px] font-bold tracking-tight hover:border-primary transition-all">
                                                 <span id="wishlist-category-label">Category</span>
                                                 <span class="material-symbols-outlined text-sm">expand_more</span>
                                             </button>
                                             <!-- Dropdown Content -->
                                             <div class="absolute left-0 top-full w-48 pt-2 z-50 hidden group-hover:block animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div class="bg-white shadow-xl border border-outline/5 p-2 space-y-1">
-                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
+                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold tracking-tight hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
                                                             data-filter-type="category" data-filter-value="all">
                                                         <span class="w-2.5 h-2.5 rounded-full border-2 border-outline/20 group-hover/opt:border-secondary transition-colors"></span>
                                                         All Categories
                                                     </button>
                                                     <th:block th:each="cat : ${wishlistCategories}">
-                                                        <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
+                                                        <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold tracking-tight hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
                                                                 data-filter-type="category" th:data-filter-value="${cat}">
                                                             <span class="w-2.5 h-2.5 rounded-full border-2 border-outline/20 group-hover/opt:border-secondary transition-colors"></span>
                                                             <span th:text="${cat}">Category Name</span>
@@ -576,24 +597,24 @@
 
                                         <!-- Status Dropdown -->
                                         <div class="relative group">
-                                            <button class="bg-white border border-outline/10 px-4 py-2 flex items-center gap-4 text-[11px] font-black uppercase tracking-widest hover:border-primary transition-all">
+                                            <button class="bg-white border border-outline/10 px-4 py-2 flex items-center gap-4 text-[11px] font-bold tracking-tight hover:border-primary transition-all">
                                                 <span id="wishlist-status-label">Status</span>
                                                 <span class="material-symbols-outlined text-sm">expand_more</span>
                                             </button>
                                             <!-- Dropdown Content -->
                                             <div class="absolute left-0 top-full w-48 pt-2 z-50 hidden group-hover:block animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div class="bg-white shadow-xl border border-outline/5 p-2 space-y-1">
-                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
+                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold tracking-tight hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
                                                             data-filter-type="status" data-filter-value="all">
                                                         <span class="w-3 h-3 rounded-full border-2 border-outline/20 group-hover/opt:border-secondary transition-colors"></span>
                                                         All Status
                                                     </button>
-                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
+                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold tracking-tight hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
                                                             data-filter-type="status" data-filter-value="in-stock">
                                                         <span class="w-3 h-3 rounded-full border-2 border-outline/20 group-hover/opt:border-secondary transition-colors"></span>
                                                         In Stock
                                                     </button>
-                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
+                                                    <button class="wishlist-filter-btn w-full text-left px-3 py-2 text-[11px] font-bold tracking-tight hover:bg-surface-low transition-colors flex items-center gap-3 group/opt"
                                                             data-filter-type="status" data-filter-value="out-of-stock">
                                                         <span class="w-3 h-3 rounded-full border-2 border-outline/20 group-hover/opt:border-secondary transition-colors"></span>
                                                         Out of Stock
@@ -617,13 +638,28 @@
                                         <div class="mb-6 opacity-20 scale-150">
                                             <span class="material-symbols-outlined text-6xl text-secondary">favorite</span>
                                         </div>
-                                        <p class="text-[11px] font-medium text-on-surface-variant/40 uppercase tracking-[0.2em]">It is empty here :-(</p>
+                                        <p class="text-[11px] font-bold text-on-surface-variant/40 tracking-wide text-center">It is empty here :-(</p>
                                     </div>
 
                                     <!-- Wishlist Content Area -->
                                     <div id="wishlist-content-area" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-in fade-in duration-500">
                                         <!-- JS will populate this dynamically -->
                                     </div>
+                                </div>
+
+                                <!-- Tab: Review History -->
+                                <div id="tab-review-history" class="tab-content hidden space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                    <div class="flex flex-col items-center justify-center py-8">
+                                        <h2 class="text-3xl font-black tracking-tighter uppercase">Review History</h2>
+                                        <div class="h-1 w-12 bg-secondary mt-2"></div>
+                                        <p class="text-[10px] font-bold text-gray-400 tracking-wide mt-4">Tất cả đánh giá của bạn về sản phẩm H&Y</p>
+                                    </div>
+                                    <div id="review-history-container" class="space-y-6 min-h-[400px]">
+                                        <div class="flex items-center justify-center py-20">
+                                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+                                        </div>
+                                    </div>
+                                    <div id="review-history-pagination" class="flex justify-center gap-2 pt-8"></div>
                                 </div>
 
                                 <!-- Tab: Recently Viewed -->
@@ -639,15 +675,15 @@
                                         <div id="selection-controls" class="hidden flex items-center gap-4 animate-in fade-in slide-in-from-left-4">
                                             <label class="flex items-center gap-2 cursor-pointer group">
                                                 <input type="checkbox" id="select-all-recently-viewed" onchange="PersonalCenter.toggleSelectAllRecentlyViewed(this.checked)" class="w-4 h-4 rounded border-outline/20 text-secondary focus:ring-secondary">
-                                                <span class="text-[11px] font-black uppercase tracking-widest group-hover:text-primary transition-colors">Select All</span>
+                                                <span class="text-[11px] font-bold tracking-tight group-hover:text-primary transition-colors">Select all</span>
                                             </label>
                                             <button id="delete-selected-btn" onclick="PersonalCenter.deleteSelectedRecentlyViewed()" 
-                                                    class="bg-red-500 text-white px-4 py-1.5 text-[10px] font-black uppercase tracking-widest hover:bg-red-600 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                                                Delete Selected (0)
+                                                    class="bg-red-500 text-white px-4 py-1.5 text-[11px] font-bold tracking-tight hover:bg-red-600 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                                Delete selected (0)
                                             </button>
                                         </div>
                                         <button id="toggle-select-mode-btn" onclick="PersonalCenter.toggleRecentlyViewedSelectionMode()" 
-                                                class="ml-auto text-[11px] font-black uppercase tracking-widest text-on-surface-variant/60 hover:text-primary transition-colors flex items-center gap-2">
+                                                class="ml-auto text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors flex items-center gap-2">
                                             <span class="material-symbols-outlined text-[18px]" id="select-btn-icon">rule</span>
                                             <span id="select-btn-text">Select</span>
                                         </button>
@@ -749,8 +785,8 @@
                                         <img id="return-product-img" src="" alt="" class="w-full h-full object-cover">
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <h4 id="return-product-name" class="text-[10px] font-black uppercase truncate mb-1 text-black">Product Name</h4>
-                                        <div class="flex gap-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                                        <h4 id="return-product-name" class="text-[11px] font-bold truncate mb-1 text-black">Product Name</h4>
+                                        <div class="flex gap-2 text-[10px] font-medium text-gray-400 tracking-wide">
                                             <span id="return-product-color">Màu: N/A</span>
                                             <span id="return-product-size">Size: N/A</span>
                                         </div>
@@ -759,9 +795,9 @@
 
                                 <!-- Reason Selection -->
                                 <div class="space-y-2">
-                                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Lý do trả hàng <span class="text-red-500">*</span></label>
+                                    <label class="text-[10px] font-bold tracking-wide text-gray-400">Lý do trả hàng <span class="text-red-500">*</span></label>
                                     <div class="relative">
-                                        <select id="return-reason" required class="w-full bg-white border border-black px-4 py-3 text-[11px] font-bold tracking-widest uppercase focus:ring-0 outline-none appearance-none cursor-pointer">
+                                        <select id="return-reason" required class="w-full bg-white border border-black px-4 py-3 text-[11px] font-bold tracking-tight focus:ring-0 outline-none appearance-none cursor-pointer">
                                             <option value="" disabled selected>Chọn lý do</option>
                                             <option value="Sản phẩm lỗi/hỏng">Sản phẩm lỗi/hỏng</option>
                                             <option value="Không đúng mô tả">Sản phẩm không đúng mô tả</option>
@@ -777,11 +813,11 @@
 
                                 <!-- Description -->
                                 <div class="space-y-2">
-                                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Mô tả chi tiết</label>
+                                    <label class="text-[10px] font-bold tracking-wide text-gray-400">Mô tả chi tiết</label>
                                     <textarea id="return-description" rows="4" 
-                                              class="w-full bg-white border border-black p-4 text-[11px] font-bold tracking-widest uppercase focus:ring-0 outline-none resize-none placeholder:text-gray-200"
+                                              class="w-full bg-white border border-black p-4 text-[11px] font-bold tracking-tight focus:ring-0 outline-none resize-none placeholder:text-gray-200"
                                               placeholder="Vui lòng cung cấp thêm thông tin..."></textarea>
-                                    <p class="text-[8px] text-gray-400 text-right uppercase font-bold tracking-widest">Tối đa 1000 ký tự</p>
+                                    <p class="text-[9px] font-bold text-gray-400 text-right tracking-tight">Tối đa 1000 ký tự</p>
                                 </div>
 
                                 <!-- Multiple Images Selection -->
@@ -812,11 +848,11 @@
                                 <!-- Action Buttons -->
                                 <div class="flex gap-4 pt-2 pb-2">
                                     <button type="button" onclick="OrderModule.closeReturnModal()" 
-                                            class="flex-1 border border-black px-6 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all">
+                                            class="flex-1 border border-black px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-black hover:text-white transition-all">
                                         Hủy
                                     </button>
                                     <button type="submit" 
-                                            class="flex-1 bg-black text-white px-6 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-gray-800 transition-all shadow-xl active:scale-95">
+                                            class="flex-1 bg-black text-white px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-gray-800 transition-all shadow-xl active:scale-95">
                                         Xác nhận trả hàng
                                     </button>
                                 </div>
@@ -837,7 +873,7 @@
                                 </div>
                             </div>
                             <h3 class="text-lg font-black uppercase tracking-tighter mb-2">Password Updated</h3>
-                            <p class="text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest">Your account is now more secure</p>
+                            <p class="text-[11px] font-bold text-on-surface-variant/60 tracking-tight">Your account is now more secure</p>
                         </div>
                     </div>
 
@@ -853,13 +889,50 @@
                                     <div class="icon-fix"></div>
                                 </div>
                             </div>
-                            <h3 class="text-xs font-black uppercase tracking-[0.3em] mb-6 text-black">Yêu cầu đã gửi thành công</h3>
-                            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.15em] leading-loose mb-10">Chúng tôi sẽ xem xét nội dung và phản hồi cho bạn trong vòng 24 - 48 giờ làm việc qua email hoặc thông báo này.</p>
+                            <h3 class="text-sm font-black uppercase tracking-widest mb-6 text-black">Yêu cầu đã gửi thành công</h3>
+                            <p class="text-[10px] font-bold text-gray-500 tracking-wide leading-loose mb-10">Chúng tôi sẽ xem xét nội dung và phản hồi cho bạn trong vòng 24 - 48 giờ làm việc qua email hoặc thông báo này.</p>
                             
                             <button onclick="OrderModule.closeReturnSuccess()" 
-                                    class="w-full border border-black bg-black text-white px-8 py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all shadow-lg active:scale-95">
+                                    class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all shadow-lg active:scale-95">
                                 Đóng
                             </button>
+                        </div>
+                    </div>
+
+                    <!-- Archive Order Confirmation Modal (MỚI) -->
+                    <div id="archive-order-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4">
+                        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 bg-backdrop-archive" onclick="OrderModule.closeArchiveModal()"></div>
+                        <div class="relative bg-white w-full max-w-[400px] shadow-2xl border border-black transform scale-95 opacity-0 transition-all duration-300 bg-modal-archive overflow-hidden">
+                            <!-- Modal Header -->
+                            <div class="border-b border-black p-5 flex justify-between items-center bg-gray-50">
+                                <h3 class="text-xs font-black uppercase tracking-[0.2em]">Xác nhận lưu trữ</h3>
+                                <button onclick="OrderModule.closeArchiveModal()" class="material-symbols-outlined text-xl hover:rotate-90 transition-transform text-gray-400">close</button>
+                            </div>
+
+                            <div class="p-8 space-y-6 text-center">
+                                <div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <span class="material-symbols-outlined text-3xl text-amber-500">archive</span>
+                                </div>
+                                
+                                <div class="space-y-2">
+                                    <h4 class="text-sm font-black tracking-tight text-black">Ẩn đơn hàng này?</h4>
+                                    <p class="text-[11px] font-bold text-gray-500 tracking-tight leading-relaxed">
+                                        Đơn hàng sẽ được chuyển vào mục <br>
+                                        <span class="text-black font-black">"Lịch sử đơn hàng đã xóa"</span>.
+                                    </p>
+                                </div>
+
+                                <div class="flex gap-3 pt-2">
+                                    <button onclick="OrderModule.closeArchiveModal()" 
+                                            class="flex-1 border border-black px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-gray-50 transition-all">
+                                        Hủy bỏ
+                                    </button>
+                                    <button onclick="OrderModule.submitArchiveOrder()" 
+                                            class="flex-1 bg-black text-white px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-neutral-800 transition-all shadow-xl active:scale-95">
+                                        Xác nhận ẩn
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -874,14 +947,14 @@
                             </div>
 
                             <div class="p-6 space-y-5">
-                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-relaxed">
+                                <p class="text-[11px] font-bold text-gray-500 tracking-tight leading-relaxed">
                                     Bạn có chắc chắn muốn hủy đơn hàng <span id="cancel-order-display-id" class="text-black font-black">#ORD-000000</span> không? Hành động này không thể hoàn tác.
                                 </p>
 
                                 <div class="space-y-2">
-                                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Lý do hủy đơn <span class="text-red-500">*</span></label>
+                                    <label class="text-[10px] font-bold tracking-wide text-gray-400">Lý do hủy đơn <span class="text-red-500">*</span></label>
                                     <div class="relative">
-                                        <select id="cancel-reason" class="w-full bg-white border border-black px-4 py-3 text-[11px] font-bold tracking-widest uppercase focus:ring-0 outline-none appearance-none cursor-pointer">
+                                        <select id="cancel-reason" class="w-full bg-white border border-black px-4 py-3 text-[11px] font-bold tracking-tight focus:ring-0 outline-none appearance-none cursor-pointer">
                                             <option value="" disabled selected>Chọn lý do hủy</option>
                                             <option value="Đổi ý / Không còn nhu cầu">Đổi ý / Không còn nhu cầu</option>
                                             <option value="Cập nhật địa chỉ / SĐT nhận hàng">Cập nhật địa chỉ / SĐT nhận hàng</option>
@@ -896,20 +969,48 @@
                                 </div>
 
                                 <div class="space-y-2" id="cancel-custom-reason-container">
-                                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Ghi chú thêm</label>
+                                    <label class="text-[10px] font-bold tracking-wide text-gray-400">Ghi chú thêm</label>
                                     <textarea id="cancel-description" rows="3" 
-                                              class="w-full bg-white border border-black p-4 text-[11px] font-bold tracking-widest uppercase focus:ring-0 outline-none resize-none placeholder:text-gray-200"
+                                              class="w-full bg-white border border-black p-4 text-[11px] font-bold tracking-tight focus:ring-0 outline-none resize-none placeholder:text-gray-200"
                                               placeholder="Nhập lý do chi tiết nếu chọn 'Khác'..."></textarea>
                                 </div>
 
                                 <div class="flex gap-4 pt-2">
                                     <button onclick="OrderModule.closeCancelModal()" 
-                                            class="flex-1 border border-black px-6 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all">
+                                            class="flex-1 border border-black px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-black hover:text-white transition-all">
                                         Đóng
                                     </button>
                                     <button onclick="OrderModule.submitCancelOrder()" 
-                                            class="flex-1 bg-red-600 text-white px-6 py-3.5 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-red-700 transition-all shadow-xl active:scale-95">
+                                            class="flex-1 bg-red-600 text-white px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-red-700 transition-all shadow-xl active:scale-95">
                                         Xác nhận hủy
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Repurchase Order Modal (MỚI) -->
+                    <div id="repurchase-order-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4">
+                        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 bg-backdrop-repurchase" onclick="OrderModule.closeRepurchaseModal()"></div>
+                        <div class="relative bg-white w-full max-w-[400px] shadow-2xl border border-black transform scale-95 opacity-0 transition-all duration-300 bg-modal-repurchase overflow-hidden">
+                            <div class="p-8 text-center space-y-6">
+                                <div class="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto border border-black">
+                                    <span class="material-symbols-outlined text-2xl">refresh</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <h3 class="text-xs font-black uppercase tracking-[0.2em]">Mua lại đơn hàng?</h3>
+                                    <p class="text-[10px] font-bold text-gray-400 tracking-wide leading-loose px-4">
+                                        Bạn có muốn thêm tất cả sản phẩm trong đơn hàng này vào giỏ hàng để mua lại không?
+                                    </p>
+                                </div>
+                                <div class="flex gap-3 pt-4">
+                                    <button onclick="OrderModule.closeRepurchaseModal()" 
+                                            class="flex-1 border border-black px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-50 transition-all">
+                                        Hủy
+                                    </button>
+                                    <button onclick="OrderModule.submitRepurchaseOrder()" 
+                                            class="flex-1 bg-black text-white px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-800 transition-all shadow-lg active:scale-95">
+                                        Mua lại
                                     </button>
                                 </div>
                             </div>
@@ -928,11 +1029,11 @@
                                     <div class="icon-fix"></div>
                                 </div>
                             </div>
-                            <h3 class="text-xs font-black uppercase tracking-[0.3em] mb-4 text-black text-red-600">Đã hủy đơn hàng</h3>
-                            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.15em] leading-loose mb-10">Đơn hàng của bạn đã được hủy thành công. Nếu đã thanh toán, chúng tôi sẽ xử lý hoàn tiền trong thời gian sớm nhất.</p>
+                            <h3 class="text-sm font-black uppercase tracking-tight mb-4 text-red-600">Đã hủy đơn hàng</h3>
+                            <p class="text-[10px] font-bold text-gray-500 tracking-tight leading-loose mb-10">Đơn hàng của bạn đã được hủy thành công. Nếu đã thanh toán, chúng tôi sẽ xử lý hoàn tiền trong thời gian sớm nhất.</p>
                             
                             <button onclick="OrderModule.closeCancelSuccess()" 
-                                    class="w-full border border-black bg-black text-white px-8 py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all">
+                                    class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all">
                                 Đóng
                             </button>
                         </div>
@@ -949,12 +1050,96 @@
                                     <div class="icon-circle"></div>
                                 </div>
                             </div>
-                            <h3 class="text-xs font-black uppercase tracking-[0.3em] mb-4 text-black text-amber-600">Không thể hủy đơn</h3>
-                            <p id="cancel-failed-message" class="text-[9px] font-bold text-gray-500 uppercase tracking-[0.15em] leading-loose mb-10">Đơn hàng của bạn đã chuyển sang trạng thái xử lý/vận chuyển và không thể tự hủy lúc này.</p>
+                            <h3 class="text-sm font-black uppercase tracking-tight mb-4 text-amber-600">Không thể hủy đơn</h3>
+                            <p id="cancel-failed-message" class="text-[10px] font-bold text-gray-500 tracking-tight leading-loose mb-10">Đơn hàng của bạn đã chuyển sang trạng thái xử lý/vận chuyển và không thể tự hủy lúc này.</p>
                             
                             <button onclick="OrderModule.closeCancelFailed()" 
-                                    class="w-full border border-black bg-black text-white px-8 py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white hover:text-black transition-all">
+                                    class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all">
                                 Đã hiểu
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Product Review Modal (MỚI) -->
+                    <div id="review-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4">
+                        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 bg-backdrop-review" onclick="OrderModule.closeReviewModal()"></div>
+                        <div class="relative bg-white w-full max-w-[500px] shadow-2xl border border-black transform scale-95 opacity-0 transition-all duration-300 bg-modal-review overflow-hidden">
+                            <!-- Modal Header -->
+                            <div class="border-b border-black p-5 flex justify-between items-center bg-gray-50 text-black">
+                                <h2 class="text-xs font-black uppercase tracking-[0.2em]">Đánh giá sản phẩm</h2>
+                                <button onclick="OrderModule.closeReviewModal()" class="material-symbols-outlined text-xl hover:rotate-90 transition-transform">close</button>
+                            </div>
+
+                            <div class="p-6 space-y-6">
+                                <!-- Product Info Summary -->
+                                <div class="flex items-center gap-4 bg-neutral-50 p-4 border border-black/5">
+                                    <div class="w-16 h-20 shrink-0 border border-black/10 bg-white">
+                                        <img id="review-product-img" src="" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h4 id="review-product-name" class="text-[11px] font-bold tracking-tight truncate text-black">Product Name</h4>
+                                        <p id="review-product-info" class="text-[10px] font-medium text-gray-400 tracking-wide mt-1">Màu: Black • Size: L</p>
+                                    </div>
+                                </div>
+
+                                <!-- Star Rating -->
+                                <div class="space-y-3 text-center">
+                                    <label class="text-[10px] font-bold tracking-wide text-gray-400 block">Chất lượng sản phẩm</label>
+                                    <div class="flex items-center justify-center gap-2" id="star-rating-container">
+                                        <span class="star-btn material-symbols-outlined text-3xl cursor-pointer transition-all hover:scale-125 text-gray-200" data-rating="1">star</span>
+                                        <span class="star-btn material-symbols-outlined text-3xl cursor-pointer transition-all hover:scale-125 text-gray-200" data-rating="2">star</span>
+                                        <span class="star-btn material-symbols-outlined text-3xl cursor-pointer transition-all hover:scale-125 text-gray-200" data-rating="3">star</span>
+                                        <span class="star-btn material-symbols-outlined text-3xl cursor-pointer transition-all hover:scale-125 text-gray-200" data-rating="4">star</span>
+                                        <span class="star-btn material-symbols-outlined text-3xl cursor-pointer transition-all hover:scale-125 text-gray-200" data-rating="5">star</span>
+                                    </div>
+                                    <div id="review-rating-error" class="hidden text-red-500 text-[10px] font-bold tracking-tight animate-bounce">Vui lòng chọn số sao đánh giá!</div>
+                                    <p id="rating-text" class="text-[11px] font-bold tracking-tight text-secondary min-h-[15px]"></p>
+                                    <input type="hidden" id="review-rating-value" value="0">
+                                    <input type="hidden" id="review-product-id" value="">
+                                </div>
+
+                                <!-- Feedback Content -->
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-bold tracking-wide text-gray-400">Chia sẻ cảm nhận của bạn</label>
+                                    <textarea id="review-comment" rows="4" 
+                                              class="w-full bg-white border border-black p-4 text-[11px] font-bold tracking-tight focus:ring-0 outline-none resize-none placeholder:text-gray-200 text-black"
+                                              placeholder="Bạn thấy sản phẩm như thế nào? Hãy chia sẻ cùng H&Y nhé..."></textarea>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex gap-4 pt-2">
+                                    <button onclick="OrderModule.closeReviewModal()" 
+                                            class="flex-1 border border-black px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-50 transition-all text-black">
+                                        Trở lại
+                                    </button>
+                                    <button onclick="OrderModule.submitReview()" 
+                                            class="flex-1 bg-black text-white px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-800 transition-all shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        Gửi đánh giá
+                                    </button>
+                                </div>
+                        </div>
+                    </div>
+
+                    <!-- Review Success Modal (MỚI) -->
+                    <div id="review-success-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6">
+                        <div class="absolute inset-0 bg-white/60 backdrop-blur-md opacity-0 transition-opacity duration-700 bg-backdrop-review-success"></div>
+                        <div class="relative bg-white w-full max-w-[360px] p-12 shadow-[0_40px_80px_rgba(0,0,0,0.2)] border border-black text-center transform scale-90 opacity-0 transition-all duration-500 bg-modal-review-success">
+                            <div class="success-checkmark mb-16">
+                                <div class="check-icon">
+                                    <span class="icon-line line-tip"></span>
+                                    <span class="icon-line line-long"></span>
+                                    <div class="icon-circle"></div>
+                                    <div class="icon-fix"></div>
+                                </div>
+                            </div>
+                            <h3 class="text-sm font-black uppercase tracking-tight mb-4 text-secondary">Đã gửi đánh giá</h3>
+                            <p class="text-[10px] font-bold text-gray-400 tracking-tight leading-loose mb-10">
+                                H&Y xin chân thành cảm ơn feedback của bạn. Mong rằng bạn sẽ có những trải nghiệm tuyệt vời cùng sản phẩm!
+                            </p>
+                            
+                            <button onclick="OrderModule.closeReviewSuccess()" 
+                                    class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all">
+                                Đóng
                             </button>
                         </div>
                     </div>

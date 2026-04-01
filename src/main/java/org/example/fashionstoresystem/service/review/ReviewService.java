@@ -10,6 +10,9 @@ public interface ReviewService {
     // Lấy đánh giá của một sản phẩm
     Page<ReviewResponseDTO> getReviewsByProduct(Long productId, Pageable pageable);
 
+    // Lấy đánh giá của bản thân
+    Page<ReviewResponseDTO> getReviewsByUser(Long userId, Pageable pageable);
+
     // Admin
     Page<ReviewResponseDTO> getAllReviews(Pageable pageable);
 

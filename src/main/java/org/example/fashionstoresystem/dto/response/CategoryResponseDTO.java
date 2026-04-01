@@ -16,6 +16,8 @@ public class CategoryResponseDTO {
     private String name;
     private int childCount;
     private String imageUrl;
+    private Long parentId;
+    private String parentName;
     @Builder.Default
     private List<CategoryResponseDTO> children = new ArrayList<>();
 }

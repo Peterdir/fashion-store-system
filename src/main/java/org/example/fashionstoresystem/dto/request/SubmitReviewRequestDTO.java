@@ -18,7 +18,6 @@ public class SubmitReviewRequestDTO {
     @Max(value = 5, message = "Đánh giá cao nhất là 5 sao")
     private int rating;
 
-    @NotBlank(message = "Nội dung đánh giá không được để trống")
     @Size(max = 1000, message = "Nội dung đánh giá không được vượt quá 1000 ký tự")
     private String comment;
 }

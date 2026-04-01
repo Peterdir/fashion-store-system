@@ -41,13 +41,12 @@ public class OrderExpirationTask {
         for (Order order : expiredOrders) {
             log.info("Hủy đơn hàng #{} do quá hạn thanh toán 10 phút.", order.getId());
             
-            // 1. Cập nhật trạng thái đơn hàng sang CANCELLED (hoặc EXPIRED nếu có)
-            // Ở đây dùng CANCELLED để đồng nhất với hệ thống hiện tại
-            order.setStatus(OrderStatus.CANCELLED);
+            // 1. Cập nhật trạng thái đơn hàng sang PAYMENT_EXPIRED
+            order.setStatus(OrderStatus.PAYMENT_EXPIRED);
             
             // 2. Cập nhật trạng thái của từng món đồ
             for (OrderItem item : order.getOrderItems()) {
-                item.setStatus(OrderStatus.CANCELLED);
+                item.setStatus(OrderStatus.PAYMENT_EXPIRED);
             }
             
             // 3. Hoàn kho

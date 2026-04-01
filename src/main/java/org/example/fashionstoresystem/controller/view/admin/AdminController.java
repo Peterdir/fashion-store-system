@@ -32,6 +32,11 @@ public class AdminController {
         return "admin/pages/products";
     }
 
+    @GetMapping("/categories")
+    public String showCategories() {
+        return "admin/pages/categories";
+    }
+
     @GetMapping("/customers")
     public String showCustomers() {
         return "admin/pages/customers";

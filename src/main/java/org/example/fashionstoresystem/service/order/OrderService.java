@@ -32,6 +32,9 @@ public interface OrderService {
     // Thanh toán lại cho đơn MOMO
     String retryPayment(Long userId, Long orderId);
 
+    // Mua lại đơn hàng (Đưa sản phẩm vào giỏ hàng)
+    void repurchaseOrder(Long userId, Long orderId);
+
     // Hoàn kho (dùng cho cleanup task)
     void revertInventory(Long orderId);
 

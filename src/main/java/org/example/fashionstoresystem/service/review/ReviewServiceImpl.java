@@ -76,6 +76,11 @@ public class ReviewServiceImpl implements ReviewService {
     public Page<ReviewResponseDTO> getReviewsByProduct(Long productId, Pageable pageable) {
         return reviewRepository.findByProductId(productId, pageable).map(this::mapToDTO);
     }
+
+    @Override
+    public Page<ReviewResponseDTO> getReviewsByUser(Long userId, Pageable pageable) {
+        return reviewRepository.findByUserId(userId, pageable).map(this::mapToDTO);
+    }
     
     @Override
     public Page<ReviewResponseDTO> getAllReviews(Pageable pageable) {
@@ -83,15 +88,27 @@ public class ReviewServiceImpl implements ReviewService {
     }
     
     private ReviewResponseDTO mapToDTO(Review review) {
+        String imageUrl = "/images/placeholder.png";
+        if (!review.getProduct().getImages().isEmpty()) {
+            imageUrl = review.getProduct().getImages().get(0).getUrl();
+        }
+
         return ReviewResponseDTO.builder()
                 .reviewId(review.getId())
                 .productId(review.getProduct().getId())
                 .productName(review.getProduct().getName())
+                .productImage(formatImageUrl(imageUrl))
                 .userId(review.getUser().getId())
                 .customerName(review.getUser().getFullName())
                 .rating(review.getRating())
                 .comment(review.getComment())
                 .createdAt(review.getCreatedAt())
                 .build();
+    }
+
+    private String formatImageUrl(String url) {
+        if (url == null) return "/images/placeholder.png";
+        if (url.startsWith("http") || url.startsWith("/")) return url;
+        return "/" + url;
     }
 }

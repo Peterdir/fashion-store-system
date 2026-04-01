@@ -6,6 +6,7 @@ import org.example.fashionstoresystem.dto.request.SubmitReviewRequestDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.dto.response.ReviewResponseDTO;
 import org.example.fashionstoresystem.service.review.ReviewService;
+import org.example.fashionstoresystem.util.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,10 +23,16 @@ public class ReviewController {
     // THÊM ĐÁNH GIÁ
     @PostMapping
     public ResponseEntity<MessageResponseDTO> submitReview(
-            @RequestParam Long userId,
             @Valid @RequestBody SubmitReviewRequestDTO dto) {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(reviewService.submitReview(userId, dto));
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<Page<ReviewResponseDTO>> getMyReviews(Pageable pageable) {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
+        return ResponseEntity.ok(reviewService.getReviewsByUser(userId, pageable));
     }
 
     // XEM ĐÁNH GIÁ CỦA SẢN PHẨM
