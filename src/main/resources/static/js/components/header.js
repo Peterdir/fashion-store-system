@@ -67,8 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
         menuTitle.innerHTML = `
             <div class="flex items-center gap-3">
                 <span class="w-2 h-2 bg-secondary rounded-full animate-pulse"></span>
-                <span class="text-neutral-400 font-medium tracking-widest uppercase">MUA SẮM THEO DANH MỤC</span>
-                <span class="text-primary font-black uppercase tracking-tighter">${parentName}</span>
+                <span class="text-neutral-400 font-medium tracking-widest">MUA SẮM THEO DANH MỤC</span>
+                <span class="text-primary font-black tracking-tighter">${parentName}</span>
             </div>
         `;
 
@@ -80,12 +80,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `
                     <div class="col-span-6 flex items-end justify-between border-b border-outline/10 pb-2 mt-8 mb-4 group/header">
                         <div class="flex items-center gap-3">
-                            <h3 class="text-[12px] font-black tracking-[0.2em] uppercase text-primary">
+                            <h3 class="text-[12px] font-black tracking-[0.2em] text-primary">
                                 ${parentCat.name}
                             </h3>
                         </div>
                         <a href="/category?keyword=${encodeURIComponent(parentCat.name)}" 
-                           class="text-[9px] font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors flex items-center gap-1 group-hover/header:translate-x-1 transition-transform">
+                           class="text-[9px] font-bold tracking-widest text-secondary hover:text-primary transition-colors flex items-center gap-1 group-hover/header:translate-x-1 transition-transform">
                             Khám phá tất cả
                             <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                         </a>
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="w-20 h-20 bg-surface-low overflow-hidden rounded-full mb-3 border border-outline/10 flex items-center justify-center group-hover/item:border-secondary transition-all bg-neutral-100 group-hover/item:bg-white duration-500">
                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-400 group-hover/item:text-secondary"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                         </div>
-                        <span class="text-[9px] font-bold uppercase tracking-widest text-neutral-500 group-hover/item:text-secondary transition-colors">
+                        <span class="text-[9px] font-bold tracking-widest text-neutral-500 group-hover/item:text-secondary transition-colors">
                             Xem tất cả
                         </span>
                     </a>
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                      class="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-700 opacity-95 group-hover/item:opacity-100">
                                 <div class="absolute inset-0 bg-secondary/5 opacity-0 group-hover/item:opacity-100 transition-opacity"></div>
                             </div>
-                            <span class="text-[9px] font-bold uppercase tracking-tight group-hover/item:text-secondary transition-colors leading-tight max-w-[85px] w-full">
+                            <span class="text-[9px] font-bold tracking-tight group-hover/item:text-secondary transition-colors leading-tight max-w-[85px] w-full">
                                 ${parentCat.name}
                             </span>
                         </a>
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // FALLBACK: Nếu không có subcategories thì hiển thị chính các sản phẩm như các items hình tròn
             html += `
                 <div class="col-span-6 flex items-end justify-between border-b border-outline/10 pb-2 mt-8 mb-4">
-                    <h3 class="text-[12px] font-black tracking-[0.2em] uppercase text-primary">SẢN PHẨM NỔI BẬT</h3>
+                    <h3 class="text-[12px] font-black tracking-[0.2em] text-primary">SẢN PHẨM NỔI BẬT</h3>
                 </div>
                 <div class="col-span-6 grid grid-cols-6 gap-x-4 gap-y-8 w-full items-start">
             `;
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                  class="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-700 opacity-95 group-hover/item:opacity-100">
                             <div class="absolute inset-0 bg-secondary/5 opacity-0 group-hover/item:opacity-100 transition-opacity"></div>
                         </div>
-                        <span class="text-[9px] font-bold uppercase tracking-tight group-hover/item:text-secondary transition-colors leading-tight max-w-[85px] w-full line-clamp-2">
+                        <span class="text-[9px] font-bold tracking-tight group-hover/item:text-secondary transition-colors leading-tight max-w-[85px] w-full line-clamp-2">
                             ${p.name}
                         </span>
                     </a>
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Trường hợp thực sự trống
             html += `
                 <div class="col-span-6 py-20 text-center">
-                    <p class="text-[10px] uppercase tracking-[0.2em] text-neutral-400 font-bold">Danh mục đang được cập nhật</p>
+                    <p class="text-[10px] tracking-[0.2em] text-neutral-400 font-bold">Danh mục đang được cập nhật</p>
                 </div>
             `;
         }
@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderGroupedProducts(products, subcategories, name);
         } catch (error) {
             console.error('Error loading mega menu content:', error);
-            if (menuGrid) menuGrid.innerHTML = '<div class="col-span-6 py-12 text-center text-[10px] uppercase text-red-500">Lỗi khi tải dữ liệu. Vui lòng thử lại.</div>';
+            if (menuGrid) menuGrid.innerHTML = '<div class="col-span-6 py-12 text-center text-[10px] text-red-500">Lỗi khi tải dữ liệu. Vui lòng thử lại.</div>';
         }
     };
 
@@ -228,11 +228,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 openMenu();
                 
                 if (name !== 'Categories') {
-                    // Đồng bộ sidebar active state
+                    // Đồng bộ sidebar active state & cuộn tới vị trí tương ứng
                     document.querySelectorAll('.mega-menu-item').forEach(btn => {
                         const btnName = btn.getAttribute('data-name');
                         if (btnName === name) {
                             btn.classList.add('active', 'bg-white', 'border-l-4', 'border-secondary');
+                            // Tự động cuộn Sidebar tới mục này
+                            btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                         } else {
                             btn.classList.remove('active', 'bg-white', 'border-l-4', 'border-secondary');
                         }

@@ -11,8 +11,8 @@
 | 👥 Quản Lý Khách Hàng | ✅ `AdminUserController` | ✅ `admin/pages/customers.html` | ✅ **Xong** |
 | 🎟️ Quản Lý Mã Giảm Giá | ✅ `AdminCouponController` | ✅ `admin/pages/coupons.html` | ✅ **Xong** |
 | 🔄 Yêu Cầu Hoàn Trả | ✅ `AdminReturnRequestController` | ✅ `admin/pages/returns.html` | ✅ **Xong** |
-| 📈 Báo Cáo Doanh Thu | ✅ `ReportController` | ❌ Chưa có giao diện | **🔴 Thiếu** |
-| 🏪 Bán Hàng Trực Tiếp | ✅ `OfflineSaleController` | ❌ Chưa có giao diện | **🔴 Thiếu** |
+| 📈 Báo Cáo Doanh Thu | ✅ `ReportController` | ✅ `admin/pages/reports.html` | ✅ **Xong** |
+| 🏪 Bán Hàng Trực Tiếp | ✅ `OfflineSaleController` | ✅ `admin/pages/offline-sale.html` | ✅ **Xong** |
 
 ---
 
