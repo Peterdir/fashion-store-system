@@ -453,15 +453,15 @@ const OrderModule = {
 
                 <!-- Main Content -->
                 <div class="flex items-center p-5 gap-5">
-                    <div class="w-16 h-20 shrink-0 shadow-sm border border-black/5">
-                        <img src="${imgUrl}" class="w-full h-full object-cover transition-all duration-500" onerror="this.src='${fallbackImg}'">
-                    </div>
+                    <a href="/product-detail/${item.productId}" class="w-16 h-20 shrink-0 shadow-sm border border-black/5 hover:border-black transition-all overflow-hidden group/img">
+                        <img src="${imgUrl}" class="w-full h-full object-cover transition-all duration-500 group-hover/img:scale-110" onerror="this.src='${fallbackImg}'">
+                    </a>
                     
                     <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-1">
-                            <h4 class="text-xs font-black text-black uppercase tracking-tight truncate">${item.productName}</h4>
+                        <a href="/product-detail/${item.productId}" class="flex items-center gap-2 mb-1 group/name">
+                            <h4 class="text-xs font-black text-black uppercase tracking-tight truncate group-hover/name:text-accent transition-colors">${item.productName}</h4>
                             <span class="text-[8px] font-bold text-gray-300 uppercase tracking-tighter">[${strProductId}]</span>
-                        </div>
+                        </a>
                         <div class="flex gap-2 mt-1 text-[9px] font-black uppercase tracking-widest text-gray-400">
                             <span>${item.color || 'FREE'}</span>
                             <span class="text-black/10">•</span>
@@ -483,7 +483,7 @@ const OrderModule = {
                     ${payBtn}
                     ${cancelBtn}
                     ${this.renderItemArchiveAction(item, statusEnum)}
-                    ${!returnBtn && !cancelBtn && !payBtn && !this.renderItemArchiveAction(item, statusEnum) ? `<button class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 hover:text-black transition-colors" onclick="window.location.href='/category'">Mua lại</button>` : (returnBtn || '')}
+                    ${!returnBtn && !cancelBtn && !payBtn && !this.renderItemArchiveAction(item, statusEnum) ? `<a href="/product-detail/${item.productId}" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 hover:text-black transition-colors">Mua lại</a>` : (returnBtn || '')}
                 </div>
             </div>
         `;
@@ -1398,14 +1398,16 @@ const OrderModule = {
             <div class="bg-neutral-50 border border-black/5 p-6 hover:border-black transition-all group">
                 <div class="flex gap-6">
                     <!-- Product Info -->
-                    <div class="w-20 h-24 shrink-0 bg-white border border-black/10 overflow-hidden">
-                        <img src="${review.productImage || '/images/placeholder.jpg'}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                    </div>
+                    <a href="/product-detail/${review.productId}" class="w-20 h-24 shrink-0 bg-white border border-black/10 overflow-hidden group/img">
+                        <img src="${review.productImage || '/images/placeholder.jpg'}" class="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-500">
+                    </a>
                     
                     <div class="flex-1 space-y-4">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="text-xs font-black uppercase tracking-tight text-black mb-1">${review.productName}</h4>
+                                <a href="/product-detail/${review.productId}" class="group/name">
+                                    <h4 class="text-xs font-black uppercase tracking-tight text-black mb-1 group-hover/name:text-accent transition-colors">${review.productName}</h4>
+                                </a>
                                 <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Ngày đánh giá: ${new Date(review.createdAt).toLocaleDateString('vi-VN')}</p>
                             </div>
                             <div class="flex text-secondary gap-0.5">

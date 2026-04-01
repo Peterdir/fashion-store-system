@@ -120,11 +120,13 @@ class OrderDetailManager {
             <div class="p-5 flex flex-col hover:bg-gray-50/30 transition-all duration-300">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div class="flex items-center gap-5 flex-1 w-full">
-                        <div class="relative w-16 h-20 flex-shrink-0 shadow-sm border border-black/5 rounded-sm overflow-hidden">
-                            <img src="${imgUrl}" class="w-full h-full object-cover" onerror="this.src='${this.fallbackImg}'">
-                        </div>
+                        <a href="/product-detail/${item.productId}" class="relative w-16 h-20 flex-shrink-0 shadow-sm border border-black/5 rounded-sm overflow-hidden group/img">
+                            <img src="${imgUrl}" class="w-full h-full object-cover transition-all duration-500 group-hover/img:scale-110" onerror="this.src='${this.fallbackImg}'">
+                        </a>
                         <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-black text-black uppercase tracking-tight mb-1 truncate">${item.productName}</h4>
+                            <a href="/product-detail/${item.productId}" class="group/name">
+                                <h4 class="text-sm font-black text-black uppercase tracking-tight mb-1 truncate group-hover/name:text-accent transition-colors">${item.productName}</h4>
+                            </a>
                             <div class="flex flex-wrap gap-1.5 text-[9px] font-black uppercase tracking-widest mb-2.5">
                                 <span class="bg-neutral-50 px-1.5 py-0.5 border">MÀU: ${item.color || 'FREE'}</span>
                                 <span class="bg-neutral-50 px-1.5 py-0.5 border">SIZE: ${item.size || 'FREE'}</span>
