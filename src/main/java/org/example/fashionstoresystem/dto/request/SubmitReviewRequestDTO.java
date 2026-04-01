@@ -14,6 +14,8 @@ public class SubmitReviewRequestDTO {
     @NotNull(message = "ID sản phẩm không được để trống")
     private Long productId;
 
+    private Long orderItemId;
+
     @Min(value = 1, message = "Đánh giá thấp nhất là 1 sao")
     @Max(value = 5, message = "Đánh giá cao nhất là 5 sao")
     private int rating;

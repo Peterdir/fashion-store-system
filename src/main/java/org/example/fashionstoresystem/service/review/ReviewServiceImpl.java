@@ -65,6 +65,16 @@ public class ReviewServiceImpl implements ReviewService {
                 .comment(dto.getComment())
                 .createdAt(Instant.now())
                 .build();
+
+        // Nếu có orderItemId, đánh dấu OrderItem là đã đánh giá
+        if (dto.getOrderItemId() != null) {
+            orderItemRepository.findById(dto.getOrderItemId()).ifPresent(item -> {
+                item.setReviewed(true);
+                orderItemRepository.save(item);
+                review.setOrderItem(item);
+            });
+        }
+
         reviewRepository.save(review);
 
         return MessageResponseDTO.builder()

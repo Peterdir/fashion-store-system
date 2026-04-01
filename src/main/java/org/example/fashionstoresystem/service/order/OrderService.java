@@ -18,10 +18,10 @@ public interface OrderService {
     PlaceOrderResponseDTO placeOrder(PlaceOrderRequestDTO dto);
 
     // Theo dõi trạng thái đơn hàng - Xem danh sách đơn hàng
-    Page<OrderSummaryResponseDTO> getMyOrders(Long userId, List<OrderStatus> statuses, boolean hidden, Pageable pageable);
+    Page<OrderSummaryResponseDTO> getMyOrders(Long userId, List<OrderStatus> statuses, Pageable pageable);
 
     // Dùng cho giao diện cá nhân: Liệt kê chi tiết từng món đồ (OrderItem) của User
-    Page<OrderItemSummaryDTO> getMyOrderItems(Long userId, List<OrderStatus> statuses, boolean hidden, Pageable pageable);
+    Page<OrderItemSummaryDTO> getMyOrderItems(Long userId, List<OrderStatus> statuses, Boolean reviewed, Pageable pageable);
 
     // Theo dõi trạng thái đơn hàng - Xem chi tiết đơn hàng
     OrderDetailResponseDTO getMyOrderDetail(Long userId, Long orderId);
@@ -38,9 +38,4 @@ public interface OrderService {
     // Hoàn kho (dùng cho cleanup task)
     void revertInventory(Long orderId);
 
-    // Ẩn đơn hàng (Lưu trữ)
-    void hideOrder(Long userId, Long orderId);
-
-    // Khôi phục đơn hàng
-    void restoreOrder(Long userId, Long orderId);
 }

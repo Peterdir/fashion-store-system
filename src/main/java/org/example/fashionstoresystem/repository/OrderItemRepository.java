@@ -22,6 +22,12 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     List<OrderItem> findByOrderIdAndStatus(Long orderId, OrderStatus status);
 
     // Truy vấn dành cho UI Cá nhân: Tách mảnh sản phẩm dựa vào Phân luồng Status và User
-    Page<OrderItem> findByOrderUserIdAndStatusInAndOrderHiddenByUserOrderByOrderOrderDateDesc(Long userId, List<OrderStatus> statuses, boolean hidden, Pageable pageable);
+    Page<OrderItem> findByOrderUserIdAndStatusInOrderByOrderOrderDateDesc(Long userId, List<OrderStatus> statuses, Pageable pageable);
+
+    // Truy vấn có lọc trạng thái đánh giá (Dùng cho tab Đã giao & Đánh giá)
+    Page<OrderItem> findByOrderUserIdAndStatusInAndIsReviewedOrderByOrderOrderDateDesc(Long userId, List<OrderStatus> statuses, boolean isReviewed, Pageable pageable);
+
+    // Truy vấn các sản phẩm đã đánh giá (Dùng cho Lịch sử Review)
+    Page<OrderItem> findByOrderUserIdAndIsReviewedTrueOrderByOrderOrderDateDesc(Long userId, Pageable pageable);
 
 }

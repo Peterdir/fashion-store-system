@@ -56,6 +56,10 @@ public class OrderItem {
     private ProductVariant productVariant;
 
     @Builder.Default
+    @Column(name = "is_reviewed", nullable = false)
+    private boolean isReviewed = false;
+
+    @Builder.Default
     @OneToMany(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderHistory> orderHistories = new ArrayList<>();
 }

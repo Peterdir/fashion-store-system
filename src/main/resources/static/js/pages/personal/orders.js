@@ -27,8 +27,8 @@ const OrderModule = {
         'processing': 'PAID,PROCESSING',
         'shipped': 'SHIPPING',
         'review': 'DELIVERED,COMPLETED',
-        'return': 'CANCELLED,PAYMENT_FAILED,PAYMENT_EXPIRED',
-        'deleted': null
+        'reviewed': 'DELIVERED,COMPLETED',
+        'return': 'CANCELLED,PAYMENT_FAILED,PAYMENT_EXPIRED'
     },
 
     terminalStatuses: ['COMPLETED', 'CANCELLED', 'PAYMENT_FAILED', 'PAYMENT_EXPIRED'],
@@ -202,18 +202,23 @@ const OrderModule = {
         if (loadingArea) loadingArea.classList.remove('hidden');
         if (contentArea) {
             contentArea.classList.add('hidden');
-            // We don't clear innerHTML immediately to avoid flicker if it's just a page change
         }
 
         try {
             const backendStatus = this.statusMapping[status] || null;
-            const isDeletedTab = status === 'deleted';
-            let url = `/api/orders?page=${page}&size=10&hidden=${isDeletedTab}`;
+            let url = `/api/orders?page=${page}&size=10`;
             let isItemCard = false;
 
-            if (status !== 'all' && status !== 'unpaid' && status !== 'deleted') {
-                url = `/api/orders/items?page=${page}&size=10&hidden=${isDeletedTab}`;
+            if (status !== 'all' && status !== 'unpaid') {
+                url = `/api/orders/items?page=${page}&size=10`;
                 isItemCard = true;
+                
+                // Thêm tham số reviewed dựa trên tab
+                if (status === 'review') {
+                    url += `&reviewed=false`;
+                } else if (status === 'reviewed') {
+                    url += `&reviewed=true`;
+                }
             }
 
             if (backendStatus) {
@@ -269,7 +274,8 @@ const OrderModule = {
                 case 'unpaid': emptyIcon = 'account_balance_wallet'; emptyTitle = 'Tuyệt vời!'; emptyDesc = 'Bạn không có đơn hàng nào chờ thanh toán.'; break;
                 case 'processing': emptyIcon = 'inventory_2'; emptyTitle = 'Sẵn sàng!'; emptyDesc = 'Không có đơn hàng nào đang xử lý.'; break;
                 case 'shipped': emptyIcon = 'local_shipping'; emptyTitle = 'Đường thông!'; emptyDesc = 'Không có đơn hàng nào đang vận chuyển.'; break;
-                case 'review': emptyIcon = 'rate_review'; emptyTitle = 'Chưa có lịch sử!'; emptyDesc = 'Đơn hàng hoàn tất sẽ xuất hiện ở đây.'; break;
+                case 'review': emptyIcon = 'rate_review'; emptyTitle = 'Tuyệt vời!'; emptyDesc = 'Đã hết sản phẩm chờ đánh giá! Cảm ơn bạn.'; break;
+                case 'reviewed': emptyIcon = 'history_edu'; emptyTitle = 'Chưa có review!'; emptyDesc = 'Các sản phẩm bạn đã đánh giá sẽ được lưu trữ tại đây.'; break;
                 case 'return': emptyIcon = 'assignment_return'; emptyTitle = 'Đáng mừng!'; emptyDesc = 'Bạn không có đơn hàng nào bị hủy/lỗi.'; break;
             }
 
@@ -482,22 +488,14 @@ const OrderModule = {
                     <a href="/personal/order/${item.orderId}?fromStatus=${this.currentStatus}" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase hover:bg-neutral-50 transition-colors">Chi tiết</a>
                     ${payBtn}
                     ${cancelBtn}
-                    ${this.renderItemArchiveAction(item, statusEnum)}
-                    ${!returnBtn && !cancelBtn && !payBtn && !this.renderItemArchiveAction(item, statusEnum) ? `<a href="/product-detail/${item.productId}" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 hover:text-black transition-colors">Mua lại</a>` : (returnBtn || '')}
+                    ${this.renderItemActions(item, statusEnum)}
+                    ${!returnBtn && !cancelBtn && !payBtn && !this.renderItemActions(item, statusEnum) ? `<a href="/product-detail/${item.productId}" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 hover:text-black transition-colors">Mua lại</a>` : (returnBtn || '')}
                 </div>
             </div>
         `;
     },
-    renderItemArchiveAction(item, status) {
+    renderItemActions(item, status) {
         const orderId = item.orderId;
-        if (this.currentStatus === 'deleted') {
-            return `
-                <button onclick="OrderModule.restoreOrder(${orderId})" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-black hover:bg-neutral-50 transition-colors font-black">
-                    Khôi phục
-                </button>
-            `;
-        }
-
         let buttons = '';
         if (status === 'PAYMENT_EXPIRED' || status === 'CANCELLED' || status === 'PAYMENT_FAILED') {
             buttons += `
@@ -510,9 +508,9 @@ const OrderModule = {
         if (status === 'DELIVERED' || status === 'COMPLETED') {
             if (item.isReviewed) {
                 buttons += `
-                    <button class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 cursor-default flex items-center justify-center gap-1">
+                    <div class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-emerald-600 bg-emerald-50 border-x border-emerald-100 flex items-center justify-center gap-1">
                         <span class="material-symbols-outlined text-[13px]">verified</span> Đã đánh giá
-                    </button>
+                    </div>
                 `;
             } else {
                 buttons += `
@@ -524,13 +522,6 @@ const OrderModule = {
             }
         }
 
-        if (this.terminalStatuses.includes(status)) {
-            buttons += `
-                <button onclick="OrderModule.archiveOrder(${orderId})" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-black hover:bg-neutral-50 transition-colors">
-                    Lưu trữ
-                </button>
-            `;
-        }
         return buttons;
     },
 
@@ -880,43 +871,11 @@ const OrderModule = {
                             <a href="/personal/order/${order.orderId}?fromStatus=${this.currentStatus}" class="inline-block bg-black text-white px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-neutral-800 transition-all text-center">
                                 XEM CHI TIẾT
                             </a>
-                            ${this.renderArchiveAction(order.orderId, order.statusSummary)}
                         </div>
                     </div>
                 </div>
             </div>
         `;
-    },
-    renderArchiveAction(orderId, statusSummary) {
-        if (!statusSummary) return '';
-        const statuses = Object.keys(statusSummary);
-        const isAllTerminal = statuses.every(s => this.terminalStatuses.includes(s));
-
-        if (this.currentStatus === 'deleted') {
-            return `
-                <button onclick="OrderModule.restoreOrder(${orderId})" class="inline-block border border-black text-black px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-neutral-100 transition-all">
-                    KHÔI PHỤC
-                </button>
-            `;
-        }
-
-        let buttons = '';
-        if (statuses.includes('PAYMENT_EXPIRED') || statuses.includes('CANCELLED') || statuses.includes('PAYMENT_FAILED')) {
-            buttons += `
-                <button onclick="OrderModule.repurchaseOrder(${orderId})" class="inline-block border border-secondary text-secondary px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-secondary hover:text-white transition-all">
-                    MUA LẠI
-                </button>
-            `;
-        }
-
-        if (isAllTerminal) {
-            buttons += `
-                <button onclick="OrderModule.archiveOrder(${orderId})" class="inline-block border border-black text-black px-4 py-2 text-[9px] font-black uppercase tracking-widest hover:bg-neutral-100 transition-all">
-                    LƯU TRỮ
-                </button>
-            `;
-        }
-        return buttons;
     },
 
     /**
@@ -1050,6 +1009,7 @@ const OrderModule = {
         document.getElementById('review-product-img').src = productImg;
         document.getElementById('review-product-name').textContent = productName;
         document.getElementById('review-product-info').textContent = `Màu: ${color} • Size: ${size}`;
+        document.getElementById('review-order-item-id').value = orderItemId || '';
         
         // Reset modal
         this.selectRating(0);
@@ -1120,6 +1080,7 @@ const OrderModule = {
 
     async submitReview() {
         const productId = document.getElementById('review-product-id').value;
+        const orderItemId = document.getElementById('review-order-item-id').value;
         const rating = parseInt(document.getElementById('review-rating-value').value);
         const comment = document.getElementById('review-comment').value;
 
@@ -1133,7 +1094,7 @@ const OrderModule = {
             const response = await fetch('/api/reviews', { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId, rating, comment })
+                body: JSON.stringify({ productId, orderItemId, rating, comment })
             });
 
             if (response.ok) {
@@ -1257,91 +1218,33 @@ const OrderModule = {
         }, 500);
     },
 
-    /**
-     * Open Archive Confirmation Modal
-     */
-    openArchiveModal(orderId) {
-        this.selectedOrderIdForArchive = orderId;
-        const modal = document.getElementById('archive-order-modal');
-        const backdrop = modal.querySelector('.bg-backdrop-archive');
-        const content = modal.querySelector('.bg-modal-archive');
-
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            backdrop.classList.add('opacity-100');
-            content.classList.remove('scale-95', 'opacity-0');
-            content.classList.add('scale-100', 'opacity-100');
-        }, 10);
-    },
-
-    /**
-     * Close Archive Confirmation Modal
-     */
-    closeArchiveModal() {
-        const modal = document.getElementById('archive-order-modal');
-        const backdrop = modal.querySelector('.bg-backdrop-archive');
-        const content = modal.querySelector('.bg-modal-archive');
-
-        backdrop.classList.remove('opacity-100');
-        content.classList.add('scale-95', 'opacity-0');
-        content.classList.remove('scale-100', 'opacity-100');
-
-        setTimeout(() => {
-            modal.classList.add('hidden');
-        }, 300);
-    },
-
-    /**
-     * Legacy entry point for Archive, now opens modal
-     */
-    async archiveOrder(orderId) {
-        this.openArchiveModal(orderId);
-    },
-
-    /**
-     * Actual API call for archiving
-     */
-    async submitArchiveOrder() {
-        const orderId = this.selectedOrderIdForArchive;
-        if (!orderId) return;
-
-        try {
-            const response = await fetch(`/api/orders/${orderId}/hide`, { method: 'POST' });
-            if (!response.ok) throw new Error('Failed to archive order');
-
-            this.closeArchiveModal();
-            // Success: Reload
-            this.loadOrders(this.currentStatus);
-        } catch (error) {
-            console.error('Error archiving order:', error);
-            alert('Có lỗi xảy ra khi lưu trữ đơn hàng: ' + error.message);
-        }
-    },
-
-    async restoreOrder(orderId) {
-        try {
-            const response = await fetch(`/api/orders/${orderId}/restore`, { method: 'POST' });
-            if (!response.ok) throw new Error('Failed to restore order');
-
-            // Success: Reload
-            this.loadOrders(this.currentStatus);
-        } catch (error) {
-            console.error('Error restoring order:', error);
-            alert('Có lỗi xảy ra khi khôi phục đơn hàng: ' + error.message);
-        }
-    },
 
     showReviewSuccess() {
         const modal = document.getElementById('review-success-modal');
+        if (!modal) return;
+        
         const backdrop = modal.querySelector('.bg-backdrop-review-success');
         const content = modal.querySelector('.bg-modal-review-success');
 
+        // Reset state
         modal.classList.remove('hidden');
+        if (backdrop) {
+            backdrop.classList.remove('opacity-100');
+            backdrop.classList.add('opacity-0');
+        }
+        if (content) {
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale(90)', 'opacity-0');
+        }
+
+        // Trigger animation
         setTimeout(() => {
-            backdrop.classList.add('opacity-100');
-            content.classList.remove('scale-90', 'opacity-0');
-            content.classList.add('scale-100', 'opacity-100');
-        }, 10);
+            if (backdrop) backdrop.classList.add('opacity-100');
+            if (content) {
+                content.classList.remove('scale(90)', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }
+        }, 50);
     },
 
     closeReviewSuccess() {

@@ -31,7 +31,6 @@ import org.example.fashionstoresystem.repository.OrderItemRepository;
 import org.example.fashionstoresystem.repository.OrderRepository;
 import org.example.fashionstoresystem.repository.ProductVariantRepository;
 import org.example.fashionstoresystem.repository.UserRepository;
-import org.example.fashionstoresystem.repository.ReviewRepository;
 import org.example.fashionstoresystem.service.payment.MomoService;
 import org.example.fashionstoresystem.service.notification.NotificationService;
 import org.springframework.stereotype.Service;
@@ -62,7 +61,6 @@ public class OrderServiceImpl implements OrderService {
     private final MomoService momoService;
     private final NotificationService notificationService;
     private final CartService cartService;
-    private final ReviewRepository reviewRepository;
 
     // ĐẶT HÀNG
 
@@ -242,12 +240,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<OrderSummaryResponseDTO> getMyOrders(Long userId, List<OrderStatus> statuses, boolean hidden, Pageable pageable) {
+    public Page<OrderSummaryResponseDTO> getMyOrders(Long userId, List<OrderStatus> statuses, Pageable pageable) {
         Page<Order> orders;
         if (statuses == null || statuses.isEmpty()) {
-            orders = orderRepository.findAllMyOrders(userId, hidden, pageable);
+            orders = orderRepository.findAllMyOrders(userId, pageable);
         } else {
-            orders = orderRepository.searchMyOrdersByStatuses(userId, statuses, hidden, pageable);
+            orders = orderRepository.searchMyOrdersByStatuses(userId, statuses, pageable);
         }
 
         return orders
@@ -279,11 +277,28 @@ public class OrderServiceImpl implements OrderService {
                 });
     }
 
-    // THEO DÕI TRẠNG THÁI ĐƠN HÀNG - Xem danh sách Từng món (OrderItem)
     @Override
     @Transactional(readOnly = true)
-    public Page<OrderItemSummaryDTO> getMyOrderItems(Long userId, List<OrderStatus> statuses, boolean hidden, Pageable pageable) {
-        Page<OrderItem> items = orderItemRepository.findByOrderUserIdAndStatusInAndOrderHiddenByUserOrderByOrderOrderDateDesc(userId, statuses, hidden, pageable);
+    public Page<OrderItemSummaryDTO> getMyOrderItems(Long userId, List<OrderStatus> statuses, Boolean reviewed, Pageable pageable) {
+        Page<OrderItem> items;
+        
+        if (Boolean.TRUE.equals(reviewed)) {
+            // Trường hợp: Lấy Lịch sử Review (Tất cả sản phẩm đã được đánh giá thành công)
+            items = orderItemRepository.findByOrderUserIdAndIsReviewedTrueOrderByOrderOrderDateDesc(userId, pageable);
+        } else if (Boolean.FALSE.equals(reviewed)) {
+            // Trường hợp: Lấy sản phẩm chờ đánh giá (Lọc theo isReviewed = false)
+            items = orderItemRepository.findByOrderUserIdAndStatusInAndIsReviewedOrderByOrderOrderDateDesc(userId, statuses, false, pageable);
+        } else {
+            // Trường hợp: Các tab khác (shipped, processing, etc. - không lọc isReviewed)
+            // Nếu statuses chỉ chứa DELIVERED hoặc COMPLETED (Tab Đánh giá mặc định), chỉ lấy sản phẩm chưa đánh giá
+            boolean isReviewTab = statuses != null && (statuses.contains(OrderStatus.DELIVERED) || statuses.contains(OrderStatus.COMPLETED)) && statuses.size() <= 2;
+            
+            if (isReviewTab) {
+                items = orderItemRepository.findByOrderUserIdAndStatusInAndIsReviewedOrderByOrderOrderDateDesc(userId, statuses, false, pageable);
+            } else {
+                items = orderItemRepository.findByOrderUserIdAndStatusInOrderByOrderOrderDateDesc(userId, statuses, pageable);
+            }
+        }
 
         return items.map(item -> OrderItemSummaryDTO.builder()
                 .orderItemId(item.getId())
@@ -302,7 +317,7 @@ public class OrderServiceImpl implements OrderService {
                 .status(item.getStatus())
                 .refundStatus(item.getRefundStatus())
                 .cancellationReason(item.getCancellationReason())
-                .isReviewed(item.getProductVariant() != null && reviewRepository.existsByUserIdAndProductId(userId, item.getProductVariant().getProduct().getId()))
+                .isReviewed(item.isReviewed())
                 .build());
     }
 
@@ -467,23 +482,6 @@ public class OrderServiceImpl implements OrderService {
                 .build();
     }
 
-    @Override
-    @Transactional
-    public void hideOrder(Long userId, Long orderId) {
-        Order order = orderRepository.findByIdAndUserId(orderId, userId)
-                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại!"));
-        order.setHiddenByUser(true);
-        orderRepository.save(order);
-    }
-
-    @Override
-    @Transactional
-    public void restoreOrder(Long userId, Long orderId) {
-        Order order = orderRepository.findByIdAndUserId(orderId, userId)
-                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại!"));
-        order.setHiddenByUser(false);
-        orderRepository.save(order);
-    }
     
     @Override
     @Transactional

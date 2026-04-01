@@ -511,8 +511,8 @@
                                     <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="processing">Đang chuẩn bị</button>
                                     <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="shipped">Đang giao</button>
                                     <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="review">Đã giao & Đánh giá</button>
+                                    <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="reviewed">Lịch sử Review</button>
                                     <button class="order-subtab h-full flex items-center text-[11px] font-bold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors whitespace-nowrap" data-status="return">Trả hàng/Hủy</button>
-                                    <button class="order-subtab h-full flex items-center text-[11px] font-medium tracking-tight text-on-surface-variant/30 hover:text-primary transition-colors whitespace-nowrap" data-status="deleted">Đơn đã lưu trữ</button>
                                 </div>
                             </div>
 
@@ -860,7 +860,9 @@
                         </div>
                     </div>
 
-                    <!-- Success Modal for Password Change -->
+                    </div>
+
+                    <!-- Modals Section -->
                     <div id="pc-password-success-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6 pointer-events-none">
                         <div class="absolute inset-0 bg-white/40 backdrop-blur-md opacity-0 transition-opacity duration-700 bg-backdrop"></div>
                         <div class="relative bg-white w-full max-w-[320px] p-10 shadow-[0_30px_70px_rgba(0,0,0,0.15)] border border-outline/5 text-center transform scale-90 opacity-0 transition-all duration-500 bg-modal">
@@ -877,7 +879,6 @@
                         </div>
                     </div>
 
-                    <!-- Return Request Success Modal -->
                     <div id="return-success-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6">
                         <div class="absolute inset-0 bg-white/60 backdrop-blur-md opacity-0 transition-opacity duration-700 bg-backdrop-success"></div>
                         <div class="relative bg-white w-full max-w-[360px] p-12 shadow-[0_40px_80px_rgba(0,0,0,0.2)] border border-black text-center transform scale-90 opacity-0 transition-all duration-500 bg-modal-success">
@@ -891,66 +892,19 @@
                             </div>
                             <h3 class="text-sm font-black uppercase tracking-widest mb-6 text-black">Yêu cầu đã gửi thành công</h3>
                             <p class="text-[10px] font-bold text-gray-500 tracking-wide leading-loose mb-10">Chúng tôi sẽ xem xét nội dung và phản hồi cho bạn trong vòng 24 - 48 giờ làm việc qua email hoặc thông báo này.</p>
-                            
-                            <button onclick="OrderModule.closeReturnSuccess()" 
-                                    class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all shadow-lg active:scale-95">
-                                Đóng
-                            </button>
+                            <button onclick="OrderModule.closeReturnSuccess()" class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all shadow-lg active:scale-95">Đóng</button>
                         </div>
                     </div>
 
-                    <!-- Archive Order Confirmation Modal (MỚI) -->
-                    <div id="archive-order-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4">
-                        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 bg-backdrop-archive" onclick="OrderModule.closeArchiveModal()"></div>
-                        <div class="relative bg-white w-full max-w-[400px] shadow-2xl border border-black transform scale-95 opacity-0 transition-all duration-300 bg-modal-archive overflow-hidden">
-                            <!-- Modal Header -->
-                            <div class="border-b border-black p-5 flex justify-between items-center bg-gray-50">
-                                <h3 class="text-xs font-black uppercase tracking-[0.2em]">Xác nhận lưu trữ</h3>
-                                <button onclick="OrderModule.closeArchiveModal()" class="material-symbols-outlined text-xl hover:rotate-90 transition-transform text-gray-400">close</button>
-                            </div>
-
-                            <div class="p-8 space-y-6 text-center">
-                                <div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-2">
-                                    <span class="material-symbols-outlined text-3xl text-amber-500">archive</span>
-                                </div>
-                                
-                                <div class="space-y-2">
-                                    <h4 class="text-sm font-black tracking-tight text-black">Ẩn đơn hàng này?</h4>
-                                    <p class="text-[11px] font-bold text-gray-500 tracking-tight leading-relaxed">
-                                        Đơn hàng sẽ được chuyển vào mục <br>
-                                        <span class="text-black font-black">"Lịch sử đơn hàng đã xóa"</span>.
-                                    </p>
-                                </div>
-
-                                <div class="flex gap-3 pt-2">
-                                    <button onclick="OrderModule.closeArchiveModal()" 
-                                            class="flex-1 border border-black px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-gray-50 transition-all">
-                                        Hủy bỏ
-                                    </button>
-                                    <button onclick="OrderModule.submitArchiveOrder()" 
-                                            class="flex-1 bg-black text-white px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-neutral-800 transition-all shadow-xl active:scale-95">
-                                        Xác nhận ẩn
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Cancel Order Modal (MỚI) -->
                     <div id="cancel-order-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4">
                         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 bg-backdrop-cancel" onclick="OrderModule.closeCancelModal()"></div>
                         <div class="relative bg-white w-full max-w-[450px] shadow-2xl border border-black transform scale-95 opacity-0 transition-all duration-300 bg-modal-cancel overflow-hidden">
-                            <!-- Modal Header -->
                             <div class="border-b border-black p-5 flex justify-between items-center bg-gray-50">
                                 <h3 class="text-xs font-black uppercase tracking-[0.2em]">Xác nhận hủy đơn hàng</h3>
                                 <button onclick="OrderModule.closeCancelModal()" class="material-symbols-outlined text-xl hover:rotate-90 transition-transform">close</button>
                             </div>
-
                             <div class="p-6 space-y-5">
-                                <p class="text-[11px] font-bold text-gray-500 tracking-tight leading-relaxed">
-                                    Bạn có chắc chắn muốn hủy đơn hàng <span id="cancel-order-display-id" class="text-black font-black">#ORD-000000</span> không? Hành động này không thể hoàn tác.
-                                </p>
-
+                                <p class="text-[11px] font-bold text-gray-500 tracking-tight leading-relaxed">Bạn có chắc chắn muốn hủy đơn hàng <span id="cancel-order-display-id" class="text-black font-black">#ORD-000000</span> không? Hành động này không thể hoàn tác.</p>
                                 <div class="space-y-2">
                                     <label class="text-[10px] font-bold tracking-wide text-gray-400">Lý do hủy đơn <span class="text-red-500">*</span></label>
                                     <div class="relative">
@@ -967,57 +921,35 @@
                                         <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-sm">expand_more</span>
                                     </div>
                                 </div>
-
                                 <div class="space-y-2" id="cancel-custom-reason-container">
                                     <label class="text-[10px] font-bold tracking-wide text-gray-400">Ghi chú thêm</label>
-                                    <textarea id="cancel-description" rows="3" 
-                                              class="w-full bg-white border border-black p-4 text-[11px] font-bold tracking-tight focus:ring-0 outline-none resize-none placeholder:text-gray-200"
-                                              placeholder="Nhập lý do chi tiết nếu chọn 'Khác'..."></textarea>
+                                    <textarea id="cancel-description" rows="3" class="w-full bg-white border border-black p-4 text-[11px] font-bold tracking-tight focus:ring-0 outline-none resize-none placeholder:text-gray-200" placeholder="Nhập lý do chi tiết nếu chọn 'Khác'..."></textarea>
                                 </div>
-
                                 <div class="flex gap-4 pt-2">
-                                    <button onclick="OrderModule.closeCancelModal()" 
-                                            class="flex-1 border border-black px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-black hover:text-white transition-all">
-                                        Đóng
-                                    </button>
-                                    <button onclick="OrderModule.submitCancelOrder()" 
-                                            class="flex-1 bg-red-600 text-white px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-red-700 transition-all shadow-xl active:scale-95">
-                                        Xác nhận hủy
-                                    </button>
+                                    <button onclick="OrderModule.closeCancelModal()" class="flex-1 border border-black px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-black hover:text-white transition-all">Đóng</button>
+                                    <button onclick="OrderModule.submitCancelOrder()" class="flex-1 bg-red-600 text-white px-6 py-3.5 text-[11px] font-bold tracking-tight hover:bg-red-700 transition-all shadow-xl active:scale-95">Xác nhận hủy</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Repurchase Order Modal (MỚI) -->
                     <div id="repurchase-order-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4">
                         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 bg-backdrop-repurchase" onclick="OrderModule.closeRepurchaseModal()"></div>
                         <div class="relative bg-white w-full max-w-[400px] shadow-2xl border border-black transform scale-95 opacity-0 transition-all duration-300 bg-modal-repurchase overflow-hidden">
                             <div class="p-8 text-center space-y-6">
-                                <div class="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto border border-black">
-                                    <span class="material-symbols-outlined text-2xl">refresh</span>
-                                </div>
+                                <div class="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto border border-black"><span class="material-symbols-outlined text-2xl">refresh</span></div>
                                 <div class="space-y-2">
                                     <h3 class="text-xs font-black uppercase tracking-[0.2em]">Mua lại đơn hàng?</h3>
-                                    <p class="text-[10px] font-bold text-gray-400 tracking-wide leading-loose px-4">
-                                        Bạn có muốn thêm tất cả sản phẩm trong đơn hàng này vào giỏ hàng để mua lại không?
-                                    </p>
+                                    <p class="text-[10px] font-bold text-gray-400 tracking-wide leading-loose px-4">Bạn có muốn thêm tất cả sản phẩm trong đơn hàng này vào giỏ hàng để mua lại không?</p>
                                 </div>
                                 <div class="flex gap-3 pt-4">
-                                    <button onclick="OrderModule.closeRepurchaseModal()" 
-                                            class="flex-1 border border-black px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-50 transition-all">
-                                        Hủy
-                                    </button>
-                                    <button onclick="OrderModule.submitRepurchaseOrder()" 
-                                            class="flex-1 bg-black text-white px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-800 transition-all shadow-lg active:scale-95">
-                                        Mua lại
-                                    </button>
+                                    <button onclick="OrderModule.closeRepurchaseModal()" class="flex-1 border border-black px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-50 transition-all">Hủy</button>
+                                    <button onclick="OrderModule.submitRepurchaseOrder()" class="flex-1 bg-black text-white px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-800 transition-all shadow-lg active:scale-95">Mua lại</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Cancel Success Modal (MỚI) -->
                     <div id="cancel-success-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6">
                         <div class="absolute inset-0 bg-white/60 backdrop-blur-md opacity-0 transition-opacity duration-700 bg-backdrop-cancel-success"></div>
                         <div class="relative bg-white w-full max-w-[360px] p-12 shadow-[0_40px_80px_rgba(0,0,0,0.2)] border border-black text-center transform scale-90 opacity-0 transition-all duration-500 bg-modal-cancel-success">
@@ -1031,58 +963,37 @@
                             </div>
                             <h3 class="text-sm font-black uppercase tracking-tight mb-4 text-red-600">Đã hủy đơn hàng</h3>
                             <p class="text-[10px] font-bold text-gray-500 tracking-tight leading-loose mb-10">Đơn hàng của bạn đã được hủy thành công. Nếu đã thanh toán, chúng tôi sẽ xử lý hoàn tiền trong thời gian sớm nhất.</p>
-                            
-                            <button onclick="OrderModule.closeCancelSuccess()" 
-                                    class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all">
-                                Đóng
-                            </button>
+                            <button onclick="OrderModule.closeCancelSuccess()" class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all">Đóng</button>
                         </div>
                     </div>
 
-                    <!-- Cancel Failed Modal (MỚI) -->
                     <div id="cancel-failed-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6">
                         <div class="absolute inset-0 bg-white/60 backdrop-blur-md opacity-0 transition-opacity duration-700 bg-backdrop-cancel-failed"></div>
                         <div class="relative bg-white w-full max-w-[360px] p-12 shadow-[0_40px_80px_rgba(0,0,0,0.2)] border border-black text-center transform scale-90 opacity-0 transition-all duration-500 bg-modal-cancel-failed">
                             <div class="error-xmark mb-16">
-                                <div class="x-icon">
-                                    <span class="icon-line line-left"></span>
-                                    <span class="icon-line line-right"></span>
-                                    <div class="icon-circle"></div>
-                                </div>
+                                <div class="x-icon"><span class="icon-line line-left"></span><span class="icon-line line-right"></span><div class="icon-circle"></div></div>
                             </div>
                             <h3 class="text-sm font-black uppercase tracking-tight mb-4 text-amber-600">Không thể hủy đơn</h3>
                             <p id="cancel-failed-message" class="text-[10px] font-bold text-gray-500 tracking-tight leading-loose mb-10">Đơn hàng của bạn đã chuyển sang trạng thái xử lý/vận chuyển và không thể tự hủy lúc này.</p>
-                            
-                            <button onclick="OrderModule.closeCancelFailed()" 
-                                    class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all">
-                                Đã hiểu
-                            </button>
+                            <button onclick="OrderModule.closeCancelFailed()" class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all">Đã hiểu</button>
                         </div>
                     </div>
 
-                    <!-- Product Review Modal (MỚI) -->
                     <div id="review-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4">
                         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 bg-backdrop-review" onclick="OrderModule.closeReviewModal()"></div>
                         <div class="relative bg-white w-full max-w-[500px] shadow-2xl border border-black transform scale-95 opacity-0 transition-all duration-300 bg-modal-review overflow-hidden">
-                            <!-- Modal Header -->
                             <div class="border-b border-black p-5 flex justify-between items-center bg-gray-50 text-black">
                                 <h2 class="text-xs font-black uppercase tracking-[0.2em]">Đánh giá sản phẩm</h2>
                                 <button onclick="OrderModule.closeReviewModal()" class="material-symbols-outlined text-xl hover:rotate-90 transition-transform">close</button>
                             </div>
-
                             <div class="p-6 space-y-6">
-                                <!-- Product Info Summary -->
                                 <div class="flex items-center gap-4 bg-neutral-50 p-4 border border-black/5">
-                                    <div class="w-16 h-20 shrink-0 border border-black/10 bg-white">
-                                        <img id="review-product-img" src="" class="w-full h-full object-cover">
-                                    </div>
+                                    <div class="w-16 h-20 shrink-0 border border-black/10 bg-white"><img id="review-product-img" src="" class="w-full h-full object-cover"></div>
                                     <div class="flex-1 min-w-0">
                                         <h4 id="review-product-name" class="text-[11px] font-bold tracking-tight truncate text-black">Product Name</h4>
                                         <p id="review-product-info" class="text-[10px] font-medium text-gray-400 tracking-wide mt-1">Màu: Black • Size: L</p>
                                     </div>
                                 </div>
-
-                                <!-- Star Rating -->
                                 <div class="space-y-3 text-center">
                                     <label class="text-[10px] font-bold tracking-wide text-gray-400 block">Chất lượng sản phẩm</label>
                                     <div class="flex items-center justify-center gap-2" id="star-rating-container">
@@ -1096,31 +1007,20 @@
                                     <p id="rating-text" class="text-[11px] font-bold tracking-tight text-secondary min-h-[15px]"></p>
                                     <input type="hidden" id="review-rating-value" value="0">
                                     <input type="hidden" id="review-product-id" value="">
+                                    <input type="hidden" id="review-order-item-id" value="">
                                 </div>
-
-                                <!-- Feedback Content -->
                                 <div class="space-y-2">
                                     <label class="text-[10px] font-bold tracking-wide text-gray-400">Chia sẻ cảm nhận của bạn</label>
-                                    <textarea id="review-comment" rows="4" 
-                                              class="w-full bg-white border border-black p-4 text-[11px] font-bold tracking-tight focus:ring-0 outline-none resize-none placeholder:text-gray-200 text-black"
-                                              placeholder="Bạn thấy sản phẩm như thế nào? Hãy chia sẻ cùng H&Y nhé..."></textarea>
+                                    <textarea id="review-comment" rows="4" class="w-full bg-white border border-black p-4 text-[11px] font-bold tracking-tight focus:ring-0 outline-none resize-none placeholder:text-gray-200 text-black" placeholder="Bạn thấy sản phẩm như thế nào? Hãy chia sẻ cùng H&Y nhé..."></textarea>
                                 </div>
-
-                                <!-- Action Buttons -->
                                 <div class="flex gap-4 pt-2">
-                                    <button onclick="OrderModule.closeReviewModal()" 
-                                            class="flex-1 border border-black px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-50 transition-all text-black">
-                                        Trở lại
-                                    </button>
-                                    <button onclick="OrderModule.submitReview()" 
-                                            class="flex-1 bg-black text-white px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-800 transition-all shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                                        Gửi đánh giá
-                                    </button>
+                                    <button onclick="OrderModule.closeReviewModal()" class="flex-1 border border-black px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-50 transition-all text-black">Trở lại</button>
+                                    <button onclick="OrderModule.submitReview()" class="flex-1 bg-black text-white px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-800 transition-all shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">Gửi đánh giá</button>
                                 </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Review Success Modal (MỚI) -->
                     <div id="review-success-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6">
                         <div class="absolute inset-0 bg-white/60 backdrop-blur-md opacity-0 transition-opacity duration-700 bg-backdrop-review-success"></div>
                         <div class="relative bg-white w-full max-w-[360px] p-12 shadow-[0_40px_80px_rgba(0,0,0,0.2)] border border-black text-center transform scale-90 opacity-0 transition-all duration-500 bg-modal-review-success">
@@ -1133,21 +1033,13 @@
                                 </div>
                             </div>
                             <h3 class="text-sm font-black uppercase tracking-tight mb-4 text-secondary">Đã gửi đánh giá</h3>
-                            <p class="text-[10px] font-bold text-gray-400 tracking-tight leading-loose mb-10">
-                                H&Y xin chân thành cảm ơn feedback của bạn. Mong rằng bạn sẽ có những trải nghiệm tuyệt vời cùng sản phẩm!
-                            </p>
-                            
-                            <button onclick="OrderModule.closeReviewSuccess()" 
-                                    class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all">
-                                Đóng
-                            </button>
+                            <p class="text-[10px] font-bold text-gray-400 tracking-tight leading-loose mb-10">H&Y xin chân thành cảm ơn feedback của bạn. Mong rằng bạn sẽ có những trải nghiệm tuyệt vời cùng sản phẩm!</p>
+                            <button onclick="OrderModule.closeReviewSuccess()" class="w-full border border-black bg-black text-white px-8 py-4 text-[11px] font-bold tracking-tight hover:bg-white hover:text-black transition-all">Đóng</button>
                         </div>
                     </div>
 
                     <style>
                         .success-checkmark, .error-xmark { width: 80px; height: 100px; margin: 0 auto; position: relative; }
-                        
-                        /* Success Checkmark Style */
                         .check-icon { width: 80px; height: 80px; position: relative; border-radius: 50%; box-sizing: content-box; border: 4px solid #58b76c; }
                         .check-icon::before { top: 3px; left: -2px; width: 30px; transform-origin: 100% 50%; border-radius: 100px 0 0 100px; }
                         .check-icon::after { top: 0; left: 30px; width: 60px; transform-origin: 0 50%; border-radius: 0 100px 100px 0; animation: rotate-circle 4.25s ease-in; }
@@ -1157,20 +1049,16 @@
                         .icon-line.line-long { top: 38px; right: 8px; width: 47px; transform: rotate(-45deg); animation: icon-line-long 0.75s; }
                         .icon-circle { top: -4px; left: -4px; z-index: 10; width: 80px; height: 80px; border-radius: 50%; position: absolute; box-sizing: content-box; border: 4px solid rgba(88, 183, 108, .5); }
                         .icon-fix { top: 8px; width: 5px; left: 28px; z-index: 1; height: 85px; position: absolute; transform: rotate(-45deg); background-color: #FFFFFF; }
-                        
-                        /* Error X-Mark Style */
                         .x-icon { width: 80px; height: 80px; position: relative; border-radius: 50%; box-sizing: content-box; border: 4px solid #f27474; }
                         .x-icon .icon-line { background-color: #f27474; top: 37px; width: 47px; }
                         .x-icon .icon-line.line-left { left: 17px; transform: rotate(45deg); animation: icon-line-left 0.75s; }
                         .x-icon .icon-line.line-right { right: 17px; transform: rotate(-45deg); animation: icon-line-right 0.75s; }
                         .error-xmark .icon-circle { border: 4px solid rgba(242, 116, 116, .5); }
-
                         @keyframes rotate-circle { 0% { transform: rotate(-45deg); } 5% { transform: rotate(-45deg); } 12% { transform: rotate(-405deg); } 100% { transform: rotate(-405deg); } }
                         @keyframes icon-line-tip { 0% { width: 0; left: 1px; top: 19px; } 54% { width: 0; left: 1px; top: 19px; } 70% { width: 50px; left: -8px; top: 37px; } 84% { width: 17px; left: 21px; top: 48px; } 100% { width: 25px; left: 14px; top: 46px; } }
                         @keyframes icon-line-long { 0% { width: 0; right: 46px; top: 54px; } 65% { width: 0; right: 46px; top: 54px; } 84% { width: 55px; right: 0px; top: 35px; } 100% { width: 47px; right: 8px; top: 38px; } }
                         @keyframes icon-line-left { 0% { width: 0; left: 40px; top: 37px; } 100% { width: 47px; left: 17px; top: 37px; } }
                         @keyframes icon-line-right { 0% { width: 0; right: 40px; top: 37px; } 100% { width: 47px; right: 17px; top: 37px; } }
-
                         .bg-backdrop.show { opacity: 1; }
                         .bg-modal.show { opacity: 1; transform: scale(1); }
                     </style>
