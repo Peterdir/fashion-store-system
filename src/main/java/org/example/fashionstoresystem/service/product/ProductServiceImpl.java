@@ -107,6 +107,7 @@ public class ProductServiceImpl implements ProductService {
                 .minPrice(product.getVariants().isEmpty() ? 0.0 : product.getVariants().stream().mapToDouble(ProductVariant::getPrice).min().orElse(0.0))
                 .category(getParentCategoryName(product))
                 .categoryName(getCategoryName(product))
+                .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
                 .description(product.getDescription())
                 .status(product.getStatus())
                 .averageRating(avgRating != null ? avgRating : 0.0)
@@ -196,9 +197,9 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("Giá sản phẩm không hợp lệ");
         }
 
-        // Tìm hoặc tạo Category từ tên
-        Category category = categoryRepository.findByName(dto.getCategory())
-                .orElseGet(() -> categoryRepository.save(Category.builder().name(dto.getCategory()).build()));
+        // Tìm Category từ ID
+        Category category = categoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại!"));
 
         Product product = Product.builder()
                 .name(dto.getName())
@@ -248,9 +249,9 @@ public class ProductServiceImpl implements ProductService {
         }
 
         if (dto.getName() != null) product.setName(dto.getName());
-        if (dto.getCategory() != null) {
-            Category category = categoryRepository.findByName(dto.getCategory())
-                    .orElseGet(() -> categoryRepository.save(Category.builder().name(dto.getCategory()).build()));
+        if (dto.getCategoryId() != null) {
+            Category category = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại!"));
             product.setCategory(category);
         }
         if (dto.getDescription() != null) product.setDescription(dto.getDescription());

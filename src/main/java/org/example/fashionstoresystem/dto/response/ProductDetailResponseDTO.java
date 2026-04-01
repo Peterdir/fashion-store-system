@@ -18,6 +18,7 @@ public class ProductDetailResponseDTO {
     private String name;
     private Double price;
     private String category;
+    private Long categoryId;
     private String description;
     private ProductStatus status;
     private String mainImage;

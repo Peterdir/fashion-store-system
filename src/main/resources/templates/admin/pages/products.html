@@ -126,8 +126,11 @@
                             </div>
                             <div class="space-y-1">
                                 <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Danh mục <span class="text-red-500">*</span></label>
-                                <input type="text" id="form-category" required maxlength="100" placeholder="Ví dụ: Áo Polo"
-                                       class="w-full px-3 py-2.5 text-[12px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors">
+                                <select id="form-category" required
+                                        class="w-full px-3 py-2.5 text-[12px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors">
+                                    <option value="" disabled selected>Chọn danh mục</option>
+                                    <!-- Options populated by JS -->
+                                </select>
                             </div>
                             <div class="space-y-1">
                                 <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Giá (₫) <span class="text-red-500">*</span></label>

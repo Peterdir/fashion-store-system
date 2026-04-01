@@ -11,6 +11,7 @@ const AdminProducts = (() => {
         CREATE: '/api/admin/products',                // POST — tạo mới
         UPDATE: (id) => `/api/admin/products/${id}`,  // PUT  — cập nhật
         DELETE: (id) => `/api/admin/products/${id}`,  // DELETE — xóa
+        CATEGORIES: '/api/admin/categories',          // GET  — danh sách danh mục
     };
 
     const PAGE_SIZE = 10;
@@ -239,6 +240,31 @@ const AdminProducts = (() => {
         container.appendChild(row);
     }
 
+    async function loadCategories() {
+        const select = $('form-category');
+        if (!select) return;
+
+        try {
+            const res = await fetch(API.CATEGORIES);
+            if (!res.ok) throw new Error('Không thể tải danh sách danh mục');
+            const categories = await res.json();
+
+            // Giữ lại option placeholder đầu tiên
+            const firstOption = select.options[0];
+            select.innerHTML = '';
+            select.appendChild(firstOption);
+
+            categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat.id;
+                opt.textContent = cat.name;
+                select.appendChild(opt);
+            });
+        } catch (err) {
+            console.error('Category load error:', err);
+        }
+    }
+
     function resetForm() {
         $('product-form').reset();
         $('form-product-id').value = '';
@@ -247,6 +273,7 @@ const AdminProducts = (() => {
         $('variants-container').innerHTML = '';
         addImageInput();
         addVariantRow();
+        loadCategories(); // Reload categories to ensure list is fresh
     }
 
     // --- Open modal for CREATE ---
@@ -279,7 +306,13 @@ const AdminProducts = (() => {
 
             $('form-product-id').value = product.productId;
             $('form-name').value = product.name || '';
-            $('form-category').value = product.category || product.categoryName || '';
+            
+            // Wait a bit for categories to load if they haven't yet
+            if ($('form-category').options.length <= 1) {
+                await loadCategories();
+            }
+            $('form-category').value = product.categoryId || '';
+            
             $('form-price').value = product.price || '';
             $('form-description').value = product.description || '';
 
@@ -366,7 +399,7 @@ const AdminProducts = (() => {
         // Build payload
         const payload = {
             name: $('form-name').value.trim(),
-            category: $('form-category').value.trim(),
+            categoryId: parseInt($('form-category').value),
             price: parseFloat($('form-price').value),
             description: $('form-description').value.trim(),
             imageUrls,
