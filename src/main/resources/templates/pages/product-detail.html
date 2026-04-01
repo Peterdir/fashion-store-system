@@ -18,8 +18,8 @@
                 </div>
 
                 <!-- 2. CENTER: Main Image Display -->
-                <div class="flex-1">
-                    <div class="bg-surface-low aspect-[3/4] overflow-hidden relative group">
+                <div class="flex-1 flex justify-center lg:justify-start">
+                    <div class="bg-surface-low aspect-[3/4] overflow-hidden relative group w-full max-w-[550px] shadow-sm">
                         <img id="main-product-image" 
                              th:src="${product.mainImage}" 
                              th:alt="${product.name}" 
@@ -47,13 +47,12 @@
                             
                             <!-- Rating Summary -->
                             <div class="flex items-center gap-3">
-                                <div class="flex items-center gap-0.5 text-yellow-400">
-                                    <span th:each="i : ${#numbers.sequence(1, 5)}" 
-                                          class="material-symbols-outlined text-sm"
-                                          th:style="|font-variation-settings: 'FILL' ${i <= product.averageRating ? 1 : 0}|"
-                                          th:text="${i <= product.averageRating ? 'star' : (i - 0.5 <= product.averageRating ? 'star_half' : 'star')}">
-                                        star
-                                    </span>
+                                <div class="relative inline-flex text-yellow-400/20 material-symbols-outlined select-none text-sm tracking-tight">
+                                    <span>star star star star star</span>
+                                    <div class="absolute top-0 left-0 overflow-hidden text-yellow-400 whitespace-nowrap transition-all duration-700" 
+                                         th:style="|width: ${product.averageRating * 20}%|">
+                                        <span>star star star star star</span>
+                                    </div>
                                 </div>
                                 <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest" 
                                       th:if="${product.reviewCount > 0}"
@@ -166,8 +165,14 @@
                     <h2 class="text-3xl font-light text-neutral-800">Đánh giá từ khách hàng</h2>
                 </div>
                 <div class="flex items-center gap-4 py-2 px-6 bg-surface-low border border-outline/10 text-neutral-500" th:if="${product.reviewCount > 0}">
-                    <div class="flex items-center gap-1 text-yellow-400">
-                        <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1">star</span>
+                    <div class="flex items-center gap-2">
+                        <div class="relative inline-flex text-yellow-400/20 material-symbols-outlined select-none text-lg tracking-tight">
+                            <span>star star star star star</span>
+                            <div class="absolute top-0 left-0 overflow-hidden text-yellow-400 whitespace-nowrap" 
+                                 th:style="|width: ${product.averageRating * 20}%|">
+                                <span>star star star star star</span>
+                            </div>
+                        </div>
                         <span class="text-xl font-bold text-neutral-900" th:text="${#numbers.formatDecimal(product.averageRating, 1, 1)}">4.5</span>
                     </div>
                     <div class="h-4 w-[1px] bg-outline/20"></div>
