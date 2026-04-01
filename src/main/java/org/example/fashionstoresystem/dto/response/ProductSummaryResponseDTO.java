@@ -15,6 +15,11 @@ public class ProductSummaryResponseDTO {
     private String name;
     private Double price;
     private String category;
+    private String subcategory;
     private ProductStatus status;
     private String primaryImageUrl;
+    private String hoverImageUrl;
+    private Double minPrice;
+    private Double averageRating;
+    private Long reviewCount;
 }

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+
+<th:block th:fragment="sidebar">
+
+    <!-- Overlay Mobile -->
+    <div class="fixed inset-0 bg-black/40 backdrop-blur-sm z-20 lg:hidden transition-opacity"
+         x-show="sidebarOpen"
+         x-transition:enter="transition-opacity ease-linear duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-linear duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="sidebarOpen = false"></div>
+
+    <!-- Sidebar -->
+    <aside class="absolute left-0 top-0 z-30 flex h-screen w-60 flex-col bg-black text-white transition-transform duration-300 ease-in-out lg:static lg:translate-x-0"
+           :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
+
+        <!-- Logo H&Y -->
+        <div class="flex items-center justify-between px-5 py-5 border-b border-white/10">
+            <a th:href="@{/admin/dashboard}" class="flex items-center gap-2.5">
+                <img th:src="@{/images/logo.png}" alt="H&amp;Y Logo" class="w-8 h-8 object-contain">
+                <div>
+                    <span class="text-[13px] font-black tracking-[0.15em] uppercase text-white block leading-tight">H&amp;Y Admin</span>
+                    <span class="text-[9px] font-medium text-neutral-500 tracking-widest uppercase">Digital Curator</span>
+                </div>
+            </a>
+            <button @click="sidebarOpen = false" class="lg:hidden text-neutral-500 hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-xl">close</span>
+            </button>
+        </div>
+
+        <!-- Menu Sections -->
+        <nav class="flex-1 overflow-y-auto px-3 py-5 space-y-6">
+
+            <!-- QUẢN LÝ -->
+            <div>
+                <p class="px-3 text-[9px] font-bold text-neutral-600 uppercase tracking-[0.2em] mb-2">Quản Lý</p>
+                <div class="space-y-0.5">
+                    <a th:href="@{/admin/dashboard}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-neutral-400 hover:bg-white/5 hover:text-white transition-colors group">
+                        <span class="material-symbols-outlined text-[18px] text-neutral-500 group-hover:text-accent transition-colors">space_dashboard</span>
+                        <span class="text-[12px] font-bold">Tổng Quan</span>
+                    </a>
+                    <a th:href="@{/admin/orders}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-neutral-400 hover:bg-white/5 hover:text-white transition-colors group">
+                        <span class="material-symbols-outlined text-[18px] text-neutral-500 group-hover:text-accent transition-colors">receipt_long</span>
+                        <span class="text-[12px] font-bold">Đơn Hàng</span>
+                    </a>
+                    <a th:href="@{/admin/products}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-neutral-400 hover:bg-white/5 hover:text-white transition-colors group">
+                        <span class="material-symbols-outlined text-[18px] text-neutral-500 group-hover:text-accent transition-colors">inventory_2</span>
+                        <span class="text-[12px] font-bold">Sản Phẩm</span>
+                    </a>
+                    <a th:href="@{/admin/categories}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-neutral-400 hover:bg-white/5 hover:text-white transition-colors group">
+                        <span class="material-symbols-outlined text-[18px] text-neutral-500 group-hover:text-accent transition-colors">category</span>
+                        <span class="text-[12px] font-bold">Danh Mục</span>
+                    </a>
+                    <a th:href="@{/admin/customers}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-neutral-400 hover:bg-white/5 hover:text-white transition-colors group">
+                        <span class="material-symbols-outlined text-[18px] text-neutral-500 group-hover:text-accent transition-colors">group</span>
+                        <span class="text-[12px] font-bold">Khách Hàng</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- MARKETING -->
+            <div>
+                <p class="px-3 text-[9px] font-bold text-neutral-600 uppercase tracking-[0.2em] mb-2">Marketing</p>
+                <div class="space-y-0.5">
+                    <a th:href="@{/admin/coupons}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-neutral-400 hover:bg-white/5 hover:text-white transition-colors group">
+                        <span class="material-symbols-outlined text-[18px] text-neutral-500 group-hover:text-accent transition-colors">confirmation_number</span>
+                        <span class="text-[12px] font-bold">Mã Giảm Giá</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- HỖ TRỢ -->
+            <div>
+                <p class="px-3 text-[9px] font-bold text-neutral-600 uppercase tracking-[0.2em] mb-2">Hỗ Trợ</p>
+                <div class="space-y-0.5">
+                    <a th:href="@{/admin/returns}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-neutral-400 hover:bg-white/5 hover:text-white transition-colors group">
+                        <span class="material-symbols-outlined text-[18px] text-neutral-500 group-hover:text-accent transition-colors">assignment_return</span>
+                        <span class="text-[12px] font-bold">Yêu Cầu Hoàn Trả</span>
+                    </a>
+                    <a th:href="@{/admin/reports}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-neutral-400 hover:bg-white/5 hover:text-white transition-colors group">
+                        <span class="material-symbols-outlined text-[18px] text-neutral-500 group-hover:text-accent transition-colors">bar_chart</span>
+                        <span class="text-[12px] font-bold">Báo Cáo Doanh Thu</span>
+                    </a>
+                </div>
+            </div>
+
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="p-4 border-t border-white/5">
+            <a href="/" target="_blank" class="flex items-center gap-2.5 px-2 py-2 text-neutral-500 hover:text-white transition-colors group">
+                <span class="material-symbols-outlined text-[18px] group-hover:text-accent transition-colors">storefront</span>
+                <span class="text-[11px] font-bold">Xem Cửa Hàng</span>
+                <span class="material-symbols-outlined text-[14px] ml-auto">open_in_new</span>
+            </a>
+        </div>
+
+    </aside>
+
+</th:block>
+
+</body>
+</html>

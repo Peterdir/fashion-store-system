@@ -3,6 +3,7 @@ package org.example.fashionstoresystem.entity.jpa;
 import jakarta.persistence.*;
 import lombok.*;
 
+import org.example.fashionstoresystem.entity.enums.OrderStatus;
 import org.example.fashionstoresystem.entity.enums.OrderType;
 import org.example.fashionstoresystem.entity.enums.PaymentMethod;
 
@@ -41,6 +42,10 @@ public class Order {
     @Column(nullable = false)
     private OrderType type;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -48,6 +53,10 @@ public class Order {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean hiddenByUser = false;
 
     @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)

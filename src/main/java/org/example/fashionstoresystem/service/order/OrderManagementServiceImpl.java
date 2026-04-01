@@ -11,6 +11,7 @@ import org.example.fashionstoresystem.entity.jpa.OrderHistory;
 import org.example.fashionstoresystem.entity.jpa.OrderItem;
 import org.example.fashionstoresystem.repository.OrderHistoryRepository;
 import org.example.fashionstoresystem.repository.OrderItemRepository;
+import org.example.fashionstoresystem.service.notification.NotificationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class OrderManagementServiceImpl implements OrderManagementService {
     private final OrderItemRepository orderItemRepository;
     private final OrderHistoryRepository historyRepository;
     private final OrderRepository orderRepository;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -49,6 +51,16 @@ public class OrderManagementServiceImpl implements OrderManagementService {
                 .changeDate(new Date())
                 .build();
         historyRepository.save(history);
+
+        // Gửi thông báo cho user
+        String content = "Sản phẩm '" + item.getProductName() + "' trong đơn hàng #" + item.getOrder().getId() + " đã chuyển sang trạng thái: " + newStatus;
+        notificationService.createNotification(
+                item.getOrder().getUser(),
+                "Cập nhật trạng thái đơn hàng",
+                content,
+                "INFO",
+                item.getOrder().getId()
+        );
     }
 
     private void checkStatusTransition(OrderStatus currentStatus, OrderStatus newStatus) {

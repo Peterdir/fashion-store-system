@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết đơn hàng - Fashion Store</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/favicon.png" th:href="@{/images/favicon.png}">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7f7f7; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+        
+        @keyframes status-glow {
+            0% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.4); transform: scale(1); }
+            50% { box-shadow: 0 0 0 8px rgba(0, 0, 0, 0); transform: scale(1.05); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); transform: scale(1); }
+        }
+        .active-status-pulse {
+            animation: status-glow 2s infinite ease-in-out;
+            z-index: 20;
+        }
+        
+        @keyframes progress-shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .shimmer-bar {
+            background: linear-gradient(90deg, #000 0%, #444 50%, #000 100%);
+            background-size: 200% 100%;
+            animation: progress-shimmer 3s infinite linear;
+        }
+    </style>
+</head>
+<body class="text-gray-900 bg-gray-50 antialiased min-h-screen flex flex-col">
+
+    <!-- Navbar Minimal (Compact) -->
+    <nav class="bg-black text-white px-6 py-2.5 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+        <div class="flex items-center gap-3">
+            <a href="/personal-center?tab=orders" class="hover:text-gray-300 transition-colors flex items-center justify-center p-1.5 rounded-full hover:bg-gray-800">
+                <span class="material-symbols-outlined text-lg">arrow_back</span>
+            </a>
+            <h1 class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Trở về Đơn hàng</h1>
+        </div>
+        <div class="text-lg font-black tracking-tighter uppercase italic">
+            Fashio<span class="font-light">™</span>
+        </div>
+    </nav>
+
+    <!-- Main Content Area (Compact Padding) -->
+    <main class="flex-grow w-full max-w-4xl mx-auto px-4 py-8">
+        <div class="flex items-center gap-3 mb-5">
+            <h2 class="text-xl font-black uppercase tracking-tight">Chi tiết đơn hàng</h2>
+            <div class="bg-black text-white px-2 py-1 rounded-sm flex items-center gap-1.5 shadow-sm border border-black/10">
+                <span class="material-symbols-outlined text-[11px] opacity-70">tag</span>
+                <span class="font-mono text-[10px] tracking-[0.15em] font-normal" th:text="'ORD-' + ${#numbers.formatInteger(orderId, 6)}">ORD-000000</span>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="flex flex-col items-center justify-center py-20 opacity-50">
+            <span class="material-symbols-outlined text-4xl animate-spin mb-4">settings</span>
+            <p class="text-[10px] font-black uppercase tracking-widest text-center">Hệ thống đang trích xuất dữ liệu hóa đơn...<br/>Vui lòng đợi</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error" class="hidden flex flex-col items-center justify-center py-20 opacity-60 text-red-500">
+            <span class="material-symbols-outlined text-6xl mb-4 text-red-400">gpp_bad</span>
+            <p class="text-[11px] font-black uppercase tracking-widest text-center" id="error-msg">Không thể tải thông tin.</p>
+            <a href="/personal-center?tab=orders" class="mt-6 border border-gray-300 bg-white text-gray-800 px-6 py-2 text-[10px] font-black uppercase hover:bg-gray-100 transition-all rounded">Quay lại</a>
+        </div>
+
+        <!-- Order Information Structure -->
+        <div id="order-container" class="hidden space-y-6">
+            
+            <!-- Overall Meta Data (High Density) -->
+            <div class="bg-white p-4 shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between md:items-center gap-4 rounded-lg">
+                <div class="flex items-center gap-3 flex-1">
+                    <div class="bg-blue-50 text-blue-500 p-2 rounded-md hidden md:block">
+                        <span class="material-symbols-outlined text-lg">calendar_today</span>
+                    </div>
+                    <div>
+                        <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Ngày đặt hàng</p>
+                        <p class="text-xs font-bold text-gray-900" id="o-date">--/--/----</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 flex-1 border-t md:border-t-0 md:border-l border-gray-100 pt-3 md:pt-0 md:pl-4">
+                    <div class="bg-green-50 text-green-500 p-2 rounded-md hidden md:block">
+                        <span class="material-symbols-outlined text-lg">payments</span>
+                    </div>
+                    <div>
+                        <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Phương thức thanh toán</p>
+                        <p class="text-xs font-black text-gray-900 uppercase tracking-widest" id="o-pay">----</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-end flex-none border-t md:border-t-0 md:border-l border-gray-100 pt-3 md:pt-0 md:pl-4">
+                    <p class="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Tổng tiền thanh toán</p>
+                    <p class="text-xl font-black text-black tracking-tighter" id="o-total">0đ</p>
+                </div>
+            </div>
+
+            <!-- Items Layout (Giỏ hàng của đơn) -->
+            <div class="bg-white border border-gray-200 shadow-sm rounded-lg overflow-hidden">
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="text-[11px] font-black uppercase tracking-[0.15em] text-black">Danh mục mặt hàng</h3>
+                    <span class="material-symbols-outlined text-gray-400 text-sm">shopping_bag</span>
+                </div>
+                
+                <!-- Dynamic Items (Filled via Script) -->
+                <div id="items-list" class="divide-y divide-gray-100">
+                    <!-- JS sẽ inject cấu trúc sản phẩm vào đây -->
+                </div>
+
+                <!-- Payment Summary (Tóm tắt thanh toán) -->
+                <div class="bg-neutral-50/50 p-8 border-t border-gray-200">
+                    <div class="w-full space-y-4">
+                        <div class="flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                            <span>Tạm tính (Giá niêm yết)</span>
+                            <span class="text-gray-900" id="o-subtotal">0₫</span>
+                        </div>
+                        <div id="discount-row" class="hidden flex justify-between items-center text-[10px] font-bold text-emerald-500 uppercase tracking-widest border-t border-dashed border-emerald-100 pt-4">
+                            <div class="flex flex-col">
+                                <span class="flex items-center gap-2">Mã ưu đãi áp dụng <span class="material-symbols-outlined text-[12px]">confirmation_number</span></span>
+                                <span class="text-[9px] font-mono lowercase tracking-normal bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-sm w-fit mt-1" id="o-coupon-code">---</span>
+                            </div>
+                            <span id="o-discount" class="text-lg font-black">-0₫</span>
+                        </div>
+                        <div class="pt-6 border-t border-black/10 flex justify-between items-center">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-black uppercase tracking-[0.2em] text-black">Tổng cộng</span>
+                                <span class="text-[9px] text-gray-400 font-medium">Đã bao gồm VAT & Phí vận chuyển</span>
+                            </div>
+                            <span class="text-3xl font-black text-black tracking-tighter" id="o-final-total">0₫</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Information -->
+            <div class="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center justify-between gap-3">
+                    <h3 class="text-[11px] font-black uppercase tracking-[0.15em] text-black">Thông tin vận chuyển</h3>
+                    <span class="material-symbols-outlined text-gray-400 text-sm">local_shipping</span>
+                </div>
+                <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white" id="o-shipping-info">
+                     <p class="text-sm text-gray-400 italic">Vui lòng chờ...</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Application Logic (Modular) -->
+    <script th:src="@{/js/pages/personal/order-detail.js}"></script>
+    <script th:inline="javascript">
+        // Lấy ID từ Thymeleaf Controller truyền xuống (UserViewController)
+        const currentOrderId = /*[[${orderId}]]*/ 0;
+        
+        // Initialize the manager
+        document.addEventListener('DOMContentLoaded', () => {
+            // Xử lý nút Back động
+            const params = new URLSearchParams(window.location.search);
+            const fromStatus = params.get('fromStatus');
+            if (fromStatus) {
+                const backLinks = document.querySelectorAll('a[href*="/personal-center?tab=orders"]');
+                backLinks.forEach(link => {
+                    link.href = `/personal-center?tab=orders&status=${fromStatus}`;
+                });
+            }
+
+            window.orderDetailManager.init(currentOrderId);
+        });
+    </script>
+</body>
+</html>

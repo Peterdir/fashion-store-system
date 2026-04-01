@@ -5,6 +5,7 @@ import org.example.fashionstoresystem.dto.request.SubmitReviewRequestDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.dto.response.ReviewResponseDTO;
 import org.example.fashionstoresystem.entity.enums.OrderStatus;
+import org.example.fashionstoresystem.entity.jpa.OrderItem;
 import org.example.fashionstoresystem.entity.jpa.Product;
 import org.example.fashionstoresystem.entity.jpa.Review;
 import org.example.fashionstoresystem.entity.jpa.User;
@@ -65,6 +66,26 @@ public class ReviewServiceImpl implements ReviewService {
                 .comment(dto.getComment())
                 .createdAt(Instant.now())
                 .build();
+
+        // Nếu có orderItemId, đánh dấu OrderItem là đã đánh giá
+        if (dto.getOrderItemId() != null) {
+            orderItemRepository.findById(dto.getOrderItemId()).ifPresent(item -> {
+                item.setReviewed(true);
+                orderItemRepository.save(item);
+                review.setOrderItem(item);
+            });
+        } else {
+            // Fallback: Tìm OrderItem chưa đánh giá gần nhất của user cho sản phẩm này
+            orderItemRepository
+                    .findFirstByOrderUserIdAndProductVariantProductIdAndIsReviewedFalseOrderByOrderOrderDateDesc(
+                            userId, dto.getProductId()
+                    ).ifPresent(item -> {
+                        item.setReviewed(true);
+                        orderItemRepository.save(item);
+                        review.setOrderItem(item);
+                    });
+        }
+
         reviewRepository.save(review);
 
         return MessageResponseDTO.builder()
@@ -73,25 +94,63 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ReviewResponseDTO> getReviewsByProduct(Long productId, Pageable pageable) {
         return reviewRepository.findByProductId(productId, pageable).map(this::mapToDTO);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ReviewResponseDTO> getReviewsByUser(Long userId, Pageable pageable) {
+        return reviewRepository.findByUserId(userId, pageable).map(this::mapToDTO);
+    }
     
     @Override
+    @Transactional(readOnly = true)
     public Page<ReviewResponseDTO> getAllReviews(Pageable pageable) {
         return reviewRepository.findAll(pageable).map(this::mapToDTO);
     }
     
     private ReviewResponseDTO mapToDTO(Review review) {
-        return ReviewResponseDTO.builder()
+        String imageUrl = "/images/placeholder.png";
+        if (!review.getProduct().getImages().isEmpty()) {
+            imageUrl = review.getProduct().getImages().get(0).getUrl();
+        }
+
+        ReviewResponseDTO.ReviewResponseDTOBuilder builder = ReviewResponseDTO.builder()
                 .reviewId(review.getId())
                 .productId(review.getProduct().getId())
                 .productName(review.getProduct().getName())
+                .productImage(formatImageUrl(imageUrl))
                 .userId(review.getUser().getId())
                 .customerName(review.getUser().getFullName())
                 .rating(review.getRating())
                 .comment(review.getComment())
-                .createdAt(review.getCreatedAt())
-                .build();
+                .createdAt(review.getCreatedAt());
+
+        // Bổ sung thông tin đơn hàng (Sử dụng cơ chế Fallback nếu thiếu liên kết trực tiếp)
+        OrderItem orderItem = review.getOrderItem();
+        if (orderItem == null) {
+            orderItem = orderItemRepository
+                    .findFirstByOrderUserIdAndProductVariantProductIdOrderByOrderOrderDateDesc(
+                            review.getUser().getId(), 
+                            review.getProduct().getId()
+                    ).orElse(null);
+        }
+
+        if (orderItem != null) {
+            builder.price(orderItem.getPrice());
+            if (orderItem.getOrder() != null) {
+                builder.orderDate(orderItem.getOrder().getOrderDate());
+            }
+        }
+
+        return builder.build();
+    }
+
+    private String formatImageUrl(String url) {
+        if (url == null) return "/images/placeholder.png";
+        if (url.startsWith("http") || url.startsWith("/")) return url;
+        return "/" + url;
     }
 }

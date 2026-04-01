@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>Giỏ hàng | H&Y Digital Curator</title>
+    <style>
+        .qty-popover {
+            display: none;
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15);
+            z-index: 50;
+            padding: 12px;
+            border-radius: 12px;
+            width: 140px;
+            animation: qtyPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes qtyPop {
+            from { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.95); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+        }
+        .qty-popover.active { display: block; }
+        .qty-opt {
+            padding: 8px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 6px;
+        }
+        .qty-opt:hover { background: var(--primary); color: white; }
+        
+        .elite-qty-btn {
+            background: #f8f9fa;
+            border: 1px solid #eee;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .elite-qty-btn:hover {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 4px 15px -5px rgba(0,0,0,0.05);
+        }
+        /* Focused Checkout: Hide Global Header/Footer */
+        header, footer { display: none !important; }
+        #image-lightbox { z-index: 1000; }
+    </style>
+</head>
+<body>
+    <main layout:fragment="content" class="pt-8 pb-24 px-4 md:px-8 max-w-[1440px] mx-auto">
+        <!-- Focused Logo -->
+        <div class="flex justify-center mb-12">
+            <a th:href="@{/}" class="group">
+                <span class="text-3xl font-black tracking-[0.3em] uppercase block hover:text-secondary transition-colors">
+                    H<span class="text-secondary">&</span>Y
+                </span>
+            </a>
+        </div>
+
+        <!-- Checkout Progress Header -->
+        <div class="flex items-center justify-center gap-4 mb-12 text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase text-on-surface-variant">
+            <span class="text-primary border-b-2 border-primary pb-1">Giỏ hàng</span>
+            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            <span class="opacity-40">Đặt hàng</span>
+            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            <span class="opacity-40">Thanh toán</span>
+            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            <span class="opacity-40">Hoàn tất</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <!-- Left Column: Items -->
+            <div class="lg:col-span-8 space-y-8">
+                <!-- Section Header -->
+                <div class="bg-surface-container-lowest p-6 flex items-center justify-between border border-outline/5">
+                    <div class="flex items-center gap-4">
+                        <input id="select-all" type="checkbox" checked class="w-5 h-5 border-2 border-outline text-primary focus:ring-0 no-radius cursor-pointer"/>
+                        <h1 class="font-black text-xl tracking-tighter uppercase">Tất cả sản phẩm (<span th:text="${totalItems ?: 0}">0</span>)</h1>
+                    </div>
+                    <div class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-3 py-1 uppercase tracking-widest border border-emerald-100">
+                        Miễn phí vận chuyển cho mọi đơn hàng
+                    </div>
+                </div>
+
+                <!-- Promo Banner -->
+                <div class="bg-primary text-white p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border border-primary/10">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-lg">local_shipping</span>
+                        <span class="text-[11px] font-black uppercase tracking-[0.15em]">Tận hưởng miễn phí vận chuyển! Thanh toán ngay!</span>
+                    </div>
+                    <span class="text-[9px] opacity-70 font-bold uppercase tracking-widest">Đủ điều kiện giảm thêm sau khi đặt hàng</span>
+                </div>
+
+                <!-- Cart Items List -->
+                <div class="bg-surface-container-lowest border border-outline/5">
+                    <!-- CSS Loader (Hidden by default, shown during JS load if needed) -->
+                    <div id="cart-loading" class="hidden py-24 text-center">
+                        <div class="inline-block w-8 h-8 border-4 border-outline/20 border-t-primary rounded-full animate-spin"></div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="cart-empty-state" class="py-24 text-center">
+                        <span class="material-symbols-outlined text-6xl text-outline/30 mb-6">shopping_bag</span>
+                        <p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-8">Giỏ hàng của bạn đang trống</p>
+                        <a th:href="@{/category}" class="inline-block bg-primary text-white px-12 py-4 text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-90 transition-opacity no-radius shadow-lg shadow-primary/20 hover:-translate-y-0.5">Tiếp tục mua sắm</a>
+                    </div>
+
+                    <!-- Items Container (Populated by JS) -->
+                    <div id="cart-items-container" class="hidden">
+                        <!-- JS Will inject cart items here -->
+                    </div>
+                </div>
+
+                <!-- Recommendations Teaser -->
+                <div class="pt-24 pb-12 border-t border-outline/5 mt-12">
+                    <h4 class="text-xs font-black uppercase tracking-[0.3em] mb-12 text-center opacity-40">Có thể bạn cũng thích</h4>
+                    <div id="recommendations-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <!-- Sản phẩm thật sẽ được load bằng JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Order Summary (Sticky) -->
+            <div class="lg:col-span-4">
+                <div class="sticky top-24 space-y-8">
+                    <!-- Order Summary Card -->
+                    <div id="order-summary-card" class="bg-surface-container-lowest p-10 border border-outline/5 shadow-[40px_40px_40px_4%_rgba(26,28,28,0.02)] hidden">
+                        <h2 class="font-black text-2xl tracking-tighter uppercase mb-10 pb-6 border-b border-outline/10">Tóm tắt đơn hàng</h2>
+                        
+                        <!-- Mini Selection Display -->
+                        <div class="flex items-center gap-6 mb-10 opacity-60">
+                            <div id="cart-summary-images" class="flex -space-x-4">
+                                <!-- JS Populated -->
+                            </div>
+                            <span id="cart-summary-count" class="text-[10px] font-black uppercase tracking-widest">0 Sản phẩm đã chọn</span>
+                        </div>
+
+                        <div class="space-y-5 mb-10">
+                            <div class="flex justify-between text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
+                                <span>Giá bán lẻ</span>
+                                <span id="cart-summary-subtotal" class="text-primary">0₫</span>
+                            </div>
+                            <div class="flex justify-between text-[11px] font-bold uppercase tracking-widest">
+                                <span class="text-on-surface-variant">Giá dự kiến</span>
+                                <span id="cart-summary-grandtotal" class="text-secondary text-xl font-black tracking-tighter">0₫</span>
+                            </div>
+                            <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest pt-6 border-t border-dashed border-outline/20">
+                                <span class="text-on-surface-variant">Tiết kiệm</span>
+                                <span id="cart-summary-discount" class="text-secondary">-0₫</span>
+                            </div>
+                        </div>
+
+                        <button id="cart-checkout-btn" class="w-full bg-primary text-white font-black py-5 uppercase tracking-[0.3em] text-xs hover:opacity-90 transition-all active:scale-[0.98] shadow-lg shadow-primary/20 hover:shadow-xl hover:-translate-y-0.5 no-radius">
+                            Thanh toán ngay
+                        </button>
+                        
+                        <p class="text-center mt-4 text-[9px] font-black text-secondary uppercase tracking-[0.2em] animate-pulse">
+                            Đã áp dụng mã giảm giá tốt nhất!
+                        </p>
+                    </div>
+
+                    <!-- Payment Methods Section -->
+                    <div class="bg-surface-low/50 p-8 border border-outline/5">
+                        <h3 class="text-[9px] font-black uppercase tracking-[0.3em] mb-6 opacity-40">Chúng tôi chấp nhận</h3>
+                        <div class="grid grid-cols-4 gap-3 opacity-40 grayscale hover:grayscale-0 transition-all duration-500 cursor-default">
+                            <div class="h-10 bg-white flex items-center justify-center p-2 border border-outline/5 hover:border-primary/20 transition-colors">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" class="max-h-full opacity-80" alt="Visa">
+                            </div>
+                            <div class="h-10 bg-white flex items-center justify-center p-2 border border-outline/5 hover:border-primary/20 transition-colors">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" class="max-h-full opacity-80" alt="Mastercard">
+                            </div>
+                            <div class="h-10 bg-white flex items-center justify-center p-2 border border-outline/5 hover:border-primary/20 transition-colors">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="max-h-full opacity-80" alt="PayPal">
+                            </div>
+                            <div class="h-10 bg-white flex items-center justify-center p-2 border border-outline/5 hover:border-primary/20 transition-colors">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg" class="max-h-full opacity-80" alt="Apple Pay">
+                            </div>
+                        </div>
+                        <div class="mt-6 flex items-center gap-2 text-[8.5px] font-black text-on-surface-variant uppercase tracking-widest opacity-40">
+                            <span class="material-symbols-outlined text-[14px]">lock</span>
+                            Giao dịch được mã hóa bảo mật
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <th:block layout:fragment="scripts">
+        <script th:src="@{/js/pages/cart-page.js}"></script>
+    </th:block>
+</body>
+</html>

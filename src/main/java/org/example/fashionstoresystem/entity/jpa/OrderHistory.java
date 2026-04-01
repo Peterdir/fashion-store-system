@@ -21,11 +21,11 @@ public class OrderHistory {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(length = 50)
     private OrderStatus previousStatus;
 
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(length = 50)
     private OrderStatus newStatus;
 
     @Column

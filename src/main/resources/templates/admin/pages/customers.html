@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/admin-layout}">
+<head>
+    <title>Quản Lý Khách Hàng</title>
+</head>
+<body>
+
+    <div layout:fragment="content">
+
+        <!-- Page Header -->
+        <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-xl font-black tracking-tight text-primary uppercase">Khách Hàng</h1>
+                <p class="text-[11px] text-neutral-400 font-medium mt-1">Quản lý và theo dõi thông tin người dùng hệ thống</p>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white border border-neutral-100 p-4 mb-5 flex flex-wrap items-end gap-3">
+            <!-- Search Keyword -->
+            <div class="flex-1 min-w-[280px] space-y-1">
+                <label class="text-[9px] font-black uppercase tracking-[0.15em] text-neutral-400">Tìm kiếm</label>
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-[18px]">search</span>
+                    <input type="text" id="filter-keyword" placeholder="Tên, Email hoặc Số điện thoại..." 
+                           class="w-full pl-10 pr-4 py-2 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors">
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex gap-2">
+                <button id="btn-reset-filter" class="bg-neutral-100 text-neutral-500 px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-200 transition-colors">
+                    Làm mới
+                </button>
+            </div>
+        </div>
+
+        <!-- Customers Table -->
+        <div class="bg-white border border-neutral-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-neutral-50/80 border-b border-neutral-100">
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">ID</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Khách hàng</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Trạng thái</th>
+                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customers-table-body" class="divide-y divide-neutral-50">
+                        <!-- JS renders rows here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="customers-empty" class="hidden py-16 text-center">
+                <span class="material-symbols-outlined text-5xl text-neutral-200 mb-3">person_off</span>
+                <p class="text-[12px] font-bold text-neutral-400">Không tìm thấy khách hàng nào</p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="customers-loading" class="py-16 text-center">
+                <span class="material-symbols-outlined text-3xl text-neutral-300 animate-spin">sync</span>
+                <p class="text-[11px] font-medium text-neutral-400 mt-2">Đang tải dữ liệu...</p>
+            </div>
+
+            <!-- Pagination -->
+            <div id="customers-pagination" class="hidden px-5 py-3 border-t border-neutral-100 flex items-center justify-between text-[11px]">
+                <span class="text-neutral-400 font-medium" id="pagination-info"></span>
+                <div class="flex items-center gap-1" id="pagination-buttons"></div>
+            </div>
+        </div>
+
+        <!-- CUSTOMER DETAIL MODAL -->
+        <div id="customer-detail-modal" class="fixed inset-0 z-50 hidden">
+            <!-- Overlay -->
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="AdminCustomers.closeModal()"></div>
+            <!-- Modal Content -->
+            <div class="absolute right-0 top-0 h-full w-full max-w-2xl bg-white shadow-2xl overflow-y-auto transform transition-transform duration-300">
+                <!-- Modal Header -->
+                <div class="sticky top-0 z-10 bg-white border-b border-neutral-100 px-6 py-4 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-sm font-black uppercase tracking-[0.1em]">Thông Tin Khách Hàng</h2>
+                        <p class="text-[10px] text-neutral-400 font-medium mt-0.5" id="modal-customer-id"></p>
+                    </div>
+                    <button onclick="AdminCustomers.closeModal()" class="p-1.5 hover:bg-neutral-100 rounded transition-colors">
+                        <span class="material-symbols-outlined text-neutral-400">close</span>
+                    </button>
+                </div>
+
+                <!-- Modal Loading -->
+                <div id="modal-loading" class="py-20 text-center">
+                    <span class="material-symbols-outlined text-3xl text-neutral-300 animate-spin">sync</span>
+                </div>
+
+                <!-- Modal Body -->
+                <div id="modal-body" class="hidden">
+                    <!-- Profile Info -->
+                    <div class="px-6 py-5 border-b border-neutral-100">
+                        <p class="text-[10px] font-black uppercase tracking-[0.15em] text-neutral-500 mb-4">Hồ sơ cá nhân</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-neutral-50 p-3">
+                                <p class="text-[9px] font-bold text-neutral-400 uppercase tracking-widest mb-1">Họ và tên</p>
+                                <p class="text-[13px] font-black text-primary" id="modal-name">—</p>
+                            </div>
+                            <div class="bg-neutral-50 p-3">
+                                <p class="text-[9px] font-bold text-neutral-400 uppercase tracking-widest mb-1">Trạng thái</p>
+                                <div id="modal-status-badge"></div>
+                            </div>
+                            <div class="bg-neutral-50 p-3">
+                                <p class="text-[9px] font-bold text-neutral-400 uppercase tracking-widest mb-1">Email</p>
+                                <p class="text-[12px] font-bold text-neutral-700" id="modal-email">—</p>
+                            </div>
+                            <div class="bg-neutral-50 p-3">
+                                <p class="text-[9px] font-bold text-neutral-400 uppercase tracking-widest mb-1">Số điện thoại</p>
+                                <p class="text-[12px] font-bold text-neutral-700" id="modal-phone">—</p>
+                            </div>
+                            <div class="bg-neutral-50 p-3 col-span-2">
+                                <p class="text-[9px] font-bold text-neutral-400 uppercase tracking-widest mb-1">Địa chỉ</p>
+                                <p class="text-[12px] font-medium text-neutral-600" id="modal-address">—</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Account Actions -->
+                        <div class="mt-6 flex gap-3">
+                            <button id="btn-toggle-block" class="px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-1.5">
+                                <!-- JS set content -->
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Order History -->
+                    <div class="px-6 py-5">
+                        <p class="text-[10px] font-black uppercase tracking-[0.15em] text-neutral-500 mb-4">Lịch sử mua hàng</p>
+                        <div class="overflow-x-auto border border-neutral-100 rounded">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="bg-neutral-50 text-[9px] font-black uppercase tracking-widest text-neutral-400 border-b border-neutral-100">
+                                        <th class="px-4 py-2.5">Mã đơn</th>
+                                        <th class="px-4 py-2.5">Ngày đặt</th>
+                                        <th class="px-4 py-2.5 text-right">Tổng tiền</th>
+                                        <th class="px-4 py-2.5 text-center">Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="modal-order-history" class="divide-y divide-neutral-50">
+                                    <!-- JS renders items here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="modal-history-empty" class="hidden py-10 text-center border border-dashed border-neutral-200 rounded mt-2">
+                            <p class="text-[11px] text-neutral-400 font-medium">Khách hàng chưa có đơn hàng nào</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div id="admin-toast" class="fixed bottom-6 right-6 z-[100] space-y-2"></div>
+
+        <script th:src="@{/admin/js/customers.js}"></script>
+    </div>
+</body>
+</html>

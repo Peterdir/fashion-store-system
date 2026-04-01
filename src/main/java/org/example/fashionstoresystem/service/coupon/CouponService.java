@@ -24,7 +24,7 @@ public interface CouponService {
     ApplyCouponResponseDTO applyCoupon(Long userId, ApplyCouponRequestDTO dto, Double currentTotal);
 
     // Admin
-    Page<CouponResponseDTO> getAllCoupons(Pageable pageable);
+    Page<CouponResponseDTO> getAllCoupons(String keyword, Pageable pageable);
 
     CouponResponseDTO getCouponDetail(Long couponId);
 

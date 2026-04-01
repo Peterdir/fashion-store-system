@@ -24,4 +24,6 @@ public class ReturnRequestResponseDTO {
     private List<String> imageUrls;
     private Date requestDate;
     private String rejectionReason;
+    private String paymentMethod;
+    private List<ReturnItemDTO> items;
 }

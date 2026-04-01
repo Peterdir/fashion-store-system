@@ -16,5 +16,7 @@ public class ProfileResponseDTO {
     private String phone;
     private String email;
     private String address;
+    private String pendingEmail;
+    private boolean emailVerified;
     private Role role;
 }

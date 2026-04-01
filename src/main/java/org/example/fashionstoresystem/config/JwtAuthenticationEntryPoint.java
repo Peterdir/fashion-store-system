@@ -18,13 +18,24 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        // Trả về 401 Unauthorized thay vì 403 Forbidden khi chưa đăng nhập
+        String acceptHeader = request.getHeader("Accept");
+        if (acceptHeader != null && acceptHeader.contains("text/html")) {
+            // Đây là request từ trình duyệt lấy giao diện HTML, nên chuyển hướng về trang đăng nhập
+            if (request.getRequestURI().startsWith("/admin")) {
+                response.sendRedirect("/admin/login");
+            } else {
+                response.sendRedirect("/login");
+            }
+            return;
+        }
+
+        // Trả về 401 Unauthorized cho các API request
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
         MessageResponseDTO errorResponse = MessageResponseDTO.builder()
-                .message("Không có quyền truy cập. Vui lòng đăng nhập hợp lệ!")
+                .message("Phiên đăng nhập đã hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại!")
                 .build();
 
         ObjectMapper mapper = new ObjectMapper();

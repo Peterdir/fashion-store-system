@@ -4,6 +4,7 @@ import org.example.fashionstoresystem.dto.request.ProcessReturnRequestDTO;
 import org.example.fashionstoresystem.dto.request.SubmitReturnRequestDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.dto.response.ReturnRequestResponseDTO;
+import org.example.fashionstoresystem.entity.enums.ReturnStatus;
 import org.example.fashionstoresystem.entity.jpa.Order;
 import org.example.fashionstoresystem.entity.jpa.OrderItem;
 import org.example.fashionstoresystem.entity.jpa.ReturnRequest;
@@ -21,7 +22,7 @@ public interface ReturnRequestService {
     ReturnRequest submitReturnRequest(SubmitReturnRequestDTO dto);
 
     // Admin
-    Page<ReturnRequestResponseDTO> getAllReturnRequests(Pageable pageable);
+    Page<ReturnRequestResponseDTO> getAllReturnRequests(ReturnStatus status, Pageable pageable);
 
     ReturnRequestResponseDTO getReturnRequestDetail(Long requestId);
 

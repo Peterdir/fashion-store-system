@@ -18,4 +18,7 @@ public class LoginRequestDTO {
 
     @NotBlank(message = "Mật khẩu không được để trống")
     private String password;
+
+    @Builder.Default
+    private boolean rememberMe = false;
 }

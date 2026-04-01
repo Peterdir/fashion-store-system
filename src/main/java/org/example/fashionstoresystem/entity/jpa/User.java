@@ -58,6 +58,13 @@ public class User implements UserDetails {
 
     @Builder.Default
     @Column(nullable = false)
+    private boolean emailVerified = false;
+
+    @Column
+    private String pendingEmail;
+
+    @Builder.Default
+    @Column(nullable = false)
     private boolean twoFactorEnabled = false;
 
     @Builder.Default
@@ -132,4 +139,3 @@ public class User implements UserDetails {
         return status == UserStatus.ACTIVE;
     }
 }
-

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$CONTENT_TITLE - CPanel Admin">Admin CPanel</title>
+
+    <!-- 1. BƯỚC QUAN TRỌNG: Cài Đặt Tailwind Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Bạn có thể customize màu chủ chốt tại đây ngay trên file HTML -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#2563eb', // Ví dụ tạo class màu `bg-brand` màu Xanh Dương Admin
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- 2. Thêm Icon Font (Tùy Chọn) -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+    <!-- 3. Link CSS Khác (Nếu có) -->
+    <link rel="stylesheet" th:href="@{/admin/css/admin-style.css}">
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased">
+
+<div class="flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR: Sẽ bóc cục Menu dọc bên trái vào file fragment -->
+    <th:block th:replace="~{admin/fragments/sidebar :: sidebar}"></th:block>
+
+    <!-- CONTAINER CHÍNH BÊN PHẢI -->
+    <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+
+        <!-- HEADER BẤT ĐỘNG PHÍA TRÊN (Search, Account, Bell icon) -->
+        <th:block th:replace="~{admin/fragments/header :: header}"></th:block>
+
+        <!-- VÙNG CẮM NỘI DUNG MAIN -->
+        <main class="w-full grow p-6">
+            <!-- Data của Dashboard hay Products.html sẽ rớt vào đây -->
+            <div layout:fragment="content"></div>
+        </main>
+
+    </div>
+</div>
+
+<!-- 4. Link Tới JS Của Riêng Admin (Vd: Nút Bấm Đóng Mở Sidebar...) -->
+<script th:src="@{/admin/js/admin-main.js}"></script>
+<!-- Phía Admin thường xài Chart.js hoặc SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>

@@ -25,12 +25,21 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationEntryPoint jwtAuthEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        // Cho phép truy cập giao diện Thymeleaf công khai
+                        .requestMatchers("/", "/category", "/product-detail/**", "/login", "/register", "/forgot-password", "/reset-password", "/cart", "/error", "/personal-center", "/auth-notice", "/verify-email").permitAll()
+                        // Cho phép xem sản phẩm và danh mục công khai
+                        .requestMatchers("/api/products/**", "/api/categories/**").permitAll()
+                        // Cho phép truy cập login admin
+                        .requestMatchers("/admin/login").permitAll()
+                        // Cho phép truy cập tài nguyên tĩnh (CSS, JS, Images, ...)
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/vendor/**", "/admin/css/**", "/admin/js/**", "/admin/images/**").permitAll()
                         // Cho phép truy cập Swagger UI và API docs
                         .requestMatchers(
                                 "/swagger-ui/**",
@@ -41,10 +50,8 @@ public class SecurityConfig {
                         ).permitAll()
                         // Cho phép truy cập API xác thực (login, register, ...)
                         .requestMatchers("/api/auth/**").permitAll()
-                        // Cho phép xem sản phẩm công khai
-                        .requestMatchers("/api/products/**").permitAll()
                         // Admin endpoints - chỉ ADMIN mới truy cập được
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**", "/admin/**").hasRole("ADMIN")
                         // Tất cả API còn lại yêu cầu xác thực
                         .anyRequest().authenticated()
                 )
@@ -53,9 +60,16 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(jwtAuthEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
                 )
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .deleteCookies("accessToken", "refreshToken")
+                        .logoutSuccessUrl("/login?logout=true")
+                        .permitAll()
+                );
 
         return http.build();
     }
