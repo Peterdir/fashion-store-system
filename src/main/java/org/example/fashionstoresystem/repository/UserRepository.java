@@ -17,6 +17,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByPhone(String phone);
 
+    Optional<User> findByPhone(String phone);
+
     // Xác thực tài khoản qua link gửi về email
     Optional<User> findByVerificationToken(String verificationToken);
 

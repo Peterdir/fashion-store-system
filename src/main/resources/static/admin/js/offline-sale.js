@@ -59,15 +59,31 @@ const AdminPOS = (function() {
         // Modal Qty Buttons
         $('btn-qty-minus').addEventListener('click', () => {
             let qty = parseInt($('variant-qty').value) || 1;
-            if (qty > 1) { $('variant-qty').value = qty - 1; checkVariantAddability(); }
+            if (qty > 1) { 
+                $('variant-qty').value = qty - 1; 
+                checkVariantAddability(); 
+            }
         });
         $('btn-qty-plus').addEventListener('click', () => {
             let qty = parseInt($('variant-qty').value) || 1;
-            if (qty < selectedMaxStock) { $('variant-qty').value = qty + 1; checkVariantAddability(); }
+            // Nếu đã chọn variant thì giới hạn theo stock, nếu chưa thì cho tăng thoải mái (sẽ check lại khi chọn size)
+            if (selectedVariantId) {
+                if (qty < selectedMaxStock) {
+                    $('variant-qty').value = qty + 1;
+                } else {
+                    showToast(`Chỉ còn ${selectedMaxStock} sản phẩm trong kho`, 'error');
+                }
+            } else {
+                $('variant-qty').value = qty + 1;
+            }
+            checkVariantAddability();
         });
         $('variant-qty').addEventListener('input', () => {
             let qty = parseInt($('variant-qty').value) || 1;
-            if (qty > selectedMaxStock) $('variant-qty').value = selectedMaxStock;
+            if (selectedVariantId && qty > selectedMaxStock) {
+                $('variant-qty').value = selectedMaxStock;
+                showToast(`Đã điều chỉnh về tối đa ${selectedMaxStock} sản phẩm`, 'warning');
+            }
             if (qty < 1) $('variant-qty').value = 1;
             checkVariantAddability();
         });
@@ -120,7 +136,7 @@ const AdminPOS = (function() {
                          <img src="${imgUrl}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                     </div>
                     <p class="text-[10px] font-bold text-neutral-800 line-clamp-2 leading-tight mb-1 flex-1">${p.name}</p>
-                    <p class="text-[11px] font-black text-primary truncate">${formatCurrency(p.minPrice || 0)}</p>
+                    <p class="text-[11px] font-black text-primary truncate">${formatCurrency(p.minPrice || p.price || 0)}</p>
                     <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors pointer-events-none rounded"></div>
                 `;
                 div.addEventListener('click', () => openVariantModal(p.productId));
@@ -160,7 +176,7 @@ const AdminPOS = (function() {
             const mainImg = data.mainImage || '';
             let firstImg = mainImg ? (mainImg.startsWith('/images/') ? mainImg : `/images/${mainImg}`) : '/images/placeholder.jpg';
             $('variant-modal-img').src = firstImg;
-            $('variant-modal-price').textContent = `Hiển thị giá sau khi chọn biến thể`;
+            $('variant-modal-price').textContent = formatCurrency(data.minPrice || data.price || 0);
 
             renderColorOptions();
         } catch (error) {
@@ -257,8 +273,12 @@ const AdminPOS = (function() {
             $('variant-modal-img').src = url.startsWith('/images/') ? url : `/images/${url}`;
         }
         
-        // Reset qty
-        $('variant-qty').value = 1;
+        // Reset qty - keep current if valid, else 1
+        let currentQty = parseInt($('variant-qty').value) || 1;
+        if (currentQty > selectedMaxStock) {
+            $('variant-qty').value = selectedMaxStock;
+            showToast(`Sản phẩm này chỉ còn ${selectedMaxStock} trong kho`, 'warning');
+        }
 
         checkVariantAddability();
     }
@@ -403,8 +423,15 @@ const AdminPOS = (function() {
             });
 
             if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.message || 'Lỗi xử lý đơn hàng');
+                const errData = await res.json();
+                // Phân tích lỗi validation từ Spring (thường nằm trong errData.errors hoặc errData.message)
+                let errorMsg = 'Lỗi xử lý đơn hàng';
+                if (errData.errors && Array.isArray(errData.errors)) {
+                    errorMsg = errData.errors.join(', ');
+                } else if (errData.message) {
+                    errorMsg = errData.message;
+                }
+                throw new Error(errorMsg);
             }
 
             const data = await res.json();
@@ -421,6 +448,7 @@ const AdminPOS = (function() {
 
         } catch (error) {
             showToast(error.message, 'error');
+            console.error('Checkout Error:', error);
         } finally {
             if (cart.length > 0) { // If success, btn disables, else revert
                 btnCheckout.disabled = false;
