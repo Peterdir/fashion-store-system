@@ -107,7 +107,9 @@ const AdminPOS = (function() {
             
             const data = await res.json();
             products = data.content || [];
-            totalPages = data.totalPages || 1;
+            const page = data.page || data;
+            totalPages = page.totalPages || 1;
+            currentPage = page.number || 0;
             
             $('product-page-info').textContent = `Trang ${currentPage + 1} / ${totalPages || 1}`;
             $('btn-prev-page').disabled = currentPage === 0;
@@ -128,12 +130,16 @@ const AdminPOS = (function() {
         } else {
             emptyState.classList.add('hidden');
             products.forEach(p => {
-                const imgUrl = p.primaryImageUrl ? (p.primaryImageUrl.startsWith('/images/') ? p.primaryImageUrl : `/images/${p.primaryImageUrl}`) : '/images/placeholder.jpg';
+                const placeholder = `data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 50%22%3E%3Crect width=%2240%22 height=%2250%22 fill=%22%23f5f5f5%22/%3E%3C/svg%3E`;
+                const imgUrl = p.primaryImageUrl ? (p.primaryImageUrl.startsWith('/images/') ? p.primaryImageUrl : `/images/${p.primaryImageUrl}`) : placeholder;
                 const div = document.createElement('div');
                 div.className = 'bg-white border border-neutral-100 p-3 rounded group cursor-pointer hover:border-primary transition-colors flex flex-col relative';
                 div.innerHTML = `
                     <div class="h-24 w-full bg-neutral-100 rounded mb-2 overflow-hidden flex-shrink-0">
-                         <img src="${imgUrl}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                         <img src="${imgUrl}" 
+                              alt="${p.name}" 
+                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              onerror="this.onerror=null; this.src='${placeholder}';">
                     </div>
                     <p class="text-[10px] font-bold text-neutral-800 line-clamp-2 leading-tight mb-1 flex-1">${p.name}</p>
                     <p class="text-[11px] font-black text-primary truncate">${formatCurrency(p.minPrice || p.price || 0)}</p>

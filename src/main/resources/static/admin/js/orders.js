@@ -202,22 +202,32 @@ const AdminOrders = (() => {
     // ===== RENDER PAGINATION =====
     function renderPagination(pageData) {
         const container = $('orders-pagination');
+        if (!container) return;
         container.classList.remove('hidden');
 
-        const start = pageData.number * pageData.size + 1;
-        const end = Math.min(start + pageData.numberOfElements - 1, pageData.totalElements);
-        $('pagination-info').textContent = `Hiển thị ${start}–${end} / ${pageData.totalElements} đơn hàng`;
+        // Hỗ trợ cấu trúc lồng nhau (via-dto)
+        const page = pageData.page || pageData;
+        const number = page.number || 0;
+        const size = page.size || 10;
+        const totalElements = page.totalElements || 0;
+        const numberOfElements = pageData.numberOfElements || (pageData.content ? pageData.content.length : 0);
+
+        const start = number * size + 1;
+        const end = Math.min(start + numberOfElements - 1, totalElements);
+        $('pagination-info').textContent = `Hiển thị ${start}–${end} / ${totalElements} đơn hàng`;
 
         const btns = $('pagination-buttons');
         btns.innerHTML = '';
 
+        const current = number;
+        const totalPages = page.totalPages || 1;
+        const first = page.first !== undefined ? page.first : (number === 0);
+        const last = page.last !== undefined ? page.last : (number >= totalPages - 1);
+
         // Previous
-        const prevBtn = createPageBtn('chevron_left', pageData.number - 1, pageData.first);
-        btns.appendChild(prevBtn);
+        btns.appendChild(createPageBtn('chevron_left', current - 1, first));
 
         // Page Numbers (show max 5)
-        const totalPages = pageData.totalPages;
-        const current = pageData.number;
         let startP = Math.max(0, current - 2);
         let endP = Math.min(totalPages - 1, startP + 4);
         startP = Math.max(0, endP - 4);
@@ -233,8 +243,7 @@ const AdminOrders = (() => {
         }
 
         // Next
-        const nextBtn = createPageBtn('chevron_right', pageData.number + 1, pageData.last);
-        btns.appendChild(nextBtn);
+        btns.appendChild(createPageBtn('chevron_right', current + 1, last));
     }
 
     function createPageBtn(icon, page, disabled) {
