@@ -38,4 +38,6 @@ public interface OrderService {
     // Hoàn kho (dùng cho cleanup task)
     void revertInventory(Long orderId);
 
+    // DASHBOARD: Lấy thông tin tóm tắt đơn hàng cho Dashboard người dùng
+    org.example.fashionstoresystem.dto.response.OrderDashboardSummaryDTO getDashboardSummary(Long userId);
 }

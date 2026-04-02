@@ -24,11 +24,14 @@ const PersonalCenter = {
                 if (window.OrderModule && this.originalProfile) {
                     console.log('Initializing OrderModule');
                     window.OrderModule.init();
+
+                    // Load Dashboard Summary for the "outside" view
+                    window.OrderModule.loadDashboardSummary();
                     
                     const urlParams = new URLSearchParams(window.location.search);
                     const currentTab = urlParams.get('tab');
                     const currentStatus = urlParams.get('status') || 'all';
-                    if (currentTab === 'orders' || !currentTab) { // Load orders if tab is orders or on dashboard
+                    if (currentTab === 'orders') { 
                         window.OrderModule.loadOrders(currentStatus);
                     }
                 } else {

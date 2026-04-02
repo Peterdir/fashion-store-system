@@ -195,41 +195,48 @@
                                     </div>
                                     
                                     <div class="grid grid-cols-5 gap-2 text-center mb-12">
-                                        <div class="group cursor-pointer tab-link" data-tab="orders">
+                                        <div class="group cursor-pointer tab-link relative" data-tab="orders" data-status="unpaid">
+                                            <span id="pc-count-unpaid" class="hidden absolute -top-1 right-1/4 bg-red-500 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white z-10">0</span>
                                             <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-2">account_balance_wallet</span>
                                             <span class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Unpaid</span>
                                         </div>
-                                        <div class="group cursor-pointer tab-link" data-tab="orders">
+                                        <div class="group cursor-pointer tab-link relative" data-tab="orders" data-status="processing">
+                                            <span id="pc-count-processing" class="hidden absolute -top-1 right-1/4 bg-amber-500 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white z-10">0</span>
                                             <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-2">package_2</span>
                                             <span class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Processing</span>
                                         </div>
-                                        <div class="group cursor-pointer tab-link" data-tab="orders">
+                                        <div class="group cursor-pointer tab-link relative" data-tab="orders" data-status="shipped">
+                                            <span id="pc-count-shipped" class="hidden absolute -top-1 right-1/4 bg-blue-500 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white z-10">0</span>
                                             <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-2">local_shipping</span>
                                             <span class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Shipped</span>
                                         </div>
-                                        <div class="group cursor-pointer tab-link" data-tab="orders">
+                                        <div class="group cursor-pointer tab-link relative" data-tab="orders" data-status="review">
+                                            <span id="pc-count-review" class="hidden absolute -top-1 right-1/4 bg-emerald-500 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white z-10">0</span>
                                             <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-2">rate_review</span>
                                             <span class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Review</span>
                                         </div>
-                                        <div class="group cursor-pointer tab-link" data-tab="orders">
+                                        <div class="group cursor-pointer tab-link relative" data-tab="orders" data-status="return">
+                                            <span id="pc-count-return" class="hidden absolute -top-1 right-1/4 bg-gray-500 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white z-10">0</span>
                                             <span class="material-symbols-outlined text-2xl text-on-surface-variant/80 group-hover:text-primary transition-colors block mb-2">assignment_return</span>
                                             <span class="text-[11px] font-medium text-on-surface-variant group-hover:text-primary transition-colors">Returns</span>
                                         </div>
                                     </div>
 
-                                    <!-- Empty State Illustration -->
-                                    <div class="py-12 flex flex-col items-center justify-center opacity-40">
-                                        <div class="mb-4">
-                                            <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M50 20C40 20 35 30 35 30H65C65 30 60 20 50 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                                <path d="M30 40H70V80H30V40Z" stroke="currentColor" stroke-width="2"/>
-                                                <circle cx="50" cy="55" r="5" stroke="currentColor" stroke-width="2"/>
-                                                <path d="M40 70H60" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                                <path d="M80 60 L85 55 M85 65 L80 60" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                                <path d="M15 45 L20 40 M20 50 L15 45" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                            </svg>
+                                    <div id="pc-dashboard-order-content">
+                                        <!-- Empty State Illustration (Default) -->
+                                        <div class="py-12 flex flex-col items-center justify-center opacity-40">
+                                            <div class="mb-4">
+                                                <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M50 20C40 20 35 30 35 30H65C65 30 60 20 50 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                                    <path d="M30 40H70V80H30V40Z" stroke="currentColor" stroke-width="2"/>
+                                                    <circle cx="50" cy="55" r="5" stroke="currentColor" stroke-width="2"/>
+                                                    <path d="M40 70H60" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                                    <path d="M80 60 L85 55 M85 65 L80 60" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                                    <path d="M15 45 L20 40 M20 50 L15 45" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                                </svg>
+                                            </div>
+                                            <p class="text-[11px] font-medium uppercase tracking-[0.2em]">It is empty here :-(</p>
                                         </div>
-                                        <p class="text-[11px] font-medium uppercase tracking-[0.2em]">It is empty here :-(</p>
                                     </div>
                                 </div>
                             </div>

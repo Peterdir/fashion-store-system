@@ -68,4 +68,15 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // Đếm đơn theo từng trạng thái
     @Query("SELECT oi.status, COUNT(DISTINCT oi.order.id) FROM OrderItem oi GROUP BY oi.status")
     List<Object[]> countOrdersByItemStatus();
+
+    // DASHBOARD USER: Đếm số lượng đơn theo trạng thái của 1 User
+    @Query("SELECT oi.status, COUNT(DISTINCT oi.order.id) FROM OrderItem oi WHERE oi.order.user.id = :userId GROUP BY oi.status")
+    List<Object[]> countMyOrdersByItemStatus(@Param("userId") Long userId);
+
+    // Đếm số sản phẩm chưa đánh giá (Phải là đơn đã giao/hoàn thành)
+    @Query("SELECT COUNT(oi) FROM OrderItem oi WHERE oi.order.user.id = :userId AND oi.status IN ('DELIVERED', 'COMPLETED') AND oi.isReviewed = false")
+    long countUnreviewedItems(@Param("userId") Long userId);
+
+    // Lấy đơn hàng mới nhất của 1 User
+    Optional<Order> findTopByUserIdOrderByOrderDateDesc(Long userId);
 }

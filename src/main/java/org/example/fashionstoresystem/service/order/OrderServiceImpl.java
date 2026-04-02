@@ -259,33 +259,34 @@ public class OrderServiceImpl implements OrderService {
             orders = orderRepository.searchMyOrdersByStatuses(userId, statuses, pageable);
         }
 
-        return orders
-                .map(order -> {
-                    // Tổng hợp trạng thái từ các OrderItem
-                    Map<String, Integer> statusSummary = order.getOrderItems().stream()
-                            .collect(Collectors.groupingBy(
-                                    item -> item.getStatus().name(),
-                                    LinkedHashMap::new,
-                                    Collectors.summingInt(i -> 1)));
+        return orders.map(this::convertToSummaryDTO);
+    }
 
-                    List<OrderItemPreviewDTO> itemPreviews = order.getOrderItems().stream()
-                            .map(item -> OrderItemPreviewDTO.builder()
-                                    .productName(item.getProductName())
-                                    .productImage(getProductImageUrl(item.getProductVariant()))
-                                    .quantity(item.getQuantity())
-                                    .build())
-                            .collect(Collectors.toList());
+    private OrderSummaryResponseDTO convertToSummaryDTO(Order order) {
+        // Tổng hợp trạng thái từ các OrderItem
+        Map<String, Integer> statusSummary = order.getOrderItems().stream()
+                .collect(Collectors.groupingBy(
+                        item -> item.getStatus().name(),
+                        LinkedHashMap::new,
+                        Collectors.summingInt(i -> 1)));
 
-                    return OrderSummaryResponseDTO.builder()
-                            .orderId(order.getId())
-                            .orderDate(order.getOrderDate())
-                            .totalAmount(order.getTotalAmount())
-                            .paymentMethod(order.getPaymentMethod())
-                            .itemCount(order.getOrderItems().size())
-                            .statusSummary(statusSummary)
-                            .items(itemPreviews)
-                            .build();
-                });
+        List<OrderItemPreviewDTO> itemPreviews = order.getOrderItems().stream()
+                .map(item -> OrderItemPreviewDTO.builder()
+                        .productName(item.getProductName())
+                        .productImage(getProductImageUrl(item.getProductVariant()))
+                        .quantity(item.getQuantity())
+                        .build())
+                .collect(Collectors.toList());
+
+        return OrderSummaryResponseDTO.builder()
+                .orderId(order.getId())
+                .orderDate(order.getOrderDate())
+                .totalAmount(order.getTotalAmount())
+                .paymentMethod(order.getPaymentMethod())
+                .itemCount(order.getOrderItems().size())
+                .statusSummary(statusSummary)
+                .items(itemPreviews)
+                .build();
     }
 
     @Override
@@ -515,5 +516,56 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public org.example.fashionstoresystem.dto.response.OrderDashboardSummaryDTO getDashboardSummary(Long userId) {
+        List<Object[]> statusCounts = orderRepository.countMyOrdersByItemStatus(userId);
+        
+        long unpaid = 0;
+        long processing = 0;
+        long shipped = 0;
+        long returns = 0;
+
+        for (Object[] row : statusCounts) {
+            OrderStatus status = (OrderStatus) row[0];
+            long count = (long) row[1];
+
+            switch (status) {
+                case PENDING_PAYMENT:
+                    unpaid += count;
+                    break;
+                case PENDING_CONFIRMATION:
+                case PAID:
+                case PROCESSING:
+                    processing += count;
+                    break;
+                case SHIPPING:
+                    shipped += count;
+                    break;
+                case CANCELLED:
+                    // Trong hệ thống này, Return được gộp chung hoặc xử lý qua RefundStatus, 
+                    // tạm thời gộp Cancelled vào Returns nếu có RefundStatus hoặc đơn giản là Cancelled
+                    returns += count;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        long toReviewCount = orderRepository.countUnreviewedItems(userId);
+        OrderSummaryResponseDTO latestOrder = orderRepository.findTopByUserIdOrderByOrderDateDesc(userId)
+                .map(this::convertToSummaryDTO)
+                .orElse(null);
+
+        return org.example.fashionstoresystem.dto.response.OrderDashboardSummaryDTO.builder()
+                .unpaidCount(unpaid)
+                .processingCount(processing)
+                .shippedCount(shipped)
+                .toReviewCount(toReviewCount)
+                .returnCount(returns)
+                .latestOrder(latestOrder)
+                .build();
     }
 }
