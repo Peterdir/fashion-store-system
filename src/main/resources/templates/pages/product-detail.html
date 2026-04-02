@@ -247,19 +247,22 @@
     
     <!-- Image Lightbox Modal (Premium Glassmorphism) -->
     <div id="image-lightbox" class="fixed inset-0 z-[100] hidden flex flex-col items-center justify-center p-4 transition-all duration-500 opacity-0 bg-black/80 backdrop-blur-md cursor-zoom-out" onclick="closeLightbox(event)">
+        <!-- Close Button (Fixed to Viewport) -->
+        <button onclick="closeLightbox(event)" 
+                class="absolute top-8 right-8 text-white/50 hover:text-white transition-all p-4 group z-[110]">
+            <div class="flex flex-col items-end gap-2">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="transition-transform group-hover:rotate-90">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                <span class="text-[8px] font-black uppercase tracking-[0.4em] opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">Đóng (ESC)</span>
+            </div>
+        </button>
+
         <!-- Image Container -->
         <div class="relative max-w-full max-h-full flex items-center justify-center" onclick="event.stopPropagation()">
             <img id="lightbox-img" src="" alt="Xem ảnh đầy đủ" 
                  class="max-w-[95vw] max-h-[90vh] object-contain shadow-2xl transition-transform duration-500 scale-95">
-            
-            <!-- Close Button -->
-            <button onclick="closeLightbox(event)" 
-                    class="absolute -top-12 right-0 text-white/70 hover:text-white transition-colors p-2 group">
-                <div class="flex items-center gap-2">
-                    <span class="text-[9px] font-black uppercase tracking-[0.3em] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Đóng ESC</span>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </div>
-            </button>
         </div>
     </div>
 </div>
