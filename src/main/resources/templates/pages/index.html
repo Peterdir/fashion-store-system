@@ -8,80 +8,83 @@
 
 <div layout:fragment="content">
     <!-- Hero Section -->
-    <section class="relative h-[90vh] bg-primary flex items-center overflow-hidden">
-        <img th:src="@{/images/hero.png}" alt="Fashion Hero" class="absolute inset-0 w-full h-full object-cover opacity-60">
-        <div class="relative z-10 max-w-[1440px] mx-auto px-6 w-full">
-            <div class="max-w-3xl">
-                <span class="block text-secondary text-xs font-bold tracking-[0.4em] uppercase mb-6">SS26 Collection</span>
-                <h1 class="text-white text-6xl md:text-8xl leading-[0.9] mb-12">The Zenith of<br>Minimalism</h1>
-                <p class="text-white/80 text-lg max-w-md mb-12 font-sans">
-                    Exploring the boundaries between brutalist architecture and wearable art. Curated for the intentional.
+    <section class="relative h-screen bg-primary flex items-center overflow-hidden">
+        <img th:src="@{/images/hero.png}" alt="Fashion Hero" class="absolute inset-0 w-full h-full object-cover opacity-70">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary to-transparent opacity-40"></div>
+        <div class="relative z-10 max-w-[1440px] mx-auto px-8 w-full">
+            <div class="max-w-4xl">
+                <div class="overflow-hidden mb-8">
+                    <span class="block text-secondary text-[11px] font-bold tracking-[0.5em] uppercase animate-slide-up">
+                        Archival Series / SS26
+                    </span>
+                </div>
+                <h1 class="text-white text-7xl md:text-9xl leading-[0.85] mb-12 font-black">
+                    Pure<br>Form
+                </h1>
+                <p class="text-white/60 text-lg max-w-sm mb-12 font-sans font-light leading-relaxed">
+                    A curated exploration of structure, shadow, and silence. Essential pieces for the modernist wardrobe.
                 </p>
-                <div class="flex space-x-8">
-                    <a th:href="@{/category}" class="bg-white text-primary px-12 py-5 font-bold text-[11px] tracking-[0.2em] uppercase hover:bg-secondary hover:text-white transition-all duration-500 no-radius">
-                        Shop Collection
+                <div class="flex items-center space-x-12">
+                    <a th:href="@{/category}" class="group relative py-2">
+                        <span class="text-white text-[11px] font-bold tracking-[0.3em] uppercase">Shop All</span>
+                        <div class="absolute bottom-0 left-0 w-full h-[2px] bg-secondary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
                     </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Editorial Spacing / Quote -->
-    <section class="editorial-spacing bg-white border-b border-outline/10">
-        <div class="max-w-[1440px] mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-12 md:space-y-0">
-                <h2 class="text-3xl md:text-5xl max-w-2xl leading-tight">
-                    "Style is not an option, it's a silent curation of one's architectural essence."
-                </h2>
-                <div class="text-[11px] tracking-[0.3em] font-bold uppercase text-neutral-400">
-                    Est. 2026 / Studio Notes
+    <!-- Studio Services / Minimalist Values -->
+    <section class="bg-white py-12 border-b border-outline/10">
+        <div class="max-w-[1440px] mx-auto px-8">
+            <div class="flex flex-col md:flex-row justify-between items-start divide-y md:divide-y-0 md:divide-x divide-outline/10">
+                <!-- Service 01 -->
+                <div class="py-8 md:py-0 md:px-12 first:pl-0 last:pr-0 w-full group">
+                    <h3 class="text-[12px] font-bold tracking-[0.3em] uppercase mb-4 text-secondary">Logistics</h3>
+                    <p class="text-neutral-500 text-sm font-sans max-w-xs leading-relaxed">
+                        White-glove delivery service. Complimentary on orders over 5.000.000 ₫.
+                    </p>
+                </div>
+                <!-- Service 02 -->
+                <div class="py-8 md:py-0 md:px-12 w-full group">
+                    <h3 class="text-[12px] font-bold tracking-[0.3em] uppercase mb-4 text-secondary">Curation</h3>
+                    <p class="text-neutral-500 text-sm font-sans max-w-xs leading-relaxed">
+                        Hand-curated pieces from established global design houses.
+                    </p>
+                </div>
+                <!-- Service 03 -->
+                <div class="py-8 md:py-0 md:px-12 w-full group">
+                    <h3 class="text-[12px] font-bold tracking-[0.3em] uppercase mb-4 text-secondary">Payments</h3>
+                    <p class="text-neutral-500 text-sm font-sans max-w-xs leading-relaxed">
+                        Secure transactions via MoMo, Visa, and direct studio wire.
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Featured Collections Grid -->
-    <section class="bg-background editorial-spacing" th:if="${not #lists.isEmpty(categories)}">
-        <div class="max-w-[1440px] mx-auto px-6">
-            <div class="mb-12">
-                <h2 class="text-sm font-bold tracking-[0.3em] uppercase text-neutral-400">Collections</h2>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px border border-outline/10">
-                <!-- Dynamic Category Loop -->
-                <div th:each="cat : ${categories}" class="bg-surface-card editorial-spacing px-12 group cursor-pointer border-r border-b border-outline/10">
-                    <a th:href="@{/category(keyword=${cat.name})}" class="block">
-                        <div class="aspect-[3/4] overflow-hidden mb-12 bg-neutral-100">
-                            <img th:src="${cat.imageUrl != null ? (cat.imageUrl.startsWith('http') ? cat.imageUrl : '/' + cat.imageUrl) : '/images/placeholder.png'}" 
-                                 th:alt="${cat.name}" 
-                                 class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000">
-                        </div>
-                        <h3 class="text-2xl mb-4" th:text="${cat.name}">Category Name</h3>
-                        <p class="text-neutral-500 text-sm mb-8 font-sans" th:text="${cat.childCount > 0 ? cat.childCount + ' Subcategories' : 'Explore pieces'}">Subcategories</p>
-                        <span class="text-[10px] tracking-[0.2em] font-bold uppercase border-b-2 border-secondary pb-1">Explore</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
+
+
+
 
     <!-- Featured Products Section -->
-    <section class="bg-white editorial-spacing" th:if="${not #lists.isEmpty(featuredProducts)}">
-        <div class="max-w-[1440px] mx-auto px-6">
-            <div class="flex justify-between items-end mb-16">
-                <div>
-                    <h2 class="text-sm font-bold tracking-[0.3em] uppercase text-neutral-400 mb-4">Latest Arrivals</h2>
-                    <h3 class="text-4xl">New Pieces</h3>
+    <section class="bg-background py-32 border-t border-outline/10" th:if="${not #lists.isEmpty(featuredProducts)}">
+        <div class="max-w-[1440px] mx-auto px-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-24 gap-8">
+                <div class="max-w-xl">
+                    <h2 class="text-sm font-bold tracking-[0.4em] uppercase text-secondary mb-6">New Arrivals</h2>
+                    <h3 class="text-5xl md:text-6xl tracking-tighter">The Modern<br>Manifesto</h3>
                 </div>
-                <a th:href="@{/category}" class="text-[10px] tracking-[0.2em] font-bold uppercase border-b-2 border-primary pb-1 hover:border-secondary transition-colors">
-                    View All
+                <a th:href="@{/category}" class="text-[11px] tracking-[0.3em] font-bold uppercase border-b border-primary pb-2 hover:text-secondary hover:border-secondary transition-all">
+                    Explore Inventory
                 </a>
             </div>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-24">
                 <!-- Product Card Loop -->
                 <div th:each="product : ${featuredProducts}" class="group">
                     <a th:href="@{'/product-detail/' + ${product.productId}}" class="block">
-                        <div class="relative aspect-[3/4] overflow-hidden mb-6 bg-neutral-100">
+                        <div class="relative aspect-[3/4] overflow-hidden mb-8 bg-white shadow-sm ring-1 ring-black/5">
                             <!-- Primary Image -->
                             <img th:src="${product.primaryImageUrl}" 
                                  th:alt="${product.name}"
@@ -89,26 +92,28 @@
                             <!-- Hover Image -->
                             <img th:src="${product.hoverImageUrl}" 
                                  th:alt="${product.name}"
-                                 class="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 group-hover:opacity-100 group-hover:scale-105">
+                                 class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700 group-hover:opacity-100 group-hover:scale-105">
                             
-                            <!-- Badges -->
-                            <div class="absolute top-4 left-4" th:if="${product.status != null and product.status.name() != 'ACTIVE'}">
-                                <span class="bg-primary text-white text-[9px] font-bold tracking-widest uppercase px-3 py-1" th:text="${product.status}">STATUS</span>
+                            <!-- Status Badge -->
+                            <div class="absolute top-6 left-6" th:if="${product.status != null and product.status.name() != 'ACTIVE'}">
+                                <span class="bg-primary/90 backdrop-blur-sm text-white text-[9px] font-bold tracking-widest uppercase px-4 py-2" th:text="${product.status}">STATUS</span>
                             </div>
                         </div>
                         
-                        <div class="space-y-2">
-                            <h4 class="text-xs tracking-[0.1em] text-neutral-400 uppercase font-bold" th:text="${product.category}">Category</h4>
-                            <h3 class="text-lg font-medium group-hover:text-secondary transition-colors" th:text="${product.name}">Product Name</h3>
-                            <div class="flex items-center space-x-3">
-                                <span class="text-sm font-bold" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' ₫'}">0 ₫</span>
+                        <div class="space-y-4 px-1">
+                            <div class="flex justify-between items-center text-[10px] font-bold tracking-[0.2em] text-neutral-400 uppercase">
+                                <span th:text="${product.category}">Category</span>
+                                <span class="material-symbols-outlined text-[14px]">add</span>
                             </div>
+                            <h3 class="text-lg tracking-tight font-medium group-hover:text-secondary transition-colors" th:text="${product.name}">Product Name</h3>
+                            <p class="text-sm font-bold tracking-tight" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' ₫'}">0 ₫</p>
                         </div>
                     </a>
                 </div>
             </div>
         </div>
     </section>
+
 
 </div>
 
