@@ -187,7 +187,7 @@
                             <div class="flex flex-wrap items-center gap-3 text-[11px] text-neutral-400">
                                 <span>Phân loại hàng: <span th:text="${review.color + ', ' + review.size}">Black, M</span></span>
                                 <span class="w-[1px] h-3 bg-outline/20"></span>
-                                <span th:if="${review.createdAt != null}" th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy')}">01/01/2024</span>
+                                <span th:if="${review.createdAt != null}" th:text="${review.createdAt}">01/01/2024</span>
                             </div>
 
                             <!-- Comment -->
@@ -195,13 +195,7 @@
                                 Chất lượng sản phẩm rất tuyệt vời, vải mềm mịn và form dáng chuẩn như hình. Rất đáng tiền!
                             </p>
 
-                            <!-- Review Images -->
-                            <div th:if="${review.imageUrls != null && !review.imageUrls.isEmpty()}" class="flex flex-wrap gap-2 mt-3 pt-1">
-                                <div th:each="imgUrl : ${review.imageUrls}" class="w-20 h-20 border border-outline/5 overflow-hidden group/rev-img cursor-zoom-in" 
-                                     th:onclick="|openLightbox('${imgUrl}')|">
-                                    <img th:src="@{${imgUrl}}" class="w-full h-full object-cover transition-transform duration-500 group-hover/rev-img:scale-110">
-                                </div>
-                            </div>
+                            </p>
                         </div>
                     </div>
                 </div>

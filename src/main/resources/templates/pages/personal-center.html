@@ -1018,25 +1018,6 @@
                                     <textarea id="review-comment" rows="4" class="w-full bg-white border border-black p-4 text-[11px] font-bold tracking-tight focus:ring-0 outline-none resize-none placeholder:text-gray-200 text-black" placeholder="Bạn thấy sản phẩm như thế nào? Hãy chia sẻ cùng H&Y nhé..."></textarea>
                                 </div>
 
-                                <!-- Review Images Upload -->
-                                <div class="space-y-3">
-                                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Hình ảnh thực tế (Tối đa 5)</label>
-                                    <input type="file" id="review-image-input" multiple accept="image/*" class="hidden" onchange="OrderModule.handleReviewImageSelect(event)">
-                                    <div class="flex flex-wrap gap-3">
-                                        <div id="review-image-previews" class="contents">
-                                            <!-- JS Populated -->
-                                        </div>
-                                        <button type="button" id="add-review-image-btn" onclick="document.getElementById('review-image-input').click()" 
-                                                class="w-[70px] h-[70px] border border-dashed border-black/20 flex flex-col items-center justify-center gap-1 hover:border-black hover:bg-gray-50 transition-all text-gray-300 hover:text-black group">
-                                            <span class="material-symbols-outlined text-xl">add_a_photo</span>
-                                            <span class="text-[7px] font-black uppercase tracking-tighter">Thêm ảnh</span>
-                                        </button>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <p class="text-[8px] text-gray-400 uppercase font-bold tracking-widest">Định dạng: JPG, PNG • Tối đa 2MB/ảnh</p>
-                                        <p id="review-image-counter" class="text-[8px] text-black font-black uppercase tracking-widest">0/5 Ảnh</p>
-                                    </div>
-                                </div>
                             </div>
 
                             <div class="px-6 py-5 border-t border-black/5 bg-gray-50 flex gap-4">

@@ -7,7 +7,6 @@ const OrderModule = {
     currentStatus: 'all',
     currentPage: 0,
     selectedReturnImages: [], // Base64 strings for returns
-    selectedReviewImages: [], // Base64 strings for reviews
 
     /**
      * Initialize Module
@@ -680,77 +679,7 @@ const OrderModule = {
         this.renderReturnImagePreviews();
     },
 
-    /**
-     * Handle Image Selection for Product Review
-     */
-    async handleReviewImageSelect(event) {
-        const files = Array.from(event.target.files);
-        const maxImages = 5;
-        const maxSize = 2 * 1024 * 1024; // 2MB
 
-        if (this.selectedReviewImages.length + files.length > maxImages) {
-            alert(`Bạn chỉ có thể chọn tối đa ${maxImages} hình ảnh.`);
-            return;
-        }
-
-        for (const file of files) {
-            if (file.size > maxSize) {
-                alert(`Ảnh "${file.name}" vượt quá kích thước 2MB. Vui lòng chọn ảnh nhẹ hơn.`);
-                continue;
-            }
-
-            try {
-                const base64 = await this.convertToBase64(file);
-                this.selectedReviewImages.push(base64);
-            } catch (error) {
-                console.error('Error converting image:', error);
-            }
-        }
-
-        this.renderReviewImagePreviews();
-        event.target.value = ''; // Reset input
-    },
-
-    /**
-     * Render Review Image Previews
-     */
-    renderReviewImagePreviews() {
-        const container = document.getElementById('review-image-previews');
-        const counter = document.getElementById('review-image-counter');
-        const addBtn = document.getElementById('add-review-image-btn');
-
-        if (!container) return;
-
-        container.innerHTML = this.selectedReviewImages.map((img, index) => `
-            <div class="relative w-[70px] h-[70px] group border border-outline/10">
-                <img src="${img}" class="w-full h-full object-cover">
-                <button type="button" onclick="OrderModule.removeReviewImage(${index})" 
-                        class="absolute -top-2 -right-2 bg-black text-white rounded-full w-5 h-5 flex items-center justify-center shadow-lg hover:bg-red-500 transition-colors">
-                    <span class="material-symbols-outlined text-[12px]">close</span>
-                </button>
-            </div>
-        `).join('');
-
-        if (counter) {
-            counter.textContent = `${this.selectedReviewImages.length}/5 Ảnh`;
-        }
-
-        if (addBtn) {
-            if (this.selectedReviewImages.length >= 5) {
-                addBtn.classList.add('hidden');
-            } else {
-                addBtn.classList.remove('hidden');
-            }
-        }
-    },
-
-    /**
-     * Remove Review Image
-     */
-    removeReviewImage(index) {
-        this.selectedReviewImages.splice(index, 1);
-        this.renderReviewImagePreviews();
-    },
 
     /**
      * Show Premium Success Modal
@@ -867,7 +796,10 @@ const OrderModule = {
      * Create HTML for individual (Whole) order card (Compact)
      */
     renderOrderCard(order) {
-        const date = new Date(order.orderDate).toLocaleDateString('vi-VN');
+        const dateObj = new Date(order.orderDate);
+        const date = dateObj.toLocaleDateString('vi-VN');
+        const time = dateObj.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        const displayDate = `${time} ${date}`;
         const total = new Intl.NumberFormat('vi-VN').format(order.totalAmount);
         const fallbackImg = 'https://vietcetera.com/uploads/images/15-apr-2021/screen-shot-2021-04-15-at-13-21-47-1618467727402.png';
 
@@ -938,7 +870,7 @@ const OrderModule = {
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-3 mb-1.5">
                             <span class="text-[10px] font-black tracking-widest text-black">${strOrderIdFull}</span>
-                            <span class="text-[9px] font-bold text-gray-400 font-mono">${date}</span>
+                            <span class="text-[9px] font-bold text-gray-400 font-mono">${displayDate}</span>
                         </div>
                         <div class="flex items-center gap-4">
                             ${statusHtml}
@@ -1098,8 +1030,6 @@ const OrderModule = {
         // Reset modal
         this.selectRating(0);
         document.getElementById('review-comment').value = '';
-        this.selectedReviewImages = [];
-        this.renderReviewImagePreviews();
         
         // Hide error message if any
         const errorMsg = document.getElementById('review-rating-error');
@@ -1186,8 +1116,7 @@ const OrderModule = {
             productId: parseInt(productIdStr), 
             orderItemId: (orderItemIdStr && orderItemIdStr !== "undefined") ? parseInt(orderItemIdStr) : null, 
             rating, 
-            comment,
-            imageUrls: this.selectedReviewImages
+            comment
         };
 
         // For debugging 400 errors
@@ -1496,16 +1425,7 @@ const OrderModule = {
                                         "${review.comment || 'Không có bình luận.'}"
                                     </p>
                                     
-                                    <!-- Review Images Display -->
-                                    ${review.imageUrls && review.imageUrls.length > 0 ? `
-                                    <div class="mt-4 flex flex-wrap gap-2 relative z-10">
-                                        ${review.imageUrls.map(url => `
-                                            <div class="w-16 h-16 border border-black/5 overflow-hidden shadow-sm cursor-zoom-in" onclick="window.open('${url}', '_blank')">
-                                                <img src="${url}" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                    ` : ''}
+
 
                                     <div class="mt-2 flex items-center justify-between">
                                         <span class="text-[8px] font-black uppercase tracking-widest text-black/20 italic">

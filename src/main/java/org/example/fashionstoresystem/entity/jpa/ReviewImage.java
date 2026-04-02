@@ -17,6 +17,7 @@ public class ReviewImage {
     @Column(name = "review_image_id")
     private Long id;
 
+    @Lob
     @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String imageUrl;
 
