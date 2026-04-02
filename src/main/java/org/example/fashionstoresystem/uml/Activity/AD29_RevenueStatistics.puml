@@ -3,37 +3,43 @@ title Activity Diagram (Swimlane) - Revenue Statistics (UC29)
 
 |Owner (UI)|
 start
-:Chọn chức năng "Thống kê doanh thu";
-:Hiển thị giao diện chọn khoảng thời gian;
-:Chọn ngày/tháng/năm & nhấn "Xem thống kê";
+:Chọn chức năng "Thống kê doanh thu" (Dashboard / Báo cáo);
+:Nhập khoảng thời gian (Từ ngày - Đến ngày) & nhấn "Lọc";
 
 |System (Service)|
 :Nhận yêu cầu & khoảng thời gian;
 
 |Database (MySQL)|
-:Truy vấn doanh thu Online (Orders);
-:Truy vấn doanh thu Offline (Invoices);
+:Truy vấn dữ liệu từ bảng orders & order_items;
+note right: Tổng hợp theo loại ONLINE / OFFLINE
 
 |System (Service)|
 if (Có dữ liệu trả về?) then (Không)
     |Owner (UI)|
     :Hiển thị: "Không có dữ liệu trong khoảng thời gian này";
-    stop
 else (Có)
     |System (Service)|
-    :Tổng hợp tổng doanh thu & số lượng đơn;
-    :Xử lý dữ liệu để vẽ biểu đồ;
+    :Tính toán tổng doanh thu, số đơn hàng;
+    :Phân nhóm doanh thu theo ngày/tháng để vẽ biểu đồ;
 
-    if (Lỗi truy xuất?) then (Có)
+    if (Lỗi hệ thống?) then (Có)
         |Owner (UI)|
-        :Hiển thị thông báo lỗi hệ thống;
+        :Hiển thị thông báo lỗi server;
         stop
     else (Thành công)
         |Owner (UI)|
         :Hiển thị Tổng doanh thu & Số lượng đơn;
         :Hiển thị Biểu đồ minh họa trực quan;
-        :Hiển thị bảng chi tiết đơn hàng
-        (Order ID, Products, Quantity, Price, Amount);
+        :Hiển thị bảng chi tiết các đơn hàng;
+        
+        if (Yêu cầu xuất Excel?) then (Xuất)
+            |System (Service)|
+            :Gọi API exportRevenueReport();
+            :Tạo file Excel (Apache POI);
+            |Owner (UI)|
+            :Tải xuống file report.xlsx;
+        else (Không)
+        endif
     endif
 endif
 

@@ -2,7 +2,7 @@
 title Object Diagram: Place Order (UC11)\nScenario: Customer places an order with 2 items and applies a coupon
 
 ' DTO - Data sent from checkout form
-object "orderDto : OrderDTO" as dto {
+object "registerRequestDto : PlaceOrderRequestDTO" as dto {
     cartItemIds = [101, 102]
     shippingAddress = "123 Nguyen Hue, Q1, HCM"
     paymentMethod = "COD"
@@ -31,19 +31,27 @@ object "order : Order" as order {
     status = "PENDING"
     shippingAddress = "123 Nguyen Hue, Q1, HCM"
     paymentMethod = "COD"
+    type = "ONLINE"
+    hiddenByUser = false
 }
 
 ' Entity - Order Items
 object "item1 : OrderItem" as item1 {
     id = 201
     quantity = 2
+    price = 1250000.0
     productName = "Ao Thun Trang"
+    status = "PENDING_PAYMENT"
+    isReviewed = false
 }
 
 object "item2 : OrderItem" as item2 {
     id = 202
     quantity = 1
+    price = 850000.0
     productName = "Quan Jean Xanh"
+    status = "PENDING_PAYMENT"
+    isReviewed = false
 }
 
 ' Entity - ProductVariants (stock updated)
@@ -64,9 +72,10 @@ object "variant2 : ProductVariant" as v2 {
 }
 
 ' Response DTO
-object "response : OrderSuccessDTO" as res {
+object "response : PlaceOrderResponseDTO" as res {
     orderId = 1001
     totalAmount = 2050000.0
+    status = "PENDING"
     message = "Order placed successfully!"
 }
 

@@ -4,45 +4,46 @@ title Class Diagram : Payment (UC12)
 ' Controller
 class PaymentController {
     - paymentService : PaymentService
-    + showPaymentPage(orderId: Long) : String
-    + processPayment(dto: ProcessPaymentRequestDTO) : PaymentResponseDTO
+    + momoIPN(payload: Map<String, Object>) : ResponseEntity<?>
+    + momoReturn(allParams: Map<String, String>) : ResponseEntity<?>
 }
 
 ' Service
 interface PaymentService <<interface>> {
     + getOrderDetails(orderId: Long) : Order
     + processPayment(dto: ProcessPaymentRequestDTO) : PaymentResponseDTO
+    + processMomoIPN(payload: Map<String, Object>) : void
+    + processMomoReturn(allParams: Map<String, String>) : String
 }
 
 class PaymentServiceImpl {
     - orderRepository : OrderRepository
-    - paymentGateway : PaymentGateway
+    - orderItemRepository : OrderItemRepository
+    - orderHistoryRepository : OrderHistoryRepository
+    - momoService : MomoService
     + getOrderDetails(orderId: Long) : Order
     + processPayment(dto: ProcessPaymentRequestDTO) : PaymentResponseDTO
+    + processMomoIPN(payload: Map<String, Object>) : void
+    + processMomoReturn(allParams: Map<String, String>) : String
+    - updateOrderPayStatus(orderId: Long, success: boolean) : void
 }
 
-' External Gateway Service
-interface PaymentGateway <<interface>> {
-    + requestPayment(amount: Double, orderInfo: String) : PaymentResponseDTO
+' Momo Integration
+interface MomoService <<interface>> {
+    + verifySignature(params: Map<String, String>) : boolean
 }
 
 ' Repository
 interface OrderRepository <<interface>> {
-    + findById(orderId: Long) : Order
-    + save(order: Order) : Order
+    + findById(orderId: Long) : Optional<Order>
 }
 
-' DTO
-
-class ProcessPaymentRequestDTO {
-    - orderId : Long
-    - paymentMethod : PaymentMethod
+interface OrderItemRepository <<interface>> {
+    + save(entity: S) : <S extends T> S
 }
 
-class PaymentResponseDTO {
-    - status : String
-    - transactionId : String
-    - message : String
+interface OrderHistoryRepository <<interface>> {
+    + save(entity: S) : <S extends T> S
 }
 
 ' Entity
@@ -52,16 +53,25 @@ class Order {
     - totalAmount : Double
     - paymentMethod : PaymentMethod
     - orderDate : Date
+    - orderItems : List<OrderItem>
 }
 
 class OrderItem {
     - id : Long
     - status : OrderStatus
-    - refundStatus : RefundStatus
-    - cancellationReason : String
+    - price : Double
+    - quantity : Long
+}
+
+class OrderHistory {
+    - id : Long
+    - previousStatus : OrderStatus
+    - newStatus : OrderStatus
+    - changeDate : Date
 }
 
 Order "1" *-- "1..*" OrderItem : contains >
+OrderItem "1" *-- "0..*" OrderHistory : tracks >
 
 ' Relationships
 
@@ -71,16 +81,13 @@ PaymentServiceImpl ..|> PaymentService
 ' Dependency Injection
 PaymentController --> PaymentService : - paymentService
 PaymentServiceImpl --> OrderRepository : - orderRepository
-PaymentServiceImpl --> PaymentGateway : - paymentGateway
+PaymentServiceImpl --> OrderItemRepository : - orderItemRepository
+PaymentServiceImpl --> OrderHistoryRepository : - orderHistoryRepository
+PaymentServiceImpl --> MomoService : - momoService
 
 ' Object Usage
-PaymentController ..> ProcessPaymentRequestDTO : <<uses>>
-PaymentController ..> PaymentResponseDTO : <<returns>>
-PaymentServiceImpl ..> ProcessPaymentRequestDTO : <<uses>>
 PaymentServiceImpl ..> Order : <<uses>>
-OrderRepository ..> Order : <<manages>>
-
-PaymentGateway ..> PaymentResponseDTO : <<creates>>
-PaymentServiceImpl ..> PaymentResponseDTO : <<uses>>
+PaymentServiceImpl ..> OrderItem : <<uses>>
+PaymentServiceImpl ..> OrderHistory : <<uses>>
 
 @enduml

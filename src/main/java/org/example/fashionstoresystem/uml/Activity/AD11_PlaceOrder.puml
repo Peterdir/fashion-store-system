@@ -3,19 +3,19 @@ title Activity Diagram (Swimlane) - Place Order (UC11)
 
 |Client (UI)|
 start
-:Chọn "Mua ngay" hoặc chọn "Mua" trong Giỏ hàng;
+:Lựa chọn sản phẩm tử Giỏ hàng và chọn "Mua hàng";
 
 |System (Service)|
-:Hiển thị giao diện xác nhận đơn hàng;
+:Hiển thị giao diện thanh toán (Checkout);
 
 |Client (UI)|
 repeat
-    :Xác nhận thông tin giao nhận;
+    :Điền thông tin địa chỉ giao nhận;
     :Chọn phương thức thanh toán;
     if (Có mã giảm giá?) then (Có)
             :Nhập mã giảm giá;
             |System (Service)|
-            :Thực hiện UC "Sử dụng mã giảm giá";
+            :Thực hiện UC tính toán giảm giá (Coupon);
     else (Không)
     endif
 
@@ -23,40 +23,48 @@ repeat
     :Nhấn "Đặt hàng";
 
     |System (Service)|
-    :Kiểm tra tính hợp lệ (Thông tin, Tồn kho);
+    :Kiểm tra thông tin (Địa chỉ, Mã giảm giá, Tồn kho);
 
     |Database (MySQL)|
-    :Truy vấn kiểm tra kho hàng;
+    :Truy vấn kiểm tra số lượng tồn kho của các ProductVariant;
 
     |System (Service)|
-    if (Dữ liệu hợp lệ?) then (Không)
+    if (Dữ liệu hợp lệ và đủ tồn kho?) then (Không)
         |Client (UI)|
-        :Hiển thị thông báo lỗi;
+        :Hiển thị thông báo lỗi (Hết hàng/Mã không hợp lệ);
     else (Có)
         break
     endif
-repeat while (Cần sửa lại thông tin?)
-
-|Database (MySQL)|
-:Lưu thông tin đơn hàng (Bảng Orders);
-:Lưu chi tiết sản phẩm (Bảng OrderItems);
-:Trừ số lượng tồn kho (Bảng ProductVariants);
-:Xóa sản phẩm khỏi giỏ hàng (Bảng CartItems);
+repeat while (Cần chỉnh sửa thông tin?)
 
 |System (Service)|
-if (Lỗi khi lưu?) then (Có)
+if (Thanh toán Online (MOMO, VNPay)?) then (Có)
+    :Set trạng thái đơn hàng = PENDING_PAYMENT;
+else (Thanh toán khi nhận hàng (COD))
+    :Set trạng thái đơn hàng = PENDING;
+endif
+
+|Database (MySQL)|
+:Lưu thông tin Create Order (Bảng orders);
+:Lưu chi tiết các OrderItem (Bảng order_items);
+:Trừ số lượng tồn kho (Bảng product_variants);
+:Xóa các sản phẩm đã mua khỏi giỏ hàng (Bảng cart_items);
+
+|System (Service)|
+if (Lỗi khi lưu/ngoại lệ xảy ra?) then (Có)
+    :Rollback Transaction;
     |Client (UI)|
     :Thông báo lỗi hệ thống;
     stop
 else (Thành công)
     |System (Service)|
     if (Thanh toán Online?) then (Có)
-        :Set trạng thái "Chờ thanh toán";
-    else (Không - COD)
-        :Set trạng thái "Chờ xác nhận";
+        |Client (UI)|
+        :Chuyển hướng đến Cổng thanh toán (Momo/VNPay);
+    else (Không)
+        |Client (UI)|
+        :Hiển thị thông báo Đặt hàng thành công;
     endif
-    |Client (UI)|
-    :Hiển thị thông báo Đặt hàng thành công;
 endif
 
 stop

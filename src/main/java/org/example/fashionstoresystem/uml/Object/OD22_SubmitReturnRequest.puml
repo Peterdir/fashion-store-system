@@ -2,11 +2,12 @@
 title Object Diagram: Submit Return Request (UC22)\nScenario: Customer submits a return request for 2 items
 
 ' DTO - Data sent from return form
-object "returnDto : ReturnRequestDTO" as dto {
+object "returnDto : SubmitReturnRequestDTO" as dto {
     orderId = 1001
     itemIds = [201, 202]
-    reason = "Defective product"
-    description = "Item has scratches on surface"
+    reason = "Lỗi sản phẩm"
+    description = "Sản phẩm bị trầy xước"
+    imageUrls = ["https://img1.jpg", "https://img2.jpg"]
 }
 
 ' Entity - The original order
@@ -18,10 +19,12 @@ object "order : Order" as order {
 ' Entity - Items selected for return
 object "item1 : OrderItem" as item1 {
     id = 201
+    refundStatus = "RETURN_REQUESTED"
 }
 
 object "item2 : OrderItem" as item2 {
     id = 202
+    refundStatus = "RETURN_REQUESTED"
 }
 
 ' Structural relationships (OrderItems belong to Order)
@@ -32,10 +35,15 @@ order *-- item2
 object "returnRequest : ReturnRequest" as rr {
     id = 301
     status = "PENDING_APPROVAL"
-    reason = "Defective product"
-    description = "Item has scratches on surface"
+    reason = "Lỗi sản phẩm"
+    description = "Sản phẩm bị trầy xước"
     requestDate = "2026-03-19"
+    imageUrls = ["https://img1.jpg", "https://img2.jpg"]
 }
+
+' Relationships
+rr *-- item1 : returns >
+rr *-- item2 : returns >
 
 note right of order
     Order must have status "DELIVERED"

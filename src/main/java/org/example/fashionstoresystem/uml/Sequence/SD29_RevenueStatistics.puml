@@ -2,59 +2,64 @@
 title Sequence Diagram: Revenue Statistics (UC29)
 
 autonumber
-actor "Store Owner" as Owner
-participant "Revenue View\n(Thymeleaf)" as View
-participant "RevenueController\n(Controller)" as Controller
-participant "RevenueService\n(Service)" as Service
-participant "OrderRepository\n(Repo)" as OrderRepo
-database "MySQL\n(Database)" as DB
+actor "Store Admin" as Owner
+participant "Admin Dashboard\n(JS / Browser)" as View
+participant "DashboardController\n(API Controller)" as DashController
+participant "ReportController\n(API Controller)" as RepController
+participant "DashboardService\n(Service)" as DashService
+participant "RevenueService\n(Service)" as RepService
+participant "OrderRepository" as OrderRepo
+database "MySQL" as DB
 
-== 1. Access Statistics Page ==
+== 1. View Dashboard Overview ==
 
-Owner -> View : Select "Revenue Statistics"
-View -> Controller : showRevenuePage()
-note right: GET /admin/revenue
-Controller --> View : admin/revenue_stats.html
-View --> Owner : Display date selection form
+Owner -> View : Access Admin Dashboard
+View -> DashController : getDashboard()
+note right: GET /api/admin/dashboard
+DashController -> DashService : getDashboardData()
 
-== 2. Generate Revenue Report ==
+DashService -> OrderRepo : calculateTotalRevenue()
+OrderRepo -> DB : SELECT ...
+DB --> OrderRepo : total
+DashService -> OrderRepo : countOrders()
+DashService -> OrderRepo : findRecentOrders()
 
-Owner -> View : Select time period and Click "View Statistics"
-View -> Controller : generateRevenueReport(startDate, endDate)
-note right: POST /admin/revenue/report
-Controller -> Service : getDetailedRevenueReport(startDate, endDate)
+DashService --> DashController : DashboardResponseDTO
+DashController --> View : 200 OK (DashboardResponseDTO)
+View --> Owner : Display Overview (Charts, KPIs)
 
-group Data Aggregation (Summary)
-    Service -> OrderRepo : calculateTotalRevenue(startDate, endDate, "ONLINE")
-    OrderRepo -> DB : SELECT SUM(total_amount)...
-    DB --> OrderRepo : onlineRevenue
+== 2. Generate Detailed Revenue Report ==
+
+Owner -> View : Select time period and Click "Filter"
+View -> RepController : getRevenueReport(startDate, endDate)
+note right: GET /api/admin/reports/revenue
+RepController -> RepService : getDetailedRevenueReport(startDate, endDate)
+
+group Data Aggregation
+    RepService -> OrderRepo : calculate Total Revenue & Group by Order Type
+    OrderRepo -> DB : SELECT SUM... GROUP BY type
+    DB --> OrderRepo : onlineRevenue, offlineRevenue
     
-    Service -> OrderRepo : calculateTotalRevenue(startDate, endDate, "OFFLINE")
-    OrderRepo -> DB : SELECT SUM(total_amount)...
-    DB --> OrderRepo : offlineRevenue
+    RepService -> OrderRepo : findFiltered(...)
+    OrderRepo -> DB : SELECT orders within date range
+    DB --> OrderRepo : List<Order>
     
-    Service -> OrderRepo : countOrders(startDate, endDate)
-    OrderRepo -> DB : SELECT COUNT(*)...
-    DB --> OrderRepo : totalOrders
+    RepService -> RepService : Group revenue by Day/Month
 end
 
-group Fetch Detailed Order List
-    Service -> OrderRepo : findByOrderDateBetween(startDate, endDate)
-    OrderRepo -> DB : SELECT * FROM orders JOIN order_items...
-    DB --> OrderRepo : List<Order> (including OrderItems & Products)
-    OrderRepo --> Service : List<Order>
-end
+RepService --> RepController : RevenueReportDTO
+RepController --> View : 200 OK (RevenueReportDTO)
 
-Service -> Service : combineToDetailedRevenueReport(online, offline, totalOrders, orderList)
-Service --> Controller : RevenueReportDTO
-Controller --> View : admin/revenue_stats.html (Model: report)
+View --> Owner : Render Revenue Charts & Data Table
 
-alt No Data Found
-    View --> Owner : Display "No data available for this period"
-else Success
-    View --> Owner : Display Summary (Total Revenue, Order Count)
-    View --> Owner : Render Revenue Charts
-    View --> Owner : Display Detailed Table (Order ID, Products, Amount)
-end
+== 3. Export Revenue Report ==
+
+Owner -> View : Click "Export to Excel"
+View -> RepController : exportRevenueReport(startDate, endDate, format="xlsx")
+note right: GET /api/admin/reports/revenue/export
+RepController -> RepService : exportRevenueReport(...)
+RepService --> RepController : byte[] fileData
+RepController --> View : 200 OK (Content-Disposition: attachment)
+View --> Owner : Prompt File Download
 
 @enduml

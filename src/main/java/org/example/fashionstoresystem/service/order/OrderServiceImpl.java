@@ -7,6 +7,7 @@ import org.example.fashionstoresystem.dto.request.CancelOrderRequestDTO;
 import org.example.fashionstoresystem.dto.request.PlaceOrderRequestDTO;
 import org.example.fashionstoresystem.service.cart_item.CartService;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
+import org.example.fashionstoresystem.dto.response.OrderDashboardSummaryDTO;
 import org.example.fashionstoresystem.dto.response.OrderDetailResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderSummaryResponseDTO;
 import org.example.fashionstoresystem.dto.response.PlaceOrderResponseDTO;
@@ -111,14 +112,14 @@ public class OrderServiceImpl implements OrderService {
 
             if (totalAmount < 0)
                 totalAmount = 0.0;
-            
+
             // 3.5. Kiểm tra xem người dùng đã dùng mã này chưa
             userCouponRepository.findByUserIdAndCouponCode(user.getId(), dto.getCouponCode().trim())
-                .ifPresent(uc -> {
-                    if (uc.isUsed()) {
-                        throw new RuntimeException("Mã giảm giá này đã được sử dụng!");
-                    }
-                });
+                    .ifPresent(uc -> {
+                        if (uc.isUsed()) {
+                            throw new RuntimeException("Mã giảm giá này đã được sử dụng!");
+                        }
+                    });
 
             appliedCoupon = coupon;
         }
@@ -132,12 +133,12 @@ public class OrderServiceImpl implements OrderService {
         order.setType(OrderType.ONLINE);
         order.setUser(user);
         order.setCoupon(appliedCoupon); // Gán mã coupon để lưu reference
-        
-        OrderStatus initialStatus = (dto.getPaymentMethod() == PaymentMethod.COD) 
-                ? OrderStatus.PENDING_CONFIRMATION 
+
+        OrderStatus initialStatus = (dto.getPaymentMethod() == PaymentMethod.COD)
+                ? OrderStatus.PENDING_CONFIRMATION
                 : OrderStatus.PENDING_PAYMENT;
         order.setStatus(initialStatus);
-        
+
         order = orderRepository.save(order);
 
         // 5. Khởi tạo OrderItem (mỗi item có status riêng) và Trừ Kho
@@ -161,9 +162,10 @@ public class OrderServiceImpl implements OrderService {
             // Tự động kiểm tra và cập nhật trạng thái cha nếu Hết Hàng
             org.example.fashionstoresystem.entity.jpa.Product parentProduct = variant.getProduct();
             boolean hasStock = parentProduct.getVariants().stream()
-                .anyMatch(v -> v.getStockQuantity() != null && v.getStockQuantity() > 0);
-            
-            if (!hasStock && parentProduct.getStatus() == org.example.fashionstoresystem.entity.enums.ProductStatus.ACTIVE) {
+                    .anyMatch(v -> v.getStockQuantity() != null && v.getStockQuantity() > 0);
+
+            if (!hasStock
+                    && parentProduct.getStatus() == org.example.fashionstoresystem.entity.enums.ProductStatus.ACTIVE) {
                 parentProduct.setStatus(org.example.fashionstoresystem.entity.enums.ProductStatus.OUT_OF_STOCK);
                 // JPA context will auto update the parentProduct when transaction commits,
                 // but if we had productRepository we could optionally call .save()
@@ -182,10 +184,10 @@ public class OrderServiceImpl implements OrderService {
         // 7.5. Đánh dấu Coupon đã sử dụng (Nếu có)
         if (dto.getCouponCode() != null && !dto.getCouponCode().trim().isEmpty()) {
             userCouponRepository.findByUserIdAndCouponCode(user.getId(), dto.getCouponCode().trim())
-                .ifPresent(uc -> {
-                    uc.setUsed(true);
-                    userCouponRepository.save(uc);
-                });
+                    .ifPresent(uc -> {
+                        uc.setUsed(true);
+                        userCouponRepository.save(uc);
+                    });
         }
 
         // 9. Gửi thông báo
@@ -194,8 +196,7 @@ public class OrderServiceImpl implements OrderService {
                 "Đặt hàng thành công",
                 "Đơn hàng #" + order.getId() + " của bạn đã được khởi tạo thành công.",
                 "SUCCESS",
-                order.getId()
-        );
+                order.getId());
 
         // 10. Trả về kết quả
         return PlaceOrderResponseDTO.builder()
@@ -203,9 +204,9 @@ public class OrderServiceImpl implements OrderService {
                 .totalAmount(order.getTotalAmount())
                 .status(order.getStatus())
                 .paymentUrl(paymentUrl) // Vẫn giữ để tương thích nếu FE muốn redirect ngay
-                .message(order.getPaymentMethod() == PaymentMethod.MOMO 
-                    ? "Đơn hàng đã được khởi tạo. Vui lòng thanh toán trong vòng 10 phút." 
-                    : "Đặt hàng thành công! Đơn hàng của bạn đang chờ xác nhận.")
+                .message(order.getPaymentMethod() == PaymentMethod.MOMO
+                        ? "Đơn hàng đã được khởi tạo. Vui lòng thanh toán trong vòng 10 phút."
+                        : "Đặt hàng thành công! Đơn hàng của bạn đang chờ xác nhận.")
                 .build();
     }
 
@@ -214,23 +215,23 @@ public class OrderServiceImpl implements OrderService {
     public String retryPayment(Long userId, Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại!"));
-        
+
         // Bảo mật: Kiểm tra đơn hàng có thuộc về User này không
         if (!order.getUser().getId().equals(userId)) {
             throw new RuntimeException("Bạn không có quyền thanh toán đơn hàng này!");
         }
-        
+
         // Kiểm tra xem đơn hàng còn trong trạng thái PENDING_PAYMENT không
         if (order.getStatus() != OrderStatus.PENDING_PAYMENT) {
             throw new RuntimeException("Đơn hàng này không ở trạng thái chờ thanh toán!");
         }
-        
+
         // Kiểm tra hết hạn (10 phút)
         long diff = new Date().getTime() - order.getOrderDate().getTime();
         if (diff > 10 * 60 * 1000) {
             throw new RuntimeException("Yêu cầu thanh toán đã hết hạn (quá 10 phút)!");
         }
-        
+
         return momoService.createPaymentUrl(order.getId(), order.getTotalAmount());
     }
 
@@ -239,7 +240,7 @@ public class OrderServiceImpl implements OrderService {
     public void revertInventory(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại!"));
-        
+
         for (OrderItem item : order.getOrderItems()) {
             ProductVariant variant = item.getProductVariant();
             variant.setStockQuantity(variant.getStockQuantity() + item.getQuantity().intValue());
@@ -291,24 +292,31 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<OrderItemSummaryDTO> getMyOrderItems(Long userId, List<OrderStatus> statuses, Boolean reviewed, Pageable pageable) {
+    public Page<OrderItemSummaryDTO> getMyOrderItems(Long userId, List<OrderStatus> statuses, Boolean reviewed,
+            Pageable pageable) {
         Page<OrderItem> items;
-        
+
         if (Boolean.TRUE.equals(reviewed)) {
             // Trường hợp: Lấy Lịch sử Review (Tất cả sản phẩm đã được đánh giá thành công)
             items = orderItemRepository.findByOrderUserIdAndIsReviewedTrueOrderByOrderOrderDateDesc(userId, pageable);
         } else if (Boolean.FALSE.equals(reviewed)) {
             // Trường hợp: Lấy sản phẩm chờ đánh giá (Lọc theo isReviewed = false)
-            items = orderItemRepository.findByOrderUserIdAndStatusInAndIsReviewedOrderByOrderOrderDateDesc(userId, statuses, false, pageable);
+            items = orderItemRepository.findByOrderUserIdAndStatusInAndIsReviewedOrderByOrderOrderDateDesc(userId,
+                    statuses, false, pageable);
         } else {
             // Trường hợp: Các tab khác (shipped, processing, etc. - không lọc isReviewed)
-            // Nếu statuses chỉ chứa DELIVERED hoặc COMPLETED (Tab Đánh giá mặc định), chỉ lấy sản phẩm chưa đánh giá
-            boolean isReviewTab = statuses != null && (statuses.contains(OrderStatus.DELIVERED) || statuses.contains(OrderStatus.COMPLETED)) && statuses.size() <= 2;
-            
+            // Nếu statuses chỉ chứa DELIVERED hoặc COMPLETED (Tab Đánh giá mặc định), chỉ
+            // lấy sản phẩm chưa đánh giá
+            boolean isReviewTab = statuses != null
+                    && (statuses.contains(OrderStatus.DELIVERED) || statuses.contains(OrderStatus.COMPLETED))
+                    && statuses.size() <= 2;
+
             if (isReviewTab) {
-                items = orderItemRepository.findByOrderUserIdAndStatusInAndIsReviewedOrderByOrderOrderDateDesc(userId, statuses, false, pageable);
+                items = orderItemRepository.findByOrderUserIdAndStatusInAndIsReviewedOrderByOrderOrderDateDesc(userId,
+                        statuses, false, pageable);
             } else {
-                items = orderItemRepository.findByOrderUserIdAndStatusInOrderByOrderOrderDateDesc(userId, statuses, pageable);
+                items = orderItemRepository.findByOrderUserIdAndStatusInOrderByOrderOrderDateDesc(userId, statuses,
+                        pageable);
             }
         }
 
@@ -323,8 +331,10 @@ public class OrderServiceImpl implements OrderService {
                 .size(item.getProductVariant() != null ? item.getProductVariant().getSize() : null)
                 .color(item.getProductVariant() != null ? item.getProductVariant().getColor() : null)
                 .quantity(item.getQuantity())
-                .price(item.getPrice() != null ? item.getPrice() : (item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0))
-                .itemTotalAmount(item.getQuantity() * (item.getPrice() != null ? item.getPrice() : (item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0)))
+                .price(item.getPrice() != null ? item.getPrice()
+                        : (item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0))
+                .itemTotalAmount(item.getQuantity() * (item.getPrice() != null ? item.getPrice()
+                        : (item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0)))
                 .orderTotalAmount(item.getOrder().getTotalAmount())
                 .status(item.getStatus())
                 .refundStatus(item.getRefundStatus())
@@ -354,13 +364,15 @@ public class OrderServiceImpl implements OrderService {
 
                     return OrderDetailResponseDTO.OrderItemDTO.builder()
                             .orderItemId(item.getId())
-                            .productId(item.getProductVariant() != null ? item.getProductVariant().getProduct().getId() : null)
+                            .productId(item.getProductVariant() != null ? item.getProductVariant().getProduct().getId()
+                                    : null)
                             .productName(item.getProductName())
                             .productImage(getProductImageUrl(item.getProductVariant()))
                             .size(item.getProductVariant() != null ? item.getProductVariant().getSize() : null)
                             .color(item.getProductVariant() != null ? item.getProductVariant().getColor() : null)
                             .quantity(item.getQuantity())
-                            .price(item.getPrice() != null ? item.getPrice() : (item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0))
+                            .price(item.getPrice() != null ? item.getPrice()
+                                    : (item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0))
                             .status(item.getStatus())
                             .refundStatus(item.getRefundStatus())
                             .cancellationReason(item.getCancellationReason())
@@ -393,7 +405,8 @@ public class OrderServiceImpl implements OrderService {
      * Helper to get the correct product image URL (Absolute path)
      */
     private String getProductImageUrl(ProductVariant variant) {
-        if (variant == null || variant.getProduct() == null || variant.getProduct().getImages() == null || variant.getProduct().getImages().isEmpty()) {
+        if (variant == null || variant.getProduct() == null || variant.getProduct().getImages() == null
+                || variant.getProduct().getImages().isEmpty()) {
             return null;
         }
 
@@ -404,7 +417,8 @@ public class OrderServiceImpl implements OrderService {
                 .findFirst()
                 .orElse(variant.getProduct().getImages().get(0).getUrl());
 
-        if (targetUrl == null) return null;
+        if (targetUrl == null)
+            return null;
 
         // Đảm bảo đường dẫn tuyệt đối (bắt đầu bằng /)
         if (!targetUrl.startsWith("/") && !targetUrl.startsWith("http")) {
@@ -473,15 +487,14 @@ public class OrderServiceImpl implements OrderService {
         }
 
         String message = "Hủy đơn hàng thành công!";
-        
+
         // Gửi thông báo hủy đơn
         notificationService.createNotification(
                 order.getUser(),
                 "Đơn hàng đã được hủy",
                 "Đơn hàng #" + order.getId() + " đã được hủy thành công. Lý do: " + dto.getCancellationReason(),
                 "WARNING",
-                order.getId()
-        );
+                order.getId());
 
         if (hasRefund && !refundFailed) {
             message += " Yêu cầu hoàn tiền đang được xử lý.";
@@ -494,7 +507,6 @@ public class OrderServiceImpl implements OrderService {
                 .build();
     }
 
-    
     @Override
     @Transactional
     public void repurchaseOrder(Long userId, Long orderId) {
@@ -520,9 +532,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public org.example.fashionstoresystem.dto.response.OrderDashboardSummaryDTO getDashboardSummary(Long userId) {
+    public OrderDashboardSummaryDTO getDashboardSummary(Long userId) {
         List<Object[]> statusCounts = orderRepository.countMyOrdersByItemStatus(userId);
-        
+
         long unpaid = 0;
         long processing = 0;
         long shipped = 0;
@@ -545,8 +557,9 @@ public class OrderServiceImpl implements OrderService {
                     shipped += count;
                     break;
                 case CANCELLED:
-                    // Trong hệ thống này, Return được gộp chung hoặc xử lý qua RefundStatus, 
-                    // tạm thời gộp Cancelled vào Returns nếu có RefundStatus hoặc đơn giản là Cancelled
+                    // Trong hệ thống này, Return được gộp chung hoặc xử lý qua RefundStatus,
+                    // tạm thời gộp Cancelled vào Returns nếu có RefundStatus hoặc đơn giản là
+                    // Cancelled
                     returns += count;
                     break;
                 default:
@@ -559,7 +572,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(this::convertToSummaryDTO)
                 .orElse(null);
 
-        return org.example.fashionstoresystem.dto.response.OrderDashboardSummaryDTO.builder()
+        return OrderDashboardSummaryDTO.builder()
                 .unpaidCount(unpaid)
                 .processingCount(processing)
                 .shippedCount(shipped)

@@ -2,38 +2,49 @@
 title Class Diagram: Order Management (UC26)
 
 ' Controller
-class OrderManagementController {
+class AdminOrderController {
     - orderManagementService : OrderManagementService
-    + getAllOrders() : String
-    + getOrderDetails(id: Long) : String
-    + updateOrderStatus(id: Long, newStatus: OrderStatus) : MessageResponseDTO
+    + getAllOrders(status: OrderStatus, startDate: Date, endDate: Date, pageable: Pageable) : ResponseEntity<Page<OrderSummaryResponseDTO>>
+    + getOrderDetail(orderId: Long) : ResponseEntity<OrderDetailResponseDTO>
+    + updateOrderStatus(orderId: Long, status: OrderStatus) : ResponseEntity<MessageResponseDTO>
+    + updateOrderItemStatus(itemId: Long, status: OrderStatus) : ResponseEntity<Void>
+    + updateRefundStatus(itemId: Long, status: RefundStatus) : ResponseEntity<Void>
 }
 
 ' Service
 interface OrderManagementService <<interface>> {
-    + getAllOrders() : List<Order>
-    + getOrderDetails(id: Long) : Order
-    + updateOrderStatus(id: Long, newStatus: OrderStatus) : void
+    + getAllOrders(status: OrderStatus, startDate: Date, endDate: Date, pageable: Pageable) : Page<OrderSummaryResponseDTO>
+    + getOrderDetail(orderId: Long) : OrderDetailResponseDTO
+    + updateOrderStatus(orderId: Long, status: OrderStatus) : MessageResponseDTO
+    + updateOrderItemStatus(itemId: Long, status: OrderStatus) : void
+    + updateRefundStatus(itemId: Long, status: RefundStatus) : void
 }
 
 class OrderManagementServiceImpl {
     - orderRepository : OrderRepository
-    - historyRepository : OrderHistoryRepository
-    + getAllOrders() : List<Order>
-    + getOrderDetails(id: Long) : Order
-    + updateOrderStatus(id: Long, newStatus: OrderStatus) : void
+    - orderItemRepository : OrderItemRepository
+    - orderHistoryRepository : OrderHistoryRepository
+    + getAllOrders(status: OrderStatus, startDate: Date, endDate: Date, pageable: Pageable) : Page<OrderSummaryResponseDTO>
+    + getOrderDetail(orderId: Long) : OrderDetailResponseDTO
+    + updateOrderStatus(orderId: Long, status: OrderStatus) : MessageResponseDTO
+    + updateOrderItemStatus(itemId: Long, status: OrderStatus) : void
+    + updateRefundStatus(itemId: Long, status: RefundStatus) : void
     - checkStatusTransition(currentStatus: OrderStatus, newStatus: OrderStatus) : void
 }
 
 ' Repository
 interface OrderRepository <<interface>> {
-    + findAll() : List<Order>
-    + findById(id: Long) : Order
-    + save(order: Order) : Order
+    + findFiltered(status: OrderStatus, startDate: Date, endDate: Date, pageable: Pageable) : Page<Order>
+    + findById(id: Long) : Optional<Order>
+}
+
+interface OrderItemRepository <<interface>> {
+    + findById(id: Long) : Optional<OrderItem>
+    + save(entity: S) : <S extends T> S
 }
 
 interface OrderHistoryRepository <<interface>> {
-    + save(history: OrderHistory) : OrderHistory
+    + save(entity: S) : <S extends T> S
 }
 
 ' DTO
@@ -42,12 +53,26 @@ class MessageResponseDTO {
     - message : String
 }
 
+class OrderSummaryResponseDTO {
+    - orderId : Long
+    - orderDate : Date
+    - totalAmount : Double
+    - status : OrderStatus
+}
+
+class OrderDetailResponseDTO {
+    - orderId : Long
+    - status : OrderStatus
+    - items : List<OrderItemDTO>
+}
+
 ' Entity
 
 class Order {
     - id : Long
     - totalAmount : Double
     - orderDate : Date
+    - status : OrderStatus
 }
 
 class OrderItem {
@@ -66,7 +91,7 @@ class OrderHistory {
 }
 
 Order "1" *-- "1..*" OrderItem : contains >
-OrderItem "1" -- "N" OrderHistory
+OrderItem "1" *-- "0..*" OrderHistory : tracks >
 
 ' Relationships
 
@@ -74,15 +99,20 @@ OrderItem "1" -- "N" OrderHistory
 OrderManagementServiceImpl ..|> OrderManagementService
 
 ' Dependency Injection
-OrderManagementController --> OrderManagementService : - orderManagementService
+AdminOrderController --> OrderManagementService : - orderManagementService
 OrderManagementServiceImpl --> OrderRepository : - orderRepository
-OrderManagementServiceImpl --> OrderHistoryRepository : - historyRepository
+OrderManagementServiceImpl --> OrderItemRepository : - orderItemRepository
+OrderManagementServiceImpl --> OrderHistoryRepository : - orderHistoryRepository
 
 ' Object Usage
-OrderManagementController ..> Order : <<uses>>
-OrderManagementController ..> MessageResponseDTO : <<returns>>
+AdminOrderController ..> OrderSummaryResponseDTO : <<returns>>
+AdminOrderController ..> OrderDetailResponseDTO : <<returns>>
+AdminOrderController ..> MessageResponseDTO : <<returns>>
 OrderManagementServiceImpl ..> Order : <<uses>>
 OrderRepository ..> Order : <<manages>>
+
+OrderManagementServiceImpl ..> OrderItem : <<uses>>
+OrderItemRepository ..> OrderItem : <<manages>>
 
 OrderManagementServiceImpl ..> OrderHistory : <<creates>>
 OrderHistoryRepository ..> OrderHistory : <<manages>>

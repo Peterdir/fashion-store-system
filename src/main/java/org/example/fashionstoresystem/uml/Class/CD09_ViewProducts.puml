@@ -2,31 +2,40 @@
 title Class Diagram : View Products (UC09)
 
 ' Controller
+class ProductViewController {
+    - productService: ProductService
+    - recentlyViewedService: RecentlyViewedService
+    + category(keyword: String, minPrice: Double, maxPrice: Double, pageable: Pageable, model: Model) : String
+    + productDetail(productId: Long, model: Model) : String
+    - getCurrentUserEmail() : String
+}
+
 class ProductController {
     - productService: ProductService
-    + showProductsPage(keyword: String) : List<ProductSummaryResponseDTO>
-    + showProductDetail(productId: Long) : ProductDetailResponseDTO
+    + getProducts(keyword: String, minPrice: Double, maxPrice: Double, pageable: Pageable) : ResponseEntity<Page<ProductSummaryResponseDTO>>
+    + getProductDetail(productId: Long) : ResponseEntity<ProductDetailResponseDTO>
 }
 
 ' Service
 
 interface ProductService <<interface>> {
-    + getProducts(keyword: String) : List<ProductSummaryResponseDTO>
+    + getProducts(keyword: String, minPrice: Double, maxPrice: Double, pageable: Pageable) : Page<ProductSummaryResponseDTO>
     + getProductDetail(productId: Long) : ProductDetailResponseDTO
+    + getRelatedProducts(productId: Long, limit: int) : List<ProductSummaryResponseDTO>
 }
 
 class ProductServiceImpl {
     - productRepository : ProductRepository
-    + getProducts(keyword: String) : List<ProductSummaryResponseDTO>
+    + getProducts(keyword: String, minPrice: Double, maxPrice: Double, pageable: Pageable) : Page<ProductSummaryResponseDTO>
     + getProductDetail(productId: Long) : ProductDetailResponseDTO
+    + getRelatedProducts(productId: Long, limit: int) : List<ProductSummaryResponseDTO>
 }
 
 ' Repository
 
 interface ProductRepository <<interface>> {
-    + findAll() : List<Product>
-    + findByNameContaining(keyword: String) : List<Product>
-    + findById(productId: Long) : Product
+    + findFiltered(keyword: String, minPrice: Double, maxPrice: Double, pageable: Pageable) : Page<Product>
+    + findByCategoryIds(categoryIds: List<Long>, pageable: Pageable) : Page<Product>
 }
 
 ' DTO
@@ -36,8 +45,15 @@ class ProductSummaryResponseDTO {
     - name : String
     - price : Double
     - category : String
+    - subcategory : String
     - status : ProductStatus
     - primaryImageUrl : String
+    - hoverImageUrl : String
+    - minPrice : Double
+    - averageRating : Double
+    - reviewCount : Long
+    - totalStock : Long
+    - variantCount : Integer
 }
 
 class ProductDetailResponseDTO {
@@ -45,11 +61,18 @@ class ProductDetailResponseDTO {
     - name : String
     - price : Double
     - category : String
+    - categoryId : Long
     - description : String
     - status : ProductStatus
+    - mainImage : String
+    - hoverImage : String
+    - minPrice : Double
+    - categoryName : String
     - images : List<ProductImageDTO>
     - variants : List<ProductVariantDTO>
     - reviews : List<ReviewDTO>
+    - averageRating : Double
+    - reviewCount : Long
 }
 
 ' Entity
@@ -57,7 +80,6 @@ class ProductDetailResponseDTO {
 class Product {
     - id : Long
     - name : String
-    - category : String
     - description : String
     - status : ProductStatus
 }
@@ -74,12 +96,12 @@ class Review {
     - id : Long
     - rating : int
     - comment : String
-    - createdAt : Instant
 }
 
 class ProductImage {
     - id : Long
     - url : String
+    - color : String
 }
 
 ' Relationships
@@ -92,12 +114,16 @@ Product "1" *-- "0..*" Review : receives >
 ProductServiceImpl ..|> ProductService
 
 ' Dependency Injection
+ProductViewController --> ProductService: - productService
 ProductController --> ProductService: - productService
 ProductServiceImpl --> ProductRepository: - productRepository
 
 ' Object Usage
 ProductController ..> ProductSummaryResponseDTO : <<returns>>
 ProductController ..> ProductDetailResponseDTO : <<returns>>
+ProductViewController ..> ProductSummaryResponseDTO : <<uses>>
+ProductViewController ..> ProductDetailResponseDTO : <<uses>>
+
 ProductServiceImpl ..> ProductSummaryResponseDTO : <<creates>>
 ProductServiceImpl ..> ProductDetailResponseDTO : <<creates>>
 ProductServiceImpl ..> Product : <<uses>>

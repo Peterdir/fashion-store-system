@@ -4,40 +4,46 @@ title Object Diagram: View Products (UC09)\nScenario: Customer searches for prod
 object "product1 : Product" as p1 {
     id = 5
     name = "Leather Jacket"
-    category = "Outerwear"
+    description = "Premium leather jacket"
+    status = "ACTIVE"
 }
 
 object "variant1 : ProductVariant" as v1 {
     id = 1
     price = 1250000.0
-    size = 42
+    size = "M"
     color = "Black"
+    stockQuantity = 50
 }
 
 object "product2 : Product" as p2 {
     id = 12
     name = "Denim Jacket"
-    category = "Outerwear"
+    description = "Classic blue denim"
+    status = "ACTIVE"
 }
 
 object "variant2 : ProductVariant" as v2 {
     id = 2
     price = 850000.0
-    size = 40
+    size = "L"
     color = "Blue"
+    stockQuantity = 30
 }
 
 object "product3 : Product" as p3 {
     id = 28
     name = "Bomber Jacket"
-    category = "Outerwear"
+    description = "Stylish bomber jacket"
+    status = "ACTIVE"
 }
 
 object "variant3 : ProductVariant" as v3 {
     id = 3
     price = 980000.0
-    size = 44
+    size = "L"
     color = "Green"
+    stockQuantity = 10
 }
 
 p1 *-- v1

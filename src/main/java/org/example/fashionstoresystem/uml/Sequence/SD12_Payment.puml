@@ -1,72 +1,66 @@
 @startuml
-title Sequence Diagram: Payment (UC12)
+title Sequence Diagram: Payment (UC12) - MoMo Integration
 
 autonumber
-actor Customer
-participant "Payment View\n(Thymeleaf)" as View
+actor MomoWallet as Momo
 participant "PaymentController\n(Controller)" as Controller
 participant "PaymentService\n(Service)" as Service
-participant "OrderRepository\n(Repo)" as OrderRepo
-participant "OrderEntity\n(Entity)" as Entity
-participant "Payment Gateway\n(VNPay/Momo)" as Gateway
-database "MySQL\n(Database)" as DB
+participant "MomoService\n(Service)" as MomoService
+participant "OrderRepository" as OrderRepo
+participant "OrderItemRepository" as ItemRepo
+participant "OrderHistoryRepository" as HistoryRepo
+database "MySQL" as DB
 
-== Display Payment Information ==
-View -> Controller : showPaymentPage(orderId)
-note right: GET /payment/{orderId}
-Controller -> Service : getOrderDetails(orderId)
-Service -> OrderRepo : findById(orderId)
-OrderRepo -> DB : SELECT * FROM orders WHERE id = ?
+== Flow 1: MoMo IPN (Server-to-Server) ==
 
-DB --> OrderRepo : orderData
-OrderRepo --> Service : orderEntity
-Service --> Controller : orderEntity
+Momo -> Controller : POST /api/payment/momo/ipn (payload)
+Controller -> Service : processMomoIPN(payload)
 
-Controller --> View : payment.html
-View --> Customer : Display Payment Page and Total Amount
+Service -> MomoService : verifySignature(stringParams)
+MomoService --> Service : boolean (is valid)
 
-== Execute Payment and Process Business Logic ==
-Customer -> View : Select Payment Method and Click "Pay"
-View -> Controller : processPayment(orderId, method)
-note right: POST /payment/confirm
-Controller -> Service : processPayment(orderId, method)
-
-Service -> OrderRepo : findById(orderId)
-OrderRepo --> Service : orderEntity
-
-group Check Expiration (10 minutes)
-    Service -> Entity : isExpired()
-    alt If Expired (Timeout)
-        Entity --> Service : true
-        Service -> Entity : setStatus("EXPIRED")
-        Service -> OrderRepo : save(order)
-        OrderRepo -> DB : UPDATE orders SET status = 'EXPIRED'
-        Service --> Controller : PAYMENT_TIMEOUT
-        Controller -> View : redirect "/payment-error?msg=timeout"
-        View --> Customer : Display "Payment Session Expired"
-    else If Not Expired
-        Entity --> Service : false
+alt Invalid Signature
+    Service --> Controller : throw RuntimeException
+    Controller --> Momo : 204 No Content (to stop retry)
+else Valid Signature
+    Service -> Service : updateOrderPayStatus(orderId, isSuccess)
+    
+    Service -> OrderRepo : findById(orderId)
+    OrderRepo --> DB : SELECT *
+    DB --> OrderRepo : orderEntity
+    OrderRepo --> Service : Optional<Order>
+    
+    loop for each OrderItem
+        Service -> ItemRepo : setStatus(PAID / PAYMENT_FAILED)
+        ItemRepo -> DB : UPDATE order_items
+        DB --> ItemRepo : success
+        
+        opt If Payment Success
+            Service -> HistoryRepo : save(OrderHistory)
+            HistoryRepo -> DB : INSERT INTO order_histories
+        end
     end
+    
+    Controller --> Momo : 204 No Content
 end
 
-== Gọi Cổng Thanh Toán Ngoại Vi ==
-Service -> Gateway : requestPayment(amount, orderInfo)
-Gateway --> Service : paymentResponse (SUCCESS/FAILED)
+== Flow 2: MoMo Return (Client Redirect) ==
 
-alt Payment Successful
-    Service -> Entity : setStatus("PAID")
-    Service -> OrderRepo : save(order)
-    OrderRepo -> DB : UPDATE orders SET status = 'PAID'
-    Service --> Controller : SUCCESS
-    Controller -> View : redirect "/payment-success"
-    View --> Customer : Display "Payment Successful"
-else Payment Failed
-    Service -> Entity : setStatus("FAILED")
-    Service -> OrderRepo : save(order)
-    OrderRepo -> DB : UPDATE orders SET status = 'FAILED'
-    Service --> Controller : FAILED
-    Controller -> View : redirect "/payment-error"
-    View --> Customer : Display "Payment Failed" Message
+Momo -> Controller : GET /api/payment/momo/return?params...
+Controller -> Service : processMomoReturn(allParams)
+
+Service -> MomoService : verifySignature(allParams)
+MomoService --> Service : boolean (is valid)
+
+alt Invalid Signature
+    Service --> Controller : "failed"
+else Valid Signature
+    Service -> Service : updateOrderPayStatus(orderId, isSuccess)
+    note right: (Same logic as IPN flow to ensure status update)
+    
+    Service --> Controller : statusString ("success" / "failed")
 end
+
+Controller -> Momo : 302 Redirect to /personal-center?orderId=...&paymentStatus=...
 
 @enduml

@@ -15,7 +15,7 @@ import java.util.Map;
 @Builder
 public class DashboardResponseDTO {
 
-    // === KPI Cards ===
+    // KPI Cards
     private Double revenueThisMonth;
     private Double revenueLastMonth;
     private int ordersThisMonth;
@@ -24,13 +24,13 @@ public class DashboardResponseDTO {
     private long pendingReturns;
     private long totalProducts;
 
-    // === Đơn hàng gần đây ===
+    // Đơn hàng gần đây
     private List<RecentOrderDTO> recentOrders;
 
-    // === Sản phẩm bán chạy ===
+    // Sản phẩm bán chạy
     private List<TopProductDTO> topProducts;
 
-    // === Thống kê đơn theo trạng thái ===
+    // Thống kê đơn theo trạng thái
     private Map<String, Long> orderStatusStats;
 
     @Data

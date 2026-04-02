@@ -2,7 +2,7 @@
 title Object Diagram: Registration (UC01)\nScenario: Customer registers a new account successfully
 
 ' DTO - Data sent from the registration form
-object "registrationDto : RegistrationDTO" as dto {
+object "registerRequestDto : RegisterRequestDTO" as dto {
     fullName = "Lam Khanh Duy"
     phone = "0123456789"
     email = "lamkhanhduy123kg@gmail.com"
@@ -19,6 +19,9 @@ object "newUser : User" as user {
     password = "$2a$10$xJwL5..."
     status = "PENDING"
     verificationToken = "a1b2c3d4-e5f6-7890"
+    role = "CUSTOMER"
+    emailVerified = false
+    twoFactorEnabled = false
 }
 
 ' Relationship
@@ -31,7 +34,8 @@ note right of user
     User is created with:
     - Password is hashed using BCrypt
     - Status = "PENDING"
-    - Email verification token is generated
+    - Emal verification token is generated
+    - Default Role = CUSTOMER
 end note
 
 @enduml
