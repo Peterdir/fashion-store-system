@@ -162,6 +162,7 @@ Object.assign(PersonalCenter, {
 
         wishlistContentArea.innerHTML = items.map(item => `
             <div class="wishlist-item group cursor-pointer" 
+                 onclick="window.location.href='/product-detail/${item.productId}'"
                  data-category="${item.categoryName}" 
                  data-status="${item.inStock ? 'in-stock' : 'out-of-stock'}">
                 <div class="relative aspect-[3/4] overflow-hidden bg-surface-low mb-4">
@@ -189,7 +190,7 @@ Object.assign(PersonalCenter, {
                     <!-- Quick Add Action -->
                     <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-black/60 to-transparent">
                         ${item.inStock ? `
-                        <button onclick="CartUtils.addToCart({ id: ${item.productId}, productId: ${item.productId}, name: '${item.productName.replace(/'/g, "\\'")}', price: ${item.productPrice}, image: '${item.primaryImageUrl}', color: 'N/A', size: 'N/A', quantity: 1 }); event.preventDefault();"
+                        <button onclick="CartUtils.addToCart({ id: ${item.productId}, productId: ${item.productId}, name: '${item.productName.replace(/'/g, "\\'")}', price: ${item.productPrice}, image: '${item.primaryImageUrl}', color: 'N/A', size: 'N/A', quantity: 1 }); event.preventDefault(); event.stopPropagation();"
                                 class="w-full py-2 bg-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-secondary hover:text-white transition-colors">Add to Cart</button>
                         ` : `
                         <button class="w-full py-2 bg-black/20 text-white/40 cursor-not-allowed text-[10px] font-black uppercase tracking-[0.2em]" disabled>Add to Cart</button>

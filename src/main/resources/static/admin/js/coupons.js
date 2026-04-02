@@ -80,12 +80,13 @@ const AdminCoupons = (() => {
 
             $('coupons-loading').classList.add('hidden');
 
-            if (!data.content || data.content.length === 0) {
+            const content = data.content || [];
+            if (content.length === 0) {
                 $('coupons-empty').classList.remove('hidden');
                 return;
             }
 
-            renderTable(data.content);
+            renderTable(content);
             renderPagination(data);
             currentPage = data.number;
         } catch (err) {
@@ -142,18 +143,30 @@ const AdminCoupons = (() => {
     // ===== PAGINATION =====
     function renderPagination(pageData) {
         const container = $('coupons-pagination');
+        if (!container) return;
         container.classList.remove('hidden');
 
-        const start = pageData.number * pageData.size + 1;
-        const end = Math.min(start + pageData.numberOfElements - 1, pageData.totalElements);
-        $('pagination-info').textContent = `Hiển thị ${start}–${end} / ${pageData.totalElements} mã`;
+        // Hỗ trợ cấu trúc lồng nhau (via-dto)
+        const page = pageData.page || pageData;
+        const number = page.number || 0;
+        const size = page.size || 10;
+        const totalElements = page.totalElements || 0;
+        const numberOfElements = pageData.numberOfElements || (pageData.content ? pageData.content.length : 0);
+
+        const start = number * size + 1;
+        const end = Math.min(start + numberOfElements - 1, totalElements);
+        $('pagination-info').textContent = `Hiển thị ${start}–${end} / ${totalElements} mã`;
+
+        const current = number;
+        const totalPages = page.totalPages || 1;
+        const first = page.first !== undefined ? page.first : (number === 0);
+        const last = page.last !== undefined ? page.last : (number >= totalPages - 1);
 
         const btns = $('pagination-buttons');
         btns.innerHTML = '';
 
-        btns.appendChild(createPageBtn('chevron_left', pageData.number - 1, pageData.first));
-        const totalPages = pageData.totalPages;
-        const current = pageData.number;
+        btns.appendChild(createPageBtn('chevron_left', current - 1, first));
+        
         let startP = Math.max(0, current - 2);
         let endP = Math.min(totalPages - 1, startP + 4);
         startP = Math.max(0, endP - 4);
@@ -167,7 +180,7 @@ const AdminCoupons = (() => {
             btn.addEventListener('click', () => fetchCoupons(i));
             btns.appendChild(btn);
         }
-        btns.appendChild(createPageBtn('chevron_right', pageData.number + 1, pageData.last));
+        btns.appendChild(createPageBtn('chevron_right', current + 1, last));
     }
 
     function createPageBtn(icon, page, disabled) {
@@ -203,8 +216,8 @@ const AdminCoupons = (() => {
             $('form-coupon-id').value = c.couponId;
             $('form-code').value = c.code;
             $('form-discount-type').value = c.discountType;
-            $('form-discount-value').value = c.discountValue;
-            $('form-min-order').value = c.minOrderAmount || 0;
+            $('form-discount-value').value = AdminUtils.formatNumber(c.discountValue);
+            $('form-min-order').value = AdminUtils.formatNumber(c.minOrderAmount || 0);
             // Note: backend may not provide all fields in detail, ensure DTO is complete or Fetch Entity
             // For now assume standard fields are there
             $('form-usage-limit').value = c.usageLimit || '';
@@ -229,8 +242,8 @@ const AdminCoupons = (() => {
         e.preventDefault();
 
         const id = $('form-coupon-id').value;
-        const discountValue = parseFloat($('form-discount-value').value);
-        const minOrder = parseFloat($('form-min-order').value) || 0;
+        const discountValue = AdminUtils.unformatNumber($('form-discount-value').value);
+        const minOrder = AdminUtils.unformatNumber($('form-min-order').value) || 0;
         const usageLimitVal = parseInt($('form-usage-limit').value);
         
         const data = {

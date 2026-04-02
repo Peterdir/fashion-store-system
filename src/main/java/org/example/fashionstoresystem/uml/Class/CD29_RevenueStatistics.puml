@@ -2,74 +2,119 @@
 title Class Diagram: Revenue Statistics (UC29)
 
 ' Controller
-class RevenueController {
+class DashboardController {
+    - dashboardService : DashboardService
+    + getDashboard() : ResponseEntity<DashboardResponseDTO>
+}
+
+class ReportController {
     - revenueService : RevenueService
-    + showRevenuePage() : String
-    + generateRevenueReport(startDate: Date, endDate: Date) : RevenueReportDTO
+    - reportExportService : ReportExportService
+    + getRevenueReport(startDate: Date, endDate: Date) : ResponseEntity<RevenueReportDTO>
+    + exportRevenueReport(startDate: Date, endDate: Date, format: String) : ResponseEntity<byte[]>
 }
 
 ' Service
+interface DashboardService <<interface>> {
+    + getDashboardData() : DashboardResponseDTO
+}
+
 interface RevenueService <<interface>> {
     + getDetailedRevenueReport(startDate: Date, endDate: Date) : RevenueReportDTO
+}
+
+interface ReportExportService <<interface>> {
+    + exportRevenueReport(startDate: Date, endDate: Date, format: String) : byte[]
 }
 
 class RevenueServiceImpl {
     - orderRepository : OrderRepository
     + getDetailedRevenueReport(startDate: Date, endDate: Date) : RevenueReportDTO
-    - combineToDetailedRevenueReport(online: Double, offline: Double, totalOrders: int, orderList: List<Order>) : RevenueReportDTO
+}
+
+class DashboardServiceImpl {
+    - orderRepository : OrderRepository
+    - productRepository : ProductRepository
+    - userRepository : UserRepository
+    + getDashboardData() : DashboardResponseDTO
+}
+
+class ReportExportServiceImpl {
+    - revenueService : RevenueService
+    + exportRevenueReport(startDate: Date, endDate: Date, format: String) : byte[]
 }
 
 ' Repository
 interface OrderRepository <<interface>> {
-    + calculateTotalRevenue(startDate: Date, endDate: Date, type: String) : Double
+    + calculateTotalRevenue(startDate: Date, endDate: Date) : Double
     + countOrders(startDate: Date, endDate: Date) : int
     + findByOrderDateBetween(startDate: Date, endDate: Date) : List<Order>
 }
 
-' DTO
+interface ProductRepository <<interface>> {
+    + count() : long
+}
 
+interface UserRepository <<interface>> {
+    + count() : long
+}
+
+' DTO
 class RevenueReportDTO {
     - onlineRevenue : Double
     - offlineRevenue : Double
     - totalOrders : int
-    - orders : List<Order>
+    - revenueByDay : Map<String, Double>
+    - orders : List<OrderSummaryResponseDTO>
+}
+
+class DashboardResponseDTO {
+    - totalRevenue : Double
+    - totalOrders : int
+    - totalProducts : int
+    - totalCustomers : int
+    - recentOrders : List<OrderSummaryResponseDTO>
+}
+
+class OrderSummaryResponseDTO {
+    - orderId : Long
+    - orderDate : Date
+    - totalAmount : Double
+    - status : OrderStatus
 }
 
 ' Entity
-
 class Order {
     - id : Long
     - orderDate : Date
     - totalAmount : Double
     - type : OrderType
     - status : OrderStatus
-    - cancellationReason : String
-    - refundStatus : RefundStatus
 }
 
-class OrderItem {
+class Product {
     - id : Long
-    - quantity : int
-    - productName : String
+}
+
+class User {
+    - id : Long
 }
 
 ' Relationships
-
-' Composition (Order contains OrderItems)
-Order "1" *-- "many" OrderItem
-
-' Implementation
+DashboardServiceImpl ..|> DashboardService
 RevenueServiceImpl ..|> RevenueService
+ReportExportServiceImpl ..|> ReportExportService
 
 ' Dependency Injection
-RevenueController --> RevenueService : - revenueService
+DashboardController --> DashboardService : - dashboardService
+ReportController --> RevenueService : - revenueService
+ReportController --> ReportExportService : - reportExportService
+
+DashboardServiceImpl --> OrderRepository : - orderRepository
+DashboardServiceImpl --> ProductRepository : - productRepository
+DashboardServiceImpl --> UserRepository : - userRepository
+
 RevenueServiceImpl --> OrderRepository : - orderRepository
-
-' Object Usage
-RevenueController ..> RevenueReportDTO : <<uses>>
-RevenueServiceImpl ..> RevenueReportDTO : <<creates>>
-
-OrderRepository ..> Order : <<manages>>
-RevenueServiceImpl ..> Order : <<uses>>
+ReportExportServiceImpl --> RevenueService : - revenueService
 
 @enduml

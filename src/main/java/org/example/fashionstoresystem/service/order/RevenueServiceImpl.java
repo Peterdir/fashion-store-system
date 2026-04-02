@@ -6,6 +6,7 @@ import org.example.fashionstoresystem.entity.jpa.Order;
 import org.example.fashionstoresystem.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -17,15 +18,24 @@ public class RevenueServiceImpl implements RevenueService {
 
     @Override
     public RevenueReportDTO getDetailedRevenueReport(Date startDate, Date endDate) {
-        Double onlineRevenue = orderRepository.calculateTotalRevenue(startDate, endDate, org.example.fashionstoresystem.entity.enums.OrderType.ONLINE);
+        // Điều chỉnh endDate lên cuối ngày (23:59:59) để bao quát hết dữ liệu trong ngày đó
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(endDate);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
+        Date adjustedEndDate = cal.getTime();
+
+        Double onlineRevenue = orderRepository.calculateTotalRevenue(startDate, adjustedEndDate, org.example.fashionstoresystem.entity.enums.OrderType.ONLINE);
         if (onlineRevenue == null) onlineRevenue = 0.0;
 
-        Double offlineRevenue = orderRepository.calculateTotalRevenue(startDate, endDate, org.example.fashionstoresystem.entity.enums.OrderType.OFFLINE);
+        Double offlineRevenue = orderRepository.calculateTotalRevenue(startDate, adjustedEndDate, org.example.fashionstoresystem.entity.enums.OrderType.OFFLINE);
         if (offlineRevenue == null) offlineRevenue = 0.0;
 
-        int totalOrders = orderRepository.countOrders(startDate, endDate);
+        int totalOrders = orderRepository.countOrders(startDate, adjustedEndDate);
         
-        List<Order> orderList = orderRepository.findByOrderDateBetween(startDate, endDate);
+        List<Order> orderList = orderRepository.findActiveOrdersInPeriod(startDate, adjustedEndDate);
 
         return combineToDetailedRevenueReport(onlineRevenue, offlineRevenue, totalOrders, orderList);
     }
@@ -36,19 +46,32 @@ public class RevenueServiceImpl implements RevenueService {
                 .offlineRevenue(offline)
                 .totalOrders(totalOrders)
                 .orders(orderList.stream()
-                        .map(order -> RevenueReportDTO.OrderSummaryDTO.builder()
+                        .map(order -> {
+                            double subtotal = 0.0;
+                            if (order.getOrderItems() != null) {
+                                for(var item : order.getOrderItems()) {
+                                    subtotal += (item.getPrice() != null ? item.getPrice() : 0.0) * (item.getQuantity() != null ? item.getQuantity() : 0);
+                                }
+                            }
+                            double discount = subtotal - (order.getTotalAmount() != null ? order.getTotalAmount() : 0.0);
+                            if (discount < 0) discount = 0.0; // Precaution for floating point negatives
+
+                            return RevenueReportDTO.OrderSummaryDTO.builder()
                                 .orderId(order.getId())
                                 .totalAmount(order.getTotalAmount())
                                 .type(order.getType())
                                 .orderDate(order.getOrderDate() != null ? order.getOrderDate().toString() : "")
+                                .discountAmount(discount)
+                                .couponCode(order.getCoupon() != null ? order.getCoupon().getCode() : "")
                                 .items(order.getOrderItems().stream()
                                         .map(item -> RevenueReportDTO.OrderItemDTO.builder()
                                                 .productName(item.getProductName())
                                                 .quantity(item.getQuantity())
-                                                .price(item.getProductVariant() != null ? item.getProductVariant().getPrice() : 0.0)
+                                                .price(item.getPrice() != null ? item.getPrice() : 0.0)
                                                 .build())
                                         .toList())
-                                .build())
+                                .build();
+                        })
                         .toList())
                 .build();
     }

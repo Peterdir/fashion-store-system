@@ -11,6 +11,7 @@ import org.example.fashionstoresystem.entity.jpa.ProductVariant;
 import org.example.fashionstoresystem.repository.OrderItemRepository;
 import org.example.fashionstoresystem.repository.OrderRepository;
 import org.example.fashionstoresystem.repository.ProductVariantRepository;
+import org.example.fashionstoresystem.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class OfflineSaleServiceImpl implements OfflineSaleService {
     private final ProductVariantRepository productVariantRepository;
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
+    private final UserRepository userRepository;
 
     // Ghi nhận bán hàng trực tiếp
     @Override
@@ -57,12 +59,20 @@ public class OfflineSaleServiceImpl implements OfflineSaleService {
         }
 
         // Lưu giao dịch vào cơ sở dữ liệu
-        Order order = Order.builder()
+        Order.OrderBuilder orderBuilder = Order.builder()
                 .orderDate(new Date())
                 .totalAmount(totalAmount)
                 .paymentMethod(dto.getPaymentMethod())
                 .type(OrderType.OFFLINE)
-                .build();
+                .status(OrderStatus.COMPLETED); // POS = Hoàn thành ngay
+
+        // Nếu có SĐT, thử nhảy tìm User để liên kết đơn hàng
+        if (dto.getCustomerPhone() != null && !dto.getCustomerPhone().isBlank()) {
+            userRepository.findByPhone(dto.getCustomerPhone())
+                    .ifPresent(orderBuilder::user);
+        }
+
+        Order order = orderBuilder.build();
         order = orderRepository.save(order);
 
         // Cập nhật tồn kho + Tạo OrderItem
@@ -73,6 +83,7 @@ public class OfflineSaleServiceImpl implements OfflineSaleService {
                     .order(order)
                     .productVariant(variant)
                     .quantity((long) item.getQuantity())
+                    .price(variant.getPrice()) // Bổ sung giá sản phẩm
                     .productName(variant.getProduct().getName())
                     .status(OrderStatus.COMPLETED) // Bán trực tiếp = hoàn thành ngay
                     .build();

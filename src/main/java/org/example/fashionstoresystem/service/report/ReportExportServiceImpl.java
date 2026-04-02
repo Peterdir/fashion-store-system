@@ -44,33 +44,73 @@ public class ReportExportServiceImpl implements ReportExportService {
 
             PrintWriter writer = new PrintWriter(baos, true, StandardCharsets.UTF_8);
 
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+            java.text.DecimalFormat df = new java.text.DecimalFormat("#,##0 VNĐ");
+
             writer.println("BÁO CÁO DOANH THU");
-            writer.println("Từ ngày," + startDate);
-            writer.println("Đến ngày," + endDate);
+            writer.println("Từ ngày:," + sdf.format(startDate));
+            writer.println("Đến ngày:," + sdf.format(endDate));
             writer.println();
 
-            writer.println("TỔNG HỢP");
-            writer.println("Doanh thu Online," + report.getOnlineRevenue());
-            writer.println("Doanh thu Offline," + report.getOfflineRevenue());
-            writer.println("Tổng doanh thu," + (report.getOnlineRevenue() + report.getOfflineRevenue()));
-            writer.println("Tổng số đơn hàng," + report.getTotalOrders());
+            writer.println("TỔNG QUAN");
+            writer.println("Doanh thu Online:,\"" + df.format(report.getOnlineRevenue()) + "\"");
+            writer.println("Doanh thu Offline:,\"" + df.format(report.getOfflineRevenue()) + "\"");
+            writer.println("Tổng doanh thu:,\"" + df.format(report.getOnlineRevenue() + report.getOfflineRevenue()) + "\"");
+            writer.println("Tổng số đơn hàng:," + report.getTotalOrders());
             writer.println();
 
             writer.println("CHI TIẾT ĐƠN HÀNG");
+            writer.println("Mã đơn,Ngày đặt,Kênh bán,Tên sản phẩm,Số lượng,Đơn giá,Thành tiền,Mã giảm giá,Tiền giảm giá,Tổng tiền thanh toán");
+            
             if (report.getOrders() != null) {
                 for (RevenueReportDTO.OrderSummaryDTO order : report.getOrders()) {
-                    writer.println();
-                    writer.println("Đơn hàng #" + order.getOrderId()
-                            + ",Tổng tiền: " + order.getTotalAmount()
-                            + ",Loại: " + order.getType()
-                            + ",Ngày: " + order.getOrderDate());
-                    writer.println("Tên sản phẩm,Số lượng,Đơn giá");
-                    if (order.getItems() != null) {
+                    String orderIdStr = "ORD-" + String.format("%04d", order.getOrderId());
+                    // Order date comes as string, we can reformat if it's standard format, or just print it if plain
+                    // But orderDate is just `order.getOrderDate().toString()`, let's try to extract cleanly if possible
+                    String orderDateStr = order.getOrderDate(); 
+                    if (orderDateStr != null && orderDateStr.contains(".")) {
+                       orderDateStr = orderDateStr.substring(0, orderDateStr.lastIndexOf('.'));
+                    }
+                    
+                    String orderType = order.getType() != null ? order.getType().toString() : "";
+                    String orderTotal = "\"" + df.format(order.getTotalAmount() != null ? order.getTotalAmount() : 0.0) + "\"";
+                    String discountAmountStr = "\"" + df.format(order.getDiscountAmount() != null ? order.getDiscountAmount() : 0.0) + "\"";
+                    String couponCode = order.getCouponCode() != null ? order.getCouponCode() : "";
+                    if (!couponCode.isEmpty()) couponCode = "\"" + couponCode + "\"";
+
+                    if (order.getItems() != null && !order.getItems().isEmpty()) {
                         for (RevenueReportDTO.OrderItemDTO item : order.getItems()) {
-                            writer.println(item.getProductName() + ","
-                                    + item.getQuantity() + ","
-                                    + item.getPrice());
+                            double price = item.getPrice() != null ? item.getPrice() : 0.0;
+                            long quantity = item.getQuantity() != null ? item.getQuantity() : 0;
+                            double itemTotal = price * quantity;
+
+                            // escape product name
+                            String productName = item.getProductName() != null ? item.getProductName() : "";
+                            productName = "\"" + productName.replace("\"", "\"\"") + "\"";
+
+                            writer.println(orderIdStr + ","
+                                    + "\"" + orderDateStr + "\","
+                                    + orderType + ","
+                                    + productName + ","
+                                    + quantity + ","
+                                    + "\"" + df.format(price) + "\","
+                                    + "\"" + df.format(itemTotal) + "\","
+                                    + couponCode + ","
+                                    + discountAmountStr + ","
+                                    + orderTotal);
                         }
+                    } else {
+                        // Order with no items? Just print order info
+                        writer.println(orderIdStr + ","
+                                + "\"" + orderDateStr + "\","
+                                + orderType + ","
+                                + "," // product name empty
+                                + "," // qty empty
+                                + "," // price empty
+                                + "," // item total empty
+                                + couponCode + ","
+                                + discountAmountStr + ","
+                                + orderTotal);
                     }
                 }
             }

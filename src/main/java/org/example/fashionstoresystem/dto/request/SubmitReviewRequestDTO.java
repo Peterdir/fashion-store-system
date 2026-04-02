@@ -22,4 +22,7 @@ public class SubmitReviewRequestDTO {
 
     @Size(max = 1000, message = "Nội dung đánh giá không được vượt quá 1000 ký tự")
     private String comment;
+
+    @Size(max = 5, message = "Tối đa 5 ảnh minh họa")
+    private java.util.List<String> imageUrls;
 }

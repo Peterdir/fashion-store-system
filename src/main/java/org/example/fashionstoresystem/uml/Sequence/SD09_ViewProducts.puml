@@ -4,56 +4,43 @@ title Sequence Diagram: View Products (UC09)
 autonumber
 actor User
 participant "Product List View\n(Thymeleaf)" as View
-participant "ProductController\n(Controller)" as Controller
+participant "ProductViewController\n(Controller)" as Controller
 participant "ProductService\n(Service)" as Service
 participant "ProductRepository\n(Repository)" as Repository
+participant "RecentlyViewedService\n(Service)" as RecentlyViewedService
 participant "Product\n(Entity)" as Entity
 database "MySQL\n(Database)" as DB
 
-== Load Homepage / Product Page ==
+== Load Product Category Page ==
 User -> View : Access Product List page
-View -> Controller : showProductsPage()
-note right: GET /products
-Controller -> Service : getProducts(keyword)
+View -> Controller : category(keyword, pageable)
+note right: GET /category
+Controller -> Service : getProducts(keyword, pageable)
 
 group Process product query
-    alt keyword is empty (View all products)
-        Service -> Repository : findAll()
-        Repository -> DB : SELECT * FROM products
-        DB --> Repository : List<Product>
-        Repository --> Service : List<Product>
-    else keyword is NOT empty (Search)
-        Service -> Repository : findByNameContainingIgnoreCase(keyword)
-        Repository -> DB : SELECT ... WHERE LOWER(name) LIKE LOWER(%keyword%)
-        DB --> Repository : List<Product>
-        Repository --> Service : List<Product>
-    end
+    Service -> Repository : findFiltered(keyword, pageable)
+    Repository -> DB : SELECT ... WHERE (status='ACTIVE' AND keyword=...)
+    DB --> Repository : Page<Product>
+    Repository --> Service : Page<Product>
 end
 
-Service -> Service : mapToDTOs(List<Product>)
+Service -> Service : mapToDTOs(Page<Product>)
 
 alt Products available
-    Service --> Controller : List<ProductSummaryResponseDTO>
-    Controller --> View : product_list.html (with products)
+    Service --> Controller : Page<ProductSummaryResponseDTO>
+    Controller --> View : category.html (with products)
     View --> User : Display product list
 else No products found
-    Service --> Controller : Empty List
-    Controller --> View : product_list.html (with empty message)
-    View --> User : Hiển thị "No products found"
+    Service --> Controller : Empty Page
+    Controller --> View : category.html (with empty message)
+    View --> User : Display "No products found"
 end
 
-== System Error ==
-note right of Repository: Database Connection Failure
-Repository -[#red]> DB : SELECT ...
-DB --[#red]> Repository : Connection Timeout / Error
-Repository --[#red]> Service : throw DataAccessException
-Service --[#red]> Controller : forward exception
-Controller --> View : error.html
-View --> User : Display "Data Loading Error" message
+
 == View Product Detail (UC09) ==
 User -> View : Click on a Product
-View -> Controller : showProductDetail(productId)
-note right: GET /products/{id}
+View -> Controller : productDetail(productId, model)
+note right: GET /product-detail/{id}
 Controller -> Service : getProductDetail(productId)
 
 Service -> Repository : findById(productId)
@@ -64,12 +51,20 @@ alt Product exists
     Repository --> Service : Product
     Service -> Service : mapToDetailDTO(Product)
     Service --> Controller : ProductDetailResponseDTO
-    Controller --> View : product_detail.html
+
+    Controller -> Service : getRelatedProducts(productId, limit)
+    Service --> Controller : List<ProductSummaryResponseDTO>
+    
+    alt User is Logged In
+        Controller -> RecentlyViewedService : trackView(email, productId)
+    end
+
+    Controller --> View : product-detail.html
     View --> User : Display Product Information
 else Product not found (EF1)
     Repository --> Service : null / Optional.empty()
     Service --> Controller : throw NotFoundException
-    Controller --> View : error.html
+    Controller --> View : Global Exception Handler -> error.html
     View --> User : Display "Product not found" message
 end
 

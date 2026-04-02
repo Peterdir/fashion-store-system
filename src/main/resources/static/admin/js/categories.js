@@ -67,12 +67,7 @@ const AdminCategories = (function() {
             <tr class="hover:bg-neutral-50/50 transition-colors group">
                 <td class="px-5 py-4 text-[11px] font-bold text-neutral-400">#${cat.id}</td>
                 <td class="px-5 py-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded bg-neutral-100 flex items-center justify-center border border-neutral-200 overflow-hidden">
-                            <img src="${cat.imageUrl || '/images/placeholder.png'}" alt="" class="w-full h-full object-cover">
-                        </div>
-                        <span class="text-[12px] font-black text-primary uppercase tracking-tight">${cat.name}</span>
-                    </div>
+                    <span class="text-[12px] font-black text-primary uppercase tracking-tight">${cat.name}</span>
                 </td>
                 <td class="px-5 py-4">
                     ${cat.parentName ? `

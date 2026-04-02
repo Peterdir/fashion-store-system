@@ -11,6 +11,7 @@ import org.example.fashionstoresystem.entity.jpa.OrderHistory;
 import org.example.fashionstoresystem.entity.jpa.OrderItem;
 import org.example.fashionstoresystem.repository.OrderHistoryRepository;
 import org.example.fashionstoresystem.repository.OrderItemRepository;
+import org.example.fashionstoresystem.entity.enums.RefundStatus;
 import org.example.fashionstoresystem.service.notification.NotificationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -147,5 +148,27 @@ public class OrderManagementServiceImpl implements OrderManagementService {
         return MessageResponseDTO.builder()
                 .message("Cập nhật trạng thái đơn hàng thành công!")
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void updateRefundStatus(Long orderItemId, RefundStatus status) {
+        OrderItem item = orderItemRepository.findById(orderItemId)
+                .orElseThrow(() -> new RuntimeException("Sản phẩm trong đơn hàng không tồn tại!"));
+
+        item.setRefundStatus(status);
+        orderItemRepository.save(item);
+
+        // Gửi thông báo cho user nếu hoàn tiền thành công
+        if (status == RefundStatus.COMPLETED) {
+            String content = "Sản phẩm '" + item.getProductName() + "' trong đơn hàng #" + item.getOrder().getId() + " đã được hoàn tiền thành công.";
+            notificationService.createNotification(
+                    item.getOrder().getUser(),
+                    "Thông báo hoàn tiền",
+                    content,
+                    "SUCCESS",
+                    item.getOrder().getId()
+            );
+        }
     }
 }

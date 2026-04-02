@@ -6,7 +6,7 @@
 const OrderModule = {
     currentStatus: 'all',
     currentPage: 0,
-    selectedReturnImages: [], // Base64 strings
+    selectedReturnImages: [], // Base64 strings for returns
 
     /**
      * Initialize Module
@@ -368,28 +368,28 @@ const OrderModule = {
         switch (statusEnum) {
             case 'PENDING_PAYMENT':
                 statusString = 'Chờ thanh toán';
-                statusColor = 'text-yellow-700 bg-yellow-50 border-yellow-200'; break;
+                statusColor = 'text-white bg-amber-500 border-amber-500'; break;
             case 'PENDING_CONFIRMATION':
                 statusString = 'Chờ xác nhận';
-                statusColor = 'text-yellow-700 bg-yellow-50 border-yellow-200'; break;
+                statusColor = 'text-white bg-amber-500 border-amber-500'; break;
             case 'PAID':
             case 'PROCESSING':
                 statusString = 'Đang chuẩn bị';
-                statusColor = 'text-blue-700 bg-blue-50 border-blue-200'; break;
+                statusColor = 'text-white bg-blue-600 border-blue-600'; break;
             case 'SHIPPING':
                 statusString = 'Đang giao';
-                statusColor = 'text-indigo-700 bg-indigo-50 border-indigo-200'; break;
+                statusColor = 'text-white bg-indigo-600 border-indigo-600'; break;
             case 'DELIVERED':
                 statusString = 'Đã giao';
-                statusColor = 'text-emerald-700 bg-emerald-50 border-emerald-200'; break;
+                statusColor = 'text-white bg-emerald-600 border-emerald-600'; break;
             case 'COMPLETED':
                 statusString = 'Hoàn tất';
-                statusColor = 'text-green-700 bg-green-50 border-green-200'; break;
+                statusColor = 'text-white bg-black border-black'; break;
             case 'CANCELLED':
             case 'PAYMENT_FAILED':
             case 'PAYMENT_EXPIRED':
                 statusString = 'Đã hủy / Lỗi';
-                statusColor = 'text-red-700 bg-red-50 border-red-200'; break;
+                statusColor = 'text-white bg-gray-400 border-gray-400'; break;
         }
 
         const fallbackImg = 'https://vietcetera.com/uploads/images/15-apr-2021/screen-shot-2021-04-15-at-13-21-47-1618467727402.png';
@@ -432,7 +432,7 @@ const OrderModule = {
         if (cancellableStates.includes(statusEnum)) {
             cancelBtn = `
                 <button onclick="OrderModule.openCancelModal(${item.orderId}, '${strOrderIdFull}')" 
-                        class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-red-500 hover:bg-rose-50 transition-colors flex items-center justify-center gap-1">
+                        class="flex-1 text-center py-2.5 text-[9px] font-medium tracking-widest uppercase text-gray-400 hover:text-red-500 hover:bg-rose-50 transition-colors flex items-center justify-center gap-1">
                     <span class="material-symbols-outlined text-[13px]">cancel</span> Hủy đơn
                 </button>
             `;
@@ -463,7 +463,7 @@ const OrderModule = {
                     </div>
                     <div class="flex items-center gap-2">
                         ${refundBadge}
-                        <span class="px-2.5 py-0.5 text-[10px] font-black tracking-widest uppercase border ${statusColor}">${statusString}</span>
+                        <span class="px-2.5 py-1 text-[10px] font-black tracking-tight uppercase border ${statusColor}">${statusString}</span>
                     </div>
                 </div>
 
@@ -679,6 +679,8 @@ const OrderModule = {
         this.renderReturnImagePreviews();
     },
 
+
+
     /**
      * Show Premium Success Modal
      */
@@ -794,7 +796,10 @@ const OrderModule = {
      * Create HTML for individual (Whole) order card (Compact)
      */
     renderOrderCard(order) {
-        const date = new Date(order.orderDate).toLocaleDateString('vi-VN');
+        const dateObj = new Date(order.orderDate);
+        const date = dateObj.toLocaleDateString('vi-VN');
+        const time = dateObj.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        const displayDate = `${time} ${date}`;
         const total = new Intl.NumberFormat('vi-VN').format(order.totalAmount);
         const fallbackImg = 'https://vietcetera.com/uploads/images/15-apr-2021/screen-shot-2021-04-15-at-13-21-47-1618467727402.png';
 
@@ -805,12 +810,13 @@ const OrderModule = {
         const label = this.getStatusLabel(dominantStatus);
 
         let colorClass = 'bg-gray-50 text-gray-500 border-gray-200';
-        if (dominantStatus === 'DELIVERED' || dominantStatus === 'COMPLETED') colorClass = 'bg-emerald-50 text-emerald-600 border-emerald-100';
-        if (dominantStatus === 'SHIPPING') colorClass = 'bg-blue-50 text-blue-600 border-blue-100';
-        if (dominantStatus.includes('PENDING')) colorClass = 'bg-amber-50 text-amber-600 border-amber-100';
-        if (['CANCELLED', 'PAYMENT_FAILED', 'PAYMENT_EXPIRED'].includes(dominantStatus)) colorClass = 'bg-red-50 text-red-600 border-red-100';
+        if (dominantStatus === 'DELIVERED' || dominantStatus === 'COMPLETED') colorClass = 'bg-emerald-600 text-white border-emerald-600';
+        if (dominantStatus === 'SHIPPING') colorClass = 'bg-indigo-600 text-white border-indigo-600';
+        if (dominantStatus.includes('PENDING')) colorClass = 'bg-amber-500 text-white border-amber-500';
+        if (['CANCELLED', 'PAYMENT_FAILED', 'PAYMENT_EXPIRED'].includes(dominantStatus)) colorClass = 'bg-gray-400 text-white border-gray-400';
+        if (dominantStatus === 'PAID' || dominantStatus === 'PROCESSING') colorClass = 'bg-blue-600 text-white border-blue-600';
 
-        const statusHtml = `<span class="${colorClass} px-1.5 py-0.5 text-[7px] font-black uppercase tracking-wider border rounded-sm">${label}</span>`;
+        const statusHtml = `<span class="${colorClass} px-2 py-0.5 text-[9px] font-black uppercase tracking-tight border rounded-sm">${label}</span>`;
 
         // Cancellation Button Logic
         const cancellableStates = ['PENDING_PAYMENT', 'PENDING_CONFIRMATION', 'PAID', 'PROCESSING'];
@@ -818,7 +824,7 @@ const OrderModule = {
         if (cancellableStates.includes(dominantStatus)) {
             cancelBtnHtml = `
                 <button onclick="OrderModule.openCancelModal(${order.orderId}, '${strOrderIdFull}')" 
-                        class="text-[9px] font-black text-red-500 hover:text-red-700 transition-colors uppercase tracking-widest flex items-center gap-1">
+                        class="text-[9px] font-medium text-gray-400 hover:text-red-500 transition-colors uppercase tracking-widest flex items-center gap-1">
                     <span class="material-symbols-outlined text-[14px]">cancel</span> Hủy đơn
                 </button>
             `;
@@ -864,7 +870,7 @@ const OrderModule = {
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-3 mb-1.5">
                             <span class="text-[10px] font-black tracking-widest text-black">${strOrderIdFull}</span>
-                            <span class="text-[9px] font-bold text-gray-400 font-mono">${date}</span>
+                            <span class="text-[9px] font-bold text-gray-400 font-mono">${displayDate}</span>
                         </div>
                         <div class="flex items-center gap-4">
                             ${statusHtml}
@@ -1089,10 +1095,15 @@ const OrderModule = {
     },
 
     async submitReview() {
-        const productId = document.getElementById('review-product-id').value;
-        const orderItemId = document.getElementById('review-order-item-id').value;
+        const productIdStr = document.getElementById('review-product-id').value;
+        const orderItemIdStr = document.getElementById('review-order-item-id').value;
         const rating = parseInt(document.getElementById('review-rating-value').value);
         const comment = document.getElementById('review-comment').value;
+
+        if (!productIdStr || productIdStr === "undefined") {
+            alert('Lỗi: Không tìm thấy mã sản phẩm (Product ID). Vui lòng thử lại.');
+            return;
+        }
 
         if (rating === 0) {
             const errorMsg = document.getElementById('review-rating-error');
@@ -1100,11 +1111,22 @@ const OrderModule = {
             return;
         }
 
+        // Prepare payload, ensuring we don't send NaN (JSON.stringify converts NaN to null)
+        const payload = { 
+            productId: parseInt(productIdStr), 
+            orderItemId: (orderItemIdStr && orderItemIdStr !== "undefined") ? parseInt(orderItemIdStr) : null, 
+            rating, 
+            comment
+        };
+
+        // For debugging 400 errors
+        console.log('Submitting review payload:', payload);
+
         try {
             const response = await fetch('/api/reviews', { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId, orderItemId, rating, comment })
+                body: JSON.stringify(payload)
             });
 
             if (response.ok) {
@@ -1113,7 +1135,8 @@ const OrderModule = {
                 this.loadOrders(this.currentStatus);
             } else {
                 const err = await response.json();
-                alert('Lỗi: ' + (err.message || 'Không thể gửi đánh giá.'));
+                console.error('Server error response:', err);
+                alert('Lỗi gửi đánh giá: ' + (err.message || 'Dữ liệu không hợp lệ hoặc hình ảnh quá lớn.'));
             }
         } catch (error) {
             console.error('Submit review error:', error);
@@ -1401,6 +1424,9 @@ const OrderModule = {
                                     <p class="text-[11px] font-bold text-black leading-relaxed italic relative z-10 pl-1">
                                         "${review.comment || 'Không có bình luận.'}"
                                     </p>
+                                    
+
+
                                     <div class="mt-2 flex items-center justify-between">
                                         <span class="text-[8px] font-black uppercase tracking-widest text-black/20 italic">
                                             Ngày đánh giá: ${reviewDate}
@@ -1432,19 +1458,147 @@ const OrderModule = {
             return;
         }
 
-        let html = '';
-        const currentPage = data.number;
-        const totalPages = data.totalPages;
+        container.innerHTML = html;
+    },
 
-        for (let i = 0; i < totalPages; i++) {
-            const onclickHandler = isOrderTab ? `OrderModule.loadOrders('reviewed', ${i})` : `OrderModule.loadReviewHistory(${i})`;
-            html += `
-                <button onclick="${onclickHandler}" 
-                        class="w-8 h-8 flex items-center justify-center text-[10px] font-black border ${i === currentPage ? 'bg-black text-white border-black' : 'border-gray-200 hover:border-black'} transition-all">
-                    ${i + 1}
-                </button>
-            `;
+    /**
+     * DASHBOARD: Load and Render Dashboard Summary
+     */
+    async loadDashboardSummary() {
+        console.log('Loading Dashboard Summary...');
+        try {
+            const response = await fetch('/api/orders/dashboard-summary');
+            if (!response.ok) throw new Error('Failed to fetch dashboard summary');
+            const data = await response.json();
+            
+            console.log('Dashboard summary data:', data);
+            
+            this.updateDashboardBadges(data);
+            this.renderDashboardLatestOrder(data.latestOrder);
+        } catch (error) {
+            console.error('Error loading dashboard summary:', error);
         }
+    },
+
+    /**
+     * DASHBOARD: Update count badges on the dashboard icons
+     */
+    updateDashboardBadges(data) {
+        const counts = {
+            'unpaid': data.unpaidCount,
+            'processing': data.processingCount,
+            'shipped': data.shippedCount,
+            'review': data.toReviewCount,
+            'return': data.returnCount
+        };
+
+        Object.keys(counts).forEach(key => {
+            const badge = document.getElementById(`pc-count-${key}`);
+            if (badge) {
+                const count = counts[key];
+                if (count > 0) {
+                    badge.textContent = count > 99 ? '99+' : count;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+        });
+    },
+
+    /**
+     * DASHBOARD: Render the latest order preview or empty state
+     */
+    renderDashboardLatestOrder(order) {
+        const container = document.getElementById('pc-dashboard-order-content');
+        if (!container) return;
+
+        if (!order) {
+            // Keep the default empty state (already in HTML)
+            return;
+        }
+
+        // Beautiful Premium Card for Latest Order
+        const dateStr = new Date(order.orderDate).toLocaleDateString('vi-VN', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+        
+        // Get dominant status for color
+        const dominantStatus = this.getDominantStatus(order.statusSummary);
+        const label = this.getStatusLabel(dominantStatus);
+        
+        let colorClass = 'bg-gray-600';
+        if (dominantStatus === 'DELIVERED' || dominantStatus === 'COMPLETED') colorClass = 'bg-emerald-600';
+        if (dominantStatus === 'SHIPPING') colorClass = 'bg-indigo-600';
+        if (dominantStatus.includes('PENDING')) colorClass = 'bg-amber-500';
+        if (['CANCELLED', 'PAYMENT_FAILED', 'PAYMENT_EXPIRED'].includes(dominantStatus)) colorClass = 'bg-gray-400';
+        if (dominantStatus === 'PAID' || dominantStatus === 'PROCESSING') colorClass = 'bg-blue-600';
+
+        const html = `
+            <div class="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-1.5 h-1.5 rounded-full ${colorClass} animate-pulse"></span>
+                    <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant/40">Đơn hàng mới nhất</h4>
+                </div>
+                
+                <div class="group relative bg-surface-low border border-outline/10 p-6 transition-all hover:border-primary hover:shadow-xl hover:shadow-primary/5 cursor-pointer overflow-hidden"
+                     onclick="PersonalCenter.switchTab('orders'); OrderModule.loadOrders('all');">
+                    
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4">
+                                <p class="text-xs font-black tracking-tight text-black">#${order.orderId}</p>
+                                <span class="${colorClass} text-white px-2 py-0.5 text-[8px] font-black uppercase tracking-tight rounded-sm">
+                                    ${label}
+                                </span>
+                            </div>
+                            
+                            <div class="flex items-center gap-6">
+                                <div>
+                                    <p class="text-[9px] font-bold text-on-surface-variant/40 uppercase tracking-widest mb-1">Ngày đặt</p>
+                                    <p class="text-[11px] font-black text-black">${dateStr}</p>
+                                </div>
+                                <div class="w-px h-8 bg-outline/10"></div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-on-surface-variant/40 uppercase tracking-widest mb-1">Tổng cộng</p>
+                                    <p class="text-[11px] font-black text-primary">${order.totalAmount.toLocaleString('vi-VN')}₫</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <div class="flex -space-x-4">
+                                ${order.items.slice(0, 3).map((item, idx) => `
+                                    <div class="w-16 h-20 border-2 border-white shadow-sm overflow-hidden bg-white hover:scale-110 hover:z-20 transition-all duration-500" style="z-index: ${10 - idx}">
+                                        <img src="${item.productImage || '/images/placeholders/product.jpg'}" 
+                                             class="w-full h-full object-cover" 
+                                             alt="${item.productName}"
+                                             onerror="this.src='/images/placeholders/product.jpg'">
+                                    </div>
+                                `).join('')}
+                                ${order.itemCount > 3 ? `
+                                    <div class="w-16 h-20 border-2 border-white shadow-sm overflow-hidden bg-gray-50 flex items-center justify-center z-0">
+                                        <p class="text-[10px] font-black text-gray-400">+${order.itemCount - 3}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Decorative Background element -->
+                    <div class="absolute -right-4 -bottom-4 opacity-[0.03] pointer-events-none group-hover:opacity-[0.07] transition-opacity">
+                        <span class="material-symbols-outlined text-[120px]">shopping_bag</span>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex justify-end">
+                    <button onclick="PersonalCenter.switchTab('orders')" class="text-[10px] font-black uppercase tracking-widest text-primary hover:text-black flex items-center gap-2 group transition-colors">
+                        Chi tiết đơn hàng
+                        <span class="material-symbols-outlined text-[14px] group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+                    </button>
+                </div>
+            </div>
+        `;
         container.innerHTML = html;
     }
 };

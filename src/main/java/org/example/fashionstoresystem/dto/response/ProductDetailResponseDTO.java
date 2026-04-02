@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.fashionstoresystem.entity.enums.ProductStatus;
 
-import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -18,6 +17,7 @@ public class ProductDetailResponseDTO {
     private String name;
     private Double price;
     private String category;
+    private Long categoryId;
     private String description;
     private ProductStatus status;
     private String mainImage;
@@ -63,6 +63,6 @@ public class ProductDetailResponseDTO {
         private String reviewerName;
         private String size;
         private String color;
-        private Instant createdAt;
+        private String createdAt;
     }
 }

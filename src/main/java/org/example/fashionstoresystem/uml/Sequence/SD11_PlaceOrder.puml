@@ -3,8 +3,8 @@ title Sequence Diagram: Place Order (UC11)
 
 autonumber
 actor Customer
-participant "Checkout View\n(Thymeleaf)" as View
-participant "OrderController\n(Controller)" as Controller
+participant "Checkout View\n(Thymeleaf / JS)" as View
+participant "OrderController\n(API Controller)" as Controller
 participant "OrderService\n(Service)" as Service
 participant "ProductVariantRepository\n(Repo)" as VariantRepo
 participant "CouponRepository\n(Repo)" as CouponRepo
@@ -14,9 +14,8 @@ participant "CartRepository\n(Repo)" as CartRepo
 database "MySQL\n(Database)" as DB
 
 Customer -> View : Click "Place Order"
-View -> Controller : processOrder(orderData)
-note right: POST /place-order
-Controller -> Service : placeOrder(orderDto)
+View -> Controller : POST /api/orders (PlaceOrderRequestDTO)
+Controller -> Service : placeOrder(dto)
 
 group Order Management (Transaction)
     == Validate Stock ==
@@ -28,16 +27,16 @@ group Order Management (Transaction)
     end
 
     alt Insufficient stock
-        Service --> Controller : throw InsufficientStockException
-        Controller --> View : checkout.html (error)
-        View --> Customer : Display "Product Out of Stock" message
+        Service --> Controller : throw RuntimeException(Insufficient Stock)
+        Controller --> View : 400 Bad Request
+        View --> Customer : Display Error Message
     else Valid
         == Apply Coupon (if provided) ==
         opt couponCode is present
             Service -> CouponRepo : findByCode(couponCode)
             CouponRepo -> DB : SELECT * FROM coupons...
             DB --> CouponRepo : Coupon (Entity)
-            CouponRepo --> Service : Coupon object
+            CouponRepo --> Service : Optional<Coupon>
             Service -> Service : applyDiscount(coupon)
         end
 
@@ -64,8 +63,8 @@ group Order Management (Transaction)
         CartRepo -> DB : DELETE FROM cart_items WHERE id IN (...)
 
         Service --> Controller : PlaceOrderResponseDTO
-        Controller --> View : order_success.html
-        View --> Customer : Display "Order Success" message!
+        Controller --> View : 201 Created (PlaceOrderResponseDTO)
+        View --> Customer : Redirect to Success / Momo Payment
     end
 end
 @enduml

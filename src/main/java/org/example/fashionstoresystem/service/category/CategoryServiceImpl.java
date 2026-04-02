@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.CategoryRequestDTO;
 import org.example.fashionstoresystem.dto.response.CategoryResponseDTO;
 import org.example.fashionstoresystem.entity.jpa.Category;
-import org.example.fashionstoresystem.entity.jpa.Product;
 import org.example.fashionstoresystem.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -118,7 +117,6 @@ public class CategoryServiceImpl implements CategoryService {
                 .id(cat.getId())
                 .name(cat.getName())
                 .childCount(cat.getChildren() != null ? cat.getChildren().size() : 0)
-                .imageUrl(getRepresentativeImage(cat))
                 .parentId(cat.getParent() != null ? cat.getParent().getId() : null)
                 .parentName(cat.getParent() != null ? cat.getParent().getName() : null)
                 .build();
@@ -129,14 +127,12 @@ public class CategoryServiceImpl implements CategoryService {
                 .id(cat.getId())
                 .name(cat.getName())
                 .childCount(cat.getChildren() != null ? cat.getChildren().size() : 0)
-                .imageUrl(getRepresentativeImage(cat))
                 .parentId(cat.getParent() != null ? cat.getParent().getId() : null)
                 .parentName(cat.getParent() != null ? cat.getParent().getName() : null)
                 .children(cat.getChildren() != null ? cat.getChildren().stream()
                         .map(child -> CategoryResponseDTO.builder()
                                 .id(child.getId())
                                 .name(child.getName())
-                                .imageUrl(getRepresentativeImage(child))
                                 .parentId(cat.getId())
                                 .parentName(cat.getName())
                                 .childCount(child.getChildren() != null ? child.getChildren().size() : 0)
@@ -153,30 +149,8 @@ public class CategoryServiceImpl implements CategoryService {
                 .id(cat.getId())
                 .name(cat.getName())
                 .childCount(cat.getChildren() != null ? cat.getChildren().size() : 0)
-                .imageUrl(getRepresentativeImage(cat))
                 .parentId(cat.getParent() != null ? cat.getParent().getId() : null)
                 .parentName(cat.getParent() != null ? cat.getParent().getName() : null)
                 .build();
-    }
-
-    private String getRepresentativeImage(Category cat) {
-        // Ưu tiên lấy ảnh từ sản phẩm của chính danh mục này
-        if (cat.getProducts() != null && !cat.getProducts().isEmpty()) {
-            for (Product p : cat.getProducts()) {
-                if (p.getImages() != null && !p.getImages().isEmpty()) {
-                    return p.getImages().get(0).getUrl();
-                }
-            }
-        }
-        
-        // Nếu không có sản phẩm trực tiếp, thử lấy từ danh mục con đầu tiên có sản phẩm
-        if (cat.getChildren() != null && !cat.getChildren().isEmpty()) {
-            for (Category child : cat.getChildren()) {
-                String childImg = getRepresentativeImage(child);
-                if (childImg != null) return childImg;
-            }
-        }
-        
-        return "/images/placeholder.png";
     }
 }

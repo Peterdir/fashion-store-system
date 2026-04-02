@@ -14,7 +14,8 @@ import java.util.List;
 @Repository
 public interface ReturnRequestRepository extends JpaRepository<ReturnRequest, Long> {
     // Lấy danh sách Yêu cầu hoàn trả theo Trạng thái Ví dụ "CHỜ DUYỆT"
-    // Ưu tiên xếp người gửi lâu nhất (RequestDate tăng dần) lên đầu trang để xử lý trước!
+    // Ưu tiên xếp người gửi lâu nhất (RequestDate tăng dần) lên đầu trang để xử lý
+    // trước!
     Page<ReturnRequest> findByStatusOrderByRequestDateAsc(ReturnStatus status, Pageable pageable);
 
     @Query("SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END FROM OrderItem i " +
@@ -23,4 +24,7 @@ public interface ReturnRequestRepository extends JpaRepository<ReturnRequest, Lo
 
     // Lấy tất cả yêu cầu hoàn trả của 1 khách hàng
     List<ReturnRequest> findByUserIdOrderByRequestDateDesc(Long userId);
+
+    // DASHBOARD
+    long countByStatus(ReturnStatus status);
 }

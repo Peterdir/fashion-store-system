@@ -98,6 +98,8 @@ const AuthUtils = (() => {
             // Bỏ qua lỗi mạng
         }
         removeUser();
+        // Clear the user's cart from local storage to prevent it from spilling over to guest session
+        localStorage.removeItem('hy_ui_cart');
         window.location.href = '/';
     }
 

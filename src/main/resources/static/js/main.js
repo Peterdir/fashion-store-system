@@ -1,5 +1,5 @@
-// Frontend logic for Digital Curator
-console.log('Digital Curator UX Loaded');
+// Frontend logic for H&Y Fashion
+console.log('H&Y Fashion UX Loaded');
 
 document.addEventListener('DOMContentLoaded', () => {
     // Shopping Cart Interactions
@@ -77,3 +77,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`Updated cart with ${items.length} items checked.`);
     }
 });
+

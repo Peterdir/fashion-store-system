@@ -3,8 +3,9 @@ title Sequence Diagram: Registration (UC01)
 
 autonumber
 actor Customer
-participant "Register View\n(Thymeleaf)" as View
-participant "AuthController\n(Controller)" as Controller
+participant "AuthViewController\n(Controller)" as ViewController
+participant "Register View\n(Thymeleaf / JS)" as View
+participant "AuthController\n(API Controller)" as APIController
 participant "AuthService\n(Service)" as Service
 participant "UserRepository\n(Repository)" as Repository
 participant "User\n(Entity)" as Entity
@@ -12,20 +13,18 @@ database "MySQL\n(Database)" as DB
 participant "EmailService" as Mail
 
 == Load Page ==
-Customer -> View : Open "Register"
-View -> Controller : showRegisterPage()
-note right: GET /register
-Controller --> View : register.html
+Customer -> ViewController : GET /register
+ViewController --> Customer : register.html
 
 == Process Registration ==
 Customer -> View : Enter data (Full Name, Phone, Email, Password, Confirm Password)
 Customer -> View : Click "Register"
-View -> Controller : processRegistration(data)
-note right: POST /register
-Controller -> Service : registerNewAccount(registrationDTO)
+View -> APIController : POST /api/auth/register (RegisterRequestDTO)
+
+APIController -> Service : registerNewAccount(dto)
 
 group Business Logic
-    Service -> Service : validateInfo(data)
+    Service -> Service : validateRegisterInfo(dto)
 
     Service -> Repository : existsByEmail(email)
     Repository -> DB : SELECT ...
@@ -38,31 +37,31 @@ group Business Logic
     Repository --> Service: boolean
 
     alt Invalid / Duplicate Information
-        Service --> Controller : throw RegistrationException
-        Controller --> View : register.html (with error message)
-        View --> Customer : Display errors
+        Service --> APIController : throw RuntimeException
+        APIController --> View : 400 Bad Request (Error Message)
+        View --> Customer : Display error alert
     else Valid
-        Service -> Service : encodePassword(rawPassword)
-        Service -> Entity: new User(data, status=PENDING)
+        Service -> Service : passwordEncoder.encode(rawPassword)
+        Service -> Entity: new User(..., status=PENDING)
+
+        Service -> Service : createVerificationToken(User)
 
         Service -> Repository : save(User)
         Repository -> DB : INSERT INTO users ...
         DB --> Repository : user_id
         Repository --> Service : User object
-
-        Service -> Service : createVerificationToken(User)
         
         alt Send Email Success
             Service -> Mail : sendVerificationEmail(email, token)
             Mail --> Service : success
         else Email Fails
             Mail --> Service : Exception
-            note right of Service: Catch error, prevent rollback
+            note right of Service: Catch error, modify success message
         end
 
-        Service --> Controller : User object
-        Controller --> View : register.html (with success message)
-        View --> Customer : Registration success, \nPlease check your email
+        Service --> APIController : RegisterResponseDTO
+        APIController --> View : 201 Created (RegisterResponseDTO)
+        View --> Customer : Display success alert / redirect to login
     end
 end
 @enduml

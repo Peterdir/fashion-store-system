@@ -54,6 +54,11 @@ public class AdminController {
 
     @GetMapping("/reports")
     public String showReports() {
-        return "admin/pages/dashboard"; // TODO: tạo reports.html riêng
+        return "admin/pages/reports";
+    }
+
+    @GetMapping("/offline-sale")
+    public String showOfflineSale() {
+        return "admin/pages/offline-sale";
     }
 }

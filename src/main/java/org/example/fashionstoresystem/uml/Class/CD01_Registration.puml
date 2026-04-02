@@ -5,10 +5,9 @@ title Class Diagram: Registration (UC01)
 
 class AuthController {
     - authService : AuthService
-    + showRegisterPage() : String
-    + processRegistration(dto: RegisterRequestDTO) : RegisterResponseDTO
-    + verifyEmail(token: String) : Boolean
-    + resendVerificationEmail(dto: ResendVerificationEmailRequestDTO) : MessageResponseDTO
+    + register(dto: RegisterRequestDTO) : ResponseEntity<RegisterResponseDTO>
+    + verifyEmail(token: String) : ResponseEntity<Boolean>
+    + resendVerification(dto: ResendVerificationEmailRequestDTO) : ResponseEntity<MessageResponseDTO>
 }
 
 'Service
@@ -22,28 +21,35 @@ interface AuthService <<interface>> {
 class AuthServiceImpl {
     - userRepository : UserRepository
     - emailService : EmailService
+    - passwordEncoder : PasswordEncoder
+    - passwordResetTokenRepository : PasswordResetTokenRepository
+    - tokenRepository : TokenRepository
+    - refreshTokenRepository : RefreshTokenRepository
+    - jwtService : JwtService
     + registerNewAccount(dto: RegisterRequestDTO) : RegisterResponseDTO
     + verifyEmail(token: String) : Boolean
     + resendVerificationEmail(dto: ResendVerificationEmailRequestDTO) : MessageResponseDTO
-    - validateInfo(dto: RegisterRequestDTO) : Boolean
-    - encodePassword(rawPassword: String) : void
+    - validateRegisterInfo(dto: RegisterRequestDTO) : void
     - createVerificationToken(user: User) : String
+    - capitalizeName(name: String) : String
 }
 
 interface EmailService <<interface>> {
-    + sendVerificationEmail(email: String, token: String) : Boolean
+    + sendVerificationEmail(to: String, verificationToken: String) : void
 }
 
 class EmailServiceImpl {
-    + sendVerificationEmail(email: String, token: String) : Boolean
+    + sendVerificationEmail(to: String, verificationToken: String) : void
 }
 
 ' Repository
 
 interface UserRepository <<interface>> {
-    + existsByEmail(email: String) : Boolean
-    + existsByPhone(phone: String) : Boolean
-    + save(user: User) : User
+    + existsByEmail(email: String) : boolean
+    + existsByPhone(phone: String) : boolean
+    + findByVerificationToken(verificationToken: String) : Optional<User>
+    + findByEmail(email: String) : Optional<User>
+    + save(entity: S) : <S extends T> S
 }
 
 
@@ -64,8 +70,6 @@ class RegisterResponseDTO {
     - status : UserStatus
     - message : String
 }
-
-
 
 class ResendVerificationEmailRequestDTO {
     - email : String
@@ -88,6 +92,8 @@ class User {
     - verificationToken : String
     - verificationTokenExpiryDate : Instant
     - role : Role
+    - emailVerified : boolean
+    - pendingEmail : String
     - twoFactorEnabled : boolean
 }
 

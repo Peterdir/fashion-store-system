@@ -27,6 +27,8 @@ public class RevenueReportDTO {
         private Double totalAmount;
         private OrderType type;
         private String orderDate;
+        private Double discountAmount;
+        private String couponCode;
         private List<OrderItemDTO> items;
     }
 

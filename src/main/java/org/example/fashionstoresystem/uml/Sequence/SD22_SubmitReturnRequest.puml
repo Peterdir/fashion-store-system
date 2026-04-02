@@ -3,86 +3,66 @@ title Sequence Diagram: Submit Return Request (UC22)
 
 autonumber
 actor Customer
-participant "Return View\n(Thymeleaf)" as View
-participant "ReturnRequestController\n(Controller)" as Controller
+participant "Frontend View\n(JS / Browser)" as View
+participant "ReturnRequestController\n(API Controller)" as Controller
 participant "ReturnRequestService\n(Service)" as Service
 participant "OrderRepository\n(Repo)" as OrderRepo
 participant "ReturnRequestRepository\n(Repo)" as ReturnRepo
-participant "ReturnRequest\n(Entity)" as Entity
+participant "OrderItemRepository\n(Repo)" as ItemRepo
 database "MySQL\n(Database)" as DB
 
-== Display Order Items for Return ==
+== Fetch My Orders with Return Info ==
 
-Customer -> View : Open "My Orders"
-View -> Controller : showOrderList(customer_id)
-note right: GET /orders
-Controller -> Service : getOrdersByCustomer(customer_id)
-Service -> OrderRepo : findByCustomerId(customer_id)
-OrderRepo -> DB : SELECT * FROM orders WHERE customer_id = ?
-DB --> OrderRepo : List<Order>
-OrderRepo --> Service : List<Order>
-Service --> Controller : List<Order>
-Controller --> View : order_list
-View --> Customer : Display Order List
+Customer -> View : Open "My Orders" tab
+View -> Controller : getReturnRequestsByCustomer()
+note right: GET /api/return-requests
+Controller -> Service : getReturnRequestsByCustomer(userId)
+Service -> ReturnRepo : findByCustomerId(userId)
+ReturnRepo -> DB : SELECT * FROM return_requests WHERE user_id = ?
+DB --> ReturnRepo : List<ReturnRequest>
+ReturnRepo --> Service : entities
+Service --> Controller : List<ReturnRequestResponseDTO>
+Controller --> View : 200 OK (List<DTO>)
 
-Customer -> View : Select Order to Return
-View -> Controller : showReturnSelection(orderId)
-note right: GET /orders/{id}/return-items
-Controller -> Service : getOrderForReturn(orderId)
-Service -> OrderRepo : findById(orderId)
-OrderRepo -> DB : SELECT * FROM orders...
-DB --> OrderRepo : orderData
-OrderRepo --> Service : orderEntity
-Service --> Controller : orderEntity
-Controller --> View : return_selection.html
-View --> Customer : Display products eligible for return
+== Submit Return Request via API ==
 
-== Prepare Return Request Form ==
-Customer -> View : Select products and click "Request Return"
-View -> Controller : prepareReturnForm(orderId, itemIds)
-note right: GET /return/form?orderId=...&itemIds=...
-Controller -> Service : validateReturnEligibility(orderId, itemIds)
+Customer -> View : Fill info, upload images and click "Submit Return"
+View -> Controller : submitReturnRequest(SubmitReturnRequestDTO)
+note right: POST /api/return-requests (JSON via Fetch)
+Controller -> Service : submitReturnRequest(dto)
 
 group Validate Eligibility
-    Service -> OrderRepo : findById(orderId)
+    Service -> OrderRepo : findById(dto.getOrderId())
     OrderRepo --> Service : orderEntity
     
-    Note right of Service: Check ownership and status (DELIVERED)
-
-    ' Kiểm tra đã có yêu cầu hoàn trả cho các sản phẩm trước đó chưa
-    Service -> ReturnRepo : existsByOrderItemIdIn(itemIds)
-    ReturnRepo --> Service : existsStatus (True/False)
+    Service -> Service : validate order ownership & status
     
-    alt If ineligible (Policy/Already requested)
-        Service --> Controller : throw IneligibleException
-        Controller --> View : error.html
-        View --> Customer : Display "Ineligible for Return" message
-    else If Valid
-        Service --> Controller : returnEligibleItems
+    loop for each itemId
+        Service -> Service : validate itemId exists in Order
+        Service -> ReturnRepo : existsByOrderItemIdIn([itemId])
+        ReturnRepo --> Service : boolean
+        alt if already requested
+            Service --> Controller : throw RuntimeException
+            Controller --> View : 400 Bad Request
+            View --> Customer : Display Error Message
+        end
     end
 end
 
-Controller --> View : return_form.html
-View --> Customer : Display Return Form (Reason, Images...)
-
-== Submit Return Request ==
-Customer -> View : Fill info and click "Submit"
-View -> Controller : submitReturnRequest(returnDto)
-note right: POST /return/submit
-Controller -> Service : submitReturnRequest(returnDto, images)
-
-Service -> Service : createReturnRequest(dto)
-Service -> Entity : setStatus("PENDING_APPROVAL")
-
 group Save Return Request (Transaction)
+    Service -> Service : create ReturnRequest entity\nstatus = PENDING_APPROVAL
     Service -> ReturnRepo : save(returnRequest)
     ReturnRepo -> DB : INSERT INTO return_requests...
     DB --> ReturnRepo : success
-    ReturnRepo --> Service : savedReturnRequest
+    
+    loop for each itemId
+        Service -> ItemRepo : update refund_status = RETURN_REQUESTED
+        ItemRepo -> DB : UPDATE order_items
+    end
 end
 
-Service --> Controller : success
-Controller --> View : return_success.html
-View --> Customer : Display "Return Request Submitted Successfully"
+Service --> Controller : ReturnRequest entity
+Controller --> View : 200 OK (ReturnRequest)
+View --> Customer : Refresh UI & Show Active Return Request
 
 @enduml

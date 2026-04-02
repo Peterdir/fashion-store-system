@@ -1,31 +1,50 @@
 @startuml
-title Object Diagram: Payment (UC12)\nScenario: Customer pays for an order online successfully
+title Object Diagram: Payment (UC12)\nScenario: Customer pays for an order online via MoMo successfully
 
-' Entity - Order before and after payment
+' Entity - Order
 object "order : Order" as order {
     id = 1001
     totalAmount = 2100000.0
-    status = "PAID"
-    paymentMethod = "VNPAY"
+    paymentMethod = "MOMO"
     orderDate = "2026-03-19"
 }
 
-' Response from Payment Gateway
-object "paymentResponse : PaymentResponseDTO" as res {
-    status = "SUCCESS"
-    transactionId = "VNP20260319-0012345"
-    message = "Payment completed successfully"
+' Entity - Order Item
+object "item1 : OrderItem" as item1 {
+    id = 205
+    status = "PAID"
+    price = 2100000.0
+    productName = "Premium Jacket"
 }
 
-note right of order
-    Order status changed:
-    "PENDING" -> "PAID"
-    after successful payment
+' Entity - Order History
+object "history : OrderHistory" as history {
+    id = 501
+    previousStatus = "PENDING_PAYMENT"
+    newStatus = "PAID"
+    changeDate = "2026-03-19 14:30:00"
+}
+
+' External Payload (IPN Map)
+object "momoIpnPayload : Map<String, Object>" as payload {
+    orderId = "1001"
+    resultCode = "0"
+    message = "Success"
+    signature = "xxx..."
+}
+
+order *-- item1 : contains >
+item1 *-- history : tracks >
+
+note right of item1
+    OrderItem status changed:
+    "PENDING_PAYMENT" -> "PAID"
+    after successful payment IPN
 end note
 
-note right of res
-    Response received from
-    VNPay payment gateway
+note bottom of payload
+    Webhook JSON payload 
+    from MoMo server
 end note
 
 @enduml

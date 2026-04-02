@@ -5,51 +5,43 @@ title Activity Diagram (Swimlane) - Submit Return Request (UC22)
 start
 :Truy cập mục "Đơn hàng của tôi";
 :Chọn đơn hàng "Đã giao thành công";
-:Chọn sản phẩm & nhấn "Yêu cầu hoàn trả";
+:Hệ thống Call API lấy chi tiết đơn hàng;
+:Chọn các sản phẩm & nhấn "Yêu cầu hoàn trả";
+:Nhập lý do, mô tả & hình ảnh;
+:Xác nhận gửi thông tin (Call API SubmitReturnRequest);
 
 |System (Service)|
-''' Bước 6: Kiểm tra các điều kiện '''
-if (Sở hữu & Trạng thái hợp lệ?) then (Không)
+:Truy vấn OrderRepository kiểm tra tồn tại;
+if (Khách hàng sở hữu đơn hàng?) then (Không)
     |Client (UI)|
-    :Thông báo lỗi đơn hàng;
+    :Thông báo lỗi bảo mật / không hợp lệ;
     stop
 else (Có)
     |System (Service)|
-    if (Đúng chính sách hoàn trả?) then (Không)
+    :Kiểm tra từng sản phẩm dựa trên ItemIds;
+    if (Đã có yêu cầu hoàn trả cho sản phẩm chưa?) then (Có)
         |Client (UI)|
-        :Thông báo không đủ điều kiện;
+        :Thông báo sản phẩm đã được gửi yêu cầu trước đó;
         stop
-    else (Có)
+    else (Không)
+        |Database (MySQL)|
+        :Lưu thông tin ReturnRequest (status: PENDING_APPROVAL);
+        :Lưu image_url vào bảng return_request_images;
+        :Cập nhật các OrderItem liên quan (gắn return_request_id, refund_status: RETURN_REQUESTED);
+
         |System (Service)|
-        if (Đã có yêu cầu đang xử lý?) then (Có)
+        if (Lỗi lưu trữ (Exception)?) then (Có)
+            :Rollback Transaction;
             |Client (UI)|
-            :Thông báo yêu cầu đã tồn tại;
+            :Thông báo lỗi hệ thống;
             stop
-        else (Không)
+        else (Thành công)
             |Client (UI)|
-            :Hiển thị Biểu mẫu hoàn trả;
-            :Nhập lý do, mô tả & hình ảnh;
-            :Xác nhận gửi yêu cầu;
-
-            |System (Service)|
-            :Chuẩn bị dữ liệu yêu cầu;
-
-            |Database (MySQL)|
-            :Lưu thông tin yêu cầu (ReturnRequests);
-            :Lưu danh sách sản phẩm hoàn (ReturnRequestItems);
-            :Cập nhật trạng thái: Chờ duyệt;
-
-            |System (Service)|
-            if (Lỗi khi lưu dữ liệu?) then (Có)
-                |Client (UI)|
-                :Thông báo lỗi hệ thống;
-            else (Thành công)
-                |Client (UI)|
-                :Hiển thị "Gửi yêu cầu thành công";
-            endif
+            :Hiển thị "Gửi yêu cầu thành công";
+            :Cập nhật UI trạng thái sản phẩm;
+            stop
         endif
     endif
 endif
 
-stop
 @enduml

@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function formatVND(amount) {
-        return new Intl.NumberFormat('vi-VN').format(amount) + '₫';
+        return new Intl.NumberFormat('vi-VN').format(amount) + ' VNĐ';
     }
 
     function renderOrderDetails() {

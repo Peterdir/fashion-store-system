@@ -25,10 +25,42 @@
             <div class="flex items-center gap-3">
 
                 <!-- Notification Bell -->
-                <button class="relative p-2 rounded-full hover:bg-neutral-100 transition-colors group">
-                    <span class="material-symbols-outlined text-[20px] text-neutral-500 group-hover:text-primary transition-colors">notifications</span>
-                    <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-accent"></span>
-                </button>
+                <div class="relative" x-data="{ notifOpen: false }" @click.outside="notifOpen = false">
+                    <button id="btn-admin-notifications"
+                            @click="notifOpen = !notifOpen"
+                            class="relative p-2 rounded-full hover:bg-neutral-100 transition-colors group">
+                        <span class="material-symbols-outlined text-[20px] text-neutral-500 group-hover:text-primary transition-colors">notifications</span>
+                        <!-- Chấm đỏ cho Unread (sẽ được JS toggle) -->
+                        <span id="admin-notif-dot" class="hidden absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-accent"></span>
+                    </button>
+
+                    <!-- Dropdown Panel -->
+                    <div x-show="notifOpen"
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 -translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 -translate-y-1"
+                         class="absolute right-0 top-full mt-1 w-80 bg-white border border-neutral-200 shadow-xl z-50 flex flex-col"
+                         style="display: none; max-height: 400px;">
+                         
+                        <div class="px-4 py-3 border-b border-neutral-100 flex items-center justify-between bg-neutral-50 shrink-0">
+                            <span class="text-[11px] font-black uppercase tracking-widest text-neutral-800">Thông báo</span>
+                            <button id="btn-read-all-notifs" class="text-[10px] font-bold text-accent hover:text-red-700 transition-colors">
+                                Đánh dấu đã đọc
+                            </button>
+                        </div>
+
+                        <!-- Notification List -->
+                        <div id="admin-notif-list" class="overflow-y-auto flex-1 divide-y divide-neutral-50 p-1.5">
+                            <div class="py-10 text-center">
+                                <span class="material-symbols-outlined text-neutral-200 text-3xl mb-2 animate-spin">sync</span>
+                                <p class="text-[11px] text-neutral-400 font-medium">Đang tải...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- User Dropdown -->
                 <div class="relative" x-data="{ open: false }" @click.outside="open = false">
