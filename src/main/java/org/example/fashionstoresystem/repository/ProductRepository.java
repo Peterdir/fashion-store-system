@@ -16,25 +16,23 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Lấy các sản phẩm có trạng thái còn bán
     List<Product> findByStatus(ProductStatus status);
 
-    // Tìm sản phẩm theo từ khóa và lọc giá (minPrice, maxPrice)
+    // Tìm sản phẩm theo từ khóa (Keyword)
     @Query("SELECT DISTINCT p FROM Product p " +
+           "LEFT JOIN FETCH p.images i " +
            "LEFT JOIN p.category c " +
-           "LEFT JOIN p.variants v " +
            "WHERE (:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
-           "AND (:minPrice IS NULL OR v.price >= :minPrice) " +
-           "AND (:maxPrice IS NULL OR v.price <= :maxPrice) " +
            "AND p.status = 'ACTIVE'")
-    Page<Product> findFiltered(@Param("keyword") String keyword, @Param("minPrice") Double minPrice, @Param("maxPrice") Double maxPrice, Pageable pageable);
+    Page<Product> findFiltered(@Param("keyword") String keyword, Pageable pageable);
 
     // Tìm sản phẩm theo danh sách category IDs (bao gồm danh mục cha + con)
-    @Query("SELECT p FROM Product p WHERE p.category.id IN :categoryIds AND p.status = 'ACTIVE'")
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images i WHERE p.category.id IN :categoryIds AND p.status = 'ACTIVE'")
     Page<Product> findByCategoryIds(@Param("categoryIds") List<Long> categoryIds, Pageable pageable);
 
     // Tìm theo keyword + lọc trạng thái + phân trang
     Page<Product> findByNameContainingIgnoreCaseAndStatus(String keyword, ProductStatus status, Pageable pageable);
 
     // Admin tìm kiếm sản phẩm theo từ khóa (tên hoặc danh mục) và trạng thái (tùy chọn)
-    @Query("SELECT p FROM Product p LEFT JOIN p.category c WHERE " +
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images i LEFT JOIN p.category c WHERE " +
            "(:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
            "OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
            "AND (:status IS NULL OR p.status = :status)")

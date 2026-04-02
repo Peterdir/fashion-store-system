@@ -1,0 +1,142 @@
+4.1.11. Thêm vào mục yêu thích
+[11]	Thêm vào mục yêu thích
+Actor	Khách hàng
+Trigger	Khách hàng nhấn vào biểu tượng trái tim trên sản phẩm.
+Description	Use case này cho phép khách hàng linh hoạt thêm hoặc xóa một sản phẩm khỏi danh sách yêu thích (Wishlist) thông qua cơ chế chuyển đổi (toggle).
+Pre-Conditions	•	Khách hàng đã đăng nhập vào hệ thống.
+Post-Conditions	•	Trạng thái yêu thích của sản phẩm được cập nhật trong cơ sở dữ liệu.
+Main Flow	1.	Khách hàng nhấn biểu tượng trái tim trên trang danh sách sản phẩm hoặc trang chi tiết sản phẩm.
+2.	Hệ thống kiểm tra trạng thái sản phẩm trong danh sách yêu thích của người dùng.
+3.	Nếu sản phẩm chưa có trong danh sách yêu thích:
+•	Hệ thống thêm sản phẩm mới vào mục yêu thích.
+•	Hệ thống hiển thị thông báo: "Đã thêm sản phẩm vào mục yêu thích."
+4.	Nếu sản phẩm đã có trong danh sách yêu thích:
+•	Hệ thống loại bỏ sản phẩm khỏi mục yêu thích.
+•	Hệ thống hiển thị thông báo: "Đã xóa sản phẩm khỏi mục yêu thích."
+5.	Use case kết thúc.
+Alternate Flow	Không có.
+Exception Flow	EL1: Lỗi hệ thống
+•	Hệ thống gặp lỗi khi truy cập hoặc cập nhật cơ sở dữ liệu.
+•	Hệ thống hiển thị thông báo lỗi kỹ thuật.
+•	Use case kết thúc.
+
+4.1.12. Quản lý giỏ hàng
+[12]	Quản lý giỏ hàng
+Actor	Khách hàng
+Trigger	Khách hàng chọn chức năng Giỏ hàng trên giao diện.
+Description	Use case này cho phép khách hàng xem, cập nhật số lượng hoặc loại bỏ sản phẩm khỏi giỏ hàng.
+Pre-Conditions	•	Khách hàng đã đăng nhập hệ thống.
+Post-Conditions	•	Giỏ hàng được cập nhật và tổng tiền được tính toán lại.
+Main Flow	1.	Khách hàng chọn biểu tượng Giỏ hàng.
+2.	Hệ thống truy suất danh sách CartItem và tính tổng tiền dựa trên giá của từng ProductVariant.
+3.	Hệ thống hiển thị danh sách sản phẩm (Tên, size, màu, giá, số lượng) và tổng số tiền.
+4.	Khách hàng thực hiện một trong các thao tác:
+•	Cập nhật số lượng: Khách hàng nhập số lượng mới.
+•	Xóa sản phẩm: Khách hàng nhấn nút xóa.
+5.	Hệ thống xử lý cập nhật:
+•	Nếu số lượng được cập nhật > 0: Hệ thống kiểm tra tồn kho, nếu đủ thì cập nhật số lượng mới.
+•	Nếu số lượng được cập nhật = 0 hoặc khách hàng chọn xóa: Hệ thống xóa sản phẩm khỏi giỏ hàng.
+6.	Hệ thống tính toán lại tổng tiền và hiển thị giỏ hàng mới.
+7.	Use case kết thúc.
+Alternate Flow	AF1: Giỏ hàng trống
+•	Tại bước 2, nếu không có sản phẩm nào:
+o	Hệ thống hiển thị thông báo: "Giỏ hàng của bạn đang trống."
+o	Use case kết thúc.
+Exception Flow	EL1: Lỗi tồn kho khi cập nhật
+•	Tại bước 5, nếu số lượng mới vượt quá số lượng trong kho:
+o	Hệ thống hiển thị thông báo lỗi: "Số lượng vượt quá tồn kho!"
+o	Hệ thống giữ nguyên số lượng cũ.
+EL2: Lỗi phân quyền
+•	Nếu người dùng cố gắng thao tác trên giỏ hàng của người khác:
+o	Hệ thống báo lỗi: "Bạn không có quyền thay đổi giỏ hàng này!"
+o	Use case kết thúc.
+
+4.1.13. Thêm vào giỏ hàng
+[13]	Thêm vào giỏ hàng
+Actor	Khách hàng
+Trigger	Khách hàng chọn chức năng "Add to Cart" tại trang chi tiết sản phẩm.
+Description	Use case này cho phép khách hàng thêm một biến thể sản phẩm (theo size và màu) cụ thể vào giỏ hàng cá nhân.
+Pre-Conditions	•	Khách hàng đã đăng nhập vào hệ thống.
+•	Sản phẩm đang ở trạng thái ACTIVE (đang kinh doanh).
+Post-Conditions	•	Biến thể sản phẩm được thêm vào hoặc cập nhật số lượng trong giỏ hàng.
+Main Flow	1.	Khách hàng chọn kích thước (Size) và màu sắc (Color) từ trang chi tiết sản phẩm.
+2.	Khách hàng nhập số lượng và nhấn "Add to Cart".
+3.	Hệ thống xác định ID biến thể (ProductVariant ID) dựa trên lựa chọn.
+4.	Hệ thống kiểm tra tồn kho của biến thể sản phẩm.
+5.	Hệ thống kiểm tra sản phẩm đã tồn tại trong giỏ hàng của người dùng hay chưa.
+6.	Nếu chưa tồn tại: Hệ thống tạo CartItem mới với số lượng đã chọn.
+7.	Nếu đã tồn tại: Hệ thống cộng thêm số lượng mới vào số lượng hiện có (kiểm tra lại tổng số lượng không vượt quá tồn kho).
+8.	Hệ thống hiển thị thông báo thành công.
+9.	Use case kết thúc.
+Alternate Flow	Không có.
+Exception Flow	EL1: Chưa chọn thuộc tính
+•	Tại bước 2, nếu khách hàng chưa chọn Size hoặc Color:
+o	Hệ thống báo lỗi: "Vui lòng chọn đầy đủ thông tin sản phẩm (kích thước, màu sắc)!"
+o	Use case kết thúc.
+EL2: Hết hàng hoặc không đủ số lượng
+•	Tại bước 4 hoặc bước 7, nếu số lượng yêu cầu > tồn kho:
+o	Hệ thống báo lỗi: "Sản phẩm không đủ số lượng trong kho!" hoặc "Tổng số lượng vượt quá tồn kho!"
+o	Use case kết thúc.
+
+4.1.14. Thu thập mã giảm giá
+[14]	Thu thập mã giảm giá
+Actor	Khách hàng
+Trigger	Khách hàng nhấn nút "Lưu" hoặc "Thu thập" trên danh sách mã giảm giá.
+Description	Use case này cho phép khách hàng lưu mã giảm giá vào tài khoản cá nhân để sử dụng sau này.
+Pre-Conditions	•	Khách hàng đã đăng nhập vào hệ thống.
+Post-Conditions	•	Bản ghi UserCoupon được tạo ở trạng thái chưa sử dụng (used = false).
+Main Flow	1.	Khách hàng truy cập danh sách mã giảm giá khả dụng.
+2.	Khách hàng nhấn nút "Thu thập" cho một mã cụ thể.
+3.	Hệ thống kiểm tra tính hợp lệ:
+•	Mã giảm giá phải ở trạng thái ACTIVE (đang kích hoạt).
+•	Mã giảm giá chưa hết hạn (Expiry Date > hiện tại).
+•	Người dùng chưa thu thập mã này trước đó.
+4.	Hệ thống lưu mã vào ví voucher của người dùng.
+5.	Hệ thống thông báo: "Thu thập mã giảm giá thành công!"
+6.	Use case kết thúc.
+Alternate Flow	Không có.
+Exception Flow	EL1: Mã không hợp lệ hoặc hết hạn
+•	Tại bước 3, nếu mã đã khóa hoặc hết hạn:
+o	Hệ thống báo lỗi ứng với nguyên nhân cụ thể.
+o	Use case kết thúc.
+EL2: Mã đã tồn tại
+•	Tại bước 3, nếu người dùng đã thu thập rồi:
+o	Hệ thống báo lỗi: "Bạn đã thu thập mã giảm giá này trước đó!"
+o	Use case kết thúc.
+
+4.1.15. Đặt hàng
+[15]	Đặt hàng
+Actor	Khách hàng
+Trigger	Khách hàng nhấn nút "Đặt hàng" (Checkout) từ giỏ hàng.
+Description	Use case này xử lý việc tạo đơn hàng chính thức, trừ tồn kho, xóa giỏ hàng và tích hợp thanh toán.
+Pre-Conditions	•	Khách hàng đã đăng nhập.
+•	Giỏ hàng có ít nhất 1 sản phẩm hợp lệ.
+Post-Conditions	•	Đơn hàng (Order) và các chi tiết đơn hàng (OrderItem) được tạo.
+•	Tồn kho của các ProductVariant được trừ tương ứng.
+•	Giỏ hàng (CartItem) được làm sạch.
+Main Flow	
+1.	Khách hàng điền thông tin nhận hàng và chọn phương thức thanh toán (COD hoặc MOMO).
+2.	Hệ thống xác thực tồn kho cho toàn bộ danh sách sản phẩm trong giỏ hàng.
+3.	Hệ thống kiểm tra và áp dụng mã giảm giá (nếu có):
+•	Xác thực mã tồn tại, còn hạn, đúng điều kiện MinOrderAmount và chưa được dùng.
+4.	Hệ thống tạo bản ghi Order với trạng thái ban đầu:
+•	COD -> PENDING_CONFIRMATION (Chờ xác nhận).
+•	MOMO -> PENDING_PAYMENT (Chờ thanh toán).
+5.	Hệ thống tạo các bản ghi OrderItem và thực hiện trừ số lượng tồn kho của các biến thể sản phẩm.
+6.	Hệ thống xóa các mục sản phẩm tương ứng khỏi giỏ hàng của người dùng.
+7.	Nếu chọn MOMO: Hệ thống tạo URL thanh toán và yêu cầu người dùng thực hiện giao dịch trong vòng 10 phút.
+8.	Hệ thống gửi thông báo đặt hàng thành công và hiển thị phản hồi cho khách hàng.
+9.	Use case kết thúc.
+Alternate Flow	AF1: Khách hàng thanh toán MoMo thất bại/quá hạn
+•	Tại bước 7, nếu sau 10 phút chưa thanh toán thành công:
+o	Hệ thống tự động hủy đơn hàng và hoàn lại tồn kho cho sản phẩm.
+o	Use case kết thúc.
+Exception Flow	EL1: Sản phẩm hết hàng bất ngờ
+•	Tại bước 2, nếu có sản phẩm không đủ tồn kho:
+o	Hệ thống báo lỗi chi tiết tên sản phẩm và dừng quy trình đặt hàng.
+EL2: Lỗi mã giảm giá
+•	Tại bước 3, nếu mã không thỏa mãn điều kiện:
+o	Hệ thống báo lỗi và không áp dụng mức giảm trừ.
+EL3: Lỗi hệ thống thanh toán
+•	Nếu không thể tạo URL MoMo:
+o	Hệ thống báo lỗi và chuyển đơn hàng về trạng thái lỗi hoặc yêu cầu thử lại.

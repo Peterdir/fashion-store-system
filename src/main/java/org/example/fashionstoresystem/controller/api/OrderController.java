@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.request.CancelOrderRequestDTO;
 import org.example.fashionstoresystem.dto.request.PlaceOrderRequestDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
+import org.example.fashionstoresystem.dto.response.OrderDashboardSummaryDTO;
 import org.example.fashionstoresystem.dto.response.OrderDetailResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderSummaryResponseDTO;
 import org.example.fashionstoresystem.dto.response.PlaceOrderResponseDTO;
@@ -85,12 +86,18 @@ public class OrderController {
         return ResponseEntity.ok(new MessageResponseDTO(paymentUrl));
     }
 
-
     // MUA LẠI ĐƠN HÀNG (Đưa vào giỏ hàng)
     @PostMapping("/{orderId}/repurchase")
     public ResponseEntity<MessageResponseDTO> repurchaseOrder(@PathVariable Long orderId) {
         Long userId = SecurityUtils.getAuthenticatedUserId();
         orderService.repurchaseOrder(userId, orderId);
         return ResponseEntity.ok(new MessageResponseDTO("Đã thêm các sản phẩm vào giỏ hàng thành công!"));
+    }
+
+    // DASHBOARD SUMMARY
+    @GetMapping("/dashboard-summary")
+    public ResponseEntity<OrderDashboardSummaryDTO> getDashboardSummary() {
+        Long userId = SecurityUtils.getAuthenticatedUserId();
+        return ResponseEntity.ok(orderService.getDashboardSummary(userId));
     }
 }

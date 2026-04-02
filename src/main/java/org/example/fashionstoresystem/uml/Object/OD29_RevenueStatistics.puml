@@ -8,53 +8,55 @@ object "report : RevenueReportDTO" as report {
     totalOrders = 2
 }
 
-' Entity - Order 1 with items
-object "order1 : Order" as o1 {
-    id = 1001
+' DTO - Order 1 summary (Nested OrderSummaryDTO)
+object "order1 : RevenueReportDTO::OrderSummaryDTO" as o1 {
+    orderId = 1001
     orderDate = "2026-03-05"
     totalAmount = 3350000.0
     type = "ONLINE"
+    itemCount = 3
 }
 
-object "item1 : OrderItem" as i1 {
-    id = 1
-    quantity = 1
+object "item1_1 : RevenueReportDTO::OrderItemDTO" as i1_1 {
     productName = "Áo Thun Trơn"
+    quantity = 1
+    price = 850000.0
 }
 
-object "item2 : OrderItem" as i2 {
-    id = 2
-    quantity = 2
+object "item1_2 : RevenueReportDTO::OrderItemDTO" as i1_2 {
     productName = "Quần Kaki"
+    quantity = 2
+    price = 1250000.0
 }
 
-' Entity - Order 2 with items
-object "order2 : Order" as o2 {
-    id = 1015
+' DTO - Order 2 summary (Nested OrderSummaryDTO)
+object "order2 : RevenueReportDTO::OrderSummaryDTO" as o2 {
+    orderId = 1015
     orderDate = "2026-03-12"
     totalAmount = 3500000.0
     type = "OFFLINE"
+    itemCount = 2
 }
 
-object "item3 : OrderItem" as i3 {
-    id = 3
-    quantity = 1
+object "item2_1 : RevenueReportDTO::OrderItemDTO" as i2_1 {
     productName = "Áo Khoác Da"
+    quantity = 1
+    price = 2500000.0
 }
 
-object "item4 : OrderItem" as i4 {
-    id = 4
-    quantity = 1
+object "item2_2 : RevenueReportDTO::OrderItemDTO" as i2_2 {
     productName = "Áo Sơ Mi"
+    quantity = 1
+    price = 1000000.0
 }
 
 ' Structural relationships
 report o-- o1
 report o-- o2
-o1 *-- i1
-o1 *-- i2
-o2 *-- i3
-o2 *-- i4
+o1 *-- i1_1
+o1 *-- i1_2
+o2 *-- i2_1
+o2 *-- i2_2
 
 note bottom of report
     Report period: 2026-03-01 to 2026-03-31
@@ -62,9 +64,9 @@ note bottom of report
                    = 6850000 VND
 end note
 
-note bottom of o1
-    order1 total = (1250000 x 2) + (850000 x 1)
-                 = 3350000 VND
+note right of o1
+    List of orders is included
+    within the Revenue Report DTO
 end note
 
 @enduml

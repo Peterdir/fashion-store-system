@@ -2,73 +2,69 @@
 title Sequence Diagram: Order Management (UC26)
 
 autonumber
-actor "Store Owner" as Owner
-participant "Order Admin View\n(Thymeleaf)" as View
-participant "OrderManagementController\n(Controller)" as Controller
+actor "Store Admin" as Owner
+participant "Admin Frontend\n(JS / Browser)" as View
+participant "AdminOrderController\n(API Controller)" as Controller
 participant "OrderManagementService\n(Service)" as Service
-participant "OrderRepository\n(Repo)" as OrderRepo
-participant "OrderHistoryRepository\n(Repo)" as HistoryRepo
-participant "Order\n(Entity)" as OrderEntity
+participant "OrderRepository" as OrderRepo
+participant "OrderItemRepository" as ItemRepo
+participant "OrderHistoryRepository" as HistoryRepo
 database "MySQL\n(Database)" as DB
 
-== 1. Display Order List ==
+== 1. View Order List ==
 
 Owner -> View : Access "Order Management"
-View -> Controller : getAllOrders()
-note right: GET /admin/orders
+View -> Controller : getAllOrders(status, dates, pageable)
+note right: GET /api/admin/orders
 Controller -> Service : getAllOrders()
-Service -> OrderRepo : findAll()
+Service -> OrderRepo : findFiltered(...)
 OrderRepo -> DB : SELECT * FROM orders
-DB --> OrderRepo : List<Order>
-OrderRepo --> Service : List<Order>
-Service --> Controller : List<Order>
-Controller --> View : admin/order_list.html
-View --> Owner : Display Order List
+DB --> OrderRepo : Page<Order>
+OrderRepo --> Service : Page<Order>
+Service --> Controller : Page<OrderSummaryResponseDTO>
+Controller --> View : 200 OK (Page<DTO>)
+View --> Owner : Render orders table
 
 == 2. View Order Details ==
 
-Owner -> View : Select an Order
-View -> Controller : getOrderDetails(id)
-note right: GET /admin/orders/{id}
-Controller -> Service : getOrderDetails(id)
-Service -> OrderRepo : findById(id)
-OrderRepo -> DB : SELECT * FROM orders WHERE id = ?
-DB --> OrderRepo : orderData
-OrderRepo --> Service : Order\n(Entity)
-Service --> Controller : Order\n(Entity)
-Controller --> View : admin/order_detail.html
-View --> Owner : Display Order Details and Current Status
+Owner -> View : Click on specific Order
+View -> Controller : getOrderDetail(orderId)
+note right: GET /api/admin/orders/{orderId}
+Controller -> Service : getOrderDetail(orderId)
+Service -> OrderRepo : findById(orderId)
+OrderRepo --> Service : Order Entity
+Service --> Controller : OrderDetailResponseDTO
+Controller --> View : 200 OK (OrderDetailResponseDTO)
+View --> Owner : Display Order info & Items
 
-== 3. Update Order Status ==
+== 3. Update Order Item Status ==
 
-Owner -> View : Select New Status and Click "Update"
-View -> Controller : updateOrderStatus(id, newStatus)
-note right: POST /admin/orders/{id}/status
-Controller -> Service : updateOrderStatus(id, newStatus)
+Owner -> View : Select new status for Item & Click "Update"
+View -> Controller : updateOrderItemStatus(itemId, status)
+note right: PATCH /api/admin/orders/items/{itemId}/status
+Controller -> Service : updateOrderItemStatus(itemId, status)
 
 group Validate and Update Status
-    Service -> OrderRepo : findById(id)
-    OrderRepo --> Service : orderEntity
+    Service -> ItemRepo : findById(itemId)
+    ItemRepo --> Service : OrderItem Entity
     
     Service -> Service : checkStatusTransition(current, new)
     
     alt Status Transition Invalid
-        Service --> Controller : throw InvalidStatusException
-        Controller --> View : error message
-        View --> Owner : Display "Invalid Status Update"
+        Service --> Controller : throw RuntimeException
+        Controller --> View : 400 Bad Request
+        View --> Owner : Display Error Notification
     else Status Valid
-        Service -> OrderEntity : setStatus(newStatus)
-        Service -> OrderRepo : save(orderEntity)
-        OrderRepo -> DB : UPDATE orders SET status = ...
+        Service -> ItemRepo : save(updated OrderItem)
+        ItemRepo -> DB : UPDATE order_items SET status = ...
         
         == Record History ==
         Service -> HistoryRepo : save(new OrderHistory)
-        HistoryRepo -> DB : INSERT INTO order_history...
-        DB --> HistoryRepo : success
+        HistoryRepo -> DB : INSERT INTO order_histories...
         
-        Service --> Controller : success
-        Controller --> View : redirect to /admin/orders/{id}?success
-        View --> Owner : Display "Status Updated Successfully"
+        Service --> Controller : void
+        Controller --> View : 204 No Content
+        View --> Owner : Refresh Item Status UI
     end
 end
 

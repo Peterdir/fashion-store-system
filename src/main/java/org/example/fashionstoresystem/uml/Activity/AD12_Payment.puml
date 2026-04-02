@@ -1,60 +1,55 @@
 @startuml
-title Activity Diagram (Swimlane) - Payment (UC12)
+title Activity Diagram (Swimlane) - Payment (UC12) - MoMo Integration
 
 |Client (UI)|
 start
-:Yêu cầu thanh toán đơn hàng;
+:Nhấn Thanh toán (Thử lại) hoặc Chọn Đặt mua thông qua Ví MoMo;
 
 |System (Service)|
-:Hiển thị thông tin đơn hàng & số tiền;
+:Tạo chữ ký bảo mật (Signature);
+:Tạo URL thanh toán MoMo (ReturnUrl & NotifyUrl);
 
 |Client (UI)|
-repeat
-    if (Thay đổi phương thức?) then (Có)
-        :Chọn phương thức mới;
-        |System (Service)|
-        :Cập nhật phương thức;
-    else (Không)
-    endif
-    |Client (UI)|
-    :Xác nhận và nhấn "Thanh toán";
+:Chuyển hướng đến Cổng thanh toán MoMo;
+
+|Payment Gateway (MoMo)|
+:Hiển thị giao diện quét mã / đăng nhập;
+:Khách hàng thực hiện thanh toán;
+:Xử lý giao dịch;
+
+fork
+    |Payment Gateway (MoMo)|
+    :Gửi IPN (Webhook) về Hệ thống;
     |System (Service)|
-    '''  Kiểm tra thời gian 10 phút '''
-    if (Đã quá 10 phút chờ?) then (Có)
+    :Nhận payload từ NotifyUrl;
+    :Xác thực chữ ký (Signature);
+    if (Chữ ký hợp lệ?) then (Có)
         |Database (MySQL)|
-        :Cập nhật: Hết hạn thanh toán;
-        |Client (UI)|
-        :Thông báo đơn hàng hết hạn;
-        stop
+        :Cập nhật trạng thái OrderItem (PAID / PAYMENT_FAILED);
+        :Lưu lịch sử giao dịch (OrderHistory);
     else (Không)
         |System (Service)|
-        :Gửi yêu cầu tới Cổng thanh toán;
-
-        |Payment Gateway|
-        :Xử lý giao dịch;
-
-        |System (Service)|
-        if (Kết quả giao dịch?) then (Thất bại)
-            |Database (MySQL)|
-            :Cập nhật: Thanh toán thất bại;
-            |Client (UI)|
-            :Hiển thị lỗi thanh toán;
-            stop
-        else (Thành công)
-            break
-        endif
+        :Bỏ qua yêu cầu;
     endif
-
-    |Client (UI)|
-    if (Khách hàng hủy?) then (Có)
-        stop
+fork again
+    |Payment Gateway (MoMo)|
+    :Trả trình duyệt về ReturnUrl;
+    |System (Service)|
+    :Nhận tham số từ ReturnUrl;
+    :Xác thực chữ ký tham số trả về;
+    :Kiểm tra mã lỗi (ResultCode);
+    if (Giao dịch thành công?) then (Có)
+        |Database (MySQL)|
+        :Đảm bảo cập nhật trạng thái PAID (dự phòng IPN trễ);
+        |Client (UI)|
+        :Hiển thị "Thanh toán thành công";
+    else (Không)
+        |Database (MySQL)|
+        :Đảm bảo cập nhật trạng thái PAYMENT_FAILED;
+        |Client (UI)|
+        :Hiển thị "Thanh toán thất bại";
     endif
-repeat while (Cần thử lại hoặc đổi cách khác?)
+end fork
 
-|Database (MySQL)|
-:Cập nhật trạng thái: Đã thanh toán;
-:Lưu vết lịch sử giao dịch;
-|Client (UI)|
-:Hiển thị "Thanh toán thành công";
 stop
 @enduml

@@ -13,13 +13,20 @@
 
         <!-- Search Bar (Center) -->
         <div class="flex-grow flex justify-center">
-            <form th:action="@{/category}" method="get" class="w-full max-w-[500px] relative">
-                <input type="text" name="keyword" th:value="${keyword}" placeholder="Search for trends, styles..." 
-                       class="w-full bg-white/5 border border-white/10 focus:border-white/30 focus:bg-white/10 px-4 py-1.5 text-[11px] font-medium tracking-tight no-radius focus:outline-none transition-all pr-12 text-white">
-                <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 hover:text-secondary transition-colors text-white/50 hover:text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="arcs"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                </button>
-            </form>
+            <div class="w-full max-w-[500px] relative" id="search-wrapper">
+                <form th:action="@{/category}" method="get" class="relative" id="search-form">
+                    <input type="text" name="keyword" id="header-search-input" th:value="${keyword}" 
+                           placeholder="Tìm kiếm sản phẩm..." autocomplete="off"
+                           class="w-full bg-white/5 border border-white/10 focus:border-white/30 focus:bg-white/10 px-4 py-1.5 text-[11px] font-medium tracking-tight no-radius focus:outline-none transition-all pr-12 text-white">
+                    <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 hover:text-secondary transition-colors text-white/50 hover:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="arcs"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </button>
+                </form>
+                <!-- Live Search Dropdown -->
+                <div id="search-dropdown" class="absolute top-full left-0 w-full bg-white text-primary shadow-[0_15px_50px_rgba(0,0,0,0.2)] border border-outline/10 rounded-b-lg z-[100] hidden overflow-hidden">
+                    <div id="search-results" class="max-h-[400px] overflow-y-auto"></div>
+                </div>
+            </div>
         </div>
 
         <!-- Actions (Right) -->
@@ -108,7 +115,7 @@
         </button>
 
         <div id="nav-container" class="max-w-[1440px] mx-auto px-12 h-8 flex items-center overflow-x-auto no-scrollbar scroll-smooth">
-            <div class="flex items-center space-x-8 whitespace-nowrap text-[10px] font-semibold tracking-[0.1em] uppercase text-white/50">
+            <div class="flex items-center space-x-8 whitespace-nowrap text-[10px] font-semibold tracking-[0.1em] text-white/50">
                 <a th:href="@{/category}" class="mega-trigger hover:text-white transition-colors flex items-center gap-2 text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                     Categories
@@ -139,7 +146,7 @@
                     <!-- Dynamic Categories in Sidebar -->
                     <button th:each="cat, iter : ${categories}" 
                             th:classappend="${iter.first} ? 'active bg-white border-l-4 border-secondary' : 'hover:bg-white/50'"
-                            class="mega-menu-item flex items-center justify-between px-6 py-3 text-[10px] font-bold uppercase tracking-widest transition-all" 
+                            class="mega-menu-item flex items-center justify-between px-6 py-3 text-[10px] font-bold tracking-widest transition-all" 
                             th:attr="data-id=${cat.id}, data-name=${cat.name}">
                         <span th:text="${cat.name}">Category Name</span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
@@ -152,7 +159,7 @@
                 <div id="mega-menu-content" class="space-y-6">
                     <div id="mega-menu-products-grid" class="grid grid-cols-6 gap-x-4 gap-y-8">
                         <div class="col-span-6 border-b border-outline/5 pb-2 mb-2">
-                            <h3 id="mega-menu-title" class="text-[10px] font-black tracking-widest uppercase flex items-center gap-2">
+                            <h3 id="mega-menu-title" class="text-[10px] font-black tracking-widest flex items-center gap-2">
                                 <span class="w-1.5 h-1.5 bg-secondary block"></span> Latest in Categories
                             </h3>
                         </div>
@@ -168,5 +175,6 @@
 
     <!-- Scroll & Mega Menu Logic -->
     <script th:src="@{/js/components/header.js}"></script>
+    <script th:src="@{/js/components/live-search.js}"></script>
     <script th:src="@{/js/components/notifications.js}"></script>
 </header>

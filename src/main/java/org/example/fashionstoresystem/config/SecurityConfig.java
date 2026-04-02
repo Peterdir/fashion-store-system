@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         // Cho phép truy cập giao diện Thymeleaf công khai
-                        .requestMatchers("/", "/category", "/product-detail/**", "/login", "/register", "/forgot-password", "/reset-password", "/cart", "/error", "/personal-center", "/auth-notice", "/verify-email").permitAll()
+                        .requestMatchers("/", "/category", "/product-detail/**", "/login", "/register", "/forgot-password", "/reset-password", "/cart", "/error", "/personal-center", "/auth-notice", "/verify-email", "/policy").permitAll()
                         // Cho phép xem sản phẩm và danh mục công khai
                         .requestMatchers("/api/products/**", "/api/categories/**").permitAll()
                         // Cho phép truy cập login admin

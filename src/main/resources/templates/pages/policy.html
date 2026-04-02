@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+    <title>Chính sách & Điều khoản | H&Y</title>
+</head>
+<body>
+    <main layout:fragment="content" class="bg-white">
+        <!-- Hero Header -->
+        <section class="pt-32 pb-20 border-b border-black/5">
+            <div class="max-w-[1440px] mx-auto px-6">
+                <div class="max-w-3xl">
+                    <span class="text-[10px] font-black uppercase tracking-[0.3em] text-secondary mb-6 block">Legal & Compliance</span>
+                    <h1 class="text-6xl md:text-8xl font-black mb-8 leading-[0.9] tracking-tighter">
+                        Chính sách <br> & Điều khoản
+                    </h1>
+                    <p class="text-xl text-neutral-500 leading-relaxed font-medium">
+                        Chúng tôi chú trọng vào sự minh bạch và quyền lợi của khách hàng. Dưới đây là các quy định chi tiết về cách thức vận hành của H&Y.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation Bar (Sticky) -->
+        <nav class="sticky top-12 z-30 bg-white/80 backdrop-blur-md border-b border-black/5">
+            <div class="max-w-[1440px] mx-auto px-6 h-14 flex items-center gap-12 overflow-x-auto no-scrollbar scroll-smooth">
+                <a href="#terms" class="text-[10px] font-black uppercase tracking-widest hover:text-secondary transition-colors whitespace-nowrap">Điều khoản sử dụng</a>
+                <a href="#privacy" class="text-[10px] font-black uppercase tracking-widest hover:text-secondary transition-colors whitespace-nowrap">Chính sách bảo mật</a>
+                <a href="#returns" class="text-[10px] font-black uppercase tracking-widest hover:text-secondary transition-colors whitespace-nowrap">Đổi trả & Hoàn tiền</a>
+                <a href="#payment" class="text-[10px] font-black uppercase tracking-widest hover:text-secondary transition-colors whitespace-nowrap">Chính sách thanh toán</a>
+            </div>
+        </nav>
+
+        <!-- Content Sections -->
+        <div class="max-w-[1440px] mx-auto px-6 py-24">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-24">
+                
+                <!-- Left: Quick Links / TOC -->
+                <aside class="lg:col-span-3 hidden lg:block">
+                    <div class="sticky top-40 space-y-8">
+                        <div>
+                            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 mb-6">Mục lục</h3>
+                            <ul class="space-y-4">
+                                <li>
+                                    <a href="#terms" class="group flex items-center gap-4 text-xs font-bold hover:text-secondary transition-colors">
+                                        <span class="w-2 h-0.5 bg-black/10 group-hover:bg-secondary group-hover:w-4 transition-all"></span>
+                                        Điều khoản sử dụng
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#privacy" class="group flex items-center gap-4 text-xs font-bold hover:text-secondary transition-colors">
+                                        <span class="w-2 h-0.5 bg-black/10 group-hover:bg-secondary group-hover:w-4 transition-all"></span>
+                                        Chính sách bảo mật
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#returns" class="group flex items-center gap-4 text-xs font-bold hover:text-secondary transition-colors">
+                                        <span class="w-2 h-0.5 bg-black/10 group-hover:bg-secondary group-hover:w-4 transition-all"></span>
+                                        Đổi trả & Hoàn tiền
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#payment" class="group flex items-center gap-4 text-xs font-bold hover:text-secondary transition-colors">
+                                        <span class="w-2 h-0.5 bg-black/10 group-hover:bg-secondary group-hover:w-4 transition-all"></span>
+                                        Chính sách thanh toán
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="p-8 bg-neutral-50 border border-black/5">
+                            <h4 class="text-[10px] font-black uppercase tracking-widest mb-4">Cần hỗ trợ?</h4>
+                            <p class="text-xs text-neutral-500 leading-relaxed mb-6">Nếu bạn có bất kỳ câu hỏi nào về các chính sách của chúng tôi, vui lòng liên hệ đội ngũ chăm sóc khách hàng.</p>
+                            <a href="mailto:contact@hyfashion.com" class="text-xs font-black border-b-2 border-black hover:border-secondary hover:text-secondary transition-all">contact@hyfashion.com</a>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Right: Detailed Content -->
+                <div class="lg:col-span-9 max-w-3xl space-y-32 h-full">
+                    
+                    <!-- 6.1 Terms of Use -->
+                    <section id="terms" class="scroll-mt-40">
+                        <h2 class="text-4xl font-extrabold mb-10 tracking-tight">Điều khoản <br> sử dụng</h2>
+                        <div class="prose prose-neutral max-w-none space-y-8 text-neutral-600 font-medium">
+                            <div class="space-y-4">
+                                <h3 class="text-xs font-black text-black uppercase tracking-widest">Mục đích</h3>
+                                <p>Các điều khoản sử dụng quy định quyền và nghĩa vụ của người dùng khi truy cập và sử dụng hệ thống website bán hàng thời trang H&Y.</p>
+                            </div>
+                            <div class="space-y-4">
+                                <h3 class="text-xs font-black text-black uppercase tracking-widest">Nội dung chính</h3>
+                                <ul class="space-y-4 list-none p-0">
+                                    <li class="flex gap-4">
+                                        <span class="w-1.5 h-1.5 bg-secondary flex-shrink-0 mt-1.5"></span>
+                                        <span>Người dùng phải cung cấp thông tin chính xác khi đăng ký tài khoản.</span>
+                                    </li>
+                                    <li class="flex gap-4">
+                                        <span class="w-1.5 h-1.5 bg-secondary flex-shrink-0 mt-1.5"></span>
+                                        <span>Người dùng chịu trách nhiệm bảo mật thông tin đăng nhập của mình.</span>
+                                    </li>
+                                    <li class="flex gap-4">
+                                        <span class="w-1.5 h-1.5 bg-secondary flex-shrink-0 mt-1.5"></span>
+                                        <span>Nghiêm cấm sử dụng hệ thống cho các mục đích gian lận, phá hoại hoặc vi phạm pháp luật.</span>
+                                    </li>
+                                    <li class="flex gap-4">
+                                        <span class="w-1.5 h-1.5 bg-secondary flex-shrink-0 mt-1.5"></span>
+                                        <span>Hệ thống có quyền tạm khóa hoặc xóa tài khoản nếu phát hiện hành vi vi phạm.</span>
+                                    </li>
+                                    <li class="flex gap-4">
+                                        <span class="w-1.5 h-1.5 bg-secondary flex-shrink-0 mt-1.5"></span>
+                                        <span>Các giao dịch mua bán trên hệ thống phải tuân theo quy trình đặt hàng và thanh toán của website.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 6.2 Privacy Policy -->
+                    <section id="privacy" class="scroll-mt-40">
+                        <h2 class="text-4xl font-extrabold mb-10 tracking-tight">Chính sách <br> bảo mật thông tin</h2>
+                        <div class="prose prose-neutral max-w-none space-y-8 text-neutral-600 font-medium">
+                            <div class="space-y-4">
+                                <h3 class="text-xs font-black text-black uppercase tracking-widest">Mục đích</h3>
+                                <p>Chính sách này quy định cách hệ thống thu thập, lưu trữ và bảo vệ thông tin cá nhân của người dùng.</p>
+                            </div>
+                            <div class="space-y-6">
+                                <h3 class="text-xs font-black text-black uppercase tracking-widest">Dữ liệu thu thập</h3>
+                                <p>Hệ thống thu thập các thông tin cơ bản để phục vụ trải nghiệm mua sắm:</p>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="p-4 bg-neutral-50 border border-black/5 text-[11px] font-bold uppercase tracking-widest">Họ tên</div>
+                                    <div class="p-4 bg-neutral-50 border border-black/5 text-[11px] font-bold uppercase tracking-widest">Email</div>
+                                    <div class="p-4 bg-neutral-50 border border-black/5 text-[11px] font-bold uppercase tracking-widest">Số điện thoại</div>
+                                    <div class="p-4 bg-neutral-50 border border-black/5 text-[11px] font-bold uppercase tracking-widest">Địa chỉ giao hàng</div>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <h3 class="text-xs font-black text-black uppercase tracking-widest">Sử dụng thông tin</h3>
+                                <ul class="space-y-4 list-none p-0">
+                                    <li class="flex gap-4">
+                                        <span class="w-1.5 h-1.5 bg-secondary flex-shrink-0 mt-1.5"></span>
+                                        <span>Xử lý đơn hàng và vận chuyển.</span>
+                                    </li>
+                                    <li class="flex gap-4">
+                                        <span class="w-1.5 h-1.5 bg-secondary flex-shrink-0 mt-1.5"></span>
+                                        <span>Gửi thông báo liên quan đến giao dịch và chương trình ưu đãi.</span>
+                                    </li>
+                                    <li class="flex gap-4">
+                                        <span class="w-1.5 h-1.5 bg-secondary flex-shrink-0 mt-1.5"></span>
+                                        <span>Hỗ trợ khách hàng và giải quyết khiếu nại.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="space-y-4">
+                                <h3 class="text-xs font-black text-black uppercase tracking-widest">Cam kết bảo mật</h3>
+                                <p>Hệ thống áp dụng các biện pháp bảo mật hiện đại như mã hóa mật khẩu và xác thực hai bước. Chúng tôi cam kết không chia sẻ thông tin cá nhân cho bên thứ ba nếu không có sự đồng ý của người dùng.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 6.3 Return & Refund -->
+                    <section id="returns" class="scroll-mt-40">
+                        <h2 class="text-4xl font-extrabold mb-10 tracking-tight">Chính sách <br> đổi trả & hoàn tiền</h2>
+                        <div class="prose prose-neutral max-w-none space-y-8 text-neutral-600 font-medium">
+                            <div class="space-y-4">
+                                <h3 class="text-xs font-black text-black uppercase tracking-widest">Điều kiện đổi trả</h3>
+                                <p>Khách hàng có thể gửi yêu cầu đổi hoặc trả sản phẩm trong các trường hợp sau:</p>
+                                <ul class="space-y-4 list-none p-0">
+                                    <li class="flex gap-4">
+                                        <span class="w-1.5 h-1.5 bg-secondary flex-shrink-0 mt-1.5"></span>
+                                        <span>Sản phẩm bị lỗi từ nhà sản xuất.</span>
+                                    </li>
+                                    <li class="flex gap-4">
+                                        <span class="w-1.5 h-1.5 bg-secondary flex-shrink-0 mt-1.5"></span>
+                                        <span>Sản phẩm giao không đúng mẫu mã, màu sắc hoặc kích thước đã đặt.</span>
+                                    </li>
+                                    <li class="flex gap-4">
+                                        <span class="w-1.5 h-1.5 bg-secondary flex-shrink-0 mt-1.5"></span>
+                                        <span>Sản phẩm bị hư hỏng trong quá trình vận chuyển.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="space-y-4">
+                                <h3 class="text-xs font-black text-black uppercase tracking-widest">Thời gian yêu cầu</h3>
+                                <div class="p-6 bg-secondary text-white inline-block">
+                                    <p class="text-[10px] font-black uppercase tracking-[0.2em] mb-1">Thời hạn tối đa</p>
+                                    <p class="text-3xl font-black">07 NGÀY</p>
+                                    <p class="text-[9px] mt-2 opacity-80 uppercase font-bold leading-tight">Kể từ khi nhận hàng thành công</p>
+                                </div>
+                            </div>
+                            <div class="space-y-6">
+                                <h3 class="text-xs font-black text-black uppercase tracking-widest">Quy trình xử lý</h3>
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-6 p-4 border border-black/5 hover:border-black/20 transition-colors">
+                                        <span class="text-xl font-black text-black/10">01</span>
+                                        <p class="text-xs font-bold uppercase tracking-widest">Gửi yêu cầu hoàn trả trên hệ thống</p>
+                                    </div>
+                                    <div class="flex items-center gap-6 p-4 border border-black/5 hover:border-black/20 transition-colors">
+                                        <span class="text-xl font-black text-black/10">02</span>
+                                        <p class="text-xs font-bold uppercase tracking-widest">H&Y kiểm tra và phê duyệt yêu cầu</p>
+                                    </div>
+                                    <div class="flex items-center gap-6 p-4 border border-black/5 hover:border-black/20 transition-colors">
+                                        <span class="text-xl font-black text-black/10">03</span>
+                                        <p class="text-xs font-bold uppercase tracking-widest">Xác nhận hoàn trả & Nhận lại hàng</p>
+                                    </div>
+                                    <div class="flex items-center gap-6 p-4 border border-black/5 hover:border-black/20 transition-colors">
+                                        <span class="text-xl font-black text-black/10">04</span>
+                                        <p class="text-xs font-bold uppercase tracking-widest">Tiến hành hoàn tiền hoặc đổi sản phẩm</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 6.4 Payment Policy -->
+                    <section id="payment" class="scroll-mt-40 mb-32">
+                        <h2 class="text-4xl font-extrabold mb-10 tracking-tight">Chính sách <br> thanh toán</h2>
+                        <div class="prose prose-neutral max-w-none space-y-8 text-neutral-600 font-medium">
+                            <p>Hệ thống H&Y hỗ trợ các phương thức thanh toán linh hoạt và bảo mật cao:</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="p-8 border border-black/5 flex flex-col gap-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-secondary"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                                    <h3 class="text-xs font-black uppercase tracking-widest">Thanh toán trực tuyến</h3>
+                                    <p class="text-xs text-neutral-500 leading-relaxed">Hỗ trợ các loại thẻ và ví điện tử phổ biến. An toàn và tức thì.</p>
+                                </div>
+                                <div class="p-8 border border-black/5 flex flex-col gap-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-secondary"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                                    <h3 class="text-xs font-black uppercase tracking-widest">Thanh toán COD</h3>
+                                    <p class="text-xs text-neutral-500 leading-relaxed">Thanh toán bằng tiền mặt ngay khi nhận hàng tại địa chỉ của bạn.</p>
+                                </div>
+                            </div>
+                            <div class="space-y-4 pt-8 border-t border-black/5">
+                                <h3 class="text-xs font-black text-black uppercase tracking-widest">Sau khi thanh toán</h3>
+                                <ul class="space-y-4 list-none p-0">
+                                    <li class="flex gap-4">
+                                        <span class="w-1.5 h-1.5 bg-secondary flex-shrink-0 mt-1.5"></span>
+                                        <span>Hệ thống tự động cập nhật trạng thái đơn hàng.</span>
+                                    </li>
+                                    <li class="flex gap-4">
+                                        <span class="w-1.5 h-1.5 bg-secondary flex-shrink-0 mt-1.5"></span>
+                                        <span>Khách hàng có thể theo dõi hành trình đơn hàng trong mục lịch sử đơn hàng.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Script to handle smooth scroll offsets -->
+    <th:block layout:fragment="script">
+        <script>
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        const headerOffset = 180; // Adjusted for sticky nav + header
+                        const elementPosition = targetElement.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                        
+                        // Push hash to URL
+                        history.pushState(null, null, targetId);
+                    }
+                });
+            });
+        </script>
+    </th:block>
+</body>
+</html>

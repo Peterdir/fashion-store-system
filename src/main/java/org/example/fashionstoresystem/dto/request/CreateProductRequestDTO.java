@@ -18,9 +18,8 @@ public class CreateProductRequestDTO {
     @Size(min = 2, max = 255, message = "Tên sản phẩm phải từ 2-255 ký tự")
     private String name;
 
-    @NotBlank(message = "Danh mục không được để trống")
-    @Size(max = 100, message = "Danh mục không được vượt quá 100 ký tự")
-    private String category;
+    @NotNull(message = "Danh mục không được để trống")
+    private Long categoryId;
 
     @NotNull(message = "Giá không được để trống")
     @Positive(message = "Giá phải lớn hơn 0")

@@ -3,22 +3,18 @@ title Activity Diagram (Swimlane) - ViewProducts (UC09)
 
 |Client (UI)|
 start
-:Truy cập trang sản phẩm;
-if (Người dùng có nhập từ khóa?) then (Có)
-    |System (Service)|
-    :Gửi yêu cầu tìm kiếm;
-    |Database (MySQL)|
-    :Truy xuất dữ liệu theo từ khóa;
-else (Không)
-    |System (Service)|
-    :Gửi yêu cầu lấy toàn bộ sản phẩm;
-    |Database (MySQL)|
-    :Truy xuất toàn bộ dữ liệu;
-endif
+:Truy cập trang danh mục sản phẩm (category);
+:Truyền tham số (keyword, minPrice, maxPrice, pageable);
+
+|System (Service)|
+:Gửi yêu cầu load danh sách sản phẩm;
+
+|Database (MySQL)|
+:Truy xuất dữ liệu (findFiltered);
 
 |System (Service)|
 ''' Kiểm tra Lỗi tải dữ liệu '''
-if (Lỗi kết nối database?) then (Có)
+if (Lỗi kết nối database / Lỗi hệ thống?) then (Có)
     |Client (UI)|
         :Hiển thị thông báo lỗi;
         stop
@@ -31,7 +27,25 @@ else (Không)
     else (Có)
         |Client (UI)|
         :Hiển thị danh sách sản phẩm;
+        
+        :Người dùng click vào một sản phẩm;
+        |System (Service)|
+        :Gửi yêu cầu tải chi tiết sản phẩm;
+        |Database (MySQL)|
+        :Truy xuất thông tin Product, Image, Variant, Review;
+        |System (Service)|
+        if (Sản phẩm tồn tại?) then (Có)
+            :Tính toán sao trung bình, tổng review;
+            :Track View History (nếu đã login);
+            |Client (UI)|
+            :Hiển thị trang chi tiết sản phẩm;
+        else (Không)
+            |Client (UI)|
+            :Hiển thị lỗi "Không tìm thấy sản phẩm";
+            stop
+        endif
     endif
+
 endif
 stop
 @enduml

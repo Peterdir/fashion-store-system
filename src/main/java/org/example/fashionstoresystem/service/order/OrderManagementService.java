@@ -19,4 +19,6 @@ public interface OrderManagementService {
     OrderDetailResponseDTO getOrderDetail(Long orderId);
 
     MessageResponseDTO updateOrderStatus(Long orderId, OrderStatus status);
+
+    void updateRefundStatus(Long orderItemId, org.example.fashionstoresystem.entity.enums.RefundStatus status);
 }

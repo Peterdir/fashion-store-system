@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/admin-layout}">
+<head>
+    <title>Báo Cáo Doanh Thu</title>
+</head>
+<body>
+
+    <div layout:fragment="content">
+
+        <!-- Page Header -->
+        <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-xl font-black tracking-tight text-primary uppercase">Báo Cáo Doanh Thu</h1>
+                <p class="text-[11px] text-neutral-400 font-medium mt-1">Thống kê và phân tích doanh thu theo kỳ</p>
+            </div>
+            <!-- Export Buttons -->
+            <div class="flex items-center gap-2">
+                <button id="btn-export-csv"
+                        class="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled>
+                    <span class="material-symbols-outlined text-[14px]">download</span>
+                    Xuất CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white border border-neutral-100 p-4 mb-5 flex flex-wrap items-end gap-3">
+            <!-- Quick Presets -->
+            <div class="space-y-1">
+                <label class="text-[9px] font-black uppercase tracking-[0.15em] text-neutral-400">Nhanh</label>
+                <div class="flex gap-1.5 flex-wrap">
+                    <button id="preset-today"      class="preset-btn px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-neutral-200 text-neutral-500 hover:border-primary hover:text-primary transition-colors">Hôm nay</button>
+                    <button id="preset-week"       class="preset-btn px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-neutral-200 text-neutral-500 hover:border-primary hover:text-primary transition-colors">7 ngày</button>
+                    <button id="preset-this-month" class="preset-btn px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-neutral-200 text-neutral-500 hover:border-primary hover:text-primary transition-colors">Tháng này</button>
+                    <button id="preset-last-month" class="preset-btn px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-neutral-200 text-neutral-500 hover:border-primary hover:text-primary transition-colors">Tháng trước</button>
+                </div>
+            </div>
+            <!-- Custom Date Range -->
+            <div class="space-y-1">
+                <label class="text-[9px] font-black uppercase tracking-[0.15em] text-neutral-400">Từ ngày - Đến ngày</label>
+                <div class="flex items-center gap-2">
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[14px] text-neutral-400 pointer-events-none">calendar_month</span>
+                        <input type="date" id="filter-start-date" class="w-full pl-8 pr-3 py-2 text-[11px] font-bold border border-neutral-200 bg-neutral-50 text-primary outline-none focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer h-[34px]">
+                    </div>
+                    <span class="text-neutral-300 text-[10px]">→</span>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[14px] text-neutral-400 pointer-events-none">calendar_month</span>
+                        <input type="date" id="filter-end-date" class="w-full pl-8 pr-3 py-2 text-[11px] font-bold border border-neutral-200 bg-neutral-50 text-primary outline-none focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer h-[34px]">
+                    </div>
+                </div>
+            </div>
+            <!-- Search Button -->
+            <div class="flex gap-2">
+                <button id="btn-load-report"
+                        class="flex items-center gap-2 bg-primary text-white px-5 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-neutral-800 transition-colors">
+                    <span class="material-symbols-outlined text-[14px]">search</span>
+                    Xem báo cáo
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="report-loading" class="hidden py-20 text-center">
+            <span class="material-symbols-outlined text-4xl text-neutral-300 animate-spin">sync</span>
+            <p class="text-[11px] font-medium text-neutral-400 mt-3">Đang tải dữ liệu...</p>
+        </div>
+
+        <!-- Empty / Prompt State -->
+        <div id="report-empty" class="py-20 text-center">
+            <span class="material-symbols-outlined text-5xl text-neutral-200 mb-3">bar_chart</span>
+            <p class="text-[13px] font-black text-neutral-300 uppercase tracking-widest">Chọn khoảng thời gian để xem báo cáo</p>
+            <p class="text-[11px] text-neutral-400 mt-1">Dùng bộ lọc phía trên hoặc chọn nhanh 7 / 30 / 90 ngày</p>
+        </div>
+
+        <!-- Report Content (hidden until data loaded) -->
+        <div id="report-content" class="hidden space-y-5">
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Total Revenue -->
+                <div class="bg-white border border-neutral-100 p-5">
+                    <p class="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-400 mb-2">Tổng Doanh Thu</p>
+                    <p class="text-2xl font-black text-primary" id="kpi-total">—</p>
+                    <p class="text-[10px] text-neutral-400 font-medium mt-1">Online + Offline</p>
+                </div>
+                <!-- Online Revenue -->
+                <div class="bg-white border border-neutral-100 p-5">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-400">Online</p>
+                    </div>
+                    <p class="text-2xl font-black text-blue-600" id="kpi-online">—</p>
+                    <p class="text-[10px] text-neutral-400 font-medium mt-1" id="kpi-online-pct">—% tổng</p>
+                </div>
+                <!-- Offline Revenue -->
+                <div class="bg-white border border-neutral-100 p-5">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-400">Offline</p>
+                    </div>
+                    <p class="text-2xl font-black text-amber-600" id="kpi-offline">—</p>
+                    <p class="text-[10px] text-neutral-400 font-medium mt-1" id="kpi-offline-pct">—% tổng</p>
+                </div>
+                <!-- Total Orders -->
+                <div class="bg-white border border-neutral-100 p-5">
+                    <p class="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-400 mb-2">Tổng Đơn Hàng</p>
+                    <p class="text-2xl font-black text-primary" id="kpi-orders">—</p>
+                    <p class="text-[10px] text-neutral-400 font-medium mt-1" id="kpi-avg">TB: —/đơn</p>
+                </div>
+            </div>
+
+            <!-- Revenue Chart -->
+            <div class="bg-white border border-neutral-100 overflow-hidden">
+                <div class="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
+                    <h3 class="text-[12px] font-black uppercase tracking-[0.15em] flex items-center gap-2 text-neutral-500">
+                        <span class="material-symbols-outlined text-[16px]">show_chart</span>
+                        Biểu Đồ Doanh Thu
+                    </h3>
+                </div>
+                <div class="p-5 w-full">
+                    <div class="relative w-full h-[300px] sm:h-[350px] lg:h-[400px]">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue Breakdown Bar -->
+            <div class="bg-white border border-neutral-100 p-5">
+                <p class="text-[10px] font-black uppercase tracking-[0.15em] text-neutral-500 mb-4">Tỷ Trọng Doanh Thu</p>
+                <div class="flex h-5 rounded-full overflow-hidden gap-0.5" id="revenue-bar">
+                    <div id="bar-online" class="bg-blue-500 transition-all duration-700 ease-out" style="width: 0%"></div>
+                    <div id="bar-offline" class="bg-amber-400 transition-all duration-700 ease-out" style="width: 0%"></div>
+                </div>
+                <div class="flex items-center gap-6 mt-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                        <span class="text-[10px] font-bold text-neutral-500">Online</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                        <span class="text-[10px] font-bold text-neutral-500">Offline</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="bg-white border border-neutral-100 overflow-hidden">
+                <div class="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
+                    <p class="text-[10px] font-black uppercase tracking-[0.15em] text-neutral-500">
+                        Chi Tiết Đơn Hàng
+                        <span class="ml-2 bg-neutral-100 text-neutral-500 px-2 py-0.5 font-bold" id="table-count"></span>
+                    </p>
+                    <!-- Filter by type in table -->
+                    <div class="flex gap-1">
+                        <button id="tab-all"     class="tab-btn px-3 py-1 text-[9px] font-black uppercase tracking-widest bg-primary text-white transition-colors">Tất cả</button>
+                        <button id="tab-online"  class="tab-btn px-3 py-1 text-[9px] font-black uppercase tracking-widest text-neutral-500 border border-neutral-200 hover:border-primary hover:text-primary transition-colors">Online</button>
+                        <button id="tab-offline" class="tab-btn px-3 py-1 text-[9px] font-black uppercase tracking-widest text-neutral-500 border border-neutral-200 hover:border-primary hover:text-primary transition-colors">Offline</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-neutral-50/80 border-b border-neutral-100">
+                                <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Mã đơn</th>
+                                <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Ngày đặt</th>
+                                <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Kênh</th>
+                                <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Số SP</th>
+                                <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-right">Doanh thu</th>
+                                <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Chi tiết</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body" class="divide-y divide-neutral-50">
+                            <!-- JS renders rows here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- No orders in table -->
+                <div id="table-empty" class="hidden py-12 text-center">
+                    <span class="material-symbols-outlined text-4xl text-neutral-200 mb-2">inbox</span>
+                    <p class="text-[12px] font-bold text-neutral-400">Không có đơn hàng nào trong khoảng này</p>
+                </div>
+
+                <!-- Pagination -->
+                <div id="pagination-container" class="px-5 py-4 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-3 hidden bg-neutral-50/50">
+                    <p class="text-[10px] font-medium text-neutral-500" id="pagination-info"></p>
+                    <div class="flex items-center gap-1" id="pagination-controls">
+                        <!-- JS renders page buttons here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ORDER DETAIL PANEL (slide-over) -->
+        <div id="order-panel" class="fixed inset-0 z-50 hidden">
+            <!-- Overlay -->
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="AdminReports.closePanel()"></div>
+            <!-- Panel -->
+            <div class="absolute right-0 top-0 h-full w-full max-w-xl bg-white shadow-2xl overflow-y-auto">
+                <!-- Panel Header -->
+                <div class="sticky top-0 z-10 bg-white border-b border-neutral-100 px-6 py-4 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-sm font-black uppercase tracking-[0.1em]" id="panel-order-id"></h2>
+                        <p class="text-[10px] text-neutral-400 font-medium mt-0.5" id="panel-order-date"></p>
+                    </div>
+                    <button onclick="AdminReports.closePanel()" class="p-1.5 hover:bg-neutral-100 rounded transition-colors">
+                        <span class="material-symbols-outlined text-neutral-400">close</span>
+                    </button>
+                </div>
+                <!-- Panel Body -->
+                <div id="panel-body" class="px-6 py-5 space-y-5">
+                    <!-- Summary Cards -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-neutral-50 p-4">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-neutral-400 mb-1">Doanh thu</p>
+                            <p class="text-lg font-black text-primary" id="panel-total"></p>
+                        </div>
+                        <div class="bg-neutral-50 p-4">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-neutral-400 mb-1">Kênh bán</p>
+                            <p class="text-sm font-black" id="panel-type"></p>
+                        </div>
+                    </div>
+                    <!-- Items -->
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.15em] text-neutral-500 mb-3">Sản phẩm trong đơn</p>
+                        <div id="panel-items" class="space-y-2">
+                            <!-- JS renders items -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div id="admin-toast" class="fixed bottom-6 right-6 z-[100] space-y-2"></div>
+
+        <!-- Chart.js for Revenue Chart -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script th:src="@{/admin/js/reports.js}"></script>
+    </div>
+</body>
+</html>

@@ -5,10 +5,7 @@ import org.example.fashionstoresystem.dto.request.SubmitReviewRequestDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.dto.response.ReviewResponseDTO;
 import org.example.fashionstoresystem.entity.enums.OrderStatus;
-import org.example.fashionstoresystem.entity.jpa.OrderItem;
-import org.example.fashionstoresystem.entity.jpa.Product;
-import org.example.fashionstoresystem.entity.jpa.Review;
-import org.example.fashionstoresystem.entity.jpa.User;
+import org.example.fashionstoresystem.entity.jpa.*;
 import org.example.fashionstoresystem.repository.OrderItemRepository;
 import org.example.fashionstoresystem.repository.ProductRepository;
 import org.example.fashionstoresystem.repository.ReviewRepository;
@@ -17,6 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -39,9 +40,8 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại!"));
 
         // Kiểm tra khách hàng đã mua sản phẩm và OrderItem đã ở trạng thái hoàn tất
-        boolean hasPurchased =
-                orderItemRepository.existsByOrderUserIdAndStatusAndProductVariantProductId(
-                        userId, OrderStatus.DELIVERED, dto.getProductId()) ||
+        boolean hasPurchased = orderItemRepository.existsByOrderUserIdAndStatusAndProductVariantProductId(
+                userId, OrderStatus.DELIVERED, dto.getProductId()) ||
                 orderItemRepository.existsByOrderUserIdAndStatusAndProductVariantProductId(
                         userId, OrderStatus.COMPLETED, dto.getProductId());
 
@@ -54,9 +54,9 @@ public class ReviewServiceImpl implements ReviewService {
             throw new RuntimeException("Điểm đánh giá phải từ 1 đến 5!");
         }
 
-//        if (dto.getComment() == null || dto.getComment().isBlank()) {
-//            throw new RuntimeException("Nội dung nhận xét không được để trống!");
-//        }
+        // if (dto.getComment() == null || dto.getComment().isBlank()) {
+        // throw new RuntimeException("Nội dung nhận xét không được để trống!");
+        // }
 
         // Lưu đánh giá
         Review review = Review.builder()
@@ -66,6 +66,8 @@ public class ReviewServiceImpl implements ReviewService {
                 .comment(dto.getComment())
                 .createdAt(Instant.now())
                 .build();
+
+        // Bỏ chức năng thêm hình ảnh
 
         // Nếu có orderItemId, đánh dấu OrderItem là đã đánh giá
         if (dto.getOrderItemId() != null) {
@@ -78,8 +80,8 @@ public class ReviewServiceImpl implements ReviewService {
             // Fallback: Tìm OrderItem chưa đánh giá gần nhất của user cho sản phẩm này
             orderItemRepository
                     .findFirstByOrderUserIdAndProductVariantProductIdAndIsReviewedFalseOrderByOrderOrderDateDesc(
-                            userId, dto.getProductId()
-                    ).ifPresent(item -> {
+                            userId, dto.getProductId())
+                    .ifPresent(item -> {
                         item.setReviewed(true);
                         orderItemRepository.save(item);
                         review.setOrderItem(item);
@@ -104,13 +106,13 @@ public class ReviewServiceImpl implements ReviewService {
     public Page<ReviewResponseDTO> getReviewsByUser(Long userId, Pageable pageable) {
         return reviewRepository.findByUserId(userId, pageable).map(this::mapToDTO);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Page<ReviewResponseDTO> getAllReviews(Pageable pageable) {
         return reviewRepository.findAll(pageable).map(this::mapToDTO);
     }
-    
+
     private ReviewResponseDTO mapToDTO(Review review) {
         String imageUrl = "/images/placeholder.png";
         if (!review.getProduct().getImages().isEmpty()) {
@@ -126,22 +128,23 @@ public class ReviewServiceImpl implements ReviewService {
                 .customerName(review.getUser().getFullName())
                 .rating(review.getRating())
                 .comment(review.getComment())
-                .createdAt(review.getCreatedAt());
+                .createdAt(review.getCreatedAt() != null ? DateTimeFormatter.ofPattern("dd/MM/yyyy").withZone(ZoneId.systemDefault()).format(review.getCreatedAt()) : "N/A");
+
 
         // Bổ sung thông tin đơn hàng (Sử dụng cơ chế Fallback nếu thiếu liên kết trực tiếp)
         OrderItem orderItem = review.getOrderItem();
         if (orderItem == null) {
             orderItem = orderItemRepository
                     .findFirstByOrderUserIdAndProductVariantProductIdOrderByOrderOrderDateDesc(
-                            review.getUser().getId(), 
-                            review.getProduct().getId()
-                    ).orElse(null);
+                            review.getUser().getId(),
+                            review.getProduct().getId())
+                    .orElse(null);
         }
 
         if (orderItem != null) {
             builder.price(orderItem.getPrice());
-            if (orderItem.getOrder() != null) {
-                builder.orderDate(orderItem.getOrder().getOrderDate());
+            if (orderItem.getOrder() != null && orderItem.getOrder().getOrderDate() != null) {
+                builder.orderDate(new SimpleDateFormat("dd/MM/yyyy").format(orderItem.getOrder().getOrderDate()));
             }
         }
 

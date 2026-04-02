@@ -88,7 +88,7 @@
                 <div class="sticky top-0 z-10 bg-white border-b border-neutral-100 px-6 py-4 flex items-center justify-between">
                     <div>
                         <h2 class="text-sm font-black uppercase tracking-[0.1em]" id="modal-title">Tạo Mã Giảm Giá</h2>
-                        <p class="text-[10px] text-neutral-400 font-medium mt-0.5" id="modal-subtitle">H&Y Digital Curator</p>
+                        <p class="text-[10px] text-neutral-400 font-medium mt-0.5" id="modal-subtitle">H&Y H&Y Fashion</p>
                     </div>
                     <button onclick="AdminCoupons.closeModal()" class="p-1.5 hover:bg-neutral-100 rounded transition-colors">
                         <span class="material-symbols-outlined text-neutral-400">close</span>
@@ -117,16 +117,16 @@
                             </div>
                             <div class="space-y-1">
                                 <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Giá trị giảm <span class="text-red-500">*</span></label>
-                                <input type="number" id="form-discount-value" required min="1" step="any" placeholder="10"
-                                       class="w-full px-3 py-2.5 text-[11px] font-bold border border-neutral-200 bg-neutral-50 outline-none focus:border-primary">
+                                <input type="text" id="form-discount-value" required placeholder="10,000"
+                                       class="price-format w-full px-3 py-2.5 text-[11px] font-bold border border-neutral-200 bg-neutral-50 outline-none focus:border-primary">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div class="space-y-1">
                                 <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Đơn tối thiểu (đ)</label>
-                                <input type="number" id="form-min-order" min="0" step="any" placeholder="0"
-                                       class="w-full px-3 py-2.5 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary">
+                                <input type="text" id="form-min-order" placeholder="0"
+                                       class="price-format w-full px-3 py-2.5 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary">
                             </div>
                             <div class="space-y-1">
                                 <label class="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">Số lượt sử dụng</label>
@@ -174,3 +174,4 @@
     </div>
 </body>
 </html>
+

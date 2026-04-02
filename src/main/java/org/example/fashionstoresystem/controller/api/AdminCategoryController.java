@@ -5,7 +5,6 @@ import org.example.fashionstoresystem.dto.request.CategoryRequestDTO;
 import org.example.fashionstoresystem.dto.response.CategoryResponseDTO;
 import org.example.fashionstoresystem.service.category.CategoryService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/categories")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 public class AdminCategoryController {
 
     private final CategoryService categoryService;

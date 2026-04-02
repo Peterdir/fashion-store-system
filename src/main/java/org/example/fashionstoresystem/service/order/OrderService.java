@@ -3,6 +3,7 @@ package org.example.fashionstoresystem.service.order;
 import org.example.fashionstoresystem.dto.request.CancelOrderRequestDTO;
 import org.example.fashionstoresystem.dto.request.PlaceOrderRequestDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
+import org.example.fashionstoresystem.dto.response.OrderDashboardSummaryDTO;
 import org.example.fashionstoresystem.dto.response.OrderDetailResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderSummaryResponseDTO;
 import org.example.fashionstoresystem.dto.response.PlaceOrderResponseDTO;
@@ -21,7 +22,8 @@ public interface OrderService {
     Page<OrderSummaryResponseDTO> getMyOrders(Long userId, List<OrderStatus> statuses, Pageable pageable);
 
     // Dùng cho giao diện cá nhân: Liệt kê chi tiết từng món đồ (OrderItem) của User
-    Page<OrderItemSummaryDTO> getMyOrderItems(Long userId, List<OrderStatus> statuses, Boolean reviewed, Pageable pageable);
+    Page<OrderItemSummaryDTO> getMyOrderItems(Long userId, List<OrderStatus> statuses, Boolean reviewed,
+            Pageable pageable);
 
     // Theo dõi trạng thái đơn hàng - Xem chi tiết đơn hàng
     OrderDetailResponseDTO getMyOrderDetail(Long userId, Long orderId);
@@ -38,4 +40,6 @@ public interface OrderService {
     // Hoàn kho (dùng cho cleanup task)
     void revertInventory(Long orderId);
 
+    // DASHBOARD: Lấy thông tin tóm tắt đơn hàng cho Dashboard người dùng
+    OrderDashboardSummaryDTO getDashboardSummary(Long userId);
 }

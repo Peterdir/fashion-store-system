@@ -1,5 +1,12 @@
 @startuml
-title Object Diagram: Order Management (UC26)\nScenario: Admin updates order status from CONFIRMED to SHIPPING
+title Object Diagram: Order Management (UC26)\nScenario: Admin updates order status from PROCESSING to SHIPPING
+
+' Entity - Order
+object "order : Order" as order {
+    id = 1005
+    totalAmount = 500000.0
+    status = "SHIPPING"
+}
 
 ' Entity - OrderItem after status update
 object "item : OrderItem" as item {
@@ -11,15 +18,18 @@ object "item : OrderItem" as item {
 ' Entity - History record created
 object "history : OrderHistory" as history {
     id = 501
-    orderItemId = 2001
-    previousStatus = "CONFIRMED"
+    previousStatus = "PROCESSING"
     newStatus = "SHIPPING"
     changeDate = "2026-03-19"
 }
 
+' Structural Relationships
+order *-- item : contains >
+item *-- history : tracks >
+
 note right of item
-    Order status updated:
-    "CONFIRMED" -> "SHIPPING"
+    OrderItem status updated:
+    "PROCESSING" -> "SHIPPING"
 end note
 
 note right of history

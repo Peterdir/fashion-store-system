@@ -11,6 +11,7 @@ const AdminProducts = (() => {
         CREATE: '/api/admin/products',                // POST — tạo mới
         UPDATE: (id) => `/api/admin/products/${id}`,  // PUT  — cập nhật
         DELETE: (id) => `/api/admin/products/${id}`,  // DELETE — xóa
+        CATEGORIES: '/api/admin/categories',          // GET  — danh sách danh mục
     };
 
     const PAGE_SIZE = 10;
@@ -113,15 +114,18 @@ const AdminProducts = (() => {
     function renderTable(products) {
         const tbody = $('products-table-body');
         tbody.innerHTML = products.map(product => {
-            const imgUrl = product.primaryImageUrl || '';
-            const imgTag = imgUrl
-                ? `<img src="${imgUrl}" alt="${product.name}" class="w-10 h-10 object-cover border border-neutral-100 flex-shrink-0" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><rect fill=%22%23f5f5f5%22 width=%2240%22 height=%2240%22/><text fill=%22%23ccc%22 font-size=%2212%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.35em%22>?</text></svg>'">`
-                : `<div class="w-10 h-10 bg-neutral-100 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-neutral-300 text-[18px]">image</span></div>`;
-
-            return `<tr class="hover:bg-neutral-50/50 transition-colors">
-                <td class="px-5 py-3">
-                    <div class="flex items-center gap-3">
-                        ${imgTag}
+                const placeholder = `data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 50%22%3E%3Crect width=%2240%22 height=%2250%22 fill=%22%23f5f5f5%22/%3E%3C/svg%3E`;
+                const imgUrl = product.primaryImageUrl ? (product.primaryImageUrl.startsWith('/images/') ? product.primaryImageUrl : `/images/${product.primaryImageUrl}`) : placeholder;
+                
+                return `<tr class="border-b border-neutral-100 hover:bg-neutral-50/50 transition-colors group">
+                    <td class="py-3 px-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-12 bg-neutral-100 overflow-hidden flex-shrink-0">
+                                <img src="${imgUrl}" 
+                                     alt="${product.name}" 
+                                     class="w-full h-full object-cover"
+                                     onerror="this.onerror=null; this.src='${placeholder}';">
+                            </div>
                         <div class="min-w-0">
                             <p class="text-[12px] font-bold text-primary truncate max-w-[220px]">${product.name}</p>
                             <p class="text-[10px] text-neutral-400 font-medium">ID: ${product.productId}</p>
@@ -131,10 +135,10 @@ const AdminProducts = (() => {
                 <td class="px-5 py-3 text-[11px] font-bold text-neutral-600">${product.category || '—'}</td>
                 <td class="px-5 py-3 text-[12px] font-bold text-primary text-right">${formatCurrency(product.price || product.minPrice)}</td>
                 <td class="px-5 py-3 text-center">
-                    <span class="text-[11px] font-bold text-neutral-600">—</span>
+                    <span class="text-[11px] font-bold ${product.totalStock > 0 ? 'text-neutral-600' : 'text-red-500'}">${product.totalStock != null ? product.totalStock : '—'}</span>
                 </td>
                 <td class="px-5 py-3 text-center">
-                    <span class="text-[11px] font-bold text-neutral-600">—</span>
+                    <span class="text-[11px] font-bold text-neutral-600">${product.variantCount != null ? product.variantCount : '—'}</span>
                 </td>
                 <td class="px-5 py-3 text-center">${renderStatusBadge(product.status)}</td>
                 <td class="px-5 py-3 text-center">
@@ -154,21 +158,32 @@ const AdminProducts = (() => {
     // ===== RENDER PAGINATION =====
     function renderPagination(pageData) {
         const container = $('products-pagination');
+        if (!container) return;
         container.classList.remove('hidden');
 
-        const start = pageData.number * pageData.size + 1;
-        const end = Math.min(start + pageData.numberOfElements - 1, pageData.totalElements);
-        $('pagination-info').textContent = `Hiển thị ${start}–${end} / ${pageData.totalElements} sản phẩm`;
+        // Hỗ trợ cả cấu trúc phẳng (mặc định) và cấu trúc lồng nhau (via-dto)
+        const page = pageData.page || pageData;
+        const number = page.number || 0;
+        const size = page.size || 10;
+        const totalElements = page.totalElements || 0;
+        const numberOfElements = pageData.numberOfElements || (pageData.content ? pageData.content.length : 0);
+
+        const start = number * size + 1;
+        const end = Math.min(start + numberOfElements - 1, totalElements);
+        $('pagination-info').textContent = `Hiển thị ${start}–${end} / ${totalElements} sản phẩm`;
+
+        const current = number;
+        const totalPages = page.totalPages || 1;
+        const first = page.first !== undefined ? page.first : (number === 0);
+        const last = page.last !== undefined ? page.last : (number >= totalPages - 1);
 
         const btns = $('pagination-buttons');
         btns.innerHTML = '';
 
         // Previous
-        btns.appendChild(createPageBtn('chevron_left', pageData.number - 1, pageData.first));
+        btns.appendChild(createPageBtn('chevron_left', current - 1, first));
 
         // Page Numbers (show max 5)
-        const totalPages = pageData.totalPages;
-        const current = pageData.number;
         let startP = Math.max(0, current - 2);
         let endP = Math.min(totalPages - 1, startP + 4);
         startP = Math.max(0, endP - 4);
@@ -184,7 +199,7 @@ const AdminProducts = (() => {
         }
 
         // Next
-        btns.appendChild(createPageBtn('chevron_right', pageData.number + 1, pageData.last));
+        btns.appendChild(createPageBtn('chevron_right', current + 1, last));
     }
 
     function createPageBtn(icon, page, disabled) {
@@ -230,6 +245,8 @@ const AdminProducts = (() => {
                    class="variant-size flex-1 px-3 py-2 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors">
             <input type="text" placeholder="Màu sắc" value="${data.color || ''}" required maxlength="50"
                    class="variant-color flex-1 px-3 py-2 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors">
+            <input type="text" placeholder="Giá (nếu khác)" value="${AdminUtils.formatNumber(data.price)}"
+                   class="price-format variant-price w-24 px-2 py-1.5 text-[11px] font-bold border border-neutral-200 bg-white outline-none focus:border-primary transition-colors">
             <input type="number" placeholder="Tồn kho" value="${data.stockQuantity ?? ''}" required min="0"
                    class="variant-stock w-24 px-3 py-2 text-[11px] font-medium border border-neutral-200 bg-neutral-50 outline-none focus:border-primary transition-colors">
             <button type="button" onclick="this.closest('.variant-row').remove()" class="p-1.5 text-neutral-300 hover:text-red-500 transition-colors flex-shrink-0">
@@ -237,6 +254,31 @@ const AdminProducts = (() => {
             </button>
         `;
         container.appendChild(row);
+    }
+
+    async function loadCategories() {
+        const select = $('form-category');
+        if (!select) return;
+
+        try {
+            const res = await fetch(API.CATEGORIES);
+            if (!res.ok) throw new Error('Không thể tải danh sách danh mục');
+            const categories = await res.json();
+
+            // Giữ lại option placeholder đầu tiên
+            const firstOption = select.options[0];
+            select.innerHTML = '';
+            select.appendChild(firstOption);
+
+            categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat.id;
+                opt.textContent = cat.name;
+                select.appendChild(opt);
+            });
+        } catch (err) {
+            console.error('Category load error:', err);
+        }
     }
 
     function resetForm() {
@@ -247,6 +289,7 @@ const AdminProducts = (() => {
         $('variants-container').innerHTML = '';
         addImageInput();
         addVariantRow();
+        loadCategories(); // Reload categories to ensure list is fresh
     }
 
     // --- Open modal for CREATE ---
@@ -279,8 +322,14 @@ const AdminProducts = (() => {
 
             $('form-product-id').value = product.productId;
             $('form-name').value = product.name || '';
-            $('form-category').value = product.category || product.categoryName || '';
-            $('form-price').value = product.price || '';
+            
+            // Wait a bit for categories to load if they haven't yet
+            if ($('form-category').options.length <= 1) {
+                await loadCategories();
+            }
+            $('form-category').value = product.categoryId || '';
+            
+            $('form-price').value = AdminUtils.formatNumber(product.price);
             $('form-description').value = product.description || '';
 
             // Show status select for edit mode
@@ -302,6 +351,7 @@ const AdminProducts = (() => {
             } else {
                 addVariantRow();
             }
+            AdminUtils.initPriceInputs();
 
             $('modal-subtitle').textContent = `Chỉnh sửa: ${product.name}`;
         } catch (err) {
@@ -351,7 +401,12 @@ const AdminProducts = (() => {
                 return;
             }
 
-            const variant = { size, color, stockQuantity: parseInt(stock) };
+            const variant = { 
+                size, 
+                color, 
+                stockQuantity: parseInt(stock),
+                price: AdminUtils.unformatNumber(row.querySelector('.variant-price').value) || null
+            };
             if (isEdit && variantId) {
                 variant.variantId = parseInt(variantId);
             }
@@ -366,8 +421,8 @@ const AdminProducts = (() => {
         // Build payload
         const payload = {
             name: $('form-name').value.trim(),
-            category: $('form-category').value.trim(),
-            price: parseFloat($('form-price').value),
+            categoryId: parseInt($('form-category').value),
+            price: AdminUtils.unformatNumber($('form-price').value),
             description: $('form-description').value.trim(),
             imageUrls,
             variants,

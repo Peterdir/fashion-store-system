@@ -4,7 +4,7 @@ title Activity Diagram (Swimlane) - Order Management (UC26)
 start
 :Truy cập chức năng Quản lý đơn hàng;
 |System (Service)|
-:Truy xuất danh sách các đơn hàng;
+:Truy xuất danh sách các đơn hàng (có thể lọc theo Status, Date);
 |Owner (UI)|
 :Hiển thị danh sách đơn hàng;
 :Chọn một đơn hàng cần xử lý;
@@ -16,25 +16,25 @@ if (Đơn hàng tồn tại?) then (Không)
     stop
 else (Có)
     |System (Service)|
-    :Truy xuất chi tiết đơn hàng;
+    :Truy xuất chi tiết đơn hàng (các sản phẩm bên trong);
     |Owner (UI)|
     :Hiển thị chi tiết đơn hàng & trạng thái hiện tại;
 
     if (Cập nhật trạng thái?) then (Không - Chỉ xem)
         stop
     else (Có)
-        :Chọn trạng thái mới & nhấn "Lưu";
+        :Chọn trạng thái mới cho Đơn hàng/Sản phẩm & nhấn "Lưu";
 
         |System (Service)|
         ''' Bước 6 & EL1: Kiểm tra tính hợp lệ trạng thái '''
         if (Trạng thái mới hợp lệ?) then (Không)
-            |Shop Owner (UI)|
-            :Thông báo lỗi: Trạng thái không hợp lệ;
+            |Owner (UI)|
+            :Thông báo lỗi: Không được phép chuyển đổi trạng thái này;
             stop
         else (Có)
             |Database (MySQL)|
-            :Cập nhật trạng thái mới (Bảng Orders);
-            :Ghi lịch sử thay đổi (Bảng OrderStatusHistory);
+            :Cập nhật trạng thái mới (Bảng orders / order_items);
+            :Ghi lịch sử thay đổi (Bảng order_histories);
 
             |System (Service)|
             if (Lỗi khi lưu?) then (Có)
@@ -42,7 +42,7 @@ else (Có)
                 :Thông báo lỗi hệ thống;
             else (Thành công)
                 |Owner (UI)|
-                :Thông báo cập nhật thành công;
+                :Thông báo cập nhật thành công và Refresh UI;
             endif
         endif
     endif

@@ -4,56 +4,59 @@ title Class Diagram: Submit Return Request (UC22)
 ' Controller
 class ReturnRequestController {
     - returnRequestService : ReturnRequestService
-    + showOrderList(customerId: Long) : String
-    + showReturnSelection(orderId: Long) : String
-    + prepareReturnForm(orderId: Long, itemIds: List<Long>) : String
-    + submitReturnRequest(dto: SubmitReturnRequestDTO) : MessageResponseDTO
+    + getReturnRequestsByCustomer() : ResponseEntity<List<ReturnRequestResponseDTO>>
+    + submitReturnRequest(dto: SubmitReturnRequestDTO) : ResponseEntity<ReturnRequest>
 }
 
 ' Service
 interface ReturnRequestService <<interface>> {
-    + getOrdersByCustomer(customerId: Long) : List<Order>
+    + getReturnRequestsByCustomer(customerId: Long) : List<ReturnRequestResponseDTO>
     + getOrderForReturn(orderId: Long) : Order
     + validateReturnEligibility(orderId: Long, itemIds: List<Long>) : List<OrderItem>
-    + submitReturnRequest(dto: SubmitReturnRequestDTO, images: List<String>) : ReturnRequest
+    + submitReturnRequest(dto: SubmitReturnRequestDTO) : ReturnRequest
 }
 
 class ReturnRequestServiceImpl {
     - orderRepository : OrderRepository
-    - returnRepository : ReturnRequestRepository
-    + getOrdersByCustomer(customerId: Long) : List<Order>
+    - returnRequestRepository : ReturnRequestRepository
+    - orderItemRepository : OrderItemRepository
+    + getReturnRequestsByCustomer(customerId: Long) : List<ReturnRequestResponseDTO>
     + getOrderForReturn(orderId: Long) : Order
     + validateReturnEligibility(orderId: Long, itemIds: List<Long>) : List<OrderItem>
-    + submitReturnRequest(dto: SubmitReturnRequestDTO, images: List<String>) : ReturnRequest
-    - createReturnRequest(dto: SubmitReturnRequestDTO) : ReturnRequest
+    + submitReturnRequest(dto: SubmitReturnRequestDTO) : ReturnRequest
 }
 
 ' Repository
 interface OrderRepository <<interface>> {
-    + findByCustomerId(customerId: Long) : List<Order>
-    + findById(orderId: Long) : Order
+    + findById(orderId: Long) : Optional<Order>
 }
 
 interface ReturnRequestRepository <<interface>> {
-    + existsByOrderItemIdIn(itemIds: List<Long>) : Boolean
-    + save(returnRequest: ReturnRequest) : ReturnRequest
+    + save(entity: S) : <S extends T> S
+    + findByCustomerId(customerId: Long) : List<ReturnRequest>
+}
+
+interface OrderItemRepository <<interface>> {
+    + save(entity: S) : <S extends T> S
 }
 
 ' DTO
-
 class SubmitReturnRequestDTO {
     - orderId : Long
     - itemIds : List<Long>
     - reason : String
     - description : String
+    - imageUrls : List<String>
 }
 
-class MessageResponseDTO {
-    - message : String
+class ReturnRequestResponseDTO {
+    - id : Long
+    - status : String
+    - reason : String
+    - orderId : Long
 }
 
 ' Entity
-
 class ReturnRequest {
     - id : Long
     - status : ReturnStatus
@@ -62,17 +65,21 @@ class ReturnRequest {
     - requestDate : Date
     - processedAt : Date
     - rejectionReason : String
+    - imageUrls : List<String>
 }
 
 class Order {
     - id : Long
+    - status : OrderStatus
+    - orderDate : Date
 }
 
 class OrderItem {
     - id : Long
+    - price : Double
+    - quantity : Long
+    - productName : String
     - status : OrderStatus
-    - refundStatus : RefundStatus
-    - cancellationReason : String
 }
 
 ' Relationships
@@ -83,12 +90,14 @@ ReturnRequestServiceImpl ..|> ReturnRequestService
 ' Dependency Injection
 ReturnRequestController --> ReturnRequestService : - returnRequestService
 ReturnRequestServiceImpl --> OrderRepository : - orderRepository
-ReturnRequestServiceImpl --> ReturnRequestRepository : - returnRepository
+ReturnRequestServiceImpl --> ReturnRequestRepository : - returnRequestRepository
+ReturnRequestServiceImpl --> OrderItemRepository : - orderItemRepository
 
 ' Object Usage
 ReturnRequestController ..> SubmitReturnRequestDTO : <<uses>>
-ReturnRequestController ..> MessageResponseDTO : <<returns>>
+ReturnRequestController ..> ReturnRequestResponseDTO : <<returns>>
 ReturnRequestServiceImpl ..> SubmitReturnRequestDTO : <<uses>>
+ReturnRequestServiceImpl ..> ReturnRequestResponseDTO : <<returns>>
 
 ReturnRequestServiceImpl ..> ReturnRequest : <<creates>>
 ReturnRequestRepository ..> ReturnRequest : <<manages>>
@@ -97,5 +106,6 @@ ReturnRequestServiceImpl ..> Order : <<uses>>
 OrderRepository ..> Order : <<manages>>
 
 ReturnRequestServiceImpl ..> OrderItem : <<uses>>
+OrderItemRepository ..> OrderItem : <<manages>>
 
 @enduml

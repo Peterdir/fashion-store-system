@@ -4,12 +4,12 @@ title Activity Diagram (Swimlane) - Registration (UC01)
 |Client (UI)|
 start
 :Mở trang đăng ký;
-:Nhập thông tin (username, email, password,...);
+:Nhập thông tin (fullName, phone, email, password, confirmPassword);
 :Nhấn "Đăng ký";
-:Gửi request register(data);
+:Gửi request POST /api/auth/register (RegisterRequestDTO);
 
 |System (Service)|
-:Validate thông tin đăng ký;
+:Validate thông tin (ex: mật khẩu khớp);
 
 if (Thông tin hợp lệ?) then (Không)
     |Client (UI)|
@@ -19,32 +19,33 @@ else (Có)
     |System (Service)|
     :Kiểm tra trùng email/số điện thoại;
 
-    if (Thông tin đã tồn tại?) then (Có)
+    if (Dữ liệu đã tồn tại?) then (Có)
         |Client (UI)|
-        :Hiển thị thông báo trùng dữ liệu;
+        :Hiển thị thông báo (Email / SĐT đã tồn tại);
         stop
     else (Không)
         |System (Service)|
-        :Bắt đầu DB transaction;
         :Mã hóa mật khẩu;
-        :Tạo verification token;
+        :Tạo đối tượng User (status = PENDING);
+        :Tạo verification token và gắn vào User;
 
         |Database (MySQL)|
-        :Lưu user (status = PENDING);
-        :Lưu verification token;
+        :Lưu User;
 
         |System (Service)|
         if (Lưu DB thành công?) then (Có)
-            :COMMIT transaction;
             |Email Service|
-            :Tạo link verify?token=xxx;
-            :Gửi email xác thực;
-            |Client (UI)|
-            :Hiển thị đăng ký thành công;
-            :Yêu cầu kiểm tra email;
+            :Thử gửi email xác thực kèm token;
+            if (Gửi email thành công?) then (Có)
+                |Client (UI)|
+                :Hiển thị "Đăng ký thành công. Vui lòng kiểm tra email";
+            else (Không - Bị lỗi)
+                |Client (UI)|
+                :Hiển thị "Đăng ký thành công nhưng không thể gửi email. Nhờ dùng tính năng 'Gửi lại mã'";
+            endif
         else (Không)
             |System (Service)|
-            :ROLLBACK transaction;
+            :Ném ngoại lệ lỗi lưu trữ;
             |Client (UI)|
             :Hiển thị lỗi hệ thống;
             stop
@@ -54,15 +55,16 @@ endif
 
 |Client (UI)|
 if (Người dùng chọn "Gửi lại mã"?) then (Có)
-    :Gửi request resendVerification;
+    :Gửi request POST /api/auth/resend-verification;
     |System (Service)|
-    :Tạo token mới;
+    :Tạo token mới cho User;
     |Database (MySQL)|
-    :Cập nhật token;
+    :Cập nhật cập token;
     |Email Service|
-    :Gửi lại email;
+    :Gửi lại email xác thực;
     |Client (UI)|
-    :Thông báo đã gửi lại;
+    :Hiển thị "Gửi lại email thành công";
+else (Không)
 endif
 
 stop

@@ -4,7 +4,14 @@ title Class Diagram : Place Order (UC11)
 ' Controller
 class OrderController {
     - orderService: OrderService
-    + processOrder(dto: PlaceOrderRequestDTO) : PlaceOrderResponseDTO
+    + placeOrder(dto: PlaceOrderRequestDTO) : ResponseEntity<PlaceOrderResponseDTO>
+}
+
+class CheckoutPageController {
+    - momoService : MomoService
+    + checkout() : String
+    + paymentSummary(orderId: Long, model: Model) : String
+    + mockMomoPayment(orderId: String, amount: String, model: Model) : String
 }
 
 ' Service
@@ -25,29 +32,30 @@ class OrderServiceImpl {
 
 ' Repository
 interface ProductVariantRepository <<interface>> {
-    + findById(variantId: Long) : ProductVariant
-    + save(variant: ProductVariant) : ProductVariant
+    + findById(variantId: Long) : Optional<ProductVariant>
+    + save(entity: S) : <S extends T> S
 }
 
 interface OrderRepository <<interface>> {
-    + save(order: Order) : Order
+    + save(entity: S) : <S extends T> S
 }
 
 interface OrderItemRepository <<interface>> {
-    + save(orderItem: OrderItem) : OrderItem
+    + save(entity: S) : <S extends T> S
 }
 
 interface CartRepository <<interface>> {
-    + deleteAllById(selectedCartItemIds: List<Long>) : void
+    + deleteAllById(ids: Iterable<? extends ID>) : void
 }
 
 interface CouponRepository <<interface>> {
-    + findByCode(code: String) : Coupon
+    + findByCode(code: String) : Optional<Coupon>
 }
 
 ' DTO
 
 class PlaceOrderRequestDTO {
+    - userId : Long
     - cartItemIds : List<Long>
     - shippingAddress : String
     - paymentMethod : PaymentMethod
@@ -70,15 +78,19 @@ class Order {
     - shippingAddress : String
     - paymentMethod : PaymentMethod
     - type : OrderType
+    - status : OrderStatus
+    - hiddenByUser : Boolean
 }
 
 class OrderItem {
     - id : Long
     - quantity : Long
+    - price : Double
     - productName : String
     - status : OrderStatus
     - refundStatus : RefundStatus
     - cancellationReason : String
+    - isReviewed : boolean
 }
 
 class ProductVariant {

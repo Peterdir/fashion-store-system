@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout}">
 <head>
-    <title>Giỏ hàng | H&Y Digital Curator</title>
+    <title>Giỏ hàng | H&Y H&Y Fashion</title>
     <style>
         .qty-popover {
             display: none;
@@ -168,18 +168,9 @@
                     <!-- Payment Methods Section -->
                     <div class="bg-surface-low/50 p-8 border border-outline/5">
                         <h3 class="text-[9px] font-black uppercase tracking-[0.3em] mb-6 opacity-40">Chúng tôi chấp nhận</h3>
-                        <div class="grid grid-cols-4 gap-3 opacity-40 grayscale hover:grayscale-0 transition-all duration-500 cursor-default">
-                            <div class="h-10 bg-white flex items-center justify-center p-2 border border-outline/5 hover:border-primary/20 transition-colors">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" class="max-h-full opacity-80" alt="Visa">
-                            </div>
-                            <div class="h-10 bg-white flex items-center justify-center p-2 border border-outline/5 hover:border-primary/20 transition-colors">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" class="max-h-full opacity-80" alt="Mastercard">
-                            </div>
-                            <div class="h-10 bg-white flex items-center justify-center p-2 border border-outline/5 hover:border-primary/20 transition-colors">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="max-h-full opacity-80" alt="PayPal">
-                            </div>
-                            <div class="h-10 bg-white flex items-center justify-center p-2 border border-outline/5 hover:border-primary/20 transition-colors">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg" class="max-h-full opacity-80" alt="Apple Pay">
+                        <div class="flex items-center justify-start opacity-60 hover:opacity-100 transition-all duration-500 cursor-default">
+                            <div class="h-12 w-12 bg-white flex items-center justify-center p-1 border border-outline/5 hover:border-primary/20 transition-colors shadow-sm">
+                                <img th:src="@{/images/momo_logo_clean_1774838615190.png}" class="max-h-full rounded-lg" alt="MoMo">
                             </div>
                         </div>
                         <div class="mt-6 flex items-center gap-2 text-[8.5px] font-black text-on-surface-variant uppercase tracking-widest opacity-40">
@@ -197,3 +188,4 @@
     </th:block>
 </body>
 </html>
+
