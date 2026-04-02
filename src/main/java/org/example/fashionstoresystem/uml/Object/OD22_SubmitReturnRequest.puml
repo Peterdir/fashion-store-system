@@ -19,12 +19,12 @@ object "order : Order" as order {
 ' Entity - Items selected for return
 object "item1 : OrderItem" as item1 {
     id = 201
-    refundStatus = "RETURN_REQUESTED"
+    refundStatus = "PENDING"
 }
 
 object "item2 : OrderItem" as item2 {
     id = 202
-    refundStatus = "RETURN_REQUESTED"
+    refundStatus = "PENDING"
 }
 
 ' Structural relationships (OrderItems belong to Order)
@@ -34,7 +34,7 @@ order *-- item2
 ' Entity - Return request created
 object "returnRequest : ReturnRequest" as rr {
     id = 301
-    status = "PENDING_APPROVAL"
+    status = "PENDING"
     reason = "Lỗi sản phẩm"
     description = "Sản phẩm bị trầy xước"
     requestDate = "2026-03-19"
@@ -52,7 +52,7 @@ end note
 
 note right of rr
     Return request is created
-    with status "PENDING_APPROVAL"
+    with status "PENDING"
     awaiting admin review
 end note
 

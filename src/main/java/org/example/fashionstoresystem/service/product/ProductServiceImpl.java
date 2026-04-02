@@ -50,13 +50,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductSummaryResponseDTO> getProducts(String keyword, Double minPrice, Double maxPrice,
-            Pageable pageable) {
-        // Sử dụng phương thức tìm kiếm linh hoạt với Keyword và Lọc giá
+    public Page<ProductSummaryResponseDTO> getProducts(String keyword, Pageable pageable) {
+        // Sử dụng phương thức tìm kiếm linh hoạt với Keyword
         Page<Product> productsPage = productRepository.findFiltered(
                 (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null,
-                minPrice,
-                maxPrice,
                 pageable);
 
         // Map Entity sang DTO

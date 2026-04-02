@@ -12,14 +12,14 @@ participant "Product\n(Entity)" as Entity
 database "MySQL\n(Database)" as DB
 
 == Load Product Category Page ==
-User -> View : Access Product List page with filters
-View -> Controller : category(keyword, minPrice, maxPrice, pageable)
+User -> View : Access Product List page
+View -> Controller : category(keyword, pageable)
 note right: GET /category
-Controller -> Service : getProducts(keyword, minPrice, maxPrice, pageable)
+Controller -> Service : getProducts(keyword, pageable)
 
 group Process product query
-    Service -> Repository : findFiltered(keyword, minPrice, maxPrice, pageable)
-    Repository -> DB : SELECT ... WHERE (filters)
+    Service -> Repository : findFiltered(keyword, pageable)
+    Repository -> DB : SELECT ... WHERE (status='ACTIVE' AND keyword=...)
     DB --> Repository : Page<Product>
     Repository --> Service : Page<Product>
 end

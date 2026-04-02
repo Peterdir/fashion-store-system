@@ -2,7 +2,7 @@
 title Object Diagram: Place Order (UC11)\nScenario: Customer places an order with 2 items and applies a coupon
 
 ' DTO - Data sent from checkout form
-object "registerRequestDto : PlaceOrderRequestDTO" as dto {
+object "placeOrderRequestDto : PlaceOrderRequestDTO" as dto {
     cartItemIds = [101, 102]
     shippingAddress = "123 Nguyen Hue, Q1, HCM"
     paymentMethod = "COD"
@@ -27,8 +27,8 @@ object "coupon : Coupon" as coupon {
 object "order : Order" as order {
     id = 1001
     orderDate = "2026-03-19"
-    totalAmount = 2050000.0
-    status = "PENDING"
+    totalAmount = 3300000.0
+    status = "PENDING_PAYMENT"
     shippingAddress = "123 Nguyen Hue, Q1, HCM"
     paymentMethod = "COD"
     type = "ONLINE"
@@ -74,8 +74,8 @@ object "variant2 : ProductVariant" as v2 {
 ' Response DTO
 object "response : PlaceOrderResponseDTO" as res {
     orderId = 1001
-    totalAmount = 2050000.0
-    status = "PENDING"
+    totalAmount = 3300000.0
+    status = "PENDING_PAYMENT"
     message = "Order placed successfully!"
 }
 
@@ -91,6 +91,7 @@ note bottom of order
     Order belongs to User "Nguyen Van A"
     Coupon "SALE50" applied: -50,000d
     totalAmount = (1,250,000 x 2) + (850,000 x 1) - 50,000
+                = 3,300,000 VND
 end note
 
 note bottom of v1

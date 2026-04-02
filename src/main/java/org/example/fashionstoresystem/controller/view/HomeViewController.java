@@ -22,7 +22,7 @@ public class HomeViewController {
         model.addAttribute("categories", categoryService.getRootCategories());
         
         // Lấy 8 sản phẩm mới nhất
-        model.addAttribute("featuredProducts", productService.getProducts(null, null, null, 
+        model.addAttribute("featuredProducts", productService.getProducts(null, 
                 PageRequest.of(0, 8, Sort.by("id").descending())).getContent());
                 
         return "pages/index";

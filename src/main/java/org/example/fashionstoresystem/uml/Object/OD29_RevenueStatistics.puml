@@ -6,48 +6,45 @@ object "report : RevenueReportDTO" as report {
     onlineRevenue = 3350000.0
     offlineRevenue = 3500000.0
     totalOrders = 2
-    revenueByDay = {"2026-03-05": 3350000.0, "2026-03-12": 3500000.0}
 }
 
-' DTO - Order 1 summary
-object "order1 : OrderSummaryResponseDTO" as o1 {
+' DTO - Order 1 summary (Nested OrderSummaryDTO)
+object "order1 : RevenueReportDTO::OrderSummaryDTO" as o1 {
     orderId = 1001
     orderDate = "2026-03-05"
     totalAmount = 3350000.0
-    paymentMethod = "COD"
+    type = "ONLINE"
     itemCount = 3
-    statusSummary = {"DELIVERED": 3}
 }
 
-object "item1_1 : OrderItemPreviewDTO" as i1_1 {
+object "item1_1 : RevenueReportDTO::OrderItemDTO" as i1_1 {
     productName = "Áo Thun Trơn"
     quantity = 1
     price = 850000.0
 }
 
-object "item1_2 : OrderItemPreviewDTO" as i1_2 {
+object "item1_2 : RevenueReportDTO::OrderItemDTO" as i1_2 {
     productName = "Quần Kaki"
     quantity = 2
     price = 1250000.0
 }
 
-' DTO - Order 2 summary
-object "order2 : OrderSummaryResponseDTO" as o2 {
+' DTO - Order 2 summary (Nested OrderSummaryDTO)
+object "order2 : RevenueReportDTO::OrderSummaryDTO" as o2 {
     orderId = 1015
     orderDate = "2026-03-12"
     totalAmount = 3500000.0
-    paymentMethod = "CASH"
+    type = "OFFLINE"
     itemCount = 2
-    statusSummary = {"PAID": 2}
 }
 
-object "item2_1 : OrderItemPreviewDTO" as i2_1 {
+object "item2_1 : RevenueReportDTO::OrderItemDTO" as i2_1 {
     productName = "Áo Khoác Da"
     quantity = 1
     price = 2500000.0
 }
 
-object "item2_2 : OrderItemPreviewDTO" as i2_2 {
+object "item2_2 : RevenueReportDTO::OrderItemDTO" as i2_2 {
     productName = "Áo Sơ Mi"
     quantity = 1
     price = 1000000.0
