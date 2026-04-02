@@ -983,7 +983,7 @@
                                 <h2 class="text-xs font-black uppercase tracking-[0.2em]">Đánh giá sản phẩm</h2>
                                 <button onclick="OrderModule.closeReviewModal()" class="material-symbols-outlined text-xl hover:rotate-90 transition-transform">close</button>
                             </div>
-                            <div class="p-6 space-y-6">
+                            <div class="p-6 space-y-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
                                 <div class="flex items-center gap-4 bg-neutral-50 p-4 border border-black/5">
                                     <div class="w-16 h-20 shrink-0 border border-black/10 bg-white"><img id="review-product-img" src="" class="w-full h-full object-cover"></div>
                                     <div class="flex-1 min-w-0">
@@ -1010,10 +1010,31 @@
                                     <label class="text-[10px] font-bold tracking-wide text-gray-400">Chia sẻ cảm nhận của bạn</label>
                                     <textarea id="review-comment" rows="4" class="w-full bg-white border border-black p-4 text-[11px] font-bold tracking-tight focus:ring-0 outline-none resize-none placeholder:text-gray-200 text-black" placeholder="Bạn thấy sản phẩm như thế nào? Hãy chia sẻ cùng H&Y nhé..."></textarea>
                                 </div>
-                                <div class="flex gap-4 pt-2">
-                                    <button onclick="OrderModule.closeReviewModal()" class="flex-1 border border-black px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-50 transition-all text-black">Trở lại</button>
-                                    <button onclick="OrderModule.submitReview()" class="flex-1 bg-black text-white px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-800 transition-all shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">Gửi đánh giá</button>
+
+                                <!-- Review Images Upload -->
+                                <div class="space-y-3">
+                                    <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">Hình ảnh thực tế (Tối đa 5)</label>
+                                    <input type="file" id="review-image-input" multiple accept="image/*" class="hidden" onchange="OrderModule.handleReviewImageSelect(event)">
+                                    <div class="flex flex-wrap gap-3">
+                                        <div id="review-image-previews" class="contents">
+                                            <!-- JS Populated -->
+                                        </div>
+                                        <button type="button" id="add-review-image-btn" onclick="document.getElementById('review-image-input').click()" 
+                                                class="w-[70px] h-[70px] border border-dashed border-black/20 flex flex-col items-center justify-center gap-1 hover:border-black hover:bg-gray-50 transition-all text-gray-300 hover:text-black group">
+                                            <span class="material-symbols-outlined text-xl">add_a_photo</span>
+                                            <span class="text-[7px] font-black uppercase tracking-tighter">Thêm ảnh</span>
+                                        </button>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-[8px] text-gray-400 uppercase font-bold tracking-widest">Định dạng: JPG, PNG • Tối đa 2MB/ảnh</p>
+                                        <p id="review-image-counter" class="text-[8px] text-black font-black uppercase tracking-widest">0/5 Ảnh</p>
+                                    </div>
                                 </div>
+                            </div>
+
+                            <div class="px-6 py-5 border-t border-black/5 bg-gray-50 flex gap-4">
+                                <button onclick="OrderModule.closeReviewModal()" class="flex-1 border border-black px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-50 transition-all text-black">Trở lại</button>
+                                <button onclick="OrderModule.submitReview()" class="flex-1 bg-black text-white px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-800 transition-all shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">Gửi đánh giá</button>
                             </div>
                         </div>
                     </div>

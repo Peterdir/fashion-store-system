@@ -65,5 +65,6 @@ public class ProductDetailResponseDTO {
         private String size;
         private String color;
         private Instant createdAt;
+        private List<String> imageUrls;
     }
 }

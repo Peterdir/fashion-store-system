@@ -11,6 +11,7 @@ import org.example.fashionstoresystem.entity.jpa.Category;
 import org.example.fashionstoresystem.entity.jpa.Product;
 import org.example.fashionstoresystem.entity.jpa.ProductImage;
 import org.example.fashionstoresystem.entity.jpa.ProductVariant;
+import org.example.fashionstoresystem.entity.jpa.ReviewImage;
 import org.example.fashionstoresystem.repository.CategoryRepository;
 import org.example.fashionstoresystem.repository.ProductRepository;
 import org.springframework.data.domain.PageRequest;
@@ -145,6 +146,7 @@ public class ProductServiceImpl implements ProductService {
                                 .size(r.getOrderItem() != null && r.getOrderItem().getProductVariant() != null ? r.getOrderItem().getProductVariant().getSize() : "Freesize")
                                 .color(r.getOrderItem() != null && r.getOrderItem().getProductVariant() != null ? r.getOrderItem().getProductVariant().getColor() : "Mặc định")
                                 .createdAt(r.getCreatedAt())
+                                .imageUrls(r.getImages().stream().map(ReviewImage::getImageUrl).toList())
                                 .build())
                         .collect(Collectors.toList()))
                 .build();

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -24,4 +25,5 @@ public class ReviewResponseDTO {
     private Double price;
     private Date orderDate;
     private Instant createdAt;
+    private List<String> imageUrls;
 }

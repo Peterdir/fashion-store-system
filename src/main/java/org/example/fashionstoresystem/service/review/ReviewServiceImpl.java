@@ -5,10 +5,7 @@ import org.example.fashionstoresystem.dto.request.SubmitReviewRequestDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.dto.response.ReviewResponseDTO;
 import org.example.fashionstoresystem.entity.enums.OrderStatus;
-import org.example.fashionstoresystem.entity.jpa.OrderItem;
-import org.example.fashionstoresystem.entity.jpa.Product;
-import org.example.fashionstoresystem.entity.jpa.Review;
-import org.example.fashionstoresystem.entity.jpa.User;
+import org.example.fashionstoresystem.entity.jpa.*;
 import org.example.fashionstoresystem.repository.OrderItemRepository;
 import org.example.fashionstoresystem.repository.ProductRepository;
 import org.example.fashionstoresystem.repository.ReviewRepository;
@@ -66,6 +63,17 @@ public class ReviewServiceImpl implements ReviewService {
                 .comment(dto.getComment())
                 .createdAt(Instant.now())
                 .build();
+
+        // Thêm hình ảnh nếu có
+        if (dto.getImageUrls() != null && !dto.getImageUrls().isEmpty()) {
+            java.util.List<ReviewImage> reviewImages = dto.getImageUrls().stream()
+                    .map(url -> ReviewImage.builder()
+                            .imageUrl(url)
+                            .review(review)
+                            .build())
+                    .toList();
+            review.getImages().addAll(reviewImages);
+        }
 
         // Nếu có orderItemId, đánh dấu OrderItem là đã đánh giá
         if (dto.getOrderItemId() != null) {
@@ -127,6 +135,12 @@ public class ReviewServiceImpl implements ReviewService {
                 .rating(review.getRating())
                 .comment(review.getComment())
                 .createdAt(review.getCreatedAt());
+
+        if (review.getImages() != null && !review.getImages().isEmpty()) {
+            builder.imageUrls(review.getImages().stream()
+                    .map(ReviewImage::getImageUrl)
+                    .toList());
+        }
 
         // Bổ sung thông tin đơn hàng (Sử dụng cơ chế Fallback nếu thiếu liên kết trực tiếp)
         OrderItem orderItem = review.getOrderItem();

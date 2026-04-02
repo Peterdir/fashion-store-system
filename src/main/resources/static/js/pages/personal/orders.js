@@ -6,7 +6,8 @@
 const OrderModule = {
     currentStatus: 'all',
     currentPage: 0,
-    selectedReturnImages: [], // Base64 strings
+    selectedReturnImages: [], // Base64 strings for returns
+    selectedReviewImages: [], // Base64 strings for reviews
 
     /**
      * Initialize Module
@@ -680,6 +681,78 @@ const OrderModule = {
     },
 
     /**
+     * Handle Image Selection for Product Review
+     */
+    async handleReviewImageSelect(event) {
+        const files = Array.from(event.target.files);
+        const maxImages = 5;
+        const maxSize = 2 * 1024 * 1024; // 2MB
+
+        if (this.selectedReviewImages.length + files.length > maxImages) {
+            alert(`Bạn chỉ có thể chọn tối đa ${maxImages} hình ảnh.`);
+            return;
+        }
+
+        for (const file of files) {
+            if (file.size > maxSize) {
+                alert(`Ảnh "${file.name}" vượt quá kích thước 2MB. Vui lòng chọn ảnh nhẹ hơn.`);
+                continue;
+            }
+
+            try {
+                const base64 = await this.convertToBase64(file);
+                this.selectedReviewImages.push(base64);
+            } catch (error) {
+                console.error('Error converting image:', error);
+            }
+        }
+
+        this.renderReviewImagePreviews();
+        event.target.value = ''; // Reset input
+    },
+
+    /**
+     * Render Review Image Previews
+     */
+    renderReviewImagePreviews() {
+        const container = document.getElementById('review-image-previews');
+        const counter = document.getElementById('review-image-counter');
+        const addBtn = document.getElementById('add-review-image-btn');
+
+        if (!container) return;
+
+        container.innerHTML = this.selectedReviewImages.map((img, index) => `
+            <div class="relative w-[70px] h-[70px] group border border-outline/10">
+                <img src="${img}" class="w-full h-full object-cover">
+                <button type="button" onclick="OrderModule.removeReviewImage(${index})" 
+                        class="absolute -top-2 -right-2 bg-black text-white rounded-full w-5 h-5 flex items-center justify-center shadow-lg hover:bg-red-500 transition-colors">
+                    <span class="material-symbols-outlined text-[12px]">close</span>
+                </button>
+            </div>
+        `).join('');
+
+        if (counter) {
+            counter.textContent = `${this.selectedReviewImages.length}/5 Ảnh`;
+        }
+
+        if (addBtn) {
+            if (this.selectedReviewImages.length >= 5) {
+                addBtn.classList.add('hidden');
+            } else {
+                addBtn.classList.remove('hidden');
+            }
+        }
+    },
+
+    /**
+     * Remove Review Image
+     */
+    removeReviewImage(index) {
+        this.selectedReviewImages.splice(index, 1);
+        this.renderReviewImagePreviews();
+    },
+
+    /**
      * Show Premium Success Modal
      */
     showReturnSuccess() {
@@ -1024,6 +1097,8 @@ const OrderModule = {
         // Reset modal
         this.selectRating(0);
         document.getElementById('review-comment').value = '';
+        this.selectedReviewImages = [];
+        this.renderReviewImagePreviews();
         
         // Hide error message if any
         const errorMsg = document.getElementById('review-rating-error');
@@ -1089,10 +1164,15 @@ const OrderModule = {
     },
 
     async submitReview() {
-        const productId = document.getElementById('review-product-id').value;
-        const orderItemId = document.getElementById('review-order-item-id').value;
+        const productIdStr = document.getElementById('review-product-id').value;
+        const orderItemIdStr = document.getElementById('review-order-item-id').value;
         const rating = parseInt(document.getElementById('review-rating-value').value);
         const comment = document.getElementById('review-comment').value;
+
+        if (!productIdStr || productIdStr === "undefined") {
+            alert('Lỗi: Không tìm thấy mã sản phẩm (Product ID). Vui lòng thử lại.');
+            return;
+        }
 
         if (rating === 0) {
             const errorMsg = document.getElementById('review-rating-error');
@@ -1100,11 +1180,23 @@ const OrderModule = {
             return;
         }
 
+        // Prepare payload, ensuring we don't send NaN (JSON.stringify converts NaN to null)
+        const payload = { 
+            productId: parseInt(productIdStr), 
+            orderItemId: (orderItemIdStr && orderItemIdStr !== "undefined") ? parseInt(orderItemIdStr) : null, 
+            rating, 
+            comment,
+            imageUrls: this.selectedReviewImages
+        };
+
+        // For debugging 400 errors
+        console.log('Submitting review payload:', payload);
+
         try {
             const response = await fetch('/api/reviews', { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId, orderItemId, rating, comment })
+                body: JSON.stringify(payload)
             });
 
             if (response.ok) {
@@ -1113,7 +1205,8 @@ const OrderModule = {
                 this.loadOrders(this.currentStatus);
             } else {
                 const err = await response.json();
-                alert('Lỗi: ' + (err.message || 'Không thể gửi đánh giá.'));
+                console.error('Server error response:', err);
+                alert('Lỗi gửi đánh giá: ' + (err.message || 'Dữ liệu không hợp lệ hoặc hình ảnh quá lớn.'));
             }
         } catch (error) {
             console.error('Submit review error:', error);
@@ -1401,6 +1494,18 @@ const OrderModule = {
                                     <p class="text-[11px] font-bold text-black leading-relaxed italic relative z-10 pl-1">
                                         "${review.comment || 'Không có bình luận.'}"
                                     </p>
+                                    
+                                    <!-- Review Images Display -->
+                                    ${review.imageUrls && review.imageUrls.length > 0 ? `
+                                    <div class="mt-4 flex flex-wrap gap-2 relative z-10">
+                                        ${review.imageUrls.map(url => `
+                                            <div class="w-16 h-16 border border-black/5 overflow-hidden shadow-sm cursor-zoom-in" onclick="window.open('${url}', '_blank')">
+                                                <img src="${url}" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    ` : ''}
+
                                     <div class="mt-2 flex items-center justify-between">
                                         <span class="text-[8px] font-black uppercase tracking-widest text-black/20 italic">
                                             Ngày đánh giá: ${reviewDate}

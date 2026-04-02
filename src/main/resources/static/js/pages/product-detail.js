@@ -202,14 +202,23 @@ function updateFinalVariant() {
 /**
  * LIGHTBOX LOGIC
  */
-function openLightbox() {
-    const mainImg = document.getElementById('main-product-image');
+function openLightbox(url) {
     const lightbox = document.getElementById('image-lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
     
-    if (!mainImg || !lightbox || !lightboxImg) return;
+    if (!lightbox || !lightboxImg) return;
 
-    lightboxImg.src = mainImg.src;
+    // If a URL is provided, use it. Otherwise, fallback to the main product image.
+    if (url && typeof url === 'string') {
+        lightboxImg.src = url;
+    } else {
+        const mainImg = document.getElementById('main-product-image');
+        if (mainImg) {
+            lightboxImg.src = mainImg.src;
+        } else {
+            return;
+        }
+    }
     
     // Show modal
     lightbox.classList.remove('hidden');
