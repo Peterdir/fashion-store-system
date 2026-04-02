@@ -1036,6 +1036,44 @@
                         </div>
                     </div>
 
+                    <!-- Delete Account Confirmation Modal -->
+                    <div id="pc-delete-account-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6">
+                        <div class="bg-backdrop absolute inset-0 bg-red-50/20 backdrop-blur-md opacity-0 transition-opacity duration-500"></div>
+                        <div class="bg-modal relative bg-white w-full max-w-[400px] p-10 shadow-[0_40px_80px_rgba(220,38,38,0.15)] border border-red-600 text-center transform scale-95 opacity-0 transition-all duration-400">
+                            <!-- Warning Icon -->
+                            <div class="mb-8 flex justify-center">
+                                <div class="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center border-4 border-red-100 animate-pulse">
+                                    <span class="material-symbols-outlined text-4xl text-red-600">warning</span>
+                                </div>
+                            </div>
+                            
+                            <h3 class="text-lg font-black uppercase tracking-tighter mb-4 text-red-600">Xóa tài khoản vĩnh viễn?</h3>
+                            <p class="text-[11px] font-bold text-gray-400 tracking-tight leading-loose mb-8">
+                                CẢNH BÁO: Hành động này sẽ đóng tài khoản của bạn vĩnh viễn. Mọi dữ liệu đơn hàng và ưu đãi sẽ không thể khôi phục.
+                            </p>
+
+                            <!-- Confirm Input Section -->
+                            <div class="mb-8 space-y-3">
+                                <label class="text-[10px] font-black uppercase tracking-widest text-gray-500">Gõ <span class="text-red-600">CONFIRM</span> để xác nhận</label>
+                                <input type="text" id="pc-delete-confirm-input" 
+                                       class="w-full border-2 border-red-100 bg-red-50/30 px-4 py-3 text-center text-sm font-black tracking-[0.2em] focus:border-red-600 focus:ring-0 outline-none transition-all placeholder:text-red-200"
+                                       placeholder="Xác nhận...">
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="space-y-3">
+                                <button id="pc-confirm-delete-btn" disabled
+                                        class="w-full bg-red-600 text-white px-8 py-4 text-[11px] font-black tracking-widest uppercase hover:bg-black transition-all shadow-xl active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed">
+                                    Xóa tài khoản của tôi
+                                </button>
+                                <button onclick="PersonalCenter.closeDeleteAccountModal()" 
+                                        class="w-full border border-gray-200 text-gray-400 px-8 py-4 text-[11px] font-black tracking-widest uppercase hover:bg-gray-50 hover:text-black transition-all">
+                                    Tôi đã đổi ý
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <style>
                         .success-checkmark, .error-xmark { width: 80px; height: 100px; margin: 0 auto; position: relative; }
                         .check-icon { width: 80px; height: 80px; position: relative; border-radius: 50%; box-sizing: content-box; border: 4px solid #58b76c; }

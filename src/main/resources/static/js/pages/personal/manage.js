@@ -257,37 +257,85 @@ Object.assign(PersonalCenter, {
 
 
     /**
-     * Confirm and Delete Account
+     * Confirm and Delete Account (Open Modal)
      */
     confirmDeleteAccount() {
-        const confirmed = confirm('CẢNH BÁO: Hành động này sẽ khóa tài khoản của bạn vĩnh viễn và không thể hoàn tác. Bạn có chắc chắn muốn tiếp tục?');
-        if (!confirmed) return;
+        const modal = document.getElementById('pc-delete-account-modal');
+        if (!modal) return;
 
-        const doubleConfirmed = prompt('Vui lòng nhập "CONFIRM" để xác nhận việc xóa tài khoản:');
-        if (doubleConfirmed !== 'CONFIRM') {
-            if (window.Toast) Toast.warning('Xác nhận không khớp, hành động đã bị hủy.');
-            return;
-        }
+        const backdrop = modal.querySelector('.bg-backdrop');
+        const content = modal.querySelector('.bg-modal');
+        const input = document.getElementById('pc-delete-confirm-input');
+        const confirmBtn = document.getElementById('pc-confirm-delete-btn');
 
-        this.executeDeleteAccount();
+        // Reset state
+        input.value = '';
+        confirmBtn.disabled = true;
+
+        // Show modal
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            backdrop.classList.add('show');
+            content.classList.add('show');
+        }, 10);
+
+        // Input listener for validation (Case-sensitive as requested)
+        input.oninput = (e) => {
+            confirmBtn.disabled = e.target.value !== 'CONFIRM';
+        };
+
+        // Confirm button click
+        confirmBtn.onclick = () => {
+            this.executeDeleteAccount();
+        };
+    },
+
+    /**
+     * Close Delete Account Modal
+     */
+    closeDeleteAccountModal() {
+        const modal = document.getElementById('pc-delete-account-modal');
+        if (!modal) return;
+
+        const backdrop = modal.querySelector('.bg-backdrop');
+        const content = modal.querySelector('.bg-modal');
+
+        backdrop.classList.remove('show');
+        content.classList.remove('show');
+
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 500);
     },
 
     async executeDeleteAccount() {
+        const confirmBtn = document.getElementById('pc-confirm-delete-btn');
+        const originalText = confirmBtn.innerHTML;
+        
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[12px]">sync</span> Processing...';
+
         try {
             const response = await fetch('/api/users/me', {
                 method: 'DELETE'
             });
 
             if (response.ok) {
-                alert('Tài khoản của bạn đã được đóng. Hẹn gặp lại!');
-                if (window.AuthUtils) AuthUtils.logout();
+                if (window.Toast) Toast.success('Tài khoản của bạn đã được xóa thành công.');
+                setTimeout(() => {
+                    if (window.AuthUtils) AuthUtils.logout();
+                }, 1500);
             } else {
                 const err = await response.json();
                 if (window.Toast) Toast.error(err.message || 'Lỗi khi xóa tài khoản!');
+                this.closeDeleteAccountModal();
             }
         } catch (error) {
             console.error('Delete account error:', error);
             if (window.Toast) Toast.error('Lỗi kết nối máy chủ!');
+            this.closeDeleteAccountModal();
+        } finally {
+            confirmBtn.innerHTML = originalText;
         }
     },
 
