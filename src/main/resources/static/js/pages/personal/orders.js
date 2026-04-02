@@ -373,6 +373,8 @@ const OrderModule = {
                 statusString = 'Chờ xác nhận';
                 statusColor = 'text-white bg-amber-500 border-amber-500'; break;
             case 'PAID':
+                statusString = 'Đã thanh toán';
+                statusColor = 'text-white bg-blue-600 border-blue-600'; break;
             case 'PROCESSING':
                 statusString = 'Đang chuẩn bị';
                 statusColor = 'text-white bg-blue-600 border-blue-600'; break;
@@ -506,8 +508,11 @@ const OrderModule = {
     },
     renderItemActions(item, status) {
         const orderId = item.orderId;
+        const isFailure = ['PAYMENT_EXPIRED', 'CANCELLED', 'PAYMENT_FAILED'].includes(status);
+        const isRefunded = item.refundStatus === 'COMPLETED';
         let buttons = '';
-        if (status === 'PAYMENT_EXPIRED' || status === 'CANCELLED' || status === 'PAYMENT_FAILED') {
+
+        if (isFailure || isRefunded) {
             buttons += `
                 <button onclick="OrderModule.repurchaseOrder(${orderId})" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-secondary hover:bg-neutral-50 transition-colors flex items-center justify-center gap-1">
                     <span class="material-symbols-outlined text-[13px]">refresh</span> Mua lại
@@ -522,7 +527,7 @@ const OrderModule = {
                         <span class="material-symbols-outlined text-[13px]">verified</span> Đã đánh giá
                     </div>
                 `;
-            } else {
+            } else if (!isRefunded) { // Only show review button if not refunded
                 buttons += `
                     <button onclick="OrderModule.openReviewModal(${item.productId}, ${item.orderItemId}, '${item.productName.replace(/'/g, "\\'")}', '${item.productImage}', '${item.color}', '${item.size}')" 
                             class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-amber-600 hover:bg-neutral-50 transition-colors flex items-center justify-center gap-1">
@@ -805,8 +810,8 @@ const OrderModule = {
 
         const strOrderIdFull = 'ORD-' + String(order.orderId).padStart(6, '0');
 
-        // Status display - Now using Dominant Status to avoid "passed" statuses showing up
-        const dominantStatus = this.getDominantStatus(order.statusSummary);
+        // Status display - Now using status provided by backend (synced with admin)
+        const dominantStatus = order.status || this.getDominantStatus(order.statusSummary);
         const label = this.getStatusLabel(dominantStatus);
 
         let colorClass = 'bg-gray-50 text-gray-500 border-gray-200';
@@ -1600,6 +1605,33 @@ const OrderModule = {
             </div>
         `;
         container.innerHTML = html;
+    },
+
+    /**
+     * Repurchase an order: Add all items from a past order back into the cart
+     */
+    async repurchaseOrder(orderId) {
+        if (!confirm('Bạn có muốn thêm tất cả sản phẩm trong đơn hàng này vào giỏ hàng để mua lại không?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/orders/${orderId}/repurchase`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                // Redirect to cart page after successful repurchase
+                alert('Đã thêm tất cả sản phẩm vào giỏ hàng thành công!');
+                window.location.href = '/cart';
+            } else {
+                const err = await response.json();
+                alert('Lỗi: ' + (err.message || 'Không thể thực hiện mua lại lúc này.'));
+            }
+        } catch (error) {
+            console.error('Repurchase error:', error);
+            alert('Lỗi kết nối server.');
+        }
     }
 };
 

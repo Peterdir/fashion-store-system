@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderDetailResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderSummaryResponseDTO;
+import org.example.fashionstoresystem.entity.enums.ReturnStatus;
+import org.example.fashionstoresystem.entity.jpa.ReturnRequest;
 import org.example.fashionstoresystem.entity.jpa.Order;
 import org.example.fashionstoresystem.repository.OrderRepository;
 import org.example.fashionstoresystem.entity.enums.OrderStatus;
@@ -11,6 +13,7 @@ import org.example.fashionstoresystem.entity.jpa.OrderHistory;
 import org.example.fashionstoresystem.entity.jpa.OrderItem;
 import org.example.fashionstoresystem.repository.OrderHistoryRepository;
 import org.example.fashionstoresystem.repository.OrderItemRepository;
+import org.example.fashionstoresystem.repository.ReturnRequestRepository;
 import org.example.fashionstoresystem.entity.enums.RefundStatus;
 import org.example.fashionstoresystem.service.notification.NotificationService;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,7 @@ public class OrderManagementServiceImpl implements OrderManagementService {
     private final OrderItemRepository orderItemRepository;
     private final OrderHistoryRepository historyRepository;
     private final OrderRepository orderRepository;
+    private final ReturnRequestRepository returnRequestRepository;
     private final NotificationService notificationService;
 
     @Override
@@ -53,6 +57,9 @@ public class OrderManagementServiceImpl implements OrderManagementService {
                 .build();
         historyRepository.save(history);
 
+        // Đồng bộ trạng thái đơn hàng tổng quát
+        updateOverallOrderStatus(item.getOrder());
+
         // Gửi thông báo cho user
         String content = "Sản phẩm '" + item.getProductName() + "' trong đơn hàng #" + item.getOrder().getId() + " đã chuyển sang trạng thái: " + newStatus;
         notificationService.createNotification(
@@ -62,6 +69,47 @@ public class OrderManagementServiceImpl implements OrderManagementService {
                 "INFO",
                 item.getOrder().getId()
         );
+    }
+
+    @Override
+    public void updateOverallOrderStatus(Order order) {
+        if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) return;
+
+        // Ưu tiên trạng thái của đơn hàng dựa trên các item
+        // Rule: Trạng thái của Đơn là trạng thái của item "chậm nhất" chưa bị hủy/lỗi.
+        // Nếu tất cả đã hoàn thành/hủy thì lấy trạng thái cuối cùng.
+        List<OrderStatus> statuses = order.getOrderItems().stream()
+                .map(OrderItem::getStatus)
+                .collect(Collectors.toList());
+
+        List<OrderStatus> priorityOrder = List.of(
+            OrderStatus.PAYMENT_FAILED, OrderStatus.PAYMENT_EXPIRED, OrderStatus.CANCELLED,
+            OrderStatus.PENDING_CONFIRMATION, OrderStatus.PENDING_PAYMENT, OrderStatus.PAID,
+            OrderStatus.PROCESSING, OrderStatus.SHIPPING, OrderStatus.DELIVERED, OrderStatus.COMPLETED
+        );
+
+        // Lọc các item active (không tính failure)
+        List<OrderStatus> activeStatuses = statuses.stream()
+                .filter(s -> s != OrderStatus.CANCELLED && s != OrderStatus.PAYMENT_FAILED && s != OrderStatus.PAYMENT_EXPIRED)
+                .toList();
+
+        OrderStatus dominantStatus;
+        if (activeStatuses.isEmpty()) {
+            // Tất cả đều đã bị hủy/lỗi: Lấy trạng thái đầu tiên tìm thấy (theo priority)
+            dominantStatus = statuses.stream()
+                .min((s1, s2) -> priorityOrder.indexOf(s1) - priorityOrder.indexOf(s2))
+                .orElse(OrderStatus.CANCELLED);
+        } else {
+            // Có ít nhất 1 item đang tiến triển: Lấy trạng thái "chậm" nhất của active items
+            dominantStatus = activeStatuses.stream()
+                .min((s1, s2) -> priorityOrder.indexOf(s1) - priorityOrder.indexOf(s2))
+                .orElse(activeStatuses.get(0));
+        }
+
+        if (order.getStatus() != dominantStatus) {
+            order.setStatus(dominantStatus);
+            orderRepository.save(order);
+        }
     }
 
     private void checkStatusTransition(OrderStatus currentStatus, OrderStatus newStatus) {
@@ -83,6 +131,7 @@ public class OrderManagementServiceImpl implements OrderManagementService {
                     .orderDate(o.getOrderDate())
                     .totalAmount(o.getTotalAmount())
                     .paymentMethod(o.getPaymentMethod())
+                    .status(o.getStatus())
                     .itemCount(o.getOrderItems().size())
                     .statusSummary(statusSummary)
                     .build();
@@ -112,6 +161,8 @@ public class OrderManagementServiceImpl implements OrderManagementService {
                     .price(item.getProductVariant().getPrice())
                     .status(item.getStatus())
                     .refundStatus(item.getRefundStatus())
+                    .returnRequestId(item.getReturnRequest() != null ? item.getReturnRequest().getId() : null)
+                    .returnStatus(item.getReturnRequest() != null ? item.getReturnRequest().getStatus().name() : null)
                     .cancellationReason(item.getCancellationReason())
                     .histories(histories)
                     .build();
@@ -121,6 +172,7 @@ public class OrderManagementServiceImpl implements OrderManagementService {
                 .orderId(order.getId())
                 .orderDate(order.getOrderDate())
                 .totalAmount(order.getTotalAmount())
+                .status(order.getStatus())
                 .paymentMethod(order.getPaymentMethod())
                 .shippingAddress(order.getShippingAddress())
                 .items(itemDTOs)
@@ -157,7 +209,29 @@ public class OrderManagementServiceImpl implements OrderManagementService {
                 .orElseThrow(() -> new RuntimeException("Sản phẩm trong đơn hàng không tồn tại!"));
 
         item.setRefundStatus(status);
+        if (status == RefundStatus.COMPLETED) {
+            item.setStatus(OrderStatus.CANCELLED);
+        }
         orderItemRepository.save(item);
+
+        // ĐỒNG BỘ VỚI RETURN REQUEST NẾU CÓ
+        if (item.getReturnRequest() != null) {
+            ReturnRequest rr = item.getReturnRequest();
+            if (status == RefundStatus.COMPLETED) {
+                // Kiểm tra xem tất cả các item trong yêu cầu hoàn trả này đã được hoàn tiền chưa
+                boolean allCompleted = rr.getReturnItems().stream()
+                        .allMatch(i -> i.getRefundStatus() == RefundStatus.COMPLETED);
+                
+                if (allCompleted) {
+                    rr.setStatus(ReturnStatus.COMPLETED);
+                    rr.setProcessedAt(new Date());
+                    returnRequestRepository.save(rr);
+                }
+            } else if (status == RefundStatus.FAILED) {
+                // Nếu hoàn tiền lỗi, có thể giữ nguyên APPROVED hoặc xử lý tùy nghiệp vụ
+                // Ở đây ta giữ nguyên để admin có thể thử lại
+            }
+        }
 
         // Gửi thông báo cho user nếu hoàn tiền thành công
         if (status == RefundStatus.COMPLETED) {

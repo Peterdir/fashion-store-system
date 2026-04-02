@@ -74,6 +74,21 @@ class OrderDetailManager {
         document.getElementById('o-date').textContent = dateStr;
         document.getElementById('o-pay').textContent = data.paymentMethod || 'COD';
         document.getElementById('o-total').textContent = this.formatCurrency(data.totalAmount);
+        
+        // Add Buy Again button for terminal statuses in header or actions area
+        const terminalStatuses = ['COMPLETED', 'CANCELLED', 'PAYMENT_FAILED', 'PAYMENT_EXPIRED'];
+        const isTerminal = data.items.some(item => terminalStatuses.includes(item.status)) || terminalStatuses.includes(data.status);
+        
+        const actionArea = document.getElementById('header-action-area');
+        if (actionArea && isTerminal) {
+            actionArea.innerHTML = `
+                <button onclick="orderDetailManager.repurchaseOrder()" 
+                        class="bg-black text-white px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">refresh</span>
+                    Mua lại đơn hàng
+                </button>
+            `;
+        }
     }
 
     renderItems(items, orderDate) {
@@ -317,6 +332,32 @@ class OrderDetailManager {
             'PAYMENT_FAILED': { label: 'Thanh toán lỗi', color: 'bg-red-50 text-red-700 border-red-100' }
         };
         return map[status] || { label: status, color: 'bg-gray-50 text-gray-700 border-gray-100' };
+    }
+
+    /**
+     * Repurchase the current order
+     */
+    async repurchaseOrder() {
+        if (!confirm('Bạn có muốn thêm tất cả sản phẩm trong đơn hàng này vào giỏ hàng để mua lại không?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/orders/${this.orderId}/repurchase`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                alert('Đã thêm tất cả sản phẩm vào giỏ hàng thành công!');
+                window.location.href = '/cart';
+            } else {
+                const err = await response.json();
+                alert('Lỗi: ' + (err.message || 'Không thể thực hiện mua lại lúc này.'));
+            }
+        } catch (error) {
+            console.error('Repurchase error:', error);
+            alert('Lỗi kết nối server.');
+        }
     }
 
     showError(msg) {

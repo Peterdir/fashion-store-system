@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.example.fashionstoresystem.entity.jpa.OrderHistory;
 import org.example.fashionstoresystem.repository.OrderHistoryRepository;
 import org.springframework.transaction.annotation.Transactional;
+import org.example.fashionstoresystem.service.order.OrderManagementService;
 
 import java.util.Date;
 import java.util.Map;
@@ -25,6 +26,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final OrderItemRepository orderItemRepository;
     private final OrderHistoryRepository orderHistoryRepository;
     private final MomoService momoService;
+    private final OrderManagementService orderManagementService;
 
     @Override
     public Order getOrderDetails(Long orderId) {
@@ -88,6 +90,8 @@ public class PaymentServiceImpl implements PaymentService {
                     }
                 }
             }
+            // ĐỒNG BỘ TRẠNG THÁI TỔNG QUÁT CỦA ORDER
+            orderManagementService.updateOverallOrderStatus(order);
         }
     }
 
