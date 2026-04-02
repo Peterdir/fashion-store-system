@@ -5,7 +5,7 @@
 | Module | API Backend | Giao Diện (HTML + JS) | Trạng Thái |
 |---|---|---|---|
 | 🔐 Đăng nhập Admin | ✅ Dùng chung `/api/auth/cookie/login` | ✅ `admin/pages/login.html` | ✅ **Xong** |
-| 📊 Dashboard (Tổng Quan) | ❌ Chưa có API riêng (data cứng) | ✅ `admin/pages/dashboard.html` | **⚠️ Data giả** |
+| 📊 Dashboard (Tổng Quan) | ✅ `DashboardController` | ✅ `admin/pages/dashboard.html` | ✅ **Xong** |
 | 📦 Quản Lý Đơn Hàng | ✅ `AdminOrderController` | ✅ `admin/pages/orders.html` | ✅ **Xong** |
 | 👕 Quản Lý Sản Phẩm | ✅ `AdminProductController` | ✅ `admin/pages/products.html` | ✅ **Xong** |
 | 👥 Quản Lý Khách Hàng | ✅ `AdminUserController` | ✅ `admin/pages/customers.html` | ✅ **Xong** |

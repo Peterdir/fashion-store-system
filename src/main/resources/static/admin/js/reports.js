@@ -15,7 +15,11 @@ const AdminReports = (() => {
     // Store the last fetched report & current filter tab
     let reportData = null;
     let currentTab = 'ALL'; // ALL | ONLINE | OFFLINE
-    let datePickerInstance = null;
+    let revenueChartInstance = null; // Thêm instance cho chart
+    
+    // Pagination state
+    let currentPage = 1;
+    const itemsPerPage = 10;
 
     // ===== DOM REF =====
     const $ = (id) => document.getElementById(id);
@@ -53,37 +57,45 @@ const AdminReports = (() => {
     }
 
     function getDateRange() {
-        if (!datePickerInstance) return { startDate: '', endDate: '' };
-        const dates = datePickerInstance.selectedDates;
-        if (dates.length !== 2) return { startDate: '', endDate: '' };
         return {
-            startDate: formatDateInput(dates[0]),
-            endDate: formatDateInput(dates[1])
+            startDate: $('filter-start-date').value,
+            endDate: $('filter-end-date').value
         };
     }
 
     // ===== PRESET BUTTONS =====
-    function applyPreset(days) {
-        const now   = new Date();
-        const start = new Date(now);
-        start.setDate(now.getDate() - days + (days === 1 ? 0 : 1));
-        const finalStart = days === 1 ? now : start;
+    function applyPreset(presetType) {
+        const now = new Date();
+        let start, end;
+        
+        if (presetType === 'today') {
+            start = new Date(now);
+            end = new Date(now);
+        } else if (presetType === 'week') {
+            start = new Date(now);
+            start.setDate(now.getDate() - 6);
+            end = new Date(now);
+        } else if (presetType === 'this-month') {
+            start = new Date(now.getFullYear(), now.getMonth(), 1);
+            end = new Date(now);
+        } else if (presetType === 'last-month') {
+            start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            end = new Date(now.getFullYear(), now.getMonth(), 0);
+        }
 
         // Highlight active preset
         document.querySelectorAll('.preset-btn').forEach(b => {
             b.classList.remove('bg-primary', 'text-white', 'border-primary');
             b.classList.add('border-neutral-200', 'text-neutral-500');
         });
-        const presetId = days === 1 ? 'preset-today' : days === 7 ? 'preset-week' : days === 30 ? 'preset-month' : 'preset-quarter';
-        const active = $(presetId);
+        const active = $('preset-' + presetType);
         if (active) {
             active.classList.add('bg-primary', 'text-white', 'border-primary');
             active.classList.remove('text-neutral-500', 'border-neutral-200');
         }
 
-        if (datePickerInstance) {
-            datePickerInstance.setDate([finalStart, now], false); // false to not trigger onChange
-        }
+        $('filter-start-date').value = formatDateInput(start);
+        $('filter-end-date').value = formatDateInput(end);
 
         loadReport();
     }
@@ -126,6 +138,7 @@ const AdminReports = (() => {
             reportData = await res.json();
 
             $('report-loading').classList.add('hidden');
+            currentPage = 1; // Reset trang khi tải dữ liệu mới
             renderReport(reportData);
             $('btn-export-csv').disabled = false;
 
@@ -162,6 +175,9 @@ const AdminReports = (() => {
             $('bar-offline').style.width = `${offlinePct}%`;
         }, 80);
 
+        // Hiển thị biểu đồ (truyền raw orders vào)
+        renderChart(data.orders || []);
+
         // Table
         currentTab = 'ALL';
         syncTabButtons('ALL');
@@ -178,16 +194,35 @@ const AdminReports = (() => {
             : orders.filter(o => (o.type || '').toUpperCase() === currentTab);
 
         const tbody = $('orders-table-body');
-        $('table-count').textContent = filtered.length;
+        const countSpan = $('table-count');
+        const emptyDiv = $('table-empty');
+        const pgnContainer = $('pagination-container');
+        const pgnInfo = $('pagination-info');
+        const pgnControls = $('pagination-controls');
+
+        countSpan.textContent = filtered.length;
 
         if (filtered.length === 0) {
             tbody.innerHTML = '';
-            $('table-empty').classList.remove('hidden');
+            emptyDiv.classList.remove('hidden');
+            pgnContainer.classList.add('hidden');
             return;
         }
-        $('table-empty').classList.add('hidden');
+        emptyDiv.classList.add('hidden');
 
-        tbody.innerHTML = filtered.map((order, idx) => {
+        // Pagination Logic
+        const totalItems = filtered.length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+        const currentSlice = filtered.slice(startIndex, endIndex);
+
+        tbody.innerHTML = currentSlice.map((order, indexInSlice) => {
+            const actualIndex = startIndex + indexInSlice; // original index cho việc mở Panel
             const isOnline = (order.type || '').toUpperCase() === 'ONLINE';
             const typeBadge = isOnline
                 ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-bold bg-blue-50 text-blue-600 uppercase tracking-widest"><span class="w-1 h-1 rounded-full bg-blue-500"></span>Online</span>`
@@ -202,7 +237,7 @@ const AdminReports = (() => {
                 <td class="px-5 py-3.5 text-[12px] font-bold text-neutral-700 text-center">${itemCount}</td>
                 <td class="px-5 py-3.5 text-[12px] font-black text-primary text-right">${formatCurrency(order.totalAmount)}</td>
                 <td class="px-5 py-3.5 text-center">
-                    <button onclick="AdminReports.openPanel(${idx})"
+                    <button onclick="AdminReports.openPanel(${actualIndex})"
                             class="text-neutral-400 hover:text-accent transition-colors"
                             title="Xem chi tiết">
                         <span class="material-symbols-outlined text-[18px]">visibility</span>
@@ -210,6 +245,55 @@ const AdminReports = (() => {
                 </td>
             </tr>`;
         }).join('');
+
+        // Render Pagination Controls
+        if (totalPages > 1) {
+            pgnInfo.textContent = `Đang xem từ ${startIndex + 1} đến ${endIndex} trên ${totalItems} đơn hàng`;
+            pgnContainer.classList.remove('hidden');
+
+            let pgnHtml = `
+                <button onclick="AdminReports.goToPage(${currentPage - 1})" 
+                        class="w-7 h-7 flex items-center justify-center rounded border ${currentPage === 1 ? 'border-neutral-100 text-neutral-300 cursor-not-allowed' : 'border-neutral-200 text-neutral-500 hover:border-primary hover:text-primary transition-colors bg-white'}"
+                        ${currentPage === 1 ? 'disabled' : ''}>
+                    <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+                </button>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (totalPages > 7) {
+                    if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                        pgnHtml += createPageBtn(i, currentPage);
+                    } else if (i === currentPage - 2 || i === currentPage + 2) {
+                        pgnHtml += `<span class="text-neutral-400 text-[10px] px-1 font-bold">...</span>`;
+                    }
+                } else {
+                    pgnHtml += createPageBtn(i, currentPage);
+                }
+            }
+
+            pgnHtml += `
+                <button onclick="AdminReports.goToPage(${currentPage + 1})" 
+                        class="w-7 h-7 flex items-center justify-center rounded border ${currentPage === totalPages ? 'border-neutral-100 text-neutral-300 cursor-not-allowed' : 'border-neutral-200 text-neutral-500 hover:border-primary hover:text-primary transition-colors bg-white'}"
+                        ${currentPage === totalPages ? 'disabled' : ''}>
+                    <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                </button>
+            `;
+            pgnControls.innerHTML = pgnHtml;
+        } else {
+            pgnContainer.classList.add('hidden');
+        }
+    }
+
+    function createPageBtn(pageIdx, currentIdx) {
+        if (pageIdx === currentIdx) {
+            return `<button class="w-7 h-7 flex items-center justify-center rounded bg-primary text-white text-[11px] font-bold">${pageIdx}</button>`;
+        }
+        return `<button onclick="AdminReports.goToPage(${pageIdx})" class="w-7 h-7 flex items-center justify-center rounded border border-neutral-200 bg-white text-neutral-500 text-[11px] font-medium hover:border-primary hover:text-primary transition-colors">${pageIdx}</button>`;
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        if (reportData) renderTable(reportData.orders || []);
     }
 
     // ===== TAB BUTTONS =====
@@ -230,8 +314,149 @@ const AdminReports = (() => {
         });
     }
 
+    // ===== RENDER CHART =====
+    function renderChart(orders) {
+        const ctx = $('revenueChart');
+        if (!ctx) return;
+
+        if (revenueChartInstance) {
+            revenueChartInstance.destroy();
+        }
+
+        const { startDate, endDate } = getDateRange();
+        if (!startDate || !endDate) return;
+
+        const parseDateSplit = (dateStr) => {
+            const [y, m, d] = dateStr.split('-');
+            return new Date(parseInt(y), parseInt(m) - 1, parseInt(d), 0, 0, 0);
+        };
+
+        const start = parseDateSplit(startDate);
+        const end = parseDateSplit(endDate);
+        const datesMap = {};
+        
+        let current = new Date(start);
+        while(current <= end) {
+            const dateStr = formatDateInput(current);
+            datesMap[dateStr] = { online: 0, offline: 0 };
+            current.setDate(current.getDate() + 1);
+        }
+
+        orders.forEach(o => {
+            if(!o.orderDate) return;
+            const d = new Date(o.orderDate);
+            if(isNaN(d)) return;
+            const dateStr = formatDateInput(d);
+            
+            if (datesMap[dateStr] !== undefined) {
+                const isOnline = (o.type || '').toUpperCase() === 'ONLINE';
+                if (isOnline) {
+                    datesMap[dateStr].online += o.totalAmount || 0;
+                } else {
+                    datesMap[dateStr].offline += o.totalAmount || 0;
+                }
+            }
+        });
+
+        const labels = Object.keys(datesMap).map(d => {
+            const arr = d.split('-');
+            return `${arr[2]}/${arr[1]}`;
+        });
+        const onlineData = Object.values(datesMap).map(v => v.online);
+        const offlineData = Object.values(datesMap).map(v => v.offline);
+
+        revenueChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Online',
+                        data: onlineData,
+                        backgroundColor: '#3b82f6',
+                        barPercentage: 0.8,
+                        categoryPercentage: 0.8
+                    },
+                    {
+                        label: 'Offline',
+                        data: offlineData,
+                        backgroundColor: '#fbbf24',
+                        barPercentage: 0.8,
+                        categoryPercentage: 0.8
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        align: 'end',
+                        labels: {
+                            usePointStyle: true,
+                            boxWidth: 8,
+                            font: { family: 'Inter', size: 11, weight: '600' },
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: '#171717',
+                        padding: 12,
+                        titleFont: { family: 'Inter', size: 12 },
+                        bodyFont: { family: 'Inter', size: 11 },
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('vi-VN').format(context.parsed.y) + '₫';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid: { display: false },
+                        ticks: { font: { family: 'Inter', size: 10 }, color: '#a3a3a3' },
+                        border: { display: false }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        grid: { color: '#f5f5f5', borderDash: [4, 4] },
+                        ticks: {
+                            font: { family: 'Inter', size: 10 },
+                            color: '#a3a3a3',
+                            callback: function(value) {
+                                if (value >= 1000000000) return (value / 1000000000) + ' Tỷ';
+                                if (value >= 1000000) return (value / 1000000) + ' Tr';
+                                if (value >= 1000) return (value / 1000) + ' K';
+                                return value;
+                            }
+                        },
+                        border: { display: false }
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    axis: 'x',
+                    intersect: false
+                }
+            }
+        });
+    }
+
     function switchTab(tab) {
         currentTab = tab;
+        currentPage = 1; // Khởi động lại về trang 1
         syncTabButtons(tab);
         if (reportData) renderTable(reportData.orders || []);
     }
@@ -317,29 +542,21 @@ const AdminReports = (() => {
 
     // ===== INIT =====
     function init() {
-        // Init Flatpickr
-        datePickerInstance = flatpickr("#filter-date-range", {
-            mode: "range",
-            dateFormat: "d/m/Y",
-            locale: "vn",
-            onChange: function(selectedDates) {
-                // Remove active styling from presets if manually interacted
-                document.querySelectorAll('.preset-btn').forEach(b => {
-                    b.classList.remove('bg-primary', 'text-white', 'border-primary');
-                    b.classList.add('border-neutral-200', 'text-neutral-500');
-                });
-                // Auto-load if full range is selected
-                if (selectedDates.length === 2) {
-                    loadReport();
-                }
-            }
-        });
-
         // Preset buttons
-        $('preset-today')   .addEventListener('click', () => applyPreset(1));
-        $('preset-week')    .addEventListener('click', () => applyPreset(7));
-        $('preset-month')   .addEventListener('click', () => applyPreset(30));
-        $('preset-quarter') .addEventListener('click', () => applyPreset(90));
+        $('preset-today')      .addEventListener('click', () => applyPreset('today'));
+        $('preset-week')       .addEventListener('click', () => applyPreset('week'));
+        $('preset-this-month') .addEventListener('click', () => applyPreset('this-month'));
+        $('preset-last-month') .addEventListener('click', () => applyPreset('last-month'));
+
+        // Reset preset state if manually modify native date input
+        const clearPresets = () => {
+             document.querySelectorAll('.preset-btn').forEach(b => {
+                 b.classList.remove('bg-primary', 'text-white', 'border-primary');
+                 b.classList.add('border-neutral-200', 'text-neutral-500');
+             });
+        };
+        $('filter-start-date').addEventListener('change', clearPresets);
+        $('filter-end-date').addEventListener('change', clearPresets);
 
         // Load report button
         $('btn-load-report').addEventListener('click', loadReport);
@@ -357,8 +574,8 @@ const AdminReports = (() => {
             if (e.key === 'Escape') closePanel();
         });
 
-        // Default: auto-load last 30 days
-        applyPreset(30);
+        // Default: This month
+        applyPreset('this-month');
     }
 
     // Auto-init
@@ -369,5 +586,5 @@ const AdminReports = (() => {
     }
 
     // Public API
-    return { openPanel, closePanel };
+    return { openPanel, closePanel, goToPage };
 })();

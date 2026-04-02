@@ -22,4 +22,6 @@ public class ProductSummaryResponseDTO {
     private Double minPrice;
     private Double averageRating;
     private Long reviewCount;
+    private Long totalStock;
+    private Integer variantCount;
 }

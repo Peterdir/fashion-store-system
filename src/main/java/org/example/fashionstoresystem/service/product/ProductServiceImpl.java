@@ -47,6 +47,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ProductSummaryResponseDTO> getProducts(String keyword, Double minPrice, Double maxPrice, Pageable pageable) {
         // Sử dụng phương thức tìm kiếm linh hoạt với Keyword và Lọc giá
         Page<Product> productsPage = productRepository.findFiltered(
@@ -66,10 +67,13 @@ public class ProductServiceImpl implements ProductService {
                 .status(product.getStatus())
                 .primaryImageUrl(formatImageUrl(product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl()))
                 .hoverImageUrl(formatImageUrl(product.getImages().size() > 1 ? product.getImages().get(1).getUrl() : (product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl())))
+                .totalStock(product.getVariants().stream().mapToLong(v -> v.getStockQuantity() == null ? 0L : v.getStockQuantity()).sum())
+                .variantCount(product.getVariants().size())
                 .build());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ProductSummaryResponseDTO> getAdminProducts(String keyword, ProductStatus status, Pageable pageable) {
         Page<Product> productsPage = productRepository.findForAdmin(
                 (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null,
@@ -87,6 +91,8 @@ public class ProductServiceImpl implements ProductService {
                 .status(product.getStatus())
                 .primaryImageUrl(formatImageUrl(product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl()))
                 .hoverImageUrl(formatImageUrl(product.getImages().size() > 1 ? product.getImages().get(1).getUrl() : (product.getImages().isEmpty() ? "/images/placeholder.png" : product.getImages().get(0).getUrl())))
+                .totalStock(product.getVariants().stream().mapToLong(v -> v.getStockQuantity() == null ? 0L : v.getStockQuantity()).sum())
+                .variantCount(product.getVariants().size())
                 .build());
     }
 
@@ -187,6 +193,8 @@ public class ProductServiceImpl implements ProductService {
                 .hoverImageUrl(formatImageUrl(p.getImages().size() > 1 ? p.getImages().get(1).getUrl() : (p.getImages().isEmpty() ? "/images/placeholder.png" : p.getImages().get(0).getUrl())))
                 .averageRating(reviewRepository.getAverageRatingByProductId(p.getId()) != null ? reviewRepository.getAverageRatingByProductId(p.getId()) : 0.0)
                 .reviewCount(reviewRepository.countByProductId(p.getId()))
+                .totalStock(p.getVariants().stream().mapToLong(v -> v.getStockQuantity() == null ? 0L : v.getStockQuantity()).sum())
+                .variantCount(p.getVariants().size())
                 .build();
     }
 

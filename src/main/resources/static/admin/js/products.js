@@ -135,10 +135,10 @@ const AdminProducts = (() => {
                 <td class="px-5 py-3 text-[11px] font-bold text-neutral-600">${product.category || '—'}</td>
                 <td class="px-5 py-3 text-[12px] font-bold text-primary text-right">${formatCurrency(product.price || product.minPrice)}</td>
                 <td class="px-5 py-3 text-center">
-                    <span class="text-[11px] font-bold text-neutral-600">—</span>
+                    <span class="text-[11px] font-bold ${product.totalStock > 0 ? 'text-neutral-600' : 'text-red-500'}">${product.totalStock != null ? product.totalStock : '—'}</span>
                 </td>
                 <td class="px-5 py-3 text-center">
-                    <span class="text-[11px] font-bold text-neutral-600">—</span>
+                    <span class="text-[11px] font-bold text-neutral-600">${product.variantCount != null ? product.variantCount : '—'}</span>
                 </td>
                 <td class="px-5 py-3 text-center">${renderStatusBadge(product.status)}</td>
                 <td class="px-5 py-3 text-center">

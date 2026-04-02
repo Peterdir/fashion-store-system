@@ -25,7 +25,7 @@ function initVariants() {
             return `
                 <div class="color-option relative w-12 h-16 border-2 transition-all cursor-pointer ${idx === 0 ? 'border-primary' : 'border-outline/10'} hover:border-primary" 
                      data-color="${color}" onclick="selectColor('${color}', this)">
-                    <img src="${thumbnailUrl}" class="w-full h-full object-cover">
+                    <img src="${thumbnailUrl}" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2264%22 viewBox=%220 0 48 64%22%3E%3Crect width=%2248%22 height=%2264%22 fill=%22%23f3f4f6%22/%3E%3C/svg%3E';" class="w-full h-full object-cover">
                 </div>
             `;
         }).join('');
@@ -96,7 +96,7 @@ function renderGalleryForColor(color) {
         <div class="thumbnail-item cursor-pointer border-2 transition-all hover:border-primary overflow-hidden aspect-[3/4] ${idx === 0 ? 'border-primary' : 'border-transparent'}"
              data-large-src="${img.url}"
              onclick="changeMainImage(this)">
-            <img src="${img.url}" class="w-full h-full object-cover">
+            <img src="${img.url}" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22400%22 viewBox=%220 0 300 400%22%3E%3Crect width=%22300%22 height=%22400%22 fill=%22%23f3f4f6%22/%3E%3C/svg%3E';" class="w-full h-full object-cover">
         </div>
     `).join('');
 
@@ -104,7 +104,7 @@ function renderGalleryForColor(color) {
         <div class="w-16 h-20 flex-shrink-0 border-2 border-white/50 overflow-hidden shadow-lg"
              data-large-src="${img.url}"
              onclick="changeMainImage(this)">
-            <img src="${img.url}" class="w-full h-full object-cover">
+            <img src="${img.url}" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2264%22 viewBox=%220 0 48 64%22%3E%3Crect width=%2248%22 height=%2264%22 fill=%22%23f3f4f6%22/%3E%3C/svg%3E';" class="w-full h-full object-cover">
         </div>
     `).join('');
 
@@ -163,7 +163,7 @@ function updateFinalVariant() {
     if (variant) {
         // Update Price
         const priceElements = document.querySelectorAll('.text-primary.font-bold, .text-3xl.font-bold.text-primary, .text-2xl.font-bold.text-primary');
-        priceElements.forEach(el => el.innerText = new Intl.NumberFormat('vi-VN').format(variant.price) + ' ₫');
+        priceElements.forEach(el => el.innerText = new Intl.NumberFormat('vi-VN').format(variant.price) + ' VNĐ');
 
         // Update Stock
         const stockDisplay = document.getElementById('stock-display');

@@ -31,20 +31,26 @@
             <!-- Quick Presets -->
             <div class="space-y-1">
                 <label class="text-[9px] font-black uppercase tracking-[0.15em] text-neutral-400">Nhanh</label>
-                <div class="flex gap-1.5">
-                    <button id="preset-today"   class="preset-btn px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-neutral-200 text-neutral-500 hover:border-primary hover:text-primary transition-colors">Hôm nay</button>
-                    <button id="preset-week"    class="preset-btn px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-neutral-200 text-neutral-500 hover:border-primary hover:text-primary transition-colors">7 ngày</button>
-                    <button id="preset-month"   class="preset-btn px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-neutral-200 text-neutral-500 hover:border-primary hover:text-primary transition-colors">30 ngày</button>
-                    <button id="preset-quarter" class="preset-btn px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-neutral-200 text-neutral-500 hover:border-primary hover:text-primary transition-colors">90 ngày</button>
+                <div class="flex gap-1.5 flex-wrap">
+                    <button id="preset-today"      class="preset-btn px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-neutral-200 text-neutral-500 hover:border-primary hover:text-primary transition-colors">Hôm nay</button>
+                    <button id="preset-week"       class="preset-btn px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-neutral-200 text-neutral-500 hover:border-primary hover:text-primary transition-colors">7 ngày</button>
+                    <button id="preset-this-month" class="preset-btn px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-neutral-200 text-neutral-500 hover:border-primary hover:text-primary transition-colors">Tháng này</button>
+                    <button id="preset-last-month" class="preset-btn px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-neutral-200 text-neutral-500 hover:border-primary hover:text-primary transition-colors">Tháng trước</button>
                 </div>
             </div>
-            <!-- Date Range Picker (VIP Form) -->
-            <div class="space-y-1" style="min-width: 260px;">
-                <label class="text-[9px] font-black uppercase tracking-[0.15em] text-neutral-400">Khoảng thời gian</label>
-                <div class="relative flex items-center">
-                    <span class="material-symbols-outlined absolute left-3 text-[16px] text-neutral-400 pointer-events-none">calendar_month</span>
-                    <input type="text" id="filter-date-range" placeholder="Ngày bắt đầu - Ngày kết thúc"
-                           class="w-full pl-9 pr-3 py-2 text-[11px] font-bold border border-neutral-200 bg-neutral-50 text-primary outline-none focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer">
+            <!-- Custom Date Range -->
+            <div class="space-y-1">
+                <label class="text-[9px] font-black uppercase tracking-[0.15em] text-neutral-400">Từ ngày - Đến ngày</label>
+                <div class="flex items-center gap-2">
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[14px] text-neutral-400 pointer-events-none">calendar_month</span>
+                        <input type="date" id="filter-start-date" class="w-full pl-8 pr-3 py-2 text-[11px] font-bold border border-neutral-200 bg-neutral-50 text-primary outline-none focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer h-[34px]">
+                    </div>
+                    <span class="text-neutral-300 text-[10px]">→</span>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[14px] text-neutral-400 pointer-events-none">calendar_month</span>
+                        <input type="date" id="filter-end-date" class="w-full pl-8 pr-3 py-2 text-[11px] font-bold border border-neutral-200 bg-neutral-50 text-primary outline-none focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer h-[34px]">
+                    </div>
                 </div>
             </div>
             <!-- Search Button -->
@@ -107,6 +113,21 @@
                 </div>
             </div>
 
+            <!-- Revenue Chart -->
+            <div class="bg-white border border-neutral-100 overflow-hidden">
+                <div class="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
+                    <h3 class="text-[12px] font-black uppercase tracking-[0.15em] flex items-center gap-2 text-neutral-500">
+                        <span class="material-symbols-outlined text-[16px]">show_chart</span>
+                        Biểu Đồ Doanh Thu
+                    </h3>
+                </div>
+                <div class="p-5 w-full">
+                    <div class="relative w-full h-[400px] sm:h-[500px] lg:h-[600px]">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <!-- Revenue Breakdown Bar -->
             <div class="bg-white border border-neutral-100 p-5">
                 <p class="text-[10px] font-black uppercase tracking-[0.15em] text-neutral-500 mb-4">Tỷ Trọng Doanh Thu</p>
@@ -163,6 +184,14 @@
                     <span class="material-symbols-outlined text-4xl text-neutral-200 mb-2">inbox</span>
                     <p class="text-[12px] font-bold text-neutral-400">Không có đơn hàng nào trong khoảng này</p>
                 </div>
+
+                <!-- Pagination -->
+                <div id="pagination-container" class="px-5 py-4 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-3 hidden bg-neutral-50/50">
+                    <p class="text-[10px] font-medium text-neutral-500" id="pagination-info"></p>
+                    <div class="flex items-center gap-1" id="pagination-controls">
+                        <!-- JS renders page buttons here -->
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -209,10 +238,8 @@
         <!-- Toast Container -->
         <div id="admin-toast" class="fixed bottom-6 right-6 z-[100] space-y-2"></div>
 
-        <!-- Flatpickr (VIP Date Range) -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-        <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script>
+        <!-- Chart.js for Revenue Chart -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <script th:src="@{/admin/js/reports.js}"></script>
     </div>

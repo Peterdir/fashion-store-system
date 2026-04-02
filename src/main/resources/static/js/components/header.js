@@ -112,8 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         html += `
                             <a href="/category?keyword=${encodeURIComponent(sub.name)}" class="group/item cursor-pointer text-center flex flex-col items-center">
                                 <div class="w-20 h-20 bg-surface-low overflow-hidden rounded-full mb-3 border border-outline/5 group-hover/item:border-secondary transition-all duration-500 relative shadow-sm group-hover/item:shadow-md">
-                                    <img src="${sub.imageUrl || '/images/placeholder.png'}" 
+                                    <img src="${sub.imageUrl || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Crect width=%2280%22 height=%2280%22 fill=%22%23f3f4f6%22/%3E%3C/svg%3E'}" 
                                          alt="${sub.name}"
+                                         onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Crect width=%2280%22 height=%2280%22 fill=%22%23f3f4f6%22/%3E%3C/svg%3E';"
                                          class="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-700 opacity-95 group-hover/item:opacity-100">
                                     <div class="absolute inset-0 bg-secondary/5 opacity-0 group-hover/item:opacity-100 transition-opacity"></div>
                                 </div>
@@ -127,8 +128,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     html += `
                         <a href="/category?keyword=${encodeURIComponent(parentCat.name)}" class="group/item cursor-pointer text-center flex flex-col items-center">
                             <div class="w-20 h-20 bg-surface-low overflow-hidden rounded-full mb-3 border border-outline/5 group-hover/item:border-secondary transition-all duration-500 relative shadow-sm group-hover/item:shadow-md">
-                                <img src="${parentCat.imageUrl || '/images/placeholder.png'}" 
+                                <img src="${parentCat.imageUrl || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Crect width=%2280%22 height=%2280%22 fill=%22%23f3f4f6%22/%3E%3C/svg%3E'}" 
                                      alt="${parentCat.name}"
+                                     onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Crect width=%2280%22 height=%2280%22 fill=%22%23f3f4f6%22/%3E%3C/svg%3E';"
                                      class="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-700 opacity-95 group-hover/item:opacity-100">
                                 <div class="absolute inset-0 bg-secondary/5 opacity-0 group-hover/item:opacity-100 transition-opacity"></div>
                             </div>
@@ -153,8 +155,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `
                     <a href="/product-detail/${p.productId}" class="group/item cursor-pointer text-center flex flex-col items-center">
                         <div class="w-20 h-20 bg-surface-low overflow-hidden rounded-full mb-3 border border-outline/5 group-hover/item:border-secondary transition-all duration-500 relative shadow-sm group-hover/item:shadow-md">
-                            <img src="${p.primaryImageUrl || '/images/placeholder.png'}" 
+                            <img src="${p.primaryImageUrl || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Crect width=%2280%22 height=%2280%22 fill=%22%23f3f4f6%22/%3E%3C/svg%3E'}" 
                                  alt="${p.name}"
+                                 onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Crect width=%2280%22 height=%2280%22 fill=%22%23f3f4f6%22/%3E%3C/svg%3E';"
                                  class="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-700 opacity-95 group-hover/item:opacity-100">
                             <div class="absolute inset-0 bg-secondary/5 opacity-0 group-hover/item:opacity-100 transition-opacity"></div>
                         </div>

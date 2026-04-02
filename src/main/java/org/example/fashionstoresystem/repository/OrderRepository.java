@@ -17,7 +17,8 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    // Lấy Lịch sử mua hàng của 1 Khách hàng. Xếp TỪ MỚI NHẤT ĐẾN CŨ NHẤT (OrderByOrderDateDesc)
+    // Lấy Lịch sử mua hàng của 1 Khách hàng. Xếp TỪ MỚI NHẤT ĐẾN CŨ NHẤT
+    // (OrderByOrderDateDesc)
     List<Order> findByUserIdOrderByOrderDateDesc(Long userId);
 
     // Lấy đơn hàng theo orderId, nhưng đảm bảo đơn hàng đó thuộc về userId
@@ -28,7 +29,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // Tính tổng doanh thu theo loại đơn (ONLINE/OFFLINE) trong khoảng thời gian
     @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate AND o.type = :type")
-    Double calculateTotalRevenue(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("type") OrderType type);
+    Double calculateTotalRevenue(@Param("startDate") Date startDate, @Param("endDate") Date endDate,
+            @Param("type") OrderType type);
 
     // Đếm số lượng đơn hàng trong khoảng thời gian
     @Query("SELECT COUNT(o) FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate")
@@ -38,11 +40,24 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> searchOrders(OrderStatus status, Date startDate, Date endDate, Pageable pageable);
 
     @Query("SELECT DISTINCT o FROM Order o LEFT JOIN o.orderItems oi WHERE o.user.id = :userId AND oi.status IN :statuses ORDER BY o.orderDate DESC")
-    Page<Order> searchMyOrdersByStatuses(@Param("userId") Long userId, @Param("statuses") List<OrderStatus> statuses, Pageable pageable);
+    Page<Order> searchMyOrdersByStatuses(@Param("userId") Long userId, @Param("statuses") List<OrderStatus> statuses,
+            Pageable pageable);
 
     @Query("SELECT DISTINCT o FROM Order o LEFT JOIN o.orderItems oi WHERE o.user.id = :userId ORDER BY o.orderDate DESC")
     Page<Order> findAllMyOrders(@Param("userId") Long userId, Pageable pageable);
 
     // Tìm đơn hàng quá hạn thanh toán
     List<Order> findByStatusAndOrderDateBefore(OrderStatus status, Date expireTime);
+
+    // DASHBOARD
+    // 5 đơn hàng mới nhất
+    List<Order> findTop5ByOrderByOrderDateDesc();
+
+    // Tổng doanh thu trong khoảng thời gian (tất cả loại)
+    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate")
+    Double calculateTotalRevenueAll(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+    // Đếm đơn theo từng trạng thái
+    @Query("SELECT oi.status, COUNT(DISTINCT oi.order.id) FROM OrderItem oi GROUP BY oi.status")
+    List<Object[]> countOrdersByItemStatus();
 }

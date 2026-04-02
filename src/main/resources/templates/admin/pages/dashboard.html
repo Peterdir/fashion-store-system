@@ -26,63 +26,56 @@
         <!-- KPI Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
-            <!-- Doanh Thu -->
+            <!-- Doanh Thu Tháng -->
             <div class="bg-white p-5 border border-neutral-100 hover:border-neutral-200 transition-colors group">
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.15em] mb-2">Doanh thu tháng</p>
-                        <h3 class="text-xl font-black text-primary tracking-tight">42,500,000₫</h3>
+                        <h3 id="kpi-revenue" class="kpi-value text-xl font-black text-primary tracking-tight">...</h3>
                     </div>
                     <span class="material-symbols-outlined text-xl text-neutral-300 group-hover:text-accent transition-colors">account_balance_wallet</span>
                 </div>
-                <div class="mt-3 flex items-center gap-1.5 text-[10px]">
-                    <span class="text-emerald-600 font-bold flex items-center gap-0.5">
-                        <span class="material-symbols-outlined text-[12px]">arrow_upward</span>18%
-                    </span>
-                    <span class="text-neutral-400">vs tháng trước</span>
+                <div id="kpi-revenue-growth" class="mt-3 flex items-center gap-1.5 text-[10px]">
+                    <span class="text-neutral-300">Đang tải...</span>
                 </div>
             </div>
 
-            <!-- Đơn Hàng -->
+            <!-- Đơn Hàng Tháng -->
             <div class="bg-white p-5 border border-neutral-100 hover:border-neutral-200 transition-colors group">
                 <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.15em] mb-2">Đơn hàng</p>
-                        <h3 class="text-xl font-black text-primary tracking-tight">1,245</h3>
+                        <p class="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.15em] mb-2">Đơn hàng tháng</p>
+                        <h3 id="kpi-orders" class="kpi-value text-xl font-black text-primary tracking-tight">...</h3>
                     </div>
                     <span class="material-symbols-outlined text-xl text-neutral-300 group-hover:text-accent transition-colors">receipt_long</span>
                 </div>
-                <div class="mt-3 flex items-center gap-1.5 text-[10px]">
-                    <span class="text-emerald-600 font-bold flex items-center gap-0.5">
-                        <span class="material-symbols-outlined text-[12px]">arrow_upward</span>4.5%
-                    </span>
-                    <span class="text-neutral-400">vs tháng trước</span>
+                <div id="kpi-orders-growth" class="mt-3 flex items-center gap-1.5 text-[10px]">
+                    <span class="text-neutral-300">Đang tải...</span>
                 </div>
             </div>
 
-            <!-- Khách Hàng Mới -->
+            <!-- Tổng Khách Hàng -->
             <div class="bg-white p-5 border border-neutral-100 hover:border-neutral-200 transition-colors group">
                 <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.15em] mb-2">Khách hàng mới</p>
-                        <h3 class="text-xl font-black text-primary tracking-tight">384</h3>
+                        <p class="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.15em] mb-2">Tổng khách hàng</p>
+                        <h3 id="kpi-customers" class="kpi-value text-xl font-black text-primary tracking-tight">...</h3>
                     </div>
-                    <span class="material-symbols-outlined text-xl text-neutral-300 group-hover:text-accent transition-colors">person_add</span>
+                    <span class="material-symbols-outlined text-xl text-neutral-300 group-hover:text-accent transition-colors">group</span>
                 </div>
-                <div class="mt-3 flex items-center gap-1.5 text-[10px]">
-                    <span class="text-red-500 font-bold flex items-center gap-0.5">
-                        <span class="material-symbols-outlined text-[12px]">arrow_downward</span>2.1%
-                    </span>
-                    <span class="text-neutral-400">vs tháng trước</span>
+                <div class="mt-3">
+                    <a th:href="@{/admin/customers}" class="text-[10px] font-bold text-neutral-400 hover:text-accent transition-colors flex items-center gap-0.5">
+                        Quản lý <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+                    </a>
                 </div>
             </div>
 
-            <!-- Yêu Cầu Hoàn Trả -->
+            <!-- Hoàn Trả Chờ Xử Lý -->
             <div class="bg-white p-5 border border-neutral-100 hover:border-neutral-200 transition-colors group">
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.15em] mb-2">Hoàn trả chờ xử lý</p>
-                        <h3 class="text-xl font-black text-accent tracking-tight">7</h3>
+                        <h3 id="kpi-returns" class="kpi-value text-xl font-black text-accent tracking-tight">...</h3>
                     </div>
                     <span class="material-symbols-outlined text-xl text-neutral-300 group-hover:text-accent transition-colors">assignment_return</span>
                 </div>
@@ -94,81 +87,103 @@
             </div>
         </div>
 
-        <!-- Recent Orders Table -->
-        <div class="bg-white border border-neutral-100 overflow-hidden">
-            <div class="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
-                <h3 class="text-[12px] font-black uppercase tracking-[0.15em]">Đơn hàng gần đây</h3>
-                <a th:href="@{/admin/orders}" class="text-[10px] font-bold text-neutral-400 hover:text-accent flex items-center gap-0.5 transition-colors">
-                    Xem tất cả <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-                </a>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="bg-neutral-50/80 border-b border-neutral-100">
-                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Mã đơn</th>
-                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Khách hàng</th>
-                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-right">Tổng tiền</th>
-                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Trạng thái</th>
-                            <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-neutral-50">
-                        <tr class="hover:bg-neutral-50/50 transition-colors">
-                            <td class="px-5 py-3.5 text-[12px] font-bold text-primary">#ORD-9023</td>
-                            <td class="px-5 py-3.5 text-[12px] text-neutral-600">Nguyễn Văn A</td>
-                            <td class="px-5 py-3.5 text-[12px] font-bold text-primary text-right">1,250,000₫</td>
-                            <td class="px-5 py-3.5 text-center">
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-bold bg-blue-50 text-blue-600 uppercase tracking-widest">
-                                    <span class="w-1 h-1 rounded-full bg-blue-500"></span> Đang xử lý
-                                </span>
-                            </td>
-                            <td class="px-5 py-3.5 text-center">
-                                <button class="text-neutral-400 hover:text-accent transition-colors">
-                                    <span class="material-symbols-outlined text-[18px]">visibility</span>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-neutral-50/50 transition-colors">
-                            <td class="px-5 py-3.5 text-[12px] font-bold text-primary">#ORD-9022</td>
-                            <td class="px-5 py-3.5 text-[12px] text-neutral-600">Trần Thị B</td>
-                            <td class="px-5 py-3.5 text-[12px] font-bold text-primary text-right">850,000₫</td>
-                            <td class="px-5 py-3.5 text-center">
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-bold bg-emerald-50 text-emerald-600 uppercase tracking-widest">
-                                    <span class="w-1 h-1 rounded-full bg-emerald-500"></span> Đã giao
-                                </span>
-                            </td>
-                            <td class="px-5 py-3.5 text-center">
-                                <button class="text-neutral-400 hover:text-accent transition-colors">
-                                    <span class="material-symbols-outlined text-[18px]">visibility</span>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-neutral-50/50 transition-colors">
-                            <td class="px-5 py-3.5 text-[12px] font-bold text-primary">#ORD-9021</td>
-                            <td class="px-5 py-3.5 text-[12px] text-neutral-600">Lê Văn C</td>
-                            <td class="px-5 py-3.5 text-[12px] font-bold text-primary text-right">2,400,000₫</td>
-                            <td class="px-5 py-3.5 text-center">
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-bold bg-amber-50 text-amber-600 uppercase tracking-widest">
-                                    <span class="w-1 h-1 rounded-full bg-amber-500"></span> Chờ thanh toán
-                                </span>
-                            </td>
-                            <td class="px-5 py-3.5 text-center">
-                                <button class="text-neutral-400 hover:text-accent transition-colors">
-                                    <span class="material-symbols-outlined text-[18px]">visibility</span>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <!-- Secondary KPI: Tổng sản phẩm -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <div class="bg-white p-4 border border-neutral-100 flex items-center gap-4">
+                <span class="material-symbols-outlined text-2xl text-neutral-300">inventory_2</span>
+                <div>
+                    <p class="text-[10px] font-bold text-neutral-400 uppercase tracking-[0.15em]">Tổng sản phẩm</p>
+                    <h3 id="kpi-products" class="kpi-value text-lg font-black text-primary">...</h3>
+                </div>
             </div>
         </div>
 
-        <script>
-            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('vi-VN', {
-                day: '2-digit', month: '2-digit', year: 'numeric'
-            });
-        </script>
+        <!-- Two-Column Layout: Recent Orders + Top Products -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+
+            <!-- Recent Orders Table -->
+            <div class="bg-white border border-neutral-100 overflow-hidden">
+                <div class="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
+                    <h3 class="text-[12px] font-black uppercase tracking-[0.15em] flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px] text-neutral-400">receipt_long</span>
+                        Đơn hàng gần đây
+                    </h3>
+                    <a th:href="@{/admin/orders}" class="text-[10px] font-bold text-neutral-400 hover:text-accent flex items-center gap-0.5 transition-colors">
+                        Xem tất cả <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                    </a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-neutral-50/80 border-b border-neutral-100">
+                                <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Mã đơn</th>
+                                <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Khách hàng</th>
+                                <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-right">Tổng tiền</th>
+                                <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Trạng thái</th>
+                                <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Ngày đặt</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-orders-body" class="divide-y divide-neutral-50">
+                            <tr>
+                                <td colspan="5" class="px-5 py-8 text-center text-[11px] text-neutral-300">
+                                    <span class="material-symbols-outlined text-2xl block mb-2 animate-pulse">hourglass_top</span>
+                                    Đang tải dữ liệu...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Top Products Table -->
+            <div class="bg-white border border-neutral-100 overflow-hidden">
+                <div class="px-5 py-4 border-b border-neutral-100 flex items-center justify-between">
+                    <h3 class="text-[12px] font-black uppercase tracking-[0.15em] flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px] text-neutral-400">trending_up</span>
+                        Sản phẩm bán chạy
+                    </h3>
+                    <a th:href="@{/admin/products}" class="text-[10px] font-bold text-neutral-400 hover:text-accent flex items-center gap-0.5 transition-colors">
+                        Quản lý SP <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                    </a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-neutral-50/80 border-b border-neutral-100">
+                                <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap w-10">#</th>
+                                <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap">Tên sản phẩm</th>
+                                <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-center">Đã bán</th>
+                                <th class="px-5 py-3 text-[10px] font-bold text-neutral-400 uppercase tracking-[0.12em] whitespace-nowrap text-right">Doanh thu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top-products-body" class="divide-y divide-neutral-50">
+                            <tr>
+                                <td colspan="4" class="px-5 py-8 text-center text-[11px] text-neutral-300">
+                                    <span class="material-symbols-outlined text-2xl block mb-2 animate-pulse">hourglass_top</span>
+                                    Đang tải dữ liệu...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Status Distribution -->
+        <div class="bg-white border border-neutral-100 overflow-hidden mb-8">
+            <div class="px-5 py-4 border-b border-neutral-100">
+                <h3 class="text-[12px] font-black uppercase tracking-[0.15em] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[16px] text-neutral-400">bar_chart</span>
+                    Phân bố trạng thái đơn hàng
+                </h3>
+            </div>
+            <div id="status-chart" class="p-5">
+                <p class="text-[11px] text-neutral-300 text-center py-4 animate-pulse">Đang tải dữ liệu...</p>
+            </div>
+        </div>
+
+        <!-- Dashboard JS -->
+        <script th:src="@{/admin/js/dashboard.js}"></script>
 
     </div>
 </body>

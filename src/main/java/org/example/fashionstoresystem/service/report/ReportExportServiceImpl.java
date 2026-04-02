@@ -60,7 +60,7 @@ public class ReportExportServiceImpl implements ReportExportService {
             writer.println();
 
             writer.println("CHI TIẾT ĐƠN HÀNG");
-            writer.println("Mã đơn,Ngày đặt,Kênh bán,Tên sản phẩm,Số lượng,Đơn giá,Thành tiền,Tổng tiền đơn hàng");
+            writer.println("Mã đơn,Ngày đặt,Kênh bán,Tên sản phẩm,Số lượng,Đơn giá,Thành tiền,Mã giảm giá,Tiền giảm giá,Tổng tiền thanh toán");
             
             if (report.getOrders() != null) {
                 for (RevenueReportDTO.OrderSummaryDTO order : report.getOrders()) {
@@ -74,6 +74,9 @@ public class ReportExportServiceImpl implements ReportExportService {
                     
                     String orderType = order.getType() != null ? order.getType().toString() : "";
                     String orderTotal = "\"" + df.format(order.getTotalAmount() != null ? order.getTotalAmount() : 0.0) + "\"";
+                    String discountAmountStr = "\"" + df.format(order.getDiscountAmount() != null ? order.getDiscountAmount() : 0.0) + "\"";
+                    String couponCode = order.getCouponCode() != null ? order.getCouponCode() : "";
+                    if (!couponCode.isEmpty()) couponCode = "\"" + couponCode + "\"";
 
                     if (order.getItems() != null && !order.getItems().isEmpty()) {
                         for (RevenueReportDTO.OrderItemDTO item : order.getItems()) {
@@ -92,6 +95,8 @@ public class ReportExportServiceImpl implements ReportExportService {
                                     + quantity + ","
                                     + "\"" + df.format(price) + "\","
                                     + "\"" + df.format(itemTotal) + "\","
+                                    + couponCode + ","
+                                    + discountAmountStr + ","
                                     + orderTotal);
                         }
                     } else {
@@ -103,6 +108,8 @@ public class ReportExportServiceImpl implements ReportExportService {
                                 + "," // qty empty
                                 + "," // price empty
                                 + "," // item total empty
+                                + couponCode + ","
+                                + discountAmountStr + ","
                                 + orderTotal);
                     }
                 }

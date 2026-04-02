@@ -157,6 +157,17 @@ public class OrderServiceImpl implements OrderService {
 
             variant.setStockQuantity(variant.getStockQuantity() - item.getQuantity());
             productVariantRepository.save(variant);
+
+            // Tự động kiểm tra và cập nhật trạng thái cha nếu Hết Hàng
+            org.example.fashionstoresystem.entity.jpa.Product parentProduct = variant.getProduct();
+            boolean hasStock = parentProduct.getVariants().stream()
+                .anyMatch(v -> v.getStockQuantity() != null && v.getStockQuantity() > 0);
+            
+            if (!hasStock && parentProduct.getStatus() == org.example.fashionstoresystem.entity.enums.ProductStatus.ACTIVE) {
+                parentProduct.setStatus(org.example.fashionstoresystem.entity.enums.ProductStatus.OUT_OF_STOCK);
+                // JPA context will auto update the parentProduct when transaction commits,
+                // but if we had productRepository we could optionally call .save()
+            }
         }
 
         // 6. Xóa các mục này khỏi giỏ hàng

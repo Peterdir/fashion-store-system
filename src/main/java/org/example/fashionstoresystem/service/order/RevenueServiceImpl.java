@@ -46,11 +46,23 @@ public class RevenueServiceImpl implements RevenueService {
                 .offlineRevenue(offline)
                 .totalOrders(totalOrders)
                 .orders(orderList.stream()
-                        .map(order -> RevenueReportDTO.OrderSummaryDTO.builder()
+                        .map(order -> {
+                            double subtotal = 0.0;
+                            if (order.getOrderItems() != null) {
+                                for(var item : order.getOrderItems()) {
+                                    subtotal += (item.getPrice() != null ? item.getPrice() : 0.0) * (item.getQuantity() != null ? item.getQuantity() : 0);
+                                }
+                            }
+                            double discount = subtotal - (order.getTotalAmount() != null ? order.getTotalAmount() : 0.0);
+                            if (discount < 0) discount = 0.0; // Precaution for floating point negatives
+
+                            return RevenueReportDTO.OrderSummaryDTO.builder()
                                 .orderId(order.getId())
                                 .totalAmount(order.getTotalAmount())
                                 .type(order.getType())
                                 .orderDate(order.getOrderDate() != null ? order.getOrderDate().toString() : "")
+                                .discountAmount(discount)
+                                .couponCode(order.getCoupon() != null ? order.getCoupon().getCode() : "")
                                 .items(order.getOrderItems().stream()
                                         .map(item -> RevenueReportDTO.OrderItemDTO.builder()
                                                 .productName(item.getProductName())
@@ -58,7 +70,8 @@ public class RevenueServiceImpl implements RevenueService {
                                                 .price(item.getPrice() != null ? item.getPrice() : 0.0)
                                                 .build())
                                         .toList())
-                                .build())
+                                .build();
+                        })
                         .toList())
                 .build();
     }

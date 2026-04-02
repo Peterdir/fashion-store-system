@@ -26,7 +26,7 @@ public class EmailServiceImpl implements EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            String subject = "Xác thực tài khoản H&Y | Digital Curator";
+            String subject = "Xác thực tài khoản H&Y | H&Y Fashion";
             String verificationLink = "http://localhost:8080/verify-email?token=" + token;
             
             // Render HTML using Thymeleaf TemplateEngine
@@ -58,3 +58,4 @@ public class EmailServiceImpl implements EmailService {
         emailLogRepository.save(emailLog);
     }
 }
+

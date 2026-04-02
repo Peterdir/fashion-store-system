@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout}">
 <head>
-    <title th:text="${product != null ? product.name + ' - Digital Curator' : 'Product Detail - Digital Curator'}">Product Detail</title>
+    <title th:text="${product != null ? product.name + ' - H&Y Fashion' : 'Product Detail - H&Y Fashion'}">Product Detail</title>
 </head>
 <body>
 
@@ -21,8 +21,9 @@
                 <div class="flex-1 flex justify-center lg:justify-start">
                     <div class="bg-surface-low aspect-[3/4] overflow-hidden relative group w-full max-w-[550px] shadow-sm">
                         <img id="main-product-image" 
-                             th:src="${product.mainImage}" 
+                             th:src="@{${product.mainImage}}" 
                              th:alt="${product.name}" 
+                             onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22800%22 viewBox=%220 0 600 800%22%3E%3Crect width=%22600%22 height=%22800%22 fill=%22%23f3f4f6%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2216%22 fill=%22%239ca3af%22%3EImage Not Available%3C/text%3E%3C/svg%3E';"
                              class="w-full h-full object-cover transition-all duration-700">
                         
                         <!-- Mobile Thumbnails (Horizontal) -->
@@ -81,7 +82,7 @@
                         <div class="py-3 border-y border-outline/5">
                             <div class="flex items-center gap-3">
                                 <span class="text-[10px] font-bold uppercase text-neutral-400">Giá từ</span>
-                                <span class="text-2xl font-bold text-primary" th:text="${#numbers.formatDecimal(product.minPrice != null ? product.minPrice : 0, 0, 'POINT', 0, 'COMMA') + ' ₫'}">20.900 ₫</span>
+                                <span class="text-2xl font-bold text-primary" th:text="${#numbers.formatDecimal(product.minPrice != null ? product.minPrice : 0, 0, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</span>
                             </div>
                         </div>
 
@@ -109,7 +110,6 @@
                         <div class="space-y-3 pt-3" th:if="${product.variants != null && !product.variants.isEmpty()}">
                             <div class="flex justify-between text-[11px] font-bold uppercase tracking-widest">
                                 <span>Chọn kích cỡ</span>
-                                <a href="#" class="text-neutral-400 border-b border-neutral-200">Hướng dẫn chọn size</a>
                             </div>
                             <div class="flex flex-wrap gap-2" id="size-selector-container">
                                 <!-- JS will populate this -->
@@ -229,14 +229,16 @@
                 <div th:each="rp : ${relatedProducts}" class="group cursor-pointer">
                     <a th:href="@{'/product-detail/' + ${rp.productId}}" class="block">
                         <div class="bg-surface-low aspect-[3/4] overflow-hidden mb-6 relative">
-                            <img th:src="${rp.primaryImageUrl}" th:alt="${rp.name}" 
+                            <img th:src="@{${rp.primaryImageUrl}}" th:alt="${rp.name}" 
+                                 onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22400%22 viewBox=%220 0 300 400%22%3E%3Crect width=%22300%22 height=%22400%22 fill=%22%23f3f4f6%22/%3E%3C/svg%3E';"
                                  class="w-full h-full object-cover transition-all duration-1000 group-hover:scale-105">
-                            <img th:src="${rp.hoverImageUrl}" th:alt="${rp.name}" 
+                            <img th:src="@{${rp.hoverImageUrl}}" th:alt="${rp.name}" 
+                                 onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22400%22 viewBox=%220 0 300 400%22%3E%3Crect width=%22300%22 height=%22400%22 fill=%22%23f3f4f6%22/%3E%3C/svg%3E';"
                                  class="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                         </div>
                         <h4 class="text-[10px] font-bold uppercase tracking-[0.2em] mb-2 group-hover:text-secondary transition-colors" th:text="${rp.name}">Product Name</h4>
                         <p class="text-[11px] font-medium text-neutral-400" 
-                           th:text="${#numbers.formatDecimal(rp.minPrice != null ? rp.minPrice : 0, 0, 'POINT', 0, 'COMMA') + ' ₫'}">0 ₫</p>
+                           th:text="${#numbers.formatDecimal(rp.minPrice != null ? rp.minPrice : 0, 0, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</p>
                     </a>
                 </div>
             </div>
@@ -264,3 +266,4 @@
 
 </body>
 </html>
+

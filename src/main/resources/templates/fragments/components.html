@@ -5,13 +5,15 @@
     <!-- Image Wrapper -->
     <div class="relative overflow-hidden bg-surface-low aspect-[3/4] mb-6 group">
         <!-- Main Image -->
-        <img th:src="${product.primaryImageUrl != null ? product.primaryImageUrl : '/images/placeholder.png'}" 
+        <img th:src="@{${product.primaryImageUrl != null ? product.primaryImageUrl : 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22400%22 viewBox=%220 0 300 400%22%3E%3Crect width=%22300%22 height=%22400%22 fill=%22%23f3f4f6%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2214%22 fill=%22%239ca3af%22%3EImage Not Available%3C/text%3E%3C/svg%3E'}}" 
              th:alt="${product.name}" 
+             onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22400%22 viewBox=%220 0 300 400%22%3E%3Crect width=%22300%22 height=%22400%22 fill=%22%23f3f4f6%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2214%22 fill=%22%239ca3af%22%3EImage Not Available%3C/text%3E%3C/svg%3E';"
              class="w-full h-full object-cover opacity-100 group-hover:opacity-0 transition-opacity duration-700 ease-in-out">
         
         <!-- Hover Image -->
-        <img th:src="${product.hoverImageUrl != null ? product.hoverImageUrl : product.primaryImageUrl}" 
+        <img th:src="@{${product.hoverImageUrl != null ? product.hoverImageUrl : (product.primaryImageUrl != null ? product.primaryImageUrl : 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22400%22 viewBox=%220 0 300 400%22%3E%3Crect width=%22300%22 height=%22400%22 fill=%22%23f3f4f6%22/%3E%3C/svg%3E')}}" 
              th:alt="${product.name}" 
+             onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22400%22 viewBox=%220 0 300 400%22%3E%3Crect width=%22300%22 height=%22400%22 fill=%22%23f3f4f6%22/%3E%3C/svg%3E';"
              class="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out scale-105 group-hover:scale-100">
         
         <!-- Badges -->
@@ -49,8 +51,8 @@
         </div>
 
         <div class="flex items-center space-x-3 pt-1">
-            <span class="text-secondary font-bold text-sm" 
-                  th:text="${#numbers.formatCurrency(product.price)}">$0.00</span>
+            <p class="text-[11px] font-medium text-neutral-400" 
+               th:text="${#numbers.formatDecimal(product.price, 0, 'POINT', 0, 'COMMA') + ' VNĐ'}">0 VNĐ</p>
         </div>
     </div>
 </a>

@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutBtn = document.getElementById('cart-checkout-btn');
 
     function formatVND(amount) {
-        return new Intl.NumberFormat('vi-VN').format(amount) + '₫';
+        return new Intl.NumberFormat('vi-VN').format(amount) + ' VNĐ';
     }
 
     async function renderCartPage() {
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             <div class="flex justify-between items-end mt-8">
                                 <div class="flex items-baseline gap-3">
-                                    <div class="text-2xl font-black text-black tracking-tighter">${formatVND(item.price)}</div>
+                                    <p class="text-[12px] font-bold text-neutral-900">${new Intl.NumberFormat('vi-VN').format(item.price)} VNĐ</p>
                                 </div>
                                 
                                 <div class="relative">
@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
             grid.innerHTML = products.map(p => `
                 <div class="space-y-4 group cursor-pointer" onclick="window.location.href='/products/${p.productId}'">
                     <div class="aspect-[3/4] bg-surface-low relative overflow-hidden no-radius">
-                        <img src="${p.primaryImageUrl || '/images/placeholder.png'}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <img src="${p.primaryImageUrl || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22400%22 viewBox=%220 0 300 400%22%3E%3Crect width=%22300%22 height=%22400%22 fill=%22%23f3f4f6%22/%3E%3C/svg%3E'}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                         <div class="absolute top-0 left-0 bg-primary text-white text-[8px] font-black px-2 py-1 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Chi tiết</div>
                         ${p.status === 'NEW' ? '<div class="absolute top-2 right-2 bg-emerald-500 text-white text-[7px] font-bold px-1.5 py-0.5 uppercase italic">New</div>' : ''}
                     </div>

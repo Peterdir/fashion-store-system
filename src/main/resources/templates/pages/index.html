@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layout}">
 <head>
-    <title layout:title-pattern="$CONTENT_TITLE">Home - Digital Curator</title>
+    <title layout:title-pattern="$CONTENT_TITLE">Home - H&Y Fashion Store</title>
 </head>
 <body>
 
@@ -41,27 +41,70 @@
     </section>
 
     <!-- Featured Collections Grid -->
-    <section class="bg-background editorial-spacing">
+    <section class="bg-background editorial-spacing" th:if="${not #lists.isEmpty(categories)}">
         <div class="max-w-[1440px] mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-px border border-outline/10">
-                <!-- Collection 1 -->
-                <div class="bg-surface-card editorial-spacing px-12 group cursor-pointer border-r border-outline/10">
-                    <div class="overflow-hidden mb-12">
-                        <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&q=80&w=800" alt="Essentials" class="w-full grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000">
-                    </div>
-                    <h3 class="text-2xl mb-4">The Essentials</h3>
-                    <p class="text-neutral-500 text-sm mb-8 font-sans">Core pieces designed for daily endurance.</p>
-                    <span class="text-[10px] tracking-[0.2em] font-bold uppercase border-b-2 border-secondary pb-1">Explore</span>
+            <div class="mb-12">
+                <h2 class="text-sm font-bold tracking-[0.3em] uppercase text-neutral-400">Collections</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px border border-outline/10">
+                <!-- Dynamic Category Loop -->
+                <div th:each="cat : ${categories}" class="bg-surface-card editorial-spacing px-12 group cursor-pointer border-r border-b border-outline/10">
+                    <a th:href="@{/category(keyword=${cat.name})}" class="block">
+                        <div class="aspect-[3/4] overflow-hidden mb-12 bg-neutral-100">
+                            <img th:src="${cat.imageUrl != null ? (cat.imageUrl.startsWith('http') ? cat.imageUrl : '/' + cat.imageUrl) : '/images/placeholder.png'}" 
+                                 th:alt="${cat.name}" 
+                                 class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000">
+                        </div>
+                        <h3 class="text-2xl mb-4" th:text="${cat.name}">Category Name</h3>
+                        <p class="text-neutral-500 text-sm mb-8 font-sans" th:text="${cat.childCount > 0 ? cat.childCount + ' Subcategories' : 'Explore pieces'}">Subcategories</p>
+                        <span class="text-[10px] tracking-[0.2em] font-bold uppercase border-b-2 border-secondary pb-1">Explore</span>
+                    </a>
                 </div>
-                
-                <!-- Collection 2 -->
-                <div class="bg-surface-card editorial-spacing px-12 group cursor-pointer">
-                    <div class="overflow-hidden mb-12">
-                        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800" alt="Avant Garde" class="w-full grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000">
-                    </div>
-                    <h3 class="text-2xl mb-4">Avant-Garde</h3>
-                    <p class="text-neutral-500 text-sm mb-8 font-sans">Breaking the silhouette of traditional luxury.</p>
-                    <span class="text-[10px] tracking-[0.2em] font-bold uppercase border-b-2 border-secondary pb-1">Explore</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products Section -->
+    <section class="bg-white editorial-spacing" th:if="${not #lists.isEmpty(featuredProducts)}">
+        <div class="max-w-[1440px] mx-auto px-6">
+            <div class="flex justify-between items-end mb-16">
+                <div>
+                    <h2 class="text-sm font-bold tracking-[0.3em] uppercase text-neutral-400 mb-4">Latest Arrivals</h2>
+                    <h3 class="text-4xl">New Pieces</h3>
+                </div>
+                <a th:href="@{/category}" class="text-[10px] tracking-[0.2em] font-bold uppercase border-b-2 border-primary pb-1 hover:border-secondary transition-colors">
+                    View All
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+                <!-- Product Card Loop -->
+                <div th:each="product : ${featuredProducts}" class="group">
+                    <a th:href="@{'/product-detail/' + ${product.productId}}" class="block">
+                        <div class="relative aspect-[3/4] overflow-hidden mb-6 bg-neutral-100">
+                            <!-- Primary Image -->
+                            <img th:src="${product.primaryImageUrl}" 
+                                 th:alt="${product.name}"
+                                 class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 group-hover:opacity-0">
+                            <!-- Hover Image -->
+                            <img th:src="${product.hoverImageUrl}" 
+                                 th:alt="${product.name}"
+                                 class="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 group-hover:opacity-100 group-hover:scale-105">
+                            
+                            <!-- Badges -->
+                            <div class="absolute top-4 left-4" th:if="${product.status != null and product.status.name() != 'ACTIVE'}">
+                                <span class="bg-primary text-white text-[9px] font-bold tracking-widest uppercase px-3 py-1" th:text="${product.status}">STATUS</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <h4 class="text-xs tracking-[0.1em] text-neutral-400 uppercase font-bold" th:text="${product.category}">Category</h4>
+                            <h3 class="text-lg font-medium group-hover:text-secondary transition-colors" th:text="${product.name}">Product Name</h3>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-sm font-bold" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' ₫'}">0 ₫</span>
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
