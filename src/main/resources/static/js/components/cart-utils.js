@@ -75,6 +75,34 @@ class CartUtils {
         localStorage.setItem(this.CART_KEY, JSON.stringify(cart));
     }
 
+    static async syncWithServer() {
+        if (!window.AuthUtils || !AuthUtils.isAuthenticated()) return;
+
+        try {
+            const response = await fetch('/api/cart');
+            if (response.ok) {
+                const data = await response.json();
+                const serverItems = data.items.map(item => ({
+                    id: item.cartItemId, // Frontend usually uses 'id' for the cart row
+                    variantId: item.variantId,
+                    productId: item.productId, // We'll need to add this to the DTO or use variantId
+                    name: item.productName,
+                    price: item.price,
+                    quantity: item.quantity,
+                    image: item.primaryImageUrl || '/images/placeholder.png',
+                    color: item.color,
+                    size: item.size
+                }));
+                this.saveCartLocallyOnly(serverItems);
+                this.updateCartIconBadge();
+                return serverItems;
+            }
+        } catch (error) {
+            console.error('Error syncing cart with server:', error);
+        }
+        return null;
+    }
+
     static updateCartIconBadge() {
         const cart = this.getCart();
         const totalCount = cart.reduce((acc, curr) => acc + curr.quantity, 0);

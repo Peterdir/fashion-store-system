@@ -501,7 +501,7 @@ const OrderModule = {
                     ${payBtn}
                     ${cancelBtn}
                     ${this.renderItemActions(item, statusEnum)}
-                    ${!returnBtn && !cancelBtn && !payBtn && !this.renderItemActions(item, statusEnum) ? `<a href="/product-detail/${item.productId}" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 hover:text-black transition-colors">Mua lại</a>` : (returnBtn || '')}
+                    ${!returnBtn && !cancelBtn && !payBtn && !this.renderItemActions(item, statusEnum) ? `<a href="/product-detail/${item.productId}" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-gray-400 hover:text-black transition-colors">Chi tiết sản phẩm</a>` : (returnBtn || '')}
                 </div>
             </div>
         `;
@@ -512,13 +512,6 @@ const OrderModule = {
         const isRefunded = item.refundStatus === 'COMPLETED';
         let buttons = '';
 
-        if (isFailure || isRefunded) {
-            buttons += `
-                <button onclick="OrderModule.repurchaseOrder(${orderId})" class="flex-1 text-center py-2.5 text-[9px] font-black tracking-widest uppercase text-secondary hover:bg-neutral-50 transition-colors flex items-center justify-center gap-1">
-                    <span class="material-symbols-outlined text-[13px]">refresh</span> Mua lại
-                </button>
-            `;
-        }
 
         if (status === 'DELIVERED' || status === 'COMPLETED') {
             if (item.isReviewed) {
@@ -961,65 +954,7 @@ const OrderModule = {
         }, 300);
     },
 
-    /**
-     * Repurchase an order (opens confirmation modal)
-     */
-    async repurchaseOrder(orderId) {
-        this.openRepurchaseModal(orderId);
-    },
 
-    openRepurchaseModal(orderId) {
-        this.selectedOrderIdForRepurchase = orderId;
-        const modal = document.getElementById('repurchase-order-modal');
-        const backdrop = modal.querySelector('.bg-backdrop-repurchase');
-        const content = modal.querySelector('.bg-modal-repurchase');
-
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            backdrop.classList.add('opacity-100');
-            content.classList.remove('scale-95', 'opacity-0');
-            content.classList.add('scale-100', 'opacity-100');
-        }, 10);
-    },
-
-    closeRepurchaseModal() {
-        const modal = document.getElementById('repurchase-order-modal');
-        const backdrop = modal.querySelector('.bg-backdrop-repurchase');
-        const content = modal.querySelector('.bg-modal-repurchase');
-
-        backdrop.classList.remove('opacity-100');
-        content.classList.add('scale-95', 'opacity-0');
-        content.classList.remove('scale-100', 'opacity-100');
-
-        setTimeout(() => {
-            modal.classList.add('hidden');
-        }, 300);
-    },
-
-    async submitRepurchaseOrder() {
-        const orderId = this.selectedOrderIdForRepurchase;
-        if (!orderId) return;
-
-        try {
-            const response = await fetch(`/api/orders/${orderId}/repurchase`, {
-                method: 'POST'
-            });
-
-            this.closeRepurchaseModal();
-
-            if (response.ok) {
-                alert('Đã thêm các sản phẩm vào giỏ hàng thành công!');
-                window.location.href = '/cart';
-            } else {
-                const err = await response.json();
-                alert('Lỗi: ' + (err.message || 'Không thể mua lại đơn hàng.'));
-            }
-        } catch (error) {
-            console.error('Repurchase error:', error);
-            this.closeRepurchaseModal();
-            alert('Đã xảy ra lỗi khi kết nối với máy chủ.');
-        }
-    },
 
     /**
      * Product Review Modal Management
@@ -1437,7 +1372,7 @@ const OrderModule = {
                                             Ngày đánh giá: ${reviewDate}
                                         </span>
                                         <a href="/product-detail/${review.productId}" class="text-[9px] font-black uppercase tracking-[0.2em] text-primary hover:text-black transition-colors flex items-center gap-1">
-                                            Buy Again <span class="material-symbols-outlined text-sm">refresh</span>
+                                            Xem sản phẩm <span class="material-symbols-outlined text-sm">arrow_forward</span>
                                         </a>
                                     </div>
                                 </div>

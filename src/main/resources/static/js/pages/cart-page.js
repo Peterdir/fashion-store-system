@@ -19,6 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function renderCartPage() {
         if (typeof CartUtils === 'undefined') return;
+
+        // Tự động đồng bộ giỏ hàng với máy chủ nếu người dùng đã đăng nhập (để lấy sp mua lại)
+        if (typeof AuthUtils !== 'undefined' && AuthUtils.isAuthenticated()) {
+            await CartUtils.syncWithServer();
+        }
+
         const cart = CartUtils.getCart();
 
         if (cart.length === 0) {

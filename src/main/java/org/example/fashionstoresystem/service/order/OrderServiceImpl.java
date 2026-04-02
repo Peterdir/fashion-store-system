@@ -512,29 +512,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
-    public void repurchaseOrder(Long userId, Long orderId) {
-        Order order = orderRepository.findByIdAndUserId(orderId, userId)
-                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại!"));
-
-        for (OrderItem item : order.getOrderItems()) {
-            if (item.getProductVariant() != null) {
-                AddToCartRequestDTO addDto = AddToCartRequestDTO.builder()
-                        .variantId(item.getProductVariant().getId())
-                        .quantity(item.getQuantity().intValue())
-                        .build();
-                try {
-                    // Thử thêm vào giỏ hàng, nếu hết hàng hoặc lỗi thì bỏ qua món đó
-                    cartService.addToCart(userId, addDto);
-                } catch (Exception e) {
-                    // Log cảnh báo nhưng vẫn tiếp tục với các món khác
-                    System.err.println("Không thể mua lại sản phẩm " + item.getProductName() + ": " + e.getMessage());
-                }
-            }
-        }
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public OrderDashboardSummaryDTO getDashboardSummary(Long userId) {
         List<Object[]> statusCounts = orderRepository.countMyOrdersByItemStatus(userId);

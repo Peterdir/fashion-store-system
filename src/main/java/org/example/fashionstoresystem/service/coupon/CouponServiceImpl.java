@@ -124,7 +124,8 @@ public class CouponServiceImpl implements CouponService {
 
         return ApplyCouponResponseDTO.builder()
                 .couponCode(coupon.getCode())
-                .discountValue(discountAmount)
+                .discountValue(coupon.getDiscountValue()) // Original (e.g. 10 for 10%)
+                .discountAmount(discountAmount) // Calculated (e.g. 36000)
                 .discountType(coupon.getDiscountType())
                 .newTotalAmount(newTotal)
                 .message("Áp dụng mã giảm giá thành công! Giảm " + discountAmount + "đ")
