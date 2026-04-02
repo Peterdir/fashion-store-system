@@ -60,20 +60,22 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <input type="checkbox" checked data-id="${item.variantId || item.id}" value="${item.variantId || item.id}" 
                                        class="item-checkbox w-5 h-5 border-2 border-outline !rounded-none text-primary focus:ring-0 cursor-pointer"/>
                             </div>
-                            <div class="w-36 h-48 bg-surface-low overflow-hidden shrink-0 border border-outline/5 relative shadow-sm group-hover/item:shadow-md transition-all duration-500">
-                                <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-1000">
-                                <div class="absolute inset-0 bg-black/0 group-hover/item:bg-black/5 transition-colors"></div>
-                            </div>
-                        </div>
-
-                        <!-- Content Area -->
-                        <div class="flex-grow flex flex-col justify-between">
-                            <div class="space-y-6">
-                                <!-- Title & Basic Info -->
-                                <div class="flex justify-between items-start gap-6">
-                                    <div class="space-y-1">
-                                        <h3 class="text-base font-black leading-tight tracking-tighter uppercase mb-2">${item.name}</h3>
-                                    </div>
+                            <div class="w-36 h-48 bg-surface-low overflow-hidden shrink-0 border border-outline/5 relative shadow-sm group-hover/item:shadow-md transition-all duration-500 cursor-pointer"
+                                 onclick="window.location.href='/product-detail/${item.productId || item.id}'">
+                                 <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-1000">
+                                 <div class="absolute inset-0 bg-black/0 group-hover/item:bg-black/5 transition-colors"></div>
+                             </div>
+                         </div>
+ 
+                         <!-- Content Area -->
+                         <div class="flex-grow flex flex-col justify-between">
+                             <div class="space-y-6">
+                                 <!-- Title & Basic Info -->
+                                 <div class="flex justify-between items-start gap-6">
+                                     <div class="space-y-1">
+                                         <h3 class="text-base font-black leading-tight tracking-tighter uppercase mb-2 cursor-pointer hover:text-secondary transition-colors"
+                                             onclick="window.location.href='/product-detail/${item.productId || item.id}'">${item.name}</h3>
+                                     </div>
                                     <div class="flex gap-4">
                                         <button onclick="CartPage.toggleWishlist('${item.productId || item.id}', this)" 
                                                 title="Lưu để mua sau"
@@ -300,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             grid.innerHTML = products.map(p => `
-                <div class="space-y-4 group cursor-pointer" onclick="window.location.href='/products/${p.productId}'">
+                <div class="space-y-4 group cursor-pointer" onclick="window.location.href='/product-detail/${p.productId}'">
                     <div class="aspect-[3/4] bg-surface-low relative overflow-hidden no-radius">
                         <img src="${p.primaryImageUrl || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22400%22 viewBox=%220 0 300 400%22%3E%3Crect width=%22300%22 height=%22400%22 fill=%22%23f3f4f6%22/%3E%3C/svg%3E'}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                         <div class="absolute top-0 left-0 bg-primary text-white text-[8px] font-black px-2 py-1 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Chi tiết</div>

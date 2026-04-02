@@ -722,12 +722,11 @@
                                             </div>
 
                                             <!-- Image Section -->
-                                            <div class="relative aspect-[3/4] overflow-hidden bg-surface-low mb-3" onclick="if(PersonalCenter.recentlyViewedSelectionMode) { this.parentElement.querySelector('.item-checkbox').click(); } else { window.location.href='/product/' + this.parentElement.dataset.productId; }">
+                                            <div class="relative aspect-[3/4] overflow-hidden bg-surface-low mb-3" onclick="if(PersonalCenter.recentlyViewedSelectionMode) { this.parentElement.querySelector('.item-checkbox').click(); } else { window.location.href='/product-detail/' + this.parentElement.dataset.productId; }">
                                                 <img th:src="${item.imageUrl}" th:alt="${item.productName}" 
                                                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                                                 
-                                                <!-- Brand Label -->
-                                                <span class="absolute top-4 left-4 text-sm font-medium text-on-surface/40" th:text="${item.brandName}">Dazy</span>
+
 
                                                 <!-- Discount Badge -->
                                                 <div class="absolute bottom-4 left-4 bg-red-50 text-red-500 px-1.5 py-0.5 text-[10px] font-black">
