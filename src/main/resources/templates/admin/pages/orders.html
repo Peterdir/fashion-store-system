@@ -181,6 +181,29 @@
             </div>
         </div>
 
+        <!-- REFUND CONFIRM MODAL -->
+        <div id="refund-confirm-modal" class="fixed inset-0 z-[60] hidden">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="AdminOrders.closeRefundModal()"></div>
+            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-white shadow-2xl p-6">
+                <div class="text-center">
+                    <div class="w-14 h-14 mx-auto mb-4 bg-amber-50 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-3xl text-amber-500">payments</span>
+                    </div>
+                    <h3 class="text-sm font-black uppercase tracking-wide mb-1">Xác nhận hoàn tiền?</h3>
+                    <p class="text-[11px] font-medium text-neutral-400 mb-1" id="refund-item-name"></p>
+                    <p class="text-[10px] text-neutral-500 mb-4">Bạn có chắc chắn muốn đánh dấu sản phẩm này là đã hoàn tiền? Hành động này sẽ gửi thông báo cho khách hàng.</p>
+                </div>
+                <div class="flex items-center justify-center gap-3">
+                    <button onclick="AdminOrders.closeRefundModal()" class="px-5 py-2 text-[10px] font-black uppercase tracking-widest text-neutral-500 hover:bg-neutral-100 transition-colors">
+                        Hủy
+                    </button>
+                    <button id="btn-confirm-refund" class="bg-amber-600 text-white px-5 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-amber-700 transition-colors flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[14px]">check_circle</span> Xác nhận
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Toast Container -->
         <div id="admin-toast" class="fixed bottom-6 right-6 z-[100] space-y-2"></div>
 

@@ -5,6 +5,7 @@ import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderDetailResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderSummaryResponseDTO;
 import org.example.fashionstoresystem.entity.enums.OrderStatus;
+import org.example.fashionstoresystem.entity.enums.RefundStatus;
 import org.example.fashionstoresystem.service.order.OrderManagementService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,6 +57,15 @@ public class AdminOrderController {
             @RequestParam OrderStatus status
     ) {
         orderManagementService.updateOrderItemStatus(itemId, status);
+        return ResponseEntity.noContent().build();
+    }
+    // CẬP NHẬT TRẠNG THÁI HOÀN TIỀN
+    @PatchMapping("/items/{itemId}/refund-status")
+    public ResponseEntity<Void> updateRefundStatus(
+            @PathVariable Long itemId,
+            @RequestParam RefundStatus status
+    ) {
+        orderManagementService.updateRefundStatus(itemId, status);
         return ResponseEntity.noContent().build();
     }
 }

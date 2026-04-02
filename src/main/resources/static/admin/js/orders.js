@@ -10,6 +10,7 @@ const AdminOrders = (() => {
         DETAIL: (id) => `/api/admin/orders/${id}`,
         UPDATE_STATUS: (id) => `/api/admin/orders/${id}/status`,
         UPDATE_ITEM_STATUS: (itemId) => `/api/admin/orders/items/${itemId}/status`,
+        UPDATE_REFUND_STATUS: (itemId) => `/api/admin/orders/items/${itemId}/refund-status`,
     };
 
     const PAGE_SIZE = 10;
@@ -47,6 +48,13 @@ const AdminOrders = (() => {
         VNPAY: 'VNPay',
         MOMO: 'MoMo',
         BANK_TRANSFER: 'Chuyển khoản',
+    };
+ 
+    const REFUND_LABELS = {
+        NONE: 'Chưa có',
+        PENDING: 'Đang xử lý',
+        COMPLETED: 'Đã hoàn tiền',
+        FAILED: 'Thất bại',
     };
 
     // Allowed next statuses from current status (admin workflow)
@@ -319,9 +327,15 @@ const AdminOrders = (() => {
                 <div class="mt-3 flex items-center justify-between gap-2 flex-wrap">
                     <div class="flex items-center gap-2">
                         ${renderStatusBadge(item.status)}
-                        ${item.refundStatus ? `<span class="text-[9px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 uppercase tracking-widest">Hoàn: ${item.refundStatus}</span>` : ''}
+                        ${item.refundStatus && item.refundStatus !== 'NONE' ? `<span class="text-[9px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 uppercase tracking-widest">Hoàn: ${REFUND_LABELS[item.refundStatus]}</span>` : ''}
                     </div>
-                    ${hasActions ? `
+                    ${item.status === 'CANCELLED' && item.refundStatus !== 'COMPLETED' ? `
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="AdminOrders.openRefundModal(${item.orderItemId}, '${item.productName.replace(/'/g, "\\'")}', 'COMPLETED')"
+                                class="bg-amber-600 text-white px-2.5 py-1 text-[9px] font-black uppercase tracking-widest hover:bg-amber-700 transition-colors">
+                            Xác nhận hoàn tiền
+                        </button>
+                    </div>` : (hasActions ? `
                     <div class="flex items-center gap-1.5">
                         <select id="item-status-${item.orderItemId}" class="px-2 py-1 text-[10px] font-medium border border-neutral-200 bg-neutral-50 outline-none">
                             <option value="">Chuyển trạng thái...</option>
@@ -331,7 +345,7 @@ const AdminOrders = (() => {
                                 class="bg-primary text-white px-2.5 py-1 text-[9px] font-black uppercase tracking-widest hover:bg-neutral-800 transition-colors">
                             Cập nhật
                         </button>
-                    </div>` : ''}
+                    </div>` : '')}
                 </div>
 
                 ${item.histories && item.histories.length > 0 ? `
@@ -480,6 +494,63 @@ const AdminOrders = (() => {
         init();
     }
 
+    // ===== UPDATE REFUND STATUS =====
+    let currentRefundItem = null;
+
+    function openRefundModal(itemId, productName, targetStatus) {
+        currentRefundItem = { itemId, targetStatus };
+        $('refund-item-name').textContent = productName;
+        $('refund-confirm-modal').classList.remove('hidden');
+        
+        const btn = $('btn-confirm-refund');
+        btn.onclick = () => updateRefundStatus(itemId, targetStatus);
+    }
+
+    function closeRefundModal() {
+        $('refund-confirm-modal').classList.add('hidden');
+        currentRefundItem = null;
+    }
+
+    async function updateRefundStatus(itemId, status) {
+        const btn = $('btn-confirm-refund');
+        const originalContent = btn.innerHTML;
+        
+        // Loading state
+        btn.disabled = true;
+        btn.innerHTML = `<span class="material-symbols-outlined text-[14px] animate-spin">sync</span> Đang xử lý...`;
+
+        try {
+            const res = await fetch(`${API.UPDATE_REFUND_STATUS(itemId)}?status=${status}`, {
+                method: 'PATCH',
+            });
+            if (res.status === 401 || res.status === 403) {
+                window.location.href = '/admin/login';
+                return;
+            }
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.message || 'Cập nhật trạng thái hoàn tiền thất bại');
+            }
+
+            showToast('Cập nhật trạng thái hoàn tiền thành công!');
+            
+            closeRefundModal();
+
+            // Reload modal
+            const orderIdText = $('modal-order-id').textContent;
+            const match = orderIdText.match(/#ORD-(\d+)/);
+            if (match) {
+                const orderId = parseInt(match[1]);
+                await openDetail(orderId);
+            }
+        } catch (err) {
+            showToast(err.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalContent;
+        }
+    }
+
     // Public API
-    return { openDetail, closeModal, updateItemStatus, updateWholeOrderStatus };
+    return { openDetail, closeModal, updateItemStatus, updateWholeOrderStatus, updateRefundStatus, openRefundModal, closeRefundModal };
 })();

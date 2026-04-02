@@ -374,15 +374,15 @@ const AdminReports = (() => {
                         label: 'Online',
                         data: onlineData,
                         backgroundColor: '#3b82f6',
-                        barPercentage: 0.8,
-                        categoryPercentage: 0.8
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.7
                     },
                     {
                         label: 'Offline',
                         data: offlineData,
                         backgroundColor: '#fbbf24',
-                        barPercentage: 0.8,
-                        categoryPercentage: 0.8
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.7
                     }
                 ]
             },
@@ -395,9 +395,9 @@ const AdminReports = (() => {
                         align: 'end',
                         labels: {
                             usePointStyle: true,
-                            boxWidth: 8,
-                            font: { family: 'Inter', size: 11, weight: '600' },
-                            padding: 20
+                            boxWidth: 6,
+                            font: { family: 'Inter', size: 10, weight: '600' },
+                            padding: 10
                         }
                     },
                     tooltip: {
@@ -425,7 +425,7 @@ const AdminReports = (() => {
                     x: {
                         stacked: true,
                         grid: { display: false },
-                        ticks: { font: { family: 'Inter', size: 10 }, color: '#a3a3a3' },
+                        ticks: { font: { family: 'Inter', size: 9 }, color: '#a3a3a3' },
                         border: { display: false }
                     },
                     y: {
@@ -433,7 +433,7 @@ const AdminReports = (() => {
                         beginAtZero: true,
                         grid: { color: '#f5f5f5', borderDash: [4, 4] },
                         ticks: {
-                            font: { family: 'Inter', size: 10 },
+                            font: { family: 'Inter', size: 9 },
                             color: '#a3a3a3',
                             callback: function(value) {
                                 if (value >= 1000000000) return (value / 1000000000) + ' Tỷ';

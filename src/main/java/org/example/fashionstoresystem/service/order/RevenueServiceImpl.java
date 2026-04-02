@@ -35,7 +35,7 @@ public class RevenueServiceImpl implements RevenueService {
 
         int totalOrders = orderRepository.countOrders(startDate, adjustedEndDate);
         
-        List<Order> orderList = orderRepository.findByOrderDateBetween(startDate, adjustedEndDate);
+        List<Order> orderList = orderRepository.findActiveOrdersInPeriod(startDate, adjustedEndDate);
 
         return combineToDetailedRevenueReport(onlineRevenue, offlineRevenue, totalOrders, orderList);
     }

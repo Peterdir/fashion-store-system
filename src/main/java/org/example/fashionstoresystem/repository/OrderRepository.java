@@ -26,14 +26,21 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // Lấy tất cả đơn hàng trong khoảng thời gian
     List<Order> findByOrderDateBetween(Date startDate, Date endDate);
+ 
+    // Lấy các đơn hàng không bị hủy trong khoảng thời gian (phục vụ báo cáo doanh thu)
+    @Query("SELECT o FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate " +
+           "AND EXISTS (SELECT 1 FROM OrderItem oi WHERE oi.order = o AND oi.status != 'CANCELLED')")
+    List<Order> findActiveOrdersInPeriod(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
-    // Tính tổng doanh thu theo loại đơn (ONLINE/OFFLINE) trong khoảng thời gian
-    @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate AND o.type = :type")
+    // Tính tổng doanh thu theo loại đơn (ONLINE/OFFLINE) trong khoảng thời gian, loại bỏ đơn đã hủy
+    @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate AND o.type = :type " +
+           "AND EXISTS (SELECT 1 FROM OrderItem oi WHERE oi.order = o AND oi.status != 'CANCELLED')")
     Double calculateTotalRevenue(@Param("startDate") Date startDate, @Param("endDate") Date endDate,
             @Param("type") OrderType type);
 
-    // Đếm số lượng đơn hàng trong khoảng thời gian
-    @Query("SELECT COUNT(o) FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate")
+    // Đếm số lượng đơn hàng trong khoảng thời gian, loại bỏ đơn đã hủy
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate " +
+           "AND EXISTS (SELECT 1 FROM OrderItem oi WHERE oi.order = o AND oi.status != 'CANCELLED')")
     int countOrders(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
     @Query("SELECT DISTINCT o FROM Order o LEFT JOIN o.orderItems oi WHERE (?1 IS NULL OR oi.status = ?1) AND (CAST(?2 AS date) IS NULL OR o.orderDate >= ?2) AND (CAST(?3 AS date) IS NULL OR o.orderDate <= ?3)")
@@ -53,8 +60,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // 5 đơn hàng mới nhất
     List<Order> findTop5ByOrderByOrderDateDesc();
 
-    // Tổng doanh thu trong khoảng thời gian (tất cả loại)
-    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate")
+    // Tổng doanh thu trong khoảng thời gian (tất cả loại), loại bỏ đơn đã hủy
+    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate " +
+           "AND EXISTS (SELECT 1 FROM OrderItem oi WHERE oi.order = o AND oi.status != 'CANCELLED')")
     Double calculateTotalRevenueAll(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
     // Đếm đơn theo từng trạng thái
