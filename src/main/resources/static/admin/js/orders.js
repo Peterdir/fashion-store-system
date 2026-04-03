@@ -57,6 +57,13 @@ const AdminOrders = (() => {
         FAILED: 'Thất bại',
     };
 
+    const RETURN_LABELS = {
+        PENDING: 'Chờ duyệt',
+        APPROVED: 'Đã duyệt',
+        REJECTED: 'Từ chối',
+        COMPLETED: 'Hoàn tất'
+    };
+
     // Allowed next statuses from current status (admin workflow)
     const STATUS_TRANSITIONS = {
         PENDING_CONFIRMATION: ['PROCESSING', 'CANCELLED'],
@@ -310,6 +317,8 @@ const AdminOrders = (() => {
             ).join('');
 
             const hasActions = transitions.length > 0;
+            const isRefunding = item.refundStatus === 'PENDING';
+            const isReturned = item.returnRequestId != null;
 
             return `<div class="border border-neutral-100 p-4">
                 <div class="flex items-start justify-between gap-3">
@@ -320,6 +329,12 @@ const AdminOrders = (() => {
                             ${item.color ? `<span>Màu: <strong class="text-neutral-600">${item.color}</strong></span>` : ''}
                             <span>SL: <strong class="text-neutral-600">${item.quantity}</strong></span>
                         </div>
+                        ${isReturned ? `
+                        <div class="mt-2 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[14px] text-amber-500">assignment_return</span>
+                            <span class="text-[10px] font-black uppercase text-amber-600">Yêu cầu hoàn trả: ${RETURN_LABELS[item.returnStatus] || item.returnStatus}</span>
+                            <a href="/admin/returns?requestId=${item.returnRequestId}" class="text-[9px] font-bold text-blue-600 underline uppercase ml-1">Xem yêu cầu</a>
+                        </div>` : ''}
                     </div>
                     <p class="text-[12px] font-black text-primary whitespace-nowrap">${formatCurrency(item.price * item.quantity)}</p>
                 </div>
@@ -329,13 +344,17 @@ const AdminOrders = (() => {
                         ${renderStatusBadge(item.status)}
                         ${item.refundStatus && item.refundStatus !== 'NONE' ? `<span class="text-[9px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 uppercase tracking-widest">Hoàn: ${REFUND_LABELS[item.refundStatus]}</span>` : ''}
                     </div>
-                    ${item.status === 'CANCELLED' && item.refundStatus !== 'COMPLETED' ? `
+                    ${((item.status === 'CANCELLED' && item.refundStatus === 'PENDING') || (item.returnStatus === 'APPROVED' && item.refundStatus === 'PENDING')) ? `
                     <div class="flex items-center gap-1.5">
                         <button onclick="AdminOrders.openRefundModal(${item.orderItemId}, '${item.productName.replace(/'/g, "\\'")}', 'COMPLETED')"
                                 class="bg-amber-600 text-white px-2.5 py-1 text-[9px] font-black uppercase tracking-widest hover:bg-amber-700 transition-colors">
                             Xác nhận hoàn tiền
                         </button>
-                    </div>` : (hasActions ? `
+                    </div>` : (item.returnStatus === 'PENDING' ? `
+                    <div class="flex items-center gap-1.5">
+                         <span class="text-[9px] font-bold text-amber-500 uppercase italic">Chờ duyệt hoàn trả</span>
+                    </div>
+                    ` : (hasActions ? `
                     <div class="flex items-center gap-1.5">
                         <select id="item-status-${item.orderItemId}" class="px-2 py-1 text-[10px] font-medium border border-neutral-200 bg-neutral-50 outline-none">
                             <option value="">Chuyển trạng thái...</option>
@@ -345,7 +364,7 @@ const AdminOrders = (() => {
                                 class="bg-primary text-white px-2.5 py-1 text-[9px] font-black uppercase tracking-widest hover:bg-neutral-800 transition-colors">
                             Cập nhật
                         </button>
-                    </div>` : '')}
+                    </div>` : ''))}
                 </div>
 
                 ${item.histories && item.histories.length > 0 ? `

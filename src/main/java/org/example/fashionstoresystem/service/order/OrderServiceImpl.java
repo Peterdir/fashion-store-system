@@ -18,6 +18,8 @@ import org.example.fashionstoresystem.entity.enums.OrderStatus;
 import org.example.fashionstoresystem.entity.enums.OrderType;
 import org.example.fashionstoresystem.entity.enums.PaymentMethod;
 import org.example.fashionstoresystem.entity.enums.RefundStatus;
+import org.example.fashionstoresystem.entity.enums.ReturnStatus;
+import org.example.fashionstoresystem.entity.jpa.ReturnRequest;
 import org.example.fashionstoresystem.entity.jpa.CartItem;
 import org.example.fashionstoresystem.entity.jpa.Coupon;
 import org.example.fashionstoresystem.entity.jpa.Order;
@@ -284,6 +286,7 @@ public class OrderServiceImpl implements OrderService {
                 .orderDate(order.getOrderDate())
                 .totalAmount(order.getTotalAmount())
                 .paymentMethod(order.getPaymentMethod())
+                .status(order.getStatus())
                 .itemCount(order.getOrderItems().size())
                 .statusSummary(statusSummary)
                 .items(itemPreviews)
@@ -390,6 +393,7 @@ public class OrderServiceImpl implements OrderService {
                 .orderId(order.getId())
                 .orderDate(order.getOrderDate())
                 .totalAmount(order.getTotalAmount())
+                .status(order.getStatus())
                 .paymentMethod(order.getPaymentMethod())
                 .shippingAddress(order.getShippingAddress())
                 .subtotalAmount(subtotal)
@@ -505,29 +509,6 @@ public class OrderServiceImpl implements OrderService {
         return MessageResponseDTO.builder()
                 .message(message)
                 .build();
-    }
-
-    @Override
-    @Transactional
-    public void repurchaseOrder(Long userId, Long orderId) {
-        Order order = orderRepository.findByIdAndUserId(orderId, userId)
-                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại!"));
-
-        for (OrderItem item : order.getOrderItems()) {
-            if (item.getProductVariant() != null) {
-                AddToCartRequestDTO addDto = AddToCartRequestDTO.builder()
-                        .variantId(item.getProductVariant().getId())
-                        .quantity(item.getQuantity().intValue())
-                        .build();
-                try {
-                    // Thử thêm vào giỏ hàng, nếu hết hàng hoặc lỗi thì bỏ qua món đó
-                    cartService.addToCart(userId, addDto);
-                } catch (Exception e) {
-                    // Log cảnh báo nhưng vẫn tiếp tục với các món khác
-                    System.err.println("Không thể mua lại sản phẩm " + item.getProductName() + ": " + e.getMessage());
-                }
-            }
-        }
     }
 
     @Override

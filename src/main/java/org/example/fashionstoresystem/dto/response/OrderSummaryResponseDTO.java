@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.fashionstoresystem.entity.enums.OrderStatus;
 import org.example.fashionstoresystem.entity.enums.PaymentMethod;
 
 import java.util.Date;
@@ -20,6 +21,7 @@ public class OrderSummaryResponseDTO {
     private Double totalAmount;
     private PaymentMethod paymentMethod;
     private int itemCount;
+    private OrderStatus status; // Trạng thái tổng quát của đơn hàng
     // Tổng hợp trạng thái của từng sản phẩm: VD {"PAID": 2, "SHIPPING": 1}
     private Map<String, Integer> statusSummary;
     private List<OrderItemPreviewDTO> items;

@@ -74,6 +74,8 @@ class OrderDetailManager {
         document.getElementById('o-date').textContent = dateStr;
         document.getElementById('o-pay').textContent = data.paymentMethod || 'COD';
         document.getElementById('o-total').textContent = this.formatCurrency(data.totalAmount);
+        
+        // ... (No repurchase button needed anymore)
     }
 
     renderItems(items, orderDate) {
@@ -318,6 +320,7 @@ class OrderDetailManager {
         };
         return map[status] || { label: status, color: 'bg-gray-50 text-gray-700 border-gray-100' };
     }
+
 
     showError(msg) {
         this.loadingEl.classList.add('hidden');

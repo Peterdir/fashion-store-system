@@ -11,6 +11,14 @@ const AdminReturns = {
         console.log('AdminReturns initialized');
         this.cacheElements();
         this.bindEvents();
+        
+        // Check for requestId in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoRequestId = urlParams.get('requestId');
+        if (autoRequestId) {
+            setTimeout(() => this.openModal(autoRequestId), 500);
+        }
+
         this.fetchReturnRequests();
     },
 

@@ -491,6 +491,7 @@ java -jar target/fashion-store-system-0.0.1-SNAPSHOT.jar
 - Nhật ký hoạt động hệ thống (Audit Log)
 - Tích hợp Redis để cache
 - Dockerize ứng dụng
+- Viết Unit Tests (JUnit, Mockito)
 - Triển khai lên Cloud (AWS, Azure, Railway)
 
 ---
