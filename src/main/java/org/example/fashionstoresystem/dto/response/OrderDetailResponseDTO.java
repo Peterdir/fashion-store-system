@@ -20,6 +20,7 @@ public class OrderDetailResponseDTO {
     private Long orderId;
     private Date orderDate;
     private Double totalAmount;
+    private OrderStatus status;
     private PaymentMethod paymentMethod;
     private String shippingAddress;
     private Double subtotalAmount;
@@ -44,6 +45,8 @@ public class OrderDetailResponseDTO {
         private Double price;
         private OrderStatus status;
         private RefundStatus refundStatus;
+        private Long returnRequestId;
+        private String returnStatus;
         private String cancellationReason;
         private List<OrderHistoryDTO> histories;
     }

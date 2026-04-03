@@ -4,7 +4,8 @@ import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderDetailResponseDTO;
 import org.example.fashionstoresystem.dto.response.OrderSummaryResponseDTO;
 import org.example.fashionstoresystem.entity.enums.OrderStatus;
-
+import org.example.fashionstoresystem.entity.enums.RefundStatus;
+import org.example.fashionstoresystem.entity.jpa.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -20,5 +21,7 @@ public interface OrderManagementService {
 
     MessageResponseDTO updateOrderStatus(Long orderId, OrderStatus status);
 
-    void updateRefundStatus(Long orderItemId, org.example.fashionstoresystem.entity.enums.RefundStatus status);
+    void updateRefundStatus(Long orderItemId, RefundStatus status);
+
+    void updateOverallOrderStatus(Order order);
 }

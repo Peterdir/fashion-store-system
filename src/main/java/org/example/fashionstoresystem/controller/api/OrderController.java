@@ -86,13 +86,6 @@ public class OrderController {
         return ResponseEntity.ok(new MessageResponseDTO(paymentUrl));
     }
 
-    // MUA LẠI ĐƠN HÀNG (Đưa vào giỏ hàng)
-    @PostMapping("/{orderId}/repurchase")
-    public ResponseEntity<MessageResponseDTO> repurchaseOrder(@PathVariable Long orderId) {
-        Long userId = SecurityUtils.getAuthenticatedUserId();
-        orderService.repurchaseOrder(userId, orderId);
-        return ResponseEntity.ok(new MessageResponseDTO("Đã thêm các sản phẩm vào giỏ hàng thành công!"));
-    }
 
     // DASHBOARD SUMMARY
     @GetMapping("/dashboard-summary")

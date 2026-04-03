@@ -145,6 +145,7 @@ public class ReturnRequestServiceImpl implements ReturnRequestService {
         } else if (nextStatus == ReturnStatus.COMPLETED) {
             for (OrderItem item : rr.getReturnItems()) {
                 item.setRefundStatus(RefundStatus.COMPLETED);
+                item.setStatus(OrderStatus.CANCELLED);
             }
         }
 

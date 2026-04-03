@@ -937,22 +937,6 @@
                         </div>
                     </div>
 
-                    <div id="repurchase-order-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4">
-                        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 bg-backdrop-repurchase" onclick="OrderModule.closeRepurchaseModal()"></div>
-                        <div class="relative bg-white w-full max-w-[400px] shadow-2xl border border-black transform scale-95 opacity-0 transition-all duration-300 bg-modal-repurchase overflow-hidden">
-                            <div class="p-8 text-center space-y-6">
-                                <div class="w-16 h-16 bg-neutral-50 rounded-full flex items-center justify-center mx-auto border border-black"><span class="material-symbols-outlined text-2xl">refresh</span></div>
-                                <div class="space-y-2">
-                                    <h3 class="text-xs font-black uppercase tracking-[0.2em]">Mua lại đơn hàng?</h3>
-                                    <p class="text-[10px] font-bold text-gray-400 tracking-wide leading-loose px-4">Bạn có muốn thêm tất cả sản phẩm trong đơn hàng này vào giỏ hàng để mua lại không?</p>
-                                </div>
-                                <div class="flex gap-3 pt-4">
-                                    <button onclick="OrderModule.closeRepurchaseModal()" class="flex-1 border border-black px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-50 transition-all">Hủy</button>
-                                    <button onclick="OrderModule.submitRepurchaseOrder()" class="flex-1 bg-black text-white px-6 py-4 text-[11px] font-bold tracking-tight hover:bg-neutral-800 transition-all shadow-lg active:scale-95">Mua lại</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <div id="cancel-success-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-6">
                         <div class="absolute inset-0 bg-white/60 backdrop-blur-md opacity-0 transition-opacity duration-700 bg-backdrop-cancel-success"></div>

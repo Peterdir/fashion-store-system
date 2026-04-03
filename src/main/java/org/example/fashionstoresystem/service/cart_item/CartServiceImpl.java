@@ -7,6 +7,8 @@ import org.example.fashionstoresystem.dto.response.CartItemResponseDTO;
 import org.example.fashionstoresystem.dto.response.CartResponseDTO;
 import org.example.fashionstoresystem.dto.response.MessageResponseDTO;
 import org.example.fashionstoresystem.entity.jpa.CartItem;
+import org.example.fashionstoresystem.entity.jpa.Product;
+import org.example.fashionstoresystem.entity.jpa.ProductImage;
 import org.example.fashionstoresystem.entity.jpa.ProductVariant;
 import org.example.fashionstoresystem.entity.jpa.User;
 import org.example.fashionstoresystem.repository.CartItemRepository;
@@ -141,17 +143,34 @@ public class CartServiceImpl implements CartService {
                 .build();
     }
 
-    // Helper: Map CartItem entity sang DTO
     private CartItemResponseDTO mapToCartItemResponse(CartItem item) {
         ProductVariant variant = item.getProductVariant();
+        Product product = variant.getProduct();
+
+        // Tìm hình ảnh phù hợp với màu sắc hoặc lấy hình ảnh đầu tiên
+        String imageUrl = null;
+        if (variant.getColor() != null && !variant.getColor().isEmpty()) {
+            imageUrl = product.getImages().stream()
+                    .filter(img -> variant.getColor().equalsIgnoreCase(img.getColor()))
+                    .map(ProductImage::getUrl)
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        if (imageUrl == null && !product.getImages().isEmpty()) {
+            imageUrl = product.getImages().get(0).getUrl();
+        }
+
         return CartItemResponseDTO.builder()
                 .cartItemId(item.getId())
                 .variantId(variant.getId())
-                .productName(variant.getProduct().getName())
+                .productId(product.getId())
+                .productName(product.getName())
                 .size(variant.getSize())
                 .color(variant.getColor())
                 .price(variant.getPrice())
                 .quantity(item.getQuantity())
+                .primaryImageUrl(imageUrl)
                 .build();
     }
 }

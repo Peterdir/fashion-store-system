@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class CartItemResponseDTO {
     private Long cartItemId;
     private Long variantId;
+    private Long productId;
     private String productName;
     private String size;
     private String color;

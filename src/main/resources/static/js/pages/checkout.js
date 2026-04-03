@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Máy chủ đã tính toán sẵn số tiền giảm thực tế dựa trên loại mã (%) hoặc cố định
-        discountAmount = appliedCoupon.discountValue;
+        discountAmount = appliedCoupon.discountAmount;
         
         renderSummary();
     }
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 appliedTag.classList.add('flex');
             }
             
-            if (tagName) tagName.textContent = appliedCoupon.code;
+            if (tagName) tagName.textContent = appliedCoupon.couponCode || appliedCoupon.code;
             if (tagDesc) {
                 const discountLabel = appliedCoupon.discountType === 'PERCENTAGE' 
                     ? `Giảm ${appliedCoupon.discountValue}%` 
