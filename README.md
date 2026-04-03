@@ -483,9 +483,6 @@ java -jar target/fashion-store-system-0.0.1-SNAPSHOT.jar
 ---
 
 ## 13. Hướng phát triển thêm
-
-- Mã hóa password bằng BCrypt
-- Export Excel / PDF báo cáo
 - Tích hợp thêm VNPay, ZaloPay
 - Gửi email xác nhận đơn hàng tự động
 - Quản lý nhân viên (Admin staff)
